@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_transfer_wizard_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.transfer.wizard.form</field>
+        <field name="model">hr.employee.transfer.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Переведення в іншу організацію">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <strong>КЗпП ст. 36 п. 5.</strong> Переведення проводиться через звільнення з source-компанії
+                        та прийняття в target-компанії. Повний розрахунок виконується на старому місці роботи.
+                        Залишок відпустки згоряє (зміни 2022 р.), якщо сторони не домовилися про перенесення.
+                    </div>
+                    <group>
+                        <group string="Source (звільнення)">
+                            <field name="source_employee_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="source_company_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="dismissal_date"/>
+                            <field name="dismissal_reason"/>
+                        </group>
+                        <group string="Target (прийняття)">
+                            <field name="target_company_id" options="{'no_create': True}"/>
+                            <field name="hire_date"/>
+                            <field name="new_department_id" options="{'no_create': True}"/>
+                            <field name="new_job_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <group string="Що копіювати">
+                        <group>
+                            <field name="copy_bank_accounts"/>
+                            <field name="copy_documents"/>
+                            <field name="copy_family_data"/>
+                        </group>
+                        <group>
+                            <field name="vacation_transfer_mode" widget="radio"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_transfer" type="object" string="Перевести"
+                            class="btn-primary"
+                            confirm="Підтвердити переведення? Буде створено нового співробітника в цільовій компанії, сформовано накази та деактивовано поточну картку."/>
+                    <button string="Скасувати" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
