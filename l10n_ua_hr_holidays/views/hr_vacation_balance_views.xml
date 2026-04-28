@@ -14,7 +14,7 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" groups="base.group_multi_company" domain="[('id', 'in', allowed_company_ids)]"/>
                             <field name="employee_id" domain="[('company_id', 'in', [company_id, False])]"/>
                             <field name="leave_type_id"/>
                             <field name="year"/>
@@ -45,7 +45,7 @@
                 <field name="employee_id"/>
                 <field name="leave_type_id" optional="show"/>
                 <field name="year" optional="show"/>
-                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                 <field name="entitled_days" optional="show"/>
                 <field name="carried_over" optional="show"/>
                 <field name="total_available" optional="show"/>
