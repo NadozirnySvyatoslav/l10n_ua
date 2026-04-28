@@ -43,14 +43,15 @@
         <field name="arch" type="xml">
             <list string="Vacation Balances">
                 <field name="employee_id"/>
-                <field name="leave_type_id"/>
-                <field name="year"/>
-                <field name="entitled_days"/>
-                <field name="carried_over"/>
-                <field name="total_available"/>
-                <field name="used_days"/>
-                <field name="planned_days"/>
-                <field name="remaining_days" decoration-danger="remaining_days &lt; 0"/>
+                <field name="leave_type_id" optional="show"/>
+                <field name="year" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="entitled_days" optional="show"/>
+                <field name="carried_over" optional="show"/>
+                <field name="total_available" optional="show"/>
+                <field name="used_days" optional="show"/>
+                <field name="planned_days" optional="show"/>
+                <field name="remaining_days" decoration-danger="remaining_days &lt; 0" optional="show"/>
             </list>
         </field>
     </record>
