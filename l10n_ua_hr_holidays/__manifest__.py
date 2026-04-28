@@ -30,6 +30,7 @@ Requires l10n_ua_hr_base module.
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/hr_vacation_balance_security.xml',
         'data/hr_sick_leave_data.xml',
         'data/hr_leave_type_data.xml',
         'data/hr_public_holiday_data.xml',

@@ -14,10 +14,10 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="employee_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="employee_id" domain="[('company_id', 'in', [company_id, False])]"/>
                             <field name="leave_type_id"/>
                             <field name="year"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
                             <field name="entitled_days"/>
@@ -61,6 +61,14 @@
         <field name="view_mode">list,form</field>
         <field name="context">{'search_default_filter_current_year': 1}</field>
         <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No vacation balances found
+            </p>
+        </field>
+    </record>
+
+</odoo>
+ type="html">
             <p class="o_view_nocontent_smiling_face">
                 No vacation balances found
             </p>
