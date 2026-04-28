@@ -69,6 +69,11 @@ class HrVacationBalance(models.Model):
         store=True
     )
 
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        self.employee_id = False
+        self.leave_type_id = False
+
     @api.depends('entitled_days', 'carried_over', 'used_days')
     def _compute_totals(self):
         for rec in self:
