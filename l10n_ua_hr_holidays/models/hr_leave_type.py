@@ -74,3 +74,8 @@ class HrLeaveType(models.Model):
         string='Max Additional Days',
         help='Maximum additional days for this leave type (e.g., 35 for hazardous, 7 for irregular)'
     )
+    create_order = fields.Boolean(
+        string='Create Order',
+        default=False,
+        help='Automatically create a vacation order (form П-3) when a leave of this type is created',
+    )

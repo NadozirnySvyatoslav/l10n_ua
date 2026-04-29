@@ -52,7 +52,7 @@
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10pt;">
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px; width: 25%;">Табельний номер</td>
-                        <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-esc="employee.barcode or ''"/></td>
+                        <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-esc="employee.employee_number or ''"/></td>
                         <td style="border: 1px solid #000; padding: 3px; width: 25%;">РНОКПП</td>
                         <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-esc="employee.rnokpp or ''"/></td>
                     </tr>
@@ -309,20 +309,49 @@
                         <th style="border: 1px solid #000; padding: 3px;">Дата закінчення</th>
                         <th style="border: 1px solid #000; padding: 3px;">Підстава</th>
                     </tr>
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 3px; height: 20px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 3px; height: 20px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                        <td style="border: 1px solid #000; padding: 3px;"></td>
-                    </tr>
+		    <t t-set="leaves" t-value="env['hr.leave'].search([
+    			('employee_id', '=', employee.id),
+    			('state', '=', 'validate'),
+			], order='date_from asc')"/>
+		    <t t-foreach="leaves" t-as="leave">
+    		        <tr>
+        		    <td style="border: 1px solid #000; padding: 3px;">
+            			<t t-esc="leave.holiday_status_id.name or ''"/>
+        		    </td>
+        		    <td style="border: 1px solid #000; padding: 3px;">
+            			<t t-esc="leave.vacation_year or (leave.date_from.year if leave.date_from else '')"/>
+        		    </td>
+        		    <td style="border: 1px solid #000; padding: 3px;">
+            			<t t-if="leave.date_from"><t t-esc="leave.date_from.strftime('%d.%m.%Y')"/></t>
+        		    </td>
+        		    <td style="border: 1px solid #000; padding: 3px;">
+            			<t t-if="leave.date_to"><t t-esc="leave.date_to.strftime('%d.%m.%Y')"/></t>
+        		    </td>
+        		    <td style="border: 1px solid #000; padding: 3px;">
+            			<t t-if="leave.order_id">
+                		    наказ № <t t-esc="leave.order_id.name"/>
+                		    від <t t-esc="leave.order_id.date.strftime('%d.%m.%Y')"/>
+            	        	</t>
+
+            			<t t-elif="leave.order_number">
+                		    наказ № <t t-esc="leave.order_number"/>
+                		    <t t-if="leave.order_date">
+                    		        від <t t-esc="leave.order_date.strftime('%d.%m.%Y')"/>
+                		    </t>
+            			</t>
+        		    </td>
+    			</tr>
+		    </t>
+
+		    <t t-if="not leaves">
+    			<tr>
+        		    <td style="border: 1px solid #000; padding: 3px; height: 20px;"></td>
+        		    <td style="border: 1px solid #000; padding: 3px;"></td>
+        		    <td style="border: 1px solid #000; padding: 3px;"></td>
+        		    <td style="border: 1px solid #000; padding: 3px;"></td>
+        		    <td style="border: 1px solid #000; padding: 3px;"></td>
+    		    	</tr>
+		    </t>
                 </table>
                 
                 <t t-if="employee.disability_group and employee.disability_group != 'none'">

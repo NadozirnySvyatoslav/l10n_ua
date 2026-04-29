@@ -2,6 +2,15 @@
 <odoo>
     <data noupdate="1">
 
+        <!-- Personnel Number Sequence (Табельний номер) -->
+        <record id="seq_hr_employee_number" model="ir.sequence">
+            <field name="name">Employee Personnel Number</field>
+            <field name="code">hr.employee.number</field>
+            <field name="prefix">%(year)s-</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
         <!-- HR Order Sequences -->
         
         <record id="seq_hr_order_hiring" model="ir.sequence">

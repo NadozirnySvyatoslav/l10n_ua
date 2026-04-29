@@ -1032,3 +1032,23 @@ msgstr "Запис трудової історії"
 #: model:ir.ui.menu,name:l10n_ua_hr_documents.menu_hr_order
 msgid "HR Orders"
 msgstr "Накази по персоналу"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_from
+msgid "Vacation Start Date"
+msgstr "Дата початку відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_to
+msgid "Vacation End Date"
+msgstr "Дата закінчення відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_id
+msgid "Leave Record"
+msgstr "Запис відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__holiday_status_id
+msgid "Leave Type"
+msgstr "Тип відпустки"

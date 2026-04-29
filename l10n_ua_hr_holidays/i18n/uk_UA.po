@@ -604,6 +604,11 @@ msgid "Order Number"
 msgstr "Номер наказу"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_leave__order_id
+msgid "Leave Order"
+msgstr "Наказ"
+
+#. module: l10n_ua_hr_holidays
 #: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__ua_leave_category__other
 msgid "Other"
 msgstr "Інше"
@@ -1013,3 +1018,14 @@ msgstr "ID е-ТВН"
 #: model:ir.ui.menu,name:l10n_ua_hr_holidays.menu_hr_vacation_calendar
 msgid "Vacation Calendar"
 msgstr "Календар відпусток"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_leave_type__create_order
+msgid "Create Order"
+msgstr "Створювати наказ"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_leave_type__create_order
+msgid "Automatically create a vacation order (form П-3) when a leave of this type is created"
+msgstr "Автоматично створювати наказ про відпустку (форма П-3) при створенні відпустки цього типу"
+

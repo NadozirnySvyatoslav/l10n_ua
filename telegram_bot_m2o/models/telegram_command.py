@@ -167,7 +167,13 @@ class TelegramBotCommand(models.Model):
         if chat.partner_id:
             lead_vals['partner_id'] = chat.partner_id.id
 
-        lead = self.env['crm.lead'].create(lead_vals)
+        # Run lead creation as the Administrator: the webhook controller uses
+        # ``auth='public'`` which gives a Public User in env, but creating a
+        # crm.lead requires CRM/currency access. ``base.user_admin`` is granted
+        # Telegram Bot Manager via ``data/security_assignments.xml`` so it has
+        # full access to bot models too.
+        admin = self.env.ref('base.user_admin')
+        lead = self.env['crm.lead'].with_user(admin).create(lead_vals)
         _logger.info(f"Created lead {lead.id} for chat {chat.telegram_chat_id}")
 
         return lead

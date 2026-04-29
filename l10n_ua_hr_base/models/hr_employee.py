@@ -8,6 +8,17 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     # === Personal Documents ===
+    employee_number = fields.Char(
+        string='Personnel Number',
+        copy=False,
+        help='Personnel number of the employee according to Ukrainian legislation (Табельний номер)')
+
+    def action_generate_employee_number(self):
+        """Generate next personnel number from the sequence."""
+        for employee in self:
+            if not employee.employee_number:
+                employee.employee_number = self.env['ir.sequence'].next_by_code('hr.employee.number')
+
     # RNOKPP is Ukrainian-specific, different from Odoo's identification_id
     rnokpp = fields.Char(
         string='RNOKPP (IPN)', size=10,

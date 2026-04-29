@@ -1,6 +1,4 @@
-from odoo import models, fields, api
-from odoo.exceptions import UserError
-
+from odoo import models, fields, api, _
 
 class HrOrder(models.Model):
     _name = 'hr.order'
@@ -52,6 +50,27 @@ class HrOrder(models.Model):
         help='Legal basis for dismissal (e.g., "за власним бажанням, ст. 38 КЗпП України")'
     )
 
+    # Vacation-specific fields
+    vacation_date_from = fields.Date(string='Vacation Start Date', tracking=True)
+    vacation_date_to = fields.Date(string='Vacation End Date', tracking=True)
+    leave_id = fields.Many2one(
+        'hr.leave',
+        string='Leave Record',
+        ondelete='set null',
+        copy=False,
+        index=True,
+    )
+    # Related field — eliminates duplication (рек. №5)
+    holiday_status_id = fields.Many2one(
+        'hr.leave.type',
+        string='Leave Type',
+        related='leave_id.holiday_status_id',
+        store=True,
+        readonly=False,   # writable for orders being created standalone before leave is linked
+        precompute=True,
+        tracking=True,
+    )
+
     @api.onchange('employee_id')
     def _onchange_employee_id(self):
         """Auto-fill department and job position from employee."""
@@ -72,7 +91,9 @@ class HrOrder(models.Model):
                 and self.job_id.company_id != self.company_id:
             self.job_id = False
 
-    subject = fields.Char(string='Subject', required=True, tracking=True, compute='_compute_subject', store=True, readonly=False)
+    subject = fields.Char(string='Subject', required=True, tracking=True, compute='_compute_subject', store=True, readonly=False, precompute=True)
+
+
 
     ORDER_TYPE_SUBJECTS = {
         'hiring': 'Про прийняття на роботу',
@@ -109,13 +130,73 @@ class HrOrder(models.Model):
                 order_type = vals.get('order_type', 'other')
                 sequence_code = f'hr.order.{order_type}'
                 vals['name'] = self.env['ir.sequence'].next_by_code(sequence_code) or 'New'
-        return super().create(vals_list)
+
+        # Collect indices of vacation orders that need a leave auto-created
+        leave_vals_list = []
+        leave_indices = []
+        for idx, vals in enumerate(vals_list):
+            if (vals.get('order_type') == 'vacation'
+                    and not vals.get('leave_id')
+                    and not self.env.context.get('_creating_order_from_leave')):
+                leave_vals_list.append({
+                    'employee_id': vals.get('employee_id'),
+                    'holiday_status_id': vals.get('holiday_status_id'),
+                    'request_date_from': vals.get('vacation_date_from'),
+                    'request_date_to': vals.get('vacation_date_to'),
+                })
+                leave_indices.append(idx)
+
+        if leave_vals_list:
+            leaves = self.env['hr.leave'].with_context(
+                _creating_leave_from_order=True
+            ).create(leave_vals_list)
+            for idx, leave in zip(leave_indices, leaves):
+                vals_list[idx]['leave_id'] = leave.id
+
+        # Add _sync_order_leave context to prevent duplicate orders on inverse related fields write
+        orders = super(HrOrder, self.with_context(_sync_order_leave=True)).create(vals_list)
+
+        # Back-link leaves → orders in a single write per leave
+        for order in orders:
+            if order.leave_id and not order.leave_id.order_id:
+                order.leave_id.with_context(_sync_order_leave=True).write(
+                    {'order_id': order.id}
+                )
+        return orders
+
+    def write(self, vals):
+        result = super().write(vals)
+        if not self.env.context.get('_sync_order_leave'):
+            if {'vacation_date_from', 'vacation_date_to'} & vals.keys():
+                for order in self.filtered(
+                    lambda o: o.order_type == 'vacation' 
+                    and o.leave_id
+                    and o.leave_id.state not in ('validate', 'validate1')
+                ):
+                    order.leave_id.with_context(_sync_order_leave=True).write({
+                        'date_from': fields.Datetime.from_string(str(order.vacation_date_from)) if order.vacation_date_from else False,
+                        'date_to': fields.Datetime.from_string(str(order.vacation_date_to)) if order.vacation_date_to else False,
+                    })
+
+        return result
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
 
     def action_cancel(self):
         self.write({'state': 'cancelled'})
+        for order in self.filtered(lambda o: o.leave_id):
+            order.leave_id.message_post(
+                body=_('Linked vacation order %s was cancelled. Leave state is unchanged.', order.name)
+            )
+        return True
+
+    def unlink(self):
+        leaves = self.mapped('leave_id')
+        res = super().unlink()
+        for leave in leaves.exists():
+            leave.message_post(body=_('Linked vacation order was deleted.'))
+        return res
 
     def action_draft(self):
         self.write({'state': 'draft'})

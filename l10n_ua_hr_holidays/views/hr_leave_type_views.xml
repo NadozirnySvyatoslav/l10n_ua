@@ -23,6 +23,7 @@
                     <group>
                         <field name="is_paid"/>
                         <field name="payment_source" invisible="not is_paid"/>
+       		    	<field name="create_order"/>
                     </group>
                 </group>
             </xpath>

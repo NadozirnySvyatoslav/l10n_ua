@@ -28,6 +28,7 @@ Requires l10n_ua_hr_base module.
         'hr_holidays',
         'resource',
         'l10n_ua_hr_base',
+        'l10n_ua_hr_documents',
     ],
     'data': [
         'security/ir.model.access.csv',

@@ -8,18 +8,30 @@ _logger = logging.getLogger(__name__)
 
 class TelegramWebhookController(http.Controller):
 
+    def _get_admin_user(self):
+        """Return a real user with sufficient privileges for ORM operations.
+
+        The webhook route uses ``auth='public'`` so that ``request.env.user`` is
+        a real (non-empty) record at flush time. Internally we run ORM as the
+        Administrator: this gives us a valid env.user that has CRM/currency
+        access required by ``crm.lead.create()`` and other side effects.
+        """
+        return request.env.ref('base.user_admin')
+
     @http.route(
         '/telegram/webhook/<string:token_hash>',
         type='http',
-        auth='none',
+        auth='public',
         methods=['POST'],
         csrf=False,
     )
     def telegram_webhook(self, token_hash, **kwargs):
         """Handle incoming Telegram webhook updates"""
 
+        admin = self._get_admin_user()
+
         # Find bot by token hash
-        bot = request.env['telegram.bot'].sudo().search([
+        bot = request.env['telegram.bot'].sudo().with_user(admin).search([
             ('token', 'like', f'%{token_hash}'),
             ('state', '=', 'running'),
         ], limit=1)
@@ -82,8 +94,9 @@ class TelegramWebhookController(http.Controller):
 
     def _handle_message(self, bot, message):
         """Handle incoming message"""
-        Chat = request.env['telegram.bot.chat'].sudo()
-        Message = request.env['telegram.bot.message'].sudo()
+        admin = self._get_admin_user()
+        Chat = request.env['telegram.bot.chat'].sudo().with_user(admin)
+        Message = request.env['telegram.bot.message'].sudo().with_user(admin)
 
         # Get chat info
         chat_data = message.get('chat', {})
@@ -158,8 +171,9 @@ class TelegramWebhookController(http.Controller):
 
     def _handle_callback(self, bot, callback_query):
         """Handle callback query (button click)"""
-        Chat = request.env['telegram.bot.chat'].sudo()
-        Message = request.env['telegram.bot.message'].sudo()
+        admin = self._get_admin_user()
+        Chat = request.env['telegram.bot.chat'].sudo().with_user(admin)
+        Message = request.env['telegram.bot.message'].sudo().with_user(admin)
 
         callback_id = callback_query.get('id')
         callback_data = callback_query.get('data', '')
@@ -204,7 +218,8 @@ class TelegramWebhookController(http.Controller):
 
     def _handle_chat_member(self, bot, chat_member_update):
         """Handle chat member status change (bot blocked/unblocked)"""
-        Chat = request.env['telegram.bot.chat'].sudo()
+        admin = self._get_admin_user()
+        Chat = request.env['telegram.bot.chat'].sudo().with_user(admin)
 
         chat_data = chat_member_update.get('chat', {})
         telegram_chat_id = chat_data.get('id')

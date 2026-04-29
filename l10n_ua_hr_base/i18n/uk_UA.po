@@ -1984,3 +1984,24 @@ msgstr "Умови праці"
 msgid "Work Experience"
 msgstr "Стаж роботи"
 
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__employee_number
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_form_inherit_ua
+msgid "Personnel Number"
+msgstr "Табельний номер"
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_form_inherit_ua
+msgid "Generate"
+msgstr "Згенерувати"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__employee_number
+msgid "Personnel number of the employee according to Ukrainian legislation (Табельний номер)"
+msgstr "Табельний номер працівника згідно з українським законодавством"
+
+#. module: l10n_ua_hr_base
+#: model:ir.sequence,name:l10n_ua_hr_base.seq_hr_employee_number
+msgid "Employee Personnel Number"
+msgstr "Табельний номер співробітника"

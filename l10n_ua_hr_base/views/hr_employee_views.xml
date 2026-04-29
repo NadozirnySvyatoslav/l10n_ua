@@ -130,6 +130,21 @@
                     </group>
                 </page>
             </xpath>
+
+            <!-- Move Personnel Number to standard Work Information tab -->
+            <xpath expr="//page[@name='work_information']//field[@name='parent_id']" position="after">
+                <label for="employee_number" string="Personnel Number"/>
+                <div class="o_row">
+                    <field name="employee_number" placeholder="e.g. 2026-0001"/>
+                    <button string="Generate" 
+                            class="btn btn-link" 
+                            type="object" 
+                            name="action_generate_employee_number" 
+                            invisible="employee_number"
+                            groups="hr.group_hr_user"/>
+                </div>
+            </xpath>
+
         </field>
     </record>
 

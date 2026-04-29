@@ -38,7 +38,7 @@
                         <td style="border: 1px solid #000; padding: 5px; width: 25%;"><strong>Працівник:</strong></td>
                         <td style="border: 1px solid #000; padding: 5px; width: 25%;"><t t-esc="payslip.employee_id.name"/></td>
                         <td style="border: 1px solid #000; padding: 5px; width: 25%;"><strong>Табельний №:</strong></td>
-                        <td style="border: 1px solid #000; padding: 5px; width: 25%;"><t t-esc="payslip.employee_id.barcode or ''"/></td>
+                        <td style="border: 1px solid #000; padding: 5px; width: 25%;"><t t-esc="payslip.employee_id.employee_number or ''"/></td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 5px;"><strong>Підрозділ:</strong></td>

@@ -82,7 +82,7 @@
             <field name="company_id" ref="demo_ua_company"/>
             <field name="department_id" ref="demo_department_admin"/>
             <field name="job_id" ref="demo_job_director"/>
-            <field name="barcode">001</field>
+            <field name="employee_number">001</field>
             <field name="rnokpp">1234567899</field>
             <field name="document_type">id_card</field>
             <field name="passport_id">123456789</field>
@@ -111,7 +111,7 @@
             <field name="company_id" ref="demo_ua_company"/>
             <field name="department_id" ref="demo_department_hr"/>
             <field name="job_id" ref="demo_job_hr_manager"/>
-            <field name="barcode">002</field>
+            <field name="employee_number">002</field>
             <field name="rnokpp">2345678902</field>
             <field name="document_type">id_card</field>
             <field name="passport_id">234567890</field>
@@ -137,7 +137,7 @@
             <field name="company_id" ref="demo_ua_company"/>
             <field name="department_id" ref="demo_department_accounting"/>
             <field name="job_id" ref="demo_job_accountant"/>
-            <field name="barcode">003</field>
+            <field name="employee_number">003</field>
             <field name="rnokpp">3456789014</field>
             <field name="document_type">id_card</field>
             <field name="passport_id">345678901</field>
@@ -163,7 +163,7 @@
             <field name="company_id" ref="demo_ua_company"/>
             <field name="department_id" ref="demo_department_it"/>
             <field name="job_id" ref="demo_job_it_admin"/>
-            <field name="barcode">004</field>
+            <field name="employee_number">004</field>
             <field name="rnokpp">4567890120</field>
             <field name="document_type">id_card</field>
             <field name="passport_id">456789012</field>
@@ -194,7 +194,7 @@
             <field name="company_id" ref="demo_ua_company"/>
             <field name="department_id" ref="demo_department_it"/>
             <field name="job_id" ref="demo_job_developer"/>
-            <field name="barcode">005</field>
+            <field name="employee_number">005</field>
             <field name="rnokpp">5678901233</field>
             <field name="document_type">id_card</field>
             <field name="passport_id">567890123</field>
@@ -225,7 +225,7 @@
             <field name="company_id" ref="demo_ua_company"/>
             <field name="department_id" ref="demo_department_hr"/>
             <field name="job_id" ref="demo_job_hr_specialist"/>
-            <field name="barcode">006</field>
+            <field name="employee_number">006</field>
             <field name="rnokpp">6789012344</field>
             <field name="document_type">id_card</field>
             <field name="passport_id">678901234</field>

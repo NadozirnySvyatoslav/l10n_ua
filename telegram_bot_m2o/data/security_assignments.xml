@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            The webhook controller in controllers/webhook.py runs ORM as
+            base.user_admin so that crm.lead.create() and other CRM-touching
+            side effects pass without empty-env.user errors. Grant the
+            Administrator the Telegram Bot Manager group on install so that
+            ACL checks against telegram.bot/chat/message succeed.
+        -->
+        <record id="user_admin_telegram_bot_manager" model="res.users">
+            <field name="id" ref="base.user_admin"/>
+            <field name="group_ids" eval="[(4, ref('telegram_bot_m2o.group_telegram_bot_manager'))]"/>
+        </record>
+    </data>
+</odoo>

@@ -90,6 +90,36 @@
     </div>
 </section>
 
+<!-- n8n Smart Fallback -->
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12">
+            <h3 class="oe_slogan">Smart AI Fallback via n8n</h3>
+            <p class="text-center">
+                Set <strong>Fallback Webhook URL</strong> on the bot to forward any message that does not match a configured command
+                to an external workflow. Ideal for plugging in an LLM (Claude, GPT) for natural-language replies and routing
+                business-critical conversations to a human team.
+            </p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span12 text-center">
+            <img src="n8n_smart_reply.png" alt="n8n Smart Reply Workflow" style="max-width: 100%; border: 1px solid #e0e0e0;"/>
+            <p><em>Example n8n workflow: Webhook → Claude (structured output) → Reply to user → Conditional team escalation</em></p>
+        </div>
+    </div>
+    <div class="oe_row oe_spaced">
+        <div class="oe_span6">
+            <h4><i class="fa fa-magic"></i> What the bot forwards</h4>
+            <p>JSON payload with bot id, chat / user info, phone, raw text and the full Telegram update — ready for the LLM to consume.</p>
+        </div>
+        <div class="oe_span6">
+            <h4><i class="fa fa-share-alt"></i> Escalation to a team chat</h4>
+            <p>Have the workflow classify the request and notify your internal Telegram group with the LLM-summarised query and the user's contact when human attention is needed.</p>
+        </div>
+    </div>
+</section>
+
 <section class="oe_container">
     <div class="oe_row oe_spaced">
         <div class="oe_span12">
