@@ -13,7 +13,8 @@ class HrVacationBalance(models.Model):
         'hr.employee',
         string='Employee',
         required=True,
-        index=True
+        index=True,
+        check_company=True
     )
     leave_type_id = fields.Many2one(
         'hr.leave.type',

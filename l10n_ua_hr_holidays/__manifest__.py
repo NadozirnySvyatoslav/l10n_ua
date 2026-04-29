@@ -23,6 +23,7 @@ Requires l10n_ua_hr_base module.
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://many2one.online',
     'license': 'LGPL-3',
+    'pre_init_hook': 'pre_init_hook',
     'depends': [
         'hr_holidays',
         'resource',
