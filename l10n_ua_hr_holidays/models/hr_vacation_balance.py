@@ -252,3 +252,26 @@ class HrVacationBalance(models.Model):
                 'sticky': False,
             }
         }
+
+    def action_recalculate_all(self):
+        """
+        Recalculate or generate vacation balances for the current year
+        for all active employees.
+        """
+        current_year = fields.Date.today().year
+        self.generate_balances(year=current_year)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Recalculation Complete',
+                'message': f'Vacation balances for {current_year} have been updated for all active employees.',
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.client',
+                    'tag': 'reload',
+                }
+            }
+        }

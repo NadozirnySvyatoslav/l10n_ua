@@ -42,6 +42,14 @@
         <field name="model">hr.vacation.balance</field>
         <field name="arch" type="xml">
             <list string="Vacation Balances">
+                <header>
+                    <button name="action_recalculate_all"
+                            string="Recalculate"
+                            type="object"
+                            class="btn-secondary"
+			    display="always"
+                            groups="hr_holidays.group_hr_holidays_manager"/>
+                </header>
                 <field name="employee_id"/>
                 <field name="leave_type_id"/>
                 <field name="year"/>
