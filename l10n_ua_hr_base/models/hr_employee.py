@@ -167,6 +167,23 @@ class HrEmployee(models.Model):
         related='job_id.max_salary', readonly=True, store=False,
         currency_field='job_currency_id', string='Max Salary')
 
+    @api.constrains('employee_number', 'company_id')
+    def _check_unique_employee_number(self):
+        for employee in self:
+            if employee.employee_number:
+                # Search for duplicates within the same company
+                duplicate = self.search([
+                    ('id', '!=', employee.id),
+                    ('employee_number', '=', employee.employee_number),
+                    ('company_id', '=', employee.company_id.id)
+                ], limit=1)
+                
+                if duplicate:
+                    raise ValidationError(_(
+                        "Табельний номер '%s' вже використовується для співробітника %s в цій компанії. "
+                        "Табельні номери мають бути унікальними."
+                    ) % (employee.employee_number, duplicate.name))
+
     @api.depends('children_ids')
     def _compute_children_count(self):
         for employee in self:
