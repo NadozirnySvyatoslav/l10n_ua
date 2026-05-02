@@ -25,4 +25,9 @@
               action="action_hr_vacation_schedule_line_calendar"
               sequence="45"/>
 
+    <menuitem id="menu_hr_employee_vacation_summary_report"
+              name="Підсумок відпусток"
+              action="action_hr_employee_vacation_summary_report"
+              parent="hr.hr_menu_hr_reports"
+              sequence="90"/>
 </odoo>

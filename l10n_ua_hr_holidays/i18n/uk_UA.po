@@ -184,6 +184,7 @@ msgstr "Компанії"
 
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_sick_leave__company_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__company_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_balance__company_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__company_id
 msgid "Company"
@@ -273,8 +274,10 @@ msgid "Display Name"
 msgstr "Назва для відображення"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_employee_vacation_summary_report__state__draft
 #: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_sick_leave__state__draft
 #: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_vacation_schedule__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_employee_vacation_summary_report_view_search
 msgid "Draft"
 msgstr "Чернетка"
 
@@ -522,6 +525,7 @@ msgid "My Activity Deadline"
 msgstr "Термін моєї активності"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_balance__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__name
 msgid "Name"
@@ -847,6 +851,38 @@ msgstr "Тип відпустки"
 msgid "Total"
 msgstr "Всього"
 
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__total_entitled
+msgid "Entitled"
+msgstr "Належить"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__total_used
+msgid "Used"
+msgstr "Використано"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__total_remaining
+msgid "Remaining"
+msgstr "Залишок"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__employee_count
+msgid "Employees"
+msgstr "Працівники"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__state
+msgid "State"
+msgstr "Статус"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_employee_vacation_summary_report__state__generated
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_employee_vacation_summary_report_view_search
+msgid "Generated"
+msgstr "Сформовано"
+
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_sick_leave__total_amount
 msgid "Total Amount"
@@ -989,6 +1025,7 @@ msgid "Working Days"
 msgstr "Робочі дні"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee_vacation_summary_report__year
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_balance__year
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__year
 msgid "Year"
@@ -1028,4 +1065,3 @@ msgstr "Створювати наказ"
 #: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_leave_type__create_order
 msgid "Automatically create a vacation order (form П-3) when a leave of this type is created"
 msgstr "Автоматично створювати наказ про відпустку (форма П-3) при створенні відпустки цього типу"
-

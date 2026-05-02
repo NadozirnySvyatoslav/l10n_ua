@@ -40,8 +40,10 @@ Requires l10n_ua_hr_base module.
         'views/hr_sick_leave_views.xml',
         'views/hr_vacation_balance_views.xml',
         'views/hr_vacation_schedule_views.xml',
+        'views/hr_employee_vacation_summary_report_views.xml',
         'views/menu_views.xml',
         'report/hr_leave_report.xml',
+        'report/hr_employee_vacation_summary_report.xml',
     ],
     'demo': [
         'demo/hr_holidays_demo.xml',

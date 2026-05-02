@@ -16,3 +16,12 @@ access_hr_employee_child_officer,hr.employee.child.officer,model_hr_employee_chi
 access_hr_staffing_table_user,hr.staffing.table.user,model_hr_staffing_table,hr.group_hr_user,1,1,1,0
 access_hr_staffing_table_officer,hr.staffing.table.officer,model_hr_staffing_table,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
 access_hr_staffing_table_manager,hr.staffing.table.manager,model_hr_staffing_table,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_employee_list_report_user,hr.employee.list.report.user,model_hr_employee_list_report,hr.group_hr_user,1,0,0,0
+access_hr_employee_list_report_officer,hr.employee.list.report.officer,model_hr_employee_list_report,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
+access_hr_employee_list_report_manager,hr.employee.list.report.manager,model_hr_employee_list_report,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_employee_military_report_user,hr.employee.military.report.user,model_hr_employee_military_report,hr.group_hr_user,1,0,0,0
+access_hr_employee_military_report_officer,hr.employee.military.report.officer,model_hr_employee_military_report,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
+access_hr_employee_military_report_manager,hr.employee.military.report.manager,model_hr_employee_military_report,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_employee_benefits_report_user,hr.employee.benefits.report.user,model_hr_employee_benefits_report,hr.group_hr_user,1,0,0,0
+access_hr_employee_benefits_report_officer,hr.employee.benefits.report.officer,model_hr_employee_benefits_report,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
+access_hr_employee_benefits_report_manager,hr.employee.benefits.report.manager,model_hr_employee_benefits_report,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

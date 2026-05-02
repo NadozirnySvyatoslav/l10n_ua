@@ -9,4 +9,5 @@ from . import hr_employee
 from . import hr_department
 from . import hr_job
 from . import hr_staffing_table
+from . import hr_employee_reports
 from . import res_company

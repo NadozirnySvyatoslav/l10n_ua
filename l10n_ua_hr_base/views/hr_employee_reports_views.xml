@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ====================================================== -->
+    <!-- Employee List Report (Список працівників)               -->
+    <!-- ====================================================== -->
+
+    <record id="hr_employee_list_report_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.list.report.form</field>
+        <field name="model">hr.employee.list.report</field>
+        <field name="arch" type="xml">
+            <form string="Employee List Report">
+                <header>
+                    <button name="action_generate" string="Сформувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_print" string="Друк" type="object"
+                            class="btn-secondary" invisible="state != 'generated'"/>
+                    <button name="action_draft" string="Редагувати" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Параметри">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Результат">
+                            <field name="employee_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Працівники" name="employees">
+                            <field name="employee_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="department_id"/>
+                                    <field name="job_id"/>
+                                    <field name="hire_date"/>
+                                    <field name="rnokpp"/>
+                                    <field name="work_phone"/>
+                                    <field name="work_email"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Нотатки" name="notes">
+                            <field name="notes" placeholder="Додаткові нотатки..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_employee_list_report_view_list" model="ir.ui.view">
+        <field name="name">hr.employee.list.report.list</field>
+        <field name="model">hr.employee.list.report</field>
+        <field name="arch" type="xml">
+            <list string="Employee List Reports">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'generated'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_list_report_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.list.report.search</field>
+        <field name="model">hr.employee.list.report</field>
+        <field name="arch" type="xml">
+            <search string="Employee List Reports">
+                <field name="name"/>
+                <field name="date"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="filter_generated" domain="[('state', '=', 'generated')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_employee_list_report" model="ir.actions.act_window">
+        <field name="name">Список працівників</field>
+        <field name="res_model">hr.employee.list.report</field>
+        <field name="view_mode">list,form</field>
+	<field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть звіт "Список працівників"
+            </p>
+            <p>
+                Звіт формує список активних працівників станом на вказану дату
+                та дозволяє зберегти його для подальшого перегляду і друку.
+            </p>
+        </field>
+    </record>
+
+    <!-- ====================================================== -->
+    <!-- Military Personnel Report (Військовозобов'язані)        -->
+    <!-- ====================================================== -->
+
+    <record id="hr_employee_military_report_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.military.report.form</field>
+        <field name="model">hr.employee.military.report</field>
+        <field name="arch" type="xml">
+            <form string="Military Personnel Report">
+                <header>
+                    <button name="action_generate" string="Сформувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_print" string="Друк" type="object"
+                            class="btn-secondary" invisible="state != 'generated'"/>
+                    <button name="action_draft" string="Редагувати" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Параметри">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Результат">
+                            <field name="employee_count"/>
+                            <field name="reserved_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Військовозобов'язані" name="employees">
+                            <field name="employee_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="birthday"/>
+                                    <field name="job_id"/>
+                                    <field name="military_rank_id"/>
+                                    <field name="military_specialty"/>
+                                    <field name="military_category"/>
+                                    <field name="military_fitness"/>
+                                    <field name="military_tcc_id"/>
+                                    <field name="military_reservation"/>
+                                    <field name="military_reservation_until"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Нотатки" name="notes">
+                            <field name="notes" placeholder="Додаткові нотатки..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_employee_military_report_view_list" model="ir.ui.view">
+        <field name="name">hr.employee.military.report.list</field>
+        <field name="model">hr.employee.military.report</field>
+        <field name="arch" type="xml">
+            <list string="Military Personnel Reports">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_count"/>
+                <field name="reserved_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'generated'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_military_report_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.military.report.search</field>
+        <field name="model">hr.employee.military.report</field>
+        <field name="arch" type="xml">
+            <search string="Military Personnel Reports">
+                <field name="name"/>
+                <field name="date"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="filter_generated" domain="[('state', '=', 'generated')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_employee_military_report" model="ir.actions.act_window">
+        <field name="name">Військовозобов'язані</field>
+        <field name="res_model">hr.employee.military.report</field>
+        <field name="view_mode">list,form</field>
+	<field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть звіт "Військовозобов'язані"
+            </p>
+            <p>
+                Звіт формує список працівників, що перебувають на військовому
+                обліку, станом на вказану дату та дозволяє зберегти його
+                для подальшого перегляду і друку.
+            </p>
+        </field>
+    </record>
+
+    <!-- ====================================================== -->
+    <!-- Employees with Benefits Report (Працівники з пільгами)  -->
+    <!-- ====================================================== -->
+
+    <record id="hr_employee_benefits_report_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.benefits.report.form</field>
+        <field name="model">hr.employee.benefits.report</field>
+        <field name="arch" type="xml">
+            <form string="Employees with Benefits Report">
+                <header>
+                    <button name="action_generate" string="Сформувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_print" string="Друк" type="object"
+                            class="btn-secondary" invisible="state != 'generated'"/>
+                    <button name="action_draft" string="Редагувати" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Параметри">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Результат">
+                            <field name="employee_count"/>
+                            <field name="disabled_count"/>
+                            <field name="chornobyl_count"/>
+                            <field name="veteran_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Працівники з пільгами" name="employees">
+                            <field name="employee_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="job_id"/>
+                                    <field name="disability_group"/>
+                                    <field name="chornobyl_category"/>
+                                    <field name="veteran_status"/>
+                                    <field name="benefit_ids" widget="many2many_tags"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Нотатки" name="notes">
+                            <field name="notes" placeholder="Додаткові нотатки..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_employee_benefits_report_view_list" model="ir.ui.view">
+        <field name="name">hr.employee.benefits.report.list</field>
+        <field name="model">hr.employee.benefits.report</field>
+        <field name="arch" type="xml">
+            <list string="Employees with Benefits Reports">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_count"/>
+                <field name="disabled_count"/>
+                <field name="chornobyl_count"/>
+                <field name="veteran_count"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'generated'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_benefits_report_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.benefits.report.search</field>
+        <field name="model">hr.employee.benefits.report</field>
+        <field name="arch" type="xml">
+            <search string="Employees with Benefits Reports">
+                <field name="name"/>
+                <field name="date"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="filter_generated" domain="[('state', '=', 'generated')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_employee_benefits_report" model="ir.actions.act_window">
+        <field name="name">Працівники з пільгами</field>
+        <field name="res_model">hr.employee.benefits.report</field>
+        <field name="view_mode">list,form</field>
+	<field name="domain">[]</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть звіт "Працівники з пільгами"
+            </p>
+            <p>
+                Звіт формує список працівників з інвалідністю, чорнобильською
+                категорією, статусом ветерана чи іншими пільгами станом на
+                вказану дату та дозволяє зберегти його для подальшого
+                перегляду і друку.
+            </p>
+        </field>
+    </record>
+
+</odoo>

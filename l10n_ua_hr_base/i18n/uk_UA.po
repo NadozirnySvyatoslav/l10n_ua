@@ -238,6 +238,7 @@ msgid "Children Count"
 msgstr "Кількість дітей"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__chornobyl_count
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_search_inherit_ua
 msgid "Chornobyl"
 msgstr "Чорнобилець"
@@ -383,6 +384,9 @@ msgid "Companies"
 msgstr "Компанії"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_list_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__company_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__company_id
 msgid "Company"
 msgstr "Компанія"
@@ -607,7 +611,13 @@ msgid "Documents"
 msgstr "Документи"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee_benefits_report__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee_list_report__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee_military_report__state__draft
 #: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_staffing_table__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_employee_benefits_report_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_employee_list_report_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_employee_military_report_view_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_staffing_table_search
 msgid "Draft"
 msgstr "Чернетка"
@@ -1273,6 +1283,9 @@ msgstr "Термін моєї активності"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_education_level__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefit__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_kp2010__name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_list_report__name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_rank__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__name
@@ -1541,6 +1554,7 @@ msgid "Representative Office"
 msgstr "Представництво"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__reserved_count
 #: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee__military_status__reserved
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_search_inherit_ua
 msgid "Reserved"
@@ -1706,6 +1720,9 @@ msgid "Standard salary for this position"
 msgstr "Стандартний оклад для цієї посади"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__state
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_list_report__state
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__state
 #: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__res_company__ownership_form__state
 msgid "State"
 msgstr "Статус"
@@ -1934,6 +1951,7 @@ msgid "Veteran Status"
 msgstr "Статус ветерана"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__veteran_count
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_search_inherit_ua
 msgid "Veterans"
 msgstr "Ветерани"
@@ -1965,6 +1983,7 @@ msgid "Widowed"
 msgstr "Вдівець/вдова"
 
 #. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__disabled_count
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_search_inherit_ua
 msgid "With Disability"
 msgstr "З інвалідністю"
@@ -1984,6 +2003,29 @@ msgstr "Умови праці"
 msgid "Work Experience"
 msgstr "Стаж роботи"
 
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_list_report__date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__date
+msgid "As of Date"
+msgstr "Станом на дату"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefits_report__employee_count
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_list_report__employee_count
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__employee_count
+msgid "Total"
+msgstr "Всього"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee_benefits_report__state__generated
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee_list_report__state__generated
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_employee_military_report__state__generated
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_employee_benefits_report_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_employee_list_report_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_employee_military_report_view_search
+msgid "Generated"
+msgstr "Сформовано"
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__employee_number
