@@ -14,6 +14,25 @@
               parent="menu_hr_documents_root"
               sequence="10"/>
 
+    <!-- Employee Reports (Reporting menu) -->
+    <menuitem id="menu_hr_employee_list_report"
+              name="Список працівників"
+              action="action_hr_employee_list_report"
+              parent="hr.hr_menu_hr_reports"
+              sequence="60"/>
+
+    <menuitem id="menu_hr_employee_military_report"
+              name="Військовозобов'язані"
+              action="action_hr_employee_military_report"
+              parent="hr.hr_menu_hr_reports"
+              sequence="70"/>
+
+    <menuitem id="menu_hr_employee_benefits_report"
+              name="Працівники з пільгами"
+              action="action_hr_employee_benefits_report"
+              parent="hr.hr_menu_hr_reports"
+	    sequence="80"/>
+
     <!-- Ukraine Configuration Menu -->
     <menuitem id="menu_hr_ua_configuration"
               name="Ukraine"

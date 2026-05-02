@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_vacation_summary_report_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.vacation.summary.report.form</field>
+        <field name="model">hr.employee.vacation.summary.report</field>
+        <field name="arch" type="xml">
+            <form string="Vacation Summary Report">
+                <header>
+                    <button name="action_generate" string="Сформувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_print" string="Друк" type="object"
+                            class="btn-secondary" invisible="state != 'generated'"/>
+                    <button name="action_draft" string="Редагувати" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Параметри">
+                            <field name="year" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Результат">
+                            <field name="employee_count"/>
+                            <field name="total_entitled"/>
+                            <field name="total_used"/>
+                            <field name="total_remaining"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Залишки відпусток" name="balances">
+                            <field name="balance_ids" readonly="1">
+                                <list>
+                                    <field name="employee_id"/>
+                                    <field name="leave_type_id"/>
+                                    <field name="entitled_days"/>
+                                    <field name="carried_over"/>
+                                    <field name="total_available"/>
+                                    <field name="used_days"/>
+                                    <field name="planned_days"/>
+                                    <field name="remaining_days"
+                                           decoration-danger="remaining_days &lt; 0"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Нотатки" name="notes">
+                            <field name="notes" placeholder="Додаткові нотатки..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_employee_vacation_summary_report_view_list" model="ir.ui.view">
+        <field name="name">hr.employee.vacation.summary.report.list</field>
+        <field name="model">hr.employee.vacation.summary.report</field>
+        <field name="arch" type="xml">
+            <list string="Vacation Summary Reports">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="employee_count"/>
+                <field name="total_entitled"/>
+                <field name="total_used"/>
+                <field name="total_remaining"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'generated'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_vacation_summary_report_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.vacation.summary.report.search</field>
+        <field name="model">hr.employee.vacation.summary.report</field>
+        <field name="arch" type="xml">
+            <search string="Vacation Summary Reports">
+                <field name="name"/>
+                <field name="year"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="filter_generated" domain="[('state', '=', 'generated')]"/>
+                <group>
+                    <filter string="Year" name="groupby_year" domain="[]" context="{'group_by': 'year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_employee_vacation_summary_report" model="ir.actions.act_window">
+        <field name="name">Підсумок відпусток</field>
+        <field name="res_model">hr.employee.vacation.summary.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть звіт "Підсумок відпусток"
+            </p>
+            <p>
+                Звіт формує підсумок залишків та використання відпусток
+                усіх працівників за вказаний рік та дозволяє зберегти його
+                для подальшого перегляду і друку.
+            </p>
+        </field>
+    </record>
+
+</odoo>

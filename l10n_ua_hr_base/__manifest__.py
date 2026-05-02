@@ -45,6 +45,7 @@ This module is required for all other l10n_ua_hr_* modules.
         'views/hr_department_views.xml',
         'views/hr_job_views.xml',
         'views/hr_staffing_table_views.xml',
+        'views/hr_employee_reports_views.xml',
         'views/hr_military_rank_views.xml',
         'views/hr_military_tcc_views.xml',
         'views/hr_education_level_views.xml',

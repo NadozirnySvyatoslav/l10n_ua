@@ -3,35 +3,38 @@
 
     <record id="action_report_hr_employee_list" model="ir.actions.report">
         <field name="name">Employee List</field>
-        <field name="model">hr.employee</field>
+        <field name="model">hr.employee.list.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_base.report_hr_employee_list</field>
         <field name="report_file">l10n_ua_hr_base.report_hr_employee_list</field>
-        <field name="print_report_name">'Список_працівників_%s' % (time.strftime('%Y%m%d'))</field>
-        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="print_report_name">'Список_працівників_%s' % (object.date.strftime('%Y%m%d') if object.date else time.strftime('%Y%m%d'))</field>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_a4_ua"/>
     </record>
 
     <template id="report_hr_employee_list">
         <t t-call="web.html_container">
-            <t t-call="l10n_ua_hr_base.report_hr_employee_list_document"/>
+            <t t-foreach="docs" t-as="report_doc">
+                <t t-call="l10n_ua_hr_base.report_hr_employee_list_document"/>
+            </t>
         </t>
     </template>
 
     <template id="report_hr_employee_list_document">
         <t t-call="web.basic_layout">
-            <t t-set="company" t-value="docs[0].company_id if docs else env.company"/>
+            <t t-set="company" t-value="report_doc.company_id or env.company"/>
+            <t t-set="employees" t-value="report_doc.employee_ids"/>
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
-                
+
                 <div style="text-align: center; margin-bottom: 20px;">
                     <strong t-esc="company.name"/>
                     <h3 style="margin: 10px 0;">СПИСОК ПРАЦІВНИКІВ</h3>
                     <p style="font-size: 10pt;">
-                        станом на <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d.%m.%Y')"/>
+                        станом на <span t-esc="report_doc.date.strftime('%d.%m.%Y')"/>
                     </p>
                 </div>
-                
+
                 <table style="width: 100%; border-collapse: collapse; font-size: 9pt;">
                     <thead>
                         <tr style="background-color: #f0f0f0;">
@@ -47,7 +50,7 @@
                     </thead>
                     <tbody>
                         <t t-set="row_num" t-value="0"/>
-                        <t t-foreach="docs" t-as="employee">
+                        <t t-foreach="employees" t-as="employee">
                             <t t-set="row_num" t-value="row_num + 1"/>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
@@ -63,8 +66,15 @@
                                     <t t-esc="employee.job_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-if="employee.hire_date">
-                                        <t t-esc="employee.hire_date.strftime('%d.%m.%Y')"/>
+				    <t t-set="hire_dt" t-value="employee.hire_date"/>
+                                    <t t-if="not hire_dt">
+                                        <t t-set="vdates" t-value="employee.version_ids.filtered('contract_date_start').mapped('contract_date_start')"/>
+                                        <t t-if="vdates">
+                                            <t t-set="hire_dt" t-value="min(vdates)"/>
+                                        </t>
+                                    </t>
+                                    <t t-if="hire_dt">
+                                        <t t-esc="hire_dt.strftime('%d.%m.%Y')"/>
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
@@ -80,11 +90,11 @@
                         </t>
                     </tbody>
                 </table>
-                
+
                 <div style="margin-top: 20px; font-size: 10pt;">
-                    <p>Всього працівників: <strong><t t-esc="len(docs)"/></strong></p>
+                    <p>Всього працівників: <strong><t t-esc="len(employees)"/></strong></p>
                 </div>
-                
+
                 <div style="margin-top: 30px;">
                     <table style="width: 100%;">
                         <tr>
@@ -99,7 +109,7 @@
                         </tr>
                     </table>
                 </div>
-                
+
             </div>
         </t>
     </template>
