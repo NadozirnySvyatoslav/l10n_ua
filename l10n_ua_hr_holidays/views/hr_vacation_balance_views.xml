@@ -47,7 +47,7 @@
                             string="Recalculate"
                             type="object"
                             class="btn-secondary"
-			    display="always"
+                            display="always"
                             groups="hr_holidays.group_hr_holidays_manager"/>
                 </header>
                 <field name="employee_id"/>

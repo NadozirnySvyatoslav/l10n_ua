@@ -246,8 +246,8 @@ class HrVacationBalance(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Vacation Compensation',
-                'message': f'Compensation for {self.remaining_days} unused days: {compensation:.2f} UAH',
+                'title': _('Vacation Compensation'),
+                'message': _('Compensation for %(days)s unused days: %(amount).2f UAH', days=self.remaining_days, amount=compensation),
                 'type': 'success',
                 'sticky': False,
             }
@@ -265,8 +265,8 @@ class HrVacationBalance(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Recalculation Complete',
-                'message': f'Vacation balances for {current_year} have been updated for all active employees.',
+                'title': _('Recalculation Complete'),
+                'message': _('Vacation balances for %s have been updated for all active employees.', current_year),
                 'type': 'success',
                 'sticky': False,
                 'next': {
