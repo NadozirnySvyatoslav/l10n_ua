@@ -156,6 +156,39 @@ class HrVacationBalance(models.Model):
                 'carried_over': carried,
             })
 
+    def _recompute_related_leaves(self):
+        """
+        Helper method to force recomputation of remaining days for all leaves 
+        associated with this balance record.
+        """
+        for balance in self:
+            leaves = self.env['hr.leave'].search([
+                ('employee_id', '=', balance.employee_id.id),
+                ('holiday_status_id', '=', balance.leave_type_id.id),
+                '|', ('vacation_year', '=', balance.year),
+                     '&', ('request_date_from', '>=', f'{balance.year}-01-01'),
+                          ('request_date_from', '<=', f'{balance.year}-12-31')
+            ])
+            if leaves:
+                # Sort chronologically to ensure cascading subtraction is correct
+                sorted_leaves = leaves.sorted(key=lambda l: l.request_date_from or fields.Date.today())
+                sorted_leaves._compute_remaining_before()
+                sorted_leaves._compute_remaining_after()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        balances = super().create(vals_list)
+        # Trigger recomputation for existing leaves when a balance is manually created
+        balances._recompute_related_leaves()
+        return balances
+
+    def write(self, vals):
+        res = super().write(vals)
+        # Trigger recomputation only when base days or year are modified
+        if any(field in vals for field in ['entitled_days', 'carried_over', 'year', 'employee_id', 'leave_type_id']):
+            self._recompute_related_leaves()
+        return res
+
     _unique_employee_id_leave_type_id_year = models.Constraint(
         'unique(employee_id, leave_type_id, year)',
         'Balance for this employee, leave type and year already exists!',

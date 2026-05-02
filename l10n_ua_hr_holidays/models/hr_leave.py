@@ -331,69 +331,114 @@ class HrLeave(models.Model):
 
     @api.depends('employee_id', 'holiday_status_id', 'vacation_year', 'request_date_from')
     def _compute_remaining_before(self):
-        """Compute vacation balance before this leave from hr.vacation.balance"""
+        """Computes the balance before the start of a specific leave in chronological order."""
         for leave in self:
-            if not leave.employee_id or not leave.holiday_status_id:
+            if not leave.employee_id or not leave.holiday_status_id or not leave.request_date_from:
                 leave.remaining_days_before = 0
                 continue
         
-            year = leave.vacation_year or (leave.request_date_from.year if leave.request_date_from else False)
-            if not year:
-                leave.remaining_days_before = 0
-                continue
-        
+            year = leave.vacation_year or leave.request_date_from.year
+            
+            # Get the initial total balance for the year (Entitled + Carried Over)
             balance = self.env['hr.vacation.balance'].search([
                 ('employee_id', '=', leave.employee_id.id),
                 ('leave_type_id', '=', leave.holiday_status_id.id),
                 ('year', '=', year),
             ], limit=1)
         
-            if balance: 
-                leave.remaining_days_before = balance.total_available - balance.used_days
-            elif leave.holiday_status_id.annual_days:
-                validated = self.env['hr.leave'].search([
-                    ('employee_id', '=', leave.employee_id.id),
-                    ('holiday_status_id', '=', leave.holiday_status_id.id),
-                    ('state', '=', 'validate'),
-                    ('date_from', '<=', f'{year}-12-31'),
-                    ('date_to', '>=', f'{year}-01-01'),
-                    ('id', '!=', leave._origin.id or 0),
-                ])
+            total_available = balance.total_available if balance else (leave.holiday_status_id.annual_days or 0)
 
-                used = 0
-                year_start_d = fields.Date.from_string(f'{year}-01-01')
-                year_end_d = fields.Date.from_string(f'{year}-12-31')
-                for v in validated:
-                    if not v.request_date_from or not v.request_date_to:
-                        continue
-                    ol_from = max(v.request_date_from, year_start_d)
-                    ol_to = min(v.request_date_to, year_end_d)
-                    if ol_from > ol_to:
-                        continue
-                    total_overlap = (ol_to - ol_from).days + 1
-                    dt_from = datetime.combine(ol_from, dt_time.min)
-                    dt_to = datetime.combine(ol_to, dt_time.max)
-                    holidays = self.env['resource.calendar.leaves'].search([
-                        ('resource_id', '=', False),
-                        ('date_from', '<=', dt_to),
-                        ('date_to', '>=', dt_from),
-                    ])
-                    holiday_count = 0
-                    for h in holidays:
-                        h_from = max(h.date_from.date(), ol_from)
-                        h_to = min(h.date_to.date(), ol_to)
-                        if h_from <= h_to:
-                            holiday_count += (h_to - h_from).days + 1
-                    used += max(total_overlap - holiday_count, 0)
+            # Find all EXISTING leaves for this year that start BEFORE the current one
+            domain = [
+                ('employee_id', '=', leave.employee_id.id),
+                ('holiday_status_id', '=', leave.holiday_status_id.id),
+                ('state', 'not in', ['cancel', 'refuse']), # Count both planned and approved leaves
+                ('request_date_from', '<', leave.request_date_from),
+                '|', ('vacation_year', '=', year),
+                     '&', ('request_date_from', '>=', f'{year}-01-01'),
+                          ('request_date_from', '<=', f'{year}-12-31')
+            ]
 
-                leave.remaining_days_before = leave.holiday_status_id.annual_days - used
-            else:
-                leave.remaining_days_before = 0
+            # If this is an existing record (not a new one in the form), exclude it
+            if leave._origin.id:
+                domain.append(('id', '!=', leave._origin.id))
 
-    @api.depends('remaining_days_before', 'number_of_days')
+            previous_leaves = self.env['hr.leave'].search(domain)
+            
+            # Sum the CALENDAR days of previous leaves
+            used_before = sum(previous_leaves.mapped('calendar_days'))
+
+            leave.remaining_days_before = total_available - used_before
+
+    @api.depends('remaining_days_before', 'calendar_days')
     def _compute_remaining_after(self):
         for leave in self:
-            leave.remaining_days_after = (leave.remaining_days_before or 0) - (leave.number_of_days or 0)
+            leave.remaining_days_after = (leave.remaining_days_before or 0) - (leave.calendar_days or 0)
+
+    # =================================================================================
+    # TRIGGERS FOR CHRONOLOGICAL RECOMPUTATION
+    # =================================================================================
+    
+    def _recompute_subsequent_leaves(self):
+        """Helper method: forcibly updates the balance for leaves that come AFTER the current one."""
+        for leave in self:
+            if not leave.employee_id or not leave.holiday_status_id or not leave.request_date_from:
+                continue
+            year = leave.vacation_year or leave.request_date_from.year
+           
+            # Find all leaves with a date greater than the date of the changed leave
+            subsequent_leaves = self.env['hr.leave'].search([
+                ('employee_id', '=', leave.employee_id.id),
+                ('holiday_status_id', '=', leave.holiday_status_id.id),
+                ('request_date_from', '>', leave.request_date_from),
+                '|', ('vacation_year', '=', year),
+                     '&', ('request_date_from', '>=', f'{year}-01-01'),
+                          ('request_date_from', '<=', f'{year}-12-31'),
+                ('id', '!=', leave.id)
+            ])
+            if subsequent_leaves:
+                # 1. recalculate leaves
+                subsequent_leaves._compute_remaining_before()
+                subsequent_leaves._compute_remaining_after()
+                # 2. Store data to the database
+                subsequent_leaves.flush_recordset(['remaining_days_before', 'remaining_days_after'])
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        leaves = super().create(vals_list)
+        # When a new leave is created (e.g., May), recompute the subsequent ones (October)
+        leaves._recompute_subsequent_leaves()
+        return leaves
+
+    def write(self, vals):
+        res = super().write(vals)
+        # If dates, status, or leave type change - trigger recomputation
+        if any(field in vals for field in ['date_from', 'date_to', 'request_date_from', 'request_date_to', 'state', 'holiday_status_id']):
+            self._recompute_subsequent_leaves()
+        return res
+
+    def unlink(self):
+        # Before unlinking, remember which subsequent leaves need to be recomputed
+        leaves_to_recompute = self.env['hr.leave']
+        for leave in self:
+            if leave.employee_id and leave.holiday_status_id and leave.request_date_from:
+                year = leave.vacation_year or leave.request_date_from.year
+                leaves_to_recompute |= self.env['hr.leave'].search([
+                    ('employee_id', '=', leave.employee_id.id),
+                    ('holiday_status_id', '=', leave.holiday_status_id.id),
+                    ('request_date_from', '>', leave.request_date_from),
+                    '|', ('vacation_year', '=', year),
+                         '&', ('request_date_from', '>=', f'{year}-01-01'),
+                              ('request_date_from', '<=', f'{year}-12-31'),
+                    ('id', 'not in', self.ids)
+                ])
+        res = super().unlink()
+        
+        # After unlinking, recompute the balance for the leaves kept in memory
+        if leaves_to_recompute:
+            leaves_to_recompute._compute_remaining_before()
+            leaves_to_recompute._compute_remaining_after()
+        return res
 
     def action_calculate_vacation_pay(self):
         """Calculate average daily salary and vacation pay"""
