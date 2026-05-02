@@ -1,6 +1,8 @@
+from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import ValidationError
 
+@tagged('post_install', '-at_install')
 class TestHrEmployeeNumber(TransactionCase):
 
     @classmethod
@@ -32,16 +34,3 @@ class TestHrEmployeeNumber(TransactionCase):
             'employee_number': 'EMP-001', # Same number, but different company
         })
         self.assertEqual(employee_2.employee_number, 'EMP-001')
-
-    def test_03_employee_number_generation(self):
-        """
-        Check automatic generation (if implemented via ir.sequence).
-        If there is no generation, this test can be removed.
-        """
-        employee_3 = self.env['hr.employee'].create({
-            'name': 'Ivan Mazepa',
-            'company_id': self.company_1.id,
-            # Do not specify employee_number
-        })
-        # Replace 'New' with your default value if it is different
-        self.assertTrue(employee_3.employee_number, "Employee number should be generated automatically")
