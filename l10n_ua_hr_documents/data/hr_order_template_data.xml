@@ -97,7 +97,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -202,7 +202,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -309,7 +309,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -440,7 +440,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -663,7 +663,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -799,7 +799,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>

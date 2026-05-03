@@ -53,8 +53,10 @@ class HrOrderTemplateWizard(models.TransientModel):
         employee = order.employee_id
         company = order.company_id
 
-        # Get director from company (hr_responsible_id or first manager)
-        director = company.hr_responsible_id if hasattr(company, 'hr_responsible_id') and company.hr_responsible_id else False
+        # Signatories from company settings (l10n_ua_hr_base)
+        director = company.director_id or False
+        accountant = company.accountant_id or False
+        hr_manager = company.hr_manager_id or False
 
         return {
             'o': order,
@@ -64,6 +66,8 @@ class HrOrderTemplateWizard(models.TransientModel):
             'department': order.department_id or (employee.department_id if employee else False),
             'job': order.job_id or (employee.job_id if employee else False),
             'director': director,
+            'accountant': accountant,
+            'hr_manager': hr_manager,
             'format_date': self._format_date,
             'format_date_ua': self._format_date_ua,
             'month_name': self._get_month_name,

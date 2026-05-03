@@ -94,7 +94,7 @@
             </tr>
             <tr>
                 <td style="width: 50%;">Головний бухгалтер</td>
-                <td style="width: 50%; text-align: right;">________________</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
             </tr>
         </table>
     </div>
@@ -150,7 +150,7 @@
             </tr>
             <tr>
                 <td style="width: 50%;">Головний бухгалтер</td>
-                <td style="width: 50%; text-align: right;">________________</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
             </tr>
         </table>
     </div>
@@ -258,7 +258,7 @@
             </tr>
             <tr>
                 <td style="width: 50%;">Головний бухгалтер</td>
-                <td style="width: 50%; text-align: right;">________________</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
             </tr>
         </table>
     </div>

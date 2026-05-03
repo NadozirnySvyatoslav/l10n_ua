@@ -215,6 +215,11 @@ class HrCertificate(models.Model):
             director = company.director_id
             director_position = director.job_id.name if director.job_id else 'Директор'
 
+        # Chief accountant from company settings
+        accountant = False
+        if hasattr(company, 'accountant_id') and company.accountant_id:
+            accountant = company.accountant_id
+
         # Get hire date from contract (if hr_contract module is installed)
         hire_date = False
         contract = False
@@ -236,6 +241,7 @@ class HrCertificate(models.Model):
             'company': company,
             'director': director,
             'director_position': director_position,
+            'accountant': accountant,
             'contract': contract,
             'hire_date': hire_date,
             'work_experience': work_experience,
