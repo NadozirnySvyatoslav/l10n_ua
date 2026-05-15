@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Certificates',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.1.0',
     'category': 'Human Resources/Localization',
     'summary': 'Standard HR certificates and references for Ukrainian companies',
     'description': """

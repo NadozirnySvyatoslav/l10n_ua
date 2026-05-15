@@ -23,6 +23,7 @@ Requires l10n_ua_hr_base module.
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://many2one.online',
     'license': 'LGPL-3',
+    'pre_init_hook': 'pre_init_hook',
     'depends': [
         'hr_holidays',
         'resource',
@@ -31,6 +32,7 @@ Requires l10n_ua_hr_base module.
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/hr_vacation_balance_security.xml',
         'data/hr_sick_leave_data.xml',
         'data/hr_leave_type_data.xml',
         'data/hr_public_holiday_data.xml',

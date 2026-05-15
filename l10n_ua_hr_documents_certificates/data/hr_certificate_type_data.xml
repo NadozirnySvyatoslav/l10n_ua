@@ -2,9 +2,15 @@
 <odoo>
     <data noupdate="0">
 
-        <!-- Employment Certificate (Довідка про роботу) -->
+        <!-- =================================================================
+             Common header used in templates (centred, with company info).
+             КЗпП ст. 49 — право працівника отримати довідку про роботу,
+             посаду, заробітну плату. Видається безоплатно.
+             ================================================================= -->
+
+        <!-- 1. Довідка про роботу (Employment) -->
         <record id="certificate_type_employment" model="hr.certificate.type">
-            <field name="name">Довідка про роботу</field>
+            <field name="name">Довідка з місця роботи</field>
             <field name="code">employment</field>
             <field name="sequence">10</field>
             <field name="sequence_id" ref="seq_hr_certificate_employment"/>
@@ -13,26 +19,37 @@
             <field name="requires_destination">True</field>
             <field name="validity_days">30</field>
             <field name="template_body"><![CDATA[
-<div style="font-family: Times New Roman, serif; font-size: 14pt; line-height: 1.5;">
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
-        <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+        <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address_inline if company.partner_id else (company.partner_id.contact_address if company.partner_id else '')"/></span><br/>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
         <h2 style="margin: 0;">ДОВІДКА</h2>
-        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date) or format_date(certificate.request_date)"/></p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
     </div>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Видана <strong><t t-esc="employee.name or ''"/></strong> у тому, що він(вона) дійсно працює
-        в <t t-esc="company.name or ''"/> на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
-        з <t t-esc="format_date(hire_date)"/> по теперішній час.
+        Видана <strong><t t-esc="employee.name or ''"/></strong><span t-if="rnokpp">, РНОКПП <t t-esc="rnokpp"/></span>,
+        у тому, що він(вона) дійсно працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong><span t-if="employee.department_id"> у структурному підрозділі «<t t-esc="employee.department_id.name"/>»</span>.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Довідка видана <t t-esc="destination"/>.
+        Дата прийняття на роботу — <strong><t t-esc="format_date(hire_date)"/></strong><span t-if="hire_order_number">, наказ № <t t-esc="hire_order_number"/><span t-if="hire_order_date"> від <t t-esc="format_date(hire_order_date)"/></span></span>.
+        <span t-if="contract_type_ua">Тип трудового договору — <t t-esc="contract_type_ua"/>.</span>
+        <span t-if="is_fixed_term">Строковий договір, чинний до <t t-esc="format_date(contract_end_date)"/>.</span>
+        <span t-if="not is_fixed_term">Договір укладено на невизначений строк.</span>
+    </p>
+
+    <p style="text-indent: 40px; text-align: justify;">
+        Довідка видана для подання <t t-esc="destination"/>.
+    </p>
+
+    <p style="text-indent: 40px; font-style: italic; font-size: 12pt;">
+        Підстава: ст. 49 Кодексу законів про працю України.
     </p>
 
     <div style="margin-top: 50px;">
@@ -49,7 +66,7 @@
             ]]></field>
         </record>
 
-        <!-- Salary Certificate (Довідка про заробітну плату) -->
+        <!-- 2. Довідка про заробітну плату (Salary) -->
         <record id="certificate_type_salary" model="hr.certificate.type">
             <field name="name">Довідка про заробітну плату</field>
             <field name="code">salary</field>
@@ -60,30 +77,38 @@
             <field name="requires_destination">True</field>
             <field name="validity_days">30</field>
             <field name="template_body"><![CDATA[
-<div style="font-family: Times New Roman, serif; font-size: 14pt; line-height: 1.5;">
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
         <h2 style="margin: 0;">ДОВІДКА</h2>
         <p style="margin: 5px 0;">про заробітну плату</p>
-        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date) or format_date(certificate.request_date)"/></p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
     </div>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Видана <strong><t t-esc="employee.name or ''"/></strong> у тому, що він(вона) дійсно працює
-        в <t t-esc="company.name or ''"/> на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>.
+        Видана <strong><t t-esc="employee.name or ''"/></strong><span t-if="rnokpp">, РНОКПП <t t-esc="rnokpp"/></span>,
+        у тому, що він(вона) дійсно працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
+        з <strong><t t-esc="format_date(hire_date)"/></strong> по теперішній час.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Посадовий оклад (заробітна плата) становить <strong><t t-esc="format_money(certificate.salary_amount)"/> грн.</strong> на місяць.
+        Посадовий оклад (тарифна ставка) станом на <t t-esc="format_date(today)"/> становить
+        <strong><t t-esc="format_money(certificate.salary_amount)"/> грн.</strong>
+        (<t t-esc="amount_to_words(certificate.salary_amount)"/>) на місяць.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Довідка видана <t t-esc="destination"/>.
+        Із заробітної плати утримується податок на доходи фізичних осіб (18%) та військовий збір (5%) відповідно до Податкового кодексу України.
+    </p>
+
+    <p style="text-indent: 40px; text-align: justify;">
+        Довідка видана для подання <t t-esc="destination"/>.
     </p>
 
     <div style="margin-top: 50px;">
@@ -94,7 +119,7 @@
             </tr>
             <tr>
                 <td style="width: 50%;">Головний бухгалтер</td>
-                <td style="width: 50%; text-align: right;">________________</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
             </tr>
         </table>
     </div>
@@ -104,7 +129,7 @@
             ]]></field>
         </record>
 
-        <!-- Income Certificate (Довідка про доходи) -->
+        <!-- 3. Довідка про доходи (Income) -->
         <record id="certificate_type_income" model="hr.certificate.type">
             <field name="name">Довідка про доходи</field>
             <field name="code">income</field>
@@ -115,31 +140,63 @@
             <field name="requires_destination">True</field>
             <field name="validity_days">30</field>
             <field name="template_body"><![CDATA[
-<div style="font-family: Times New Roman, serif; font-size: 14pt; line-height: 1.5;">
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
         <h2 style="margin: 0;">ДОВІДКА</h2>
         <p style="margin: 5px 0;">про доходи</p>
-        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date) or format_date(certificate.request_date)"/></p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
     </div>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Видана <strong><t t-esc="employee.name or ''"/></strong>, РНОКПП: <t t-esc="employee.rnokpp if hasattr(employee, 'rnokpp') else ''"/>,
-        у тому, що він(вона) працює в <t t-esc="company.name or ''"/> на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>.
+        Видана <strong><t t-esc="employee.name or ''"/></strong><span t-if="rnokpp">, РНОКПП <t t-esc="rnokpp"/></span>,
+        який(а) працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
+        з <t t-esc="format_date(hire_date)"/>, про те, що за період
+        з <strong><t t-esc="format_date(certificate.period_from)"/></strong>
+        по <strong><t t-esc="format_date(certificate.period_to)"/></strong> йому(їй) нараховано та виплачено такі доходи:
+    </p>
+
+    <table t-if="monthly_breakdown" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12pt;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #000; padding: 6px;">Місяць</th>
+                <th style="border: 1px solid #000; padding: 6px;">Нараховано (грн)</th>
+                <th style="border: 1px solid #000; padding: 6px;">ПДФО 18% (грн)</th>
+                <th style="border: 1px solid #000; padding: 6px;">Військовий збір 5% (грн)</th>
+                <th style="border: 1px solid #000; padding: 6px;">До виплати (грн)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr t-foreach="monthly_breakdown" t-as="row">
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;"><t t-esc="row['period']"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['gross'])"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['pdfo'])"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['military_tax'])"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['net'])"/></td>
+            </tr>
+            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                <td style="border: 1px solid #000; padding: 6px;">Усього</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_income)"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_pdfo)"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_military_tax)"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_net)"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p t-if="not monthly_breakdown" style="text-indent: 40px;">
+        Загальний дохід за період: <strong><t t-esc="format_money(certificate.total_income)"/> грн.</strong>
+        (<t t-esc="amount_to_words(certificate.total_income)"/>)
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        За період з <t t-esc="format_date(certificate.period_from)"/> по <t t-esc="format_date(certificate.period_to)"/> отримав(ла) дохід у розмірі
-        <strong><t t-esc="format_money(certificate.total_income)"/> грн.</strong>
-    </p>
-
-    <p style="text-indent: 40px; text-align: justify;">
-        Довідка видана <t t-esc="destination"/>.
+        Довідка видана для подання <t t-esc="destination"/>.
     </p>
 
     <div style="margin-top: 50px;">
@@ -150,7 +207,7 @@
             </tr>
             <tr>
                 <td style="width: 50%;">Головний бухгалтер</td>
-                <td style="width: 50%; text-align: right;">________________</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
             </tr>
         </table>
     </div>
@@ -160,7 +217,7 @@
             ]]></field>
         </record>
 
-        <!-- Work Experience Certificate (Довідка про стаж) -->
+        <!-- 4. Довідка про стаж роботи (Work Experience) -->
         <record id="certificate_type_experience" model="hr.certificate.type">
             <field name="name">Довідка про стаж роботи</field>
             <field name="code">experience</field>
@@ -171,7 +228,7 @@
             <field name="requires_destination">True</field>
             <field name="validity_days">30</field>
             <field name="template_body"><![CDATA[
-<div style="font-family: Times New Roman, serif; font-size: 14pt; line-height: 1.5;">
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
@@ -181,20 +238,29 @@
     <div style="text-align: center; margin: 30px 0;">
         <h2 style="margin: 0;">ДОВІДКА</h2>
         <p style="margin: 5px 0;">про стаж роботи</p>
-        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date) or format_date(certificate.request_date)"/></p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
     </div>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Видана <strong><t t-esc="employee.name or ''"/></strong> у тому, що він(вона) працює
-        в <t t-esc="company.name or ''"/> з <t t-esc="format_date(hire_date)"/> по теперішній час.
+        Видана <strong><t t-esc="employee.name or ''"/></strong><span t-if="rnokpp">, РНОКПП <t t-esc="rnokpp"/></span>,
+        у тому, що він(вона) працював(ла) / працює в <strong><t t-esc="company.name or ''"/></strong>
+        з <strong><t t-esc="format_date(hire_date)"/></strong>
+        <span t-if="contract_end_date">по <strong><t t-esc="format_date(contract_end_date)"/></strong></span>
+        <span t-if="not contract_end_date">по теперішній час</span>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Загальний стаж роботи на підприємстві становить <strong><t t-esc="work_experience"/></strong>.
+        Загальний стаж роботи на підприємстві станом на <t t-esc="format_date(today)"/> становить
+        <strong><t t-esc="work_experience"/></strong>.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Довідка видана <t t-esc="destination"/>.
+        Довідка видана для подання <t t-esc="destination"/>.
+    </p>
+
+    <p style="text-indent: 40px; font-style: italic; font-size: 12pt;">
+        Підстава: ст. 49 Кодексу законів про працю України.
     </p>
 
     <div style="margin-top: 50px;">
@@ -211,7 +277,7 @@
             ]]></field>
         </record>
 
-        <!-- Bank Certificate (Довідка для банку) -->
+        <!-- 5. Довідка для банку (Bank loan) -->
         <record id="certificate_type_bank" model="hr.certificate.type">
             <field name="name">Довідка для банку</field>
             <field name="code">bank</field>
@@ -222,32 +288,79 @@
             <field name="requires_destination">True</field>
             <field name="validity_days">14</field>
             <field name="template_body"><![CDATA[
-<div style="font-family: Times New Roman, serif; font-size: 14pt; line-height: 1.5;">
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/>, тел.: <t t-esc="company.phone or ''"/></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
         <h2 style="margin: 0;">ДОВІДКА</h2>
-        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date) or format_date(certificate.request_date)"/></p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
     </div>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Видана <strong><t t-esc="employee.name or ''"/></strong>, РНОКПП: <t t-esc="employee.rnokpp if hasattr(employee, 'rnokpp') else ''"/>,
-        у тому, що він(вона) дійсно працює в <t t-esc="company.name or ''"/>
-        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong> з <t t-esc="format_date(hire_date)"/>
-        по теперішній час на умовах безстрокового трудового договору.
+        Видана <strong><t t-esc="employee.name or ''"/></strong><span t-if="rnokpp">, РНОКПП <t t-esc="rnokpp"/></span>,
+        у тому, що він(вона) дійсно працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
+        з <strong><t t-esc="format_date(hire_date)"/></strong> по теперішній час
+        на умовах
+        <span t-if="is_fixed_term">строкового трудового договору (дійсний до <t t-esc="format_date(contract_end_date)"/>)</span>
+        <span t-if="not is_fixed_term">безстрокового трудового договору</span>.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Середньомісячний дохід за останні 6 місяців (з <t t-esc="format_date(certificate.period_from)"/> по <t t-esc="format_date(certificate.period_to)"/>)
-        становить <strong><t t-esc="format_money(certificate.total_income)"/> грн.</strong>
+        Посадовий оклад станом на <t t-esc="format_date(today)"/> становить
+        <strong><t t-esc="format_money(certificate.salary_amount)"/> грн.</strong>
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Довідка видана <t t-esc="destination"/>.
+        Заробітна плата за період з <strong><t t-esc="format_date(certificate.period_from)"/></strong>
+        по <strong><t t-esc="format_date(certificate.period_to)"/></strong>:
+    </p>
+
+    <table t-if="monthly_breakdown" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12pt;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #000; padding: 6px;">Місяць</th>
+                <th style="border: 1px solid #000; padding: 6px;">Нараховано (грн)</th>
+                <th style="border: 1px solid #000; padding: 6px;">Утримано (грн)</th>
+                <th style="border: 1px solid #000; padding: 6px;">До виплати (грн)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr t-foreach="monthly_breakdown" t-as="row">
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;"><t t-esc="row['period']"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['gross'])"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['pdfo'] + row['military_tax'])"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(row['net'])"/></td>
+            </tr>
+            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                <td style="border: 1px solid #000; padding: 6px;">Усього</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_income)"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_pdfo + certificate.total_military_tax)"/></td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: right;"><t t-esc="format_money(certificate.total_net)"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p t-if="monthly_breakdown" style="text-indent: 40px;">
+        Середньомісячний дохід за вказаний період становить
+        <strong><t t-esc="format_money(certificate.total_income / len(monthly_breakdown))"/> грн.</strong>
+    </p>
+
+    <p t-if="not monthly_breakdown" style="text-indent: 40px;">
+        Загальний дохід за період: <strong><t t-esc="format_money(certificate.total_income)"/> грн.</strong>
+    </p>
+
+    <p style="text-indent: 40px; text-align: justify;">
+        Утримання за виконавчими листами, аліментами та іншими судовими рішеннями не здійснюється
+        (або зазначається відповідна сума).
+    </p>
+
+    <p style="text-indent: 40px; text-align: justify;">
+        Довідка видана для подання <t t-esc="destination"/>.
     </p>
 
     <div style="margin-top: 50px;">
@@ -258,7 +371,7 @@
             </tr>
             <tr>
                 <td style="width: 50%;">Головний бухгалтер</td>
-                <td style="width: 50%; text-align: right;">________________</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
             </tr>
         </table>
     </div>
@@ -268,7 +381,7 @@
             ]]></field>
         </record>
 
-        <!-- Character Reference (Характеристика) -->
+        <!-- 6. Характеристика (Character reference) -->
         <record id="certificate_type_character" model="hr.certificate.type">
             <field name="name">Характеристика</field>
             <field name="code">character</field>
@@ -279,34 +392,35 @@
             <field name="requires_destination">True</field>
             <field name="validity_days">90</field>
             <field name="template_body"><![CDATA[
-<div style="font-family: Times New Roman, serif; font-size: 14pt; line-height: 1.5;">
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin: 30px 0;">
         <h2 style="margin: 0;">ХАРАКТЕРИСТИКА</h2>
         <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/></p>
+        <p style="margin: 5px 0;">на <t t-esc="employee.name or ''"/></p>
     </div>
 
     <p style="text-indent: 40px; text-align: justify;">
-        <strong><t t-esc="employee.name or ''"/></strong> працює в <t t-esc="company.name or ''"/>
-        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong> з <t t-esc="format_date(hire_date)"/>.
+        <strong><t t-esc="employee.name or ''"/></strong>
+        <span t-if="employee.birthday">, <t t-esc="format_date(employee.birthday)"/> року народження</span>,
+        працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
+        з <t t-esc="format_date(hire_date)"/>
+        (загальний стаж на підприємстві — <t t-esc="work_experience"/>).
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        За час роботи зарекомендував(ла) себе як відповідальний,
-        дисциплінований працівник, який сумлінно виконує свої посадові обов'язки.
+        За час роботи зарекомендував(ла) себе як відповідальний(а), дисциплінований(а) працівник(ця),
+        який(а) сумлінно виконує покладені посадові обов'язки.
+        Має високий рівень професійної підготовки, постійно підвищує кваліфікацію.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        Має високий рівень професійної підготовки, постійно підвищує свою кваліфікацію.
-        До виконання доручень ставиться відповідально.
+        У колективі користується повагою, комунікабельний(а), вміє працювати в команді.
+        До виконання доручень керівництва ставиться відповідально та ініціативно.
     </p>
 
     <p style="text-indent: 40px; text-align: justify;">
-        У колективі користується повагою. Комунікабельний(на),
-        вміє працювати в команді.
-    </p>
-
-    <p style="text-indent: 40px; text-align: justify;">
-        Характеристика видана <t t-esc="destination"/>.
+        Характеристика видана для подання <t t-esc="destination"/>.
     </p>
 
     <div style="margin-top: 50px;">
@@ -318,8 +432,263 @@
         </table>
     </div>
 
-    <p style="margin-top: 20px;"><t t-esc="format_date(certificate.issue_date) or format_date(certificate.request_date)"/></p>
+    <p style="margin-top: 20px;"><t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
     <p style="font-size: 12pt;">М.П.</p>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- 7. Довідка ОК-5 для ПФУ (Pension) — Постанова Правління ПФУ № 21-1 від 25.11.2005 -->
+        <record id="certificate_type_pension" model="hr.certificate.type">
+            <field name="name">Довідка ОК-5 для ПФУ (про заробітну плату для нарахування пенсії)</field>
+            <field name="code">pension</field>
+            <field name="sequence">70</field>
+            <field name="sequence_id" ref="seq_hr_certificate_pension"/>
+            <field name="requires_salary_info">True</field>
+            <field name="requires_period">True</field>
+            <field name="requires_destination">False</field>
+            <field name="validity_days">90</field>
+            <field name="template_body"><![CDATA[
+<div style="font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.5;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <strong><t t-esc="company.name or ''"/></strong><br/>
+        <span style="font-size: 11pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
+        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <h2 style="margin: 0;">ДОВІДКА</h2>
+        <p style="margin: 5px 0;">про заробітну плату для нарахування пенсії</p>
+        <p style="margin: 5px 0; font-size: 11pt;">(форма ОК-5, Постанова Правління ПФУ № 21-1 від 25.11.2005)</p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
+    </div>
+
+    <p>Видана <strong><t t-esc="employee.name or ''"/></strong>, РНОКПП <strong><t t-esc="rnokpp or ''"/></strong>,
+        <span t-if="employee.birthday">що народився(лась) <t t-esc="format_date(employee.birthday)"/>,</span>
+        який(а) працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
+        з <strong><t t-esc="format_date(hire_date)"/></strong>.</p>
+
+    <p>Сума нарахованої заробітної плати з утримуванням єдиного внеску на загальнообов'язкове державне соціальне страхування за період
+        з <t t-esc="format_date(certificate.period_from)"/> по <t t-esc="format_date(certificate.period_to)"/>:</p>
+
+    <table t-if="monthly_breakdown" style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 11pt;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #000; padding: 5px;">Місяць / рік</th>
+                <th style="border: 1px solid #000; padding: 5px;">Нараховано (грн)</th>
+                <th style="border: 1px solid #000; padding: 5px;">База ЄСВ (грн)</th>
+                <th style="border: 1px solid #000; padding: 5px;">ЄСВ 22% (грн)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr t-foreach="monthly_breakdown" t-as="row">
+                <td style="border: 1px solid #000; padding: 5px; text-align: center;"><t t-esc="row['period']"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['gross'])"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['gross'])"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['esv'])"/></td>
+            </tr>
+            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                <td style="border: 1px solid #000; padding: 5px;">Усього</td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_income)"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_income)"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_esv)"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p t-if="monthly_breakdown" style="text-indent: 40px;">
+        Кількість місяців у періоді — <strong><t t-esc="len(monthly_breakdown)"/></strong>.
+        Середньомісячна заробітна плата — <strong><t t-esc="format_money(certificate.total_income / len(monthly_breakdown))"/> грн.</strong>
+    </p>
+
+    <p>Єдиний внесок на загальнообов'язкове державне соціальне страхування за зазначений період сплачено повністю до Пенсійного фонду України.</p>
+
+    <div style="margin-top: 40px;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%;"><t t-esc="director_position"/></td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="director.name if director else ''"/></td>
+            </tr>
+            <tr>
+                <td style="width: 50%;">Головний бухгалтер</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 12pt;">М.П.</p>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- 8. Довідка про середню заробітну плату (для Центру зайнятості) —
+             Наказ Міністерства соціальної політики № 307 від 27.04.2018 -->
+        <record id="certificate_type_employment_center" model="hr.certificate.type">
+            <field name="name">Довідка про середню заробітну плату (Центр зайнятості)</field>
+            <field name="code">employment_center</field>
+            <field name="sequence">80</field>
+            <field name="sequence_id" ref="seq_hr_certificate_employment_center"/>
+            <field name="requires_salary_info">True</field>
+            <field name="requires_period">True</field>
+            <field name="requires_destination">False</field>
+            <field name="validity_days">30</field>
+            <field name="template_body"><![CDATA[
+<div style="font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.5;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <strong><t t-esc="company.name or ''"/></strong><br/>
+        <span style="font-size: 11pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
+        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <h2 style="margin: 0;">ДОВІДКА</h2>
+        <p style="margin: 5px 0;">про середню заробітну плату (дохід)</p>
+        <p style="margin: 5px 0; font-size: 11pt;">для отримання допомоги по безробіттю</p>
+        <p style="margin: 5px 0; font-size: 10pt; font-style: italic;">(додаток до Порядку, затвердженого Наказом Мінсоцполітики № 307 від 27.04.2018)</p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
+    </div>
+
+    <p>1. Прізвище, ім'я, по батькові: <strong><t t-esc="employee.name or ''"/></strong></p>
+    <p>2. РНОКПП: <strong><t t-esc="rnokpp or ''"/></strong></p>
+    <p>3. Найменування підприємства, ЄДРПОУ: <strong><t t-esc="company.name or ''"/>, <t t-esc="company.company_registry or ''"/></strong></p>
+    <p>4. Дата прийняття на роботу: <strong><t t-esc="format_date(hire_date)"/></strong>
+        <span t-if="contract_end_date">, дата звільнення: <strong><t t-esc="format_date(contract_end_date)"/></strong></span></p>
+    <p>5. Посада: <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong></p>
+    <p>6. Розрахунковий період: з <strong><t t-esc="format_date(certificate.period_from)"/></strong>
+        по <strong><t t-esc="format_date(certificate.period_to)"/></strong></p>
+
+    <p>7. Нарахована заробітна плата (без виплат, що не входять до фонду оплати праці):</p>
+
+    <table t-if="monthly_breakdown" style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11pt;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #000; padding: 5px;">Місяць / рік</th>
+                <th style="border: 1px solid #000; padding: 5px;">Кількість відпрацьованих днів</th>
+                <th style="border: 1px solid #000; padding: 5px;">Сума нарахованої з/п (грн)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr t-foreach="monthly_breakdown" t-as="row">
+                <td style="border: 1px solid #000; padding: 5px; text-align: center;"><t t-esc="row['period']"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: center;">_____</td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['gross'])"/></td>
+            </tr>
+            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                <td style="border: 1px solid #000; padding: 5px;">Усього</td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: center;">_____</td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_income)"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p t-if="monthly_breakdown">
+        8. Середньомісячна заробітна плата —
+        <strong><t t-esc="format_money(certificate.total_income / len(monthly_breakdown))"/> грн.</strong>
+        (<t t-esc="amount_to_words(certificate.total_income / len(monthly_breakdown))"/>)
+    </p>
+
+    <p>9. Дні, не відпрацьовані з поважних причин (відпустки без збереження з/п, лікарняні тощо), виключено з розрахунку згідно з ПКМУ № 100 від 08.02.1995.</p>
+
+    <div style="margin-top: 30px;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%;"><t t-esc="director_position"/></td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="director.name if director else ''"/></td>
+            </tr>
+            <tr>
+                <td style="width: 50%;">Головний бухгалтер</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 12pt;">М.П.</p>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- 9. Довідка про доходи для отримання житлово-комунальної субсидії —
+             Постанова КМУ № 848 від 21.10.1995 (зі змінами) -->
+        <record id="certificate_type_subsidy" model="hr.certificate.type">
+            <field name="name">Довідка про доходи для субсидії</field>
+            <field name="code">subsidy</field>
+            <field name="sequence">90</field>
+            <field name="sequence_id" ref="seq_hr_certificate_subsidy"/>
+            <field name="requires_salary_info">True</field>
+            <field name="requires_period">True</field>
+            <field name="requires_destination">False</field>
+            <field name="validity_days">30</field>
+            <field name="template_body"><![CDATA[
+<div style="font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.5;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <strong><t t-esc="company.name or ''"/></strong><br/>
+        <span style="font-size: 11pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
+        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <h2 style="margin: 0;">ДОВІДКА</h2>
+        <p style="margin: 5px 0;">про доходи для призначення житлово-комунальної субсидії</p>
+        <p style="margin: 5px 0; font-size: 10pt; font-style: italic;">(відповідно до Постанови КМУ № 848 від 21.10.1995)</p>
+        <p style="margin: 5px 0;">№ <t t-esc="certificate.name or 'New'"/> від <t t-esc="format_date(certificate.issue_date or certificate.request_date)"/></p>
+    </div>
+
+    <p>Видана <strong><t t-esc="employee.name or ''"/></strong>, РНОКПП <strong><t t-esc="rnokpp or ''"/></strong>,
+        у тому, що він(вона) працює в <strong><t t-esc="company.name or ''"/></strong>
+        на посаді <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong>
+        з <strong><t t-esc="format_date(hire_date)"/></strong>.</p>
+
+    <p>За період з <strong><t t-esc="format_date(certificate.period_from)"/></strong>
+        по <strong><t t-esc="format_date(certificate.period_to)"/></strong>
+        отримано такі доходи (помісячно, в гривнях):</p>
+
+    <table t-if="monthly_breakdown" style="width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11pt;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #000; padding: 5px;">Місяць / рік</th>
+                <th style="border: 1px solid #000; padding: 5px;">Нараховано з/п</th>
+                <th style="border: 1px solid #000; padding: 5px;">ПДФО</th>
+                <th style="border: 1px solid #000; padding: 5px;">Військовий збір</th>
+                <th style="border: 1px solid #000; padding: 5px;">До виплати</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr t-foreach="monthly_breakdown" t-as="row">
+                <td style="border: 1px solid #000; padding: 5px; text-align: center;"><t t-esc="row['period']"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['gross'])"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['pdfo'])"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['military_tax'])"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(row['net'])"/></td>
+            </tr>
+            <tr style="background-color: #f0f0f0; font-weight: bold;">
+                <td style="border: 1px solid #000; padding: 5px;">Усього</td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_income)"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_pdfo)"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_military_tax)"/></td>
+                <td style="border: 1px solid #000; padding: 5px; text-align: right;"><t t-esc="format_money(certificate.total_net)"/></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Інших виплат, що враховуються при визначенні сукупного доходу сім'ї відповідно до Постанови КМУ № 848, не нараховувалось.</p>
+
+    <p>Довідка видана для подання до структурного підрозділу з питань соціального захисту населення.</p>
+
+    <div style="margin-top: 30px;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 50%;"><t t-esc="director_position"/></td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="director.name if director else ''"/></td>
+            </tr>
+            <tr>
+                <td style="width: 50%;">Головний бухгалтер</td>
+                <td style="width: 50%; text-align: right;">________________ <t t-esc="accountant.name if accountant else ''"/></td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 12pt;">М.П.</p>
 </div>
             ]]></field>
         </record>

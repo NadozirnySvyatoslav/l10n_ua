@@ -1065,3 +1065,20 @@ msgstr "Створювати наказ"
 #: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_leave_type__create_order
 msgid "Automatically create a vacation order (form П-3) when a leave of this type is created"
 msgstr "Автоматично створювати наказ про відпустку (форма П-3) при створенні відпустки цього типу"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_vacation_balance_view_tree
+msgid "Recalculate"
+msgstr "Перерахувати"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
+msgid "Recalculation Complete"
+msgstr "Перерахунок завершено"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
+msgid "Vacation balances for %s have been updated for all active employees."
+msgstr "Залишки відпусток на %s рік оновлені для всіх активних співробітників."

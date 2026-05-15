@@ -60,5 +60,29 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        <record id="seq_hr_certificate_pension" model="ir.sequence">
+            <field name="name">HR Certificate: Pension (OK-5)</field>
+            <field name="code">hr.certificate.pension</field>
+            <field name="prefix">ОК5-%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_hr_certificate_employment_center" model="ir.sequence">
+            <field name="name">HR Certificate: Employment Center</field>
+            <field name="code">hr.certificate.employment_center</field>
+            <field name="prefix">ДЦЗ-%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_hr_certificate_subsidy" model="ir.sequence">
+            <field name="name">HR Certificate: Housing Subsidy</field>
+            <field name="code">hr.certificate.subsidy</field>
+            <field name="prefix">ДСУБ-%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
     </data>
 </odoo>

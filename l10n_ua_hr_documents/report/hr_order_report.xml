@@ -77,7 +77,7 @@
                             <tr>
                                 <td style="width: 40%;">Керівник</td>
                                 <td style="width: 30%; border-bottom: 1px solid #000;"></td>
-                                <td style="width: 30%; border-bottom: 1px solid #000;"></td>
+                                <td style="width: 30%; border-bottom: 1px solid #000;"><span t-field="order.company_id.director_id.name"/></td>
                             </tr>
                             <tr>
                                 <td></td>

@@ -72,7 +72,7 @@
                         <tr>
                             <td style="width: 50%;">Директор</td>
                             <td style="width: 50%; text-align: right;">
-                                _____________ / _____________ /
+                                _____________ / <t t-esc="leave.employee_id.company_id.director_id.name or '_____________'"/> /
                             </td>
                         </tr>
                     </table>

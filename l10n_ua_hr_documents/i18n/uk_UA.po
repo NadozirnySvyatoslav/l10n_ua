@@ -448,9 +448,11 @@ msgid "HR Order Type"
 msgstr "Тип кадрового наказу"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__order_ids
+#: model:ir.ui.menu,name:l10n_ua_hr_documents.menu_hr_order
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_search
 msgid "HR Orders"
-msgstr "Кадрові накази"
+msgstr "Накази по персоналу"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order_type__template_body
@@ -1029,9 +1031,9 @@ msgid "Work History Entry"
 msgstr "Запис трудової історії"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.ui.menu,name:l10n_ua_hr_documents.menu_hr_order
-msgid "HR Orders"
-msgstr "Накази по персоналу"
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__orders_count
+msgid "Orders Count"
+msgstr "Кількість наказів"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_from

@@ -82,10 +82,16 @@ class HrCertificate(models.Model):
 
     # Period (for salary/income certificates)
     period_from = fields.Date(
-        string='Period From'
+        string='Period From',
+        compute='_compute_period_defaults',
+        store=True,
+        readonly=False,
     )
     period_to = fields.Date(
-        string='Period To'
+        string='Period To',
+        compute='_compute_period_defaults',
+        store=True,
+        readonly=False,
     )
 
     # Salary information (computed or manual)
@@ -99,7 +105,38 @@ class HrCertificate(models.Model):
     total_income = fields.Monetary(
         string='Total Income (Period)',
         currency_field='currency_id',
-        help='Total income for the specified period'
+        compute='_compute_total_income',
+        store=True,
+        readonly=False,
+        help='Total gross income for the specified period (auto-summed from payslips when available)'
+    )
+    total_pdfo = fields.Monetary(
+        string='Total PDFO',
+        currency_field='currency_id',
+        compute='_compute_total_income',
+        store=True,
+        readonly=False,
+    )
+    total_military_tax = fields.Monetary(
+        string='Total Military Tax',
+        currency_field='currency_id',
+        compute='_compute_total_income',
+        store=True,
+        readonly=False,
+    )
+    total_esv = fields.Monetary(
+        string='Total ESV (Employer)',
+        currency_field='currency_id',
+        compute='_compute_total_income',
+        store=True,
+        readonly=False,
+    )
+    total_net = fields.Monetary(
+        string='Total Net',
+        currency_field='currency_id',
+        compute='_compute_total_income',
+        store=True,
+        readonly=False,
     )
     currency_id = fields.Many2one(
         'res.currency',
@@ -149,20 +186,41 @@ class HrCertificate(models.Model):
             else:
                 record.valid_until = False
 
-    @api.depends('employee_id')
+    @api.depends('employee_id', 'employee_id.current_version_id', 'employee_id.current_version_id.wage')
     def _compute_salary_info(self):
         for record in self:
-            if record.employee_id:
-                # Try to get salary from Ukrainian contract
-                if hasattr(record.employee_id, 'contract_ua_id') and record.employee_id.contract_ua_id:
-                    record.salary_amount = record.employee_id.contract_ua_id.wage
-                # Fallback to hr.version wage
-                elif record.employee_id.version_id:
-                    record.salary_amount = record.employee_id.version_id.wage
-                else:
-                    record.salary_amount = 0
+            version = record._get_employee_version()
+            record.salary_amount = version.wage if version else 0
+
+    @api.depends('certificate_type_id', 'request_date')
+    def _compute_period_defaults(self):
+        """Auto-fill period for cert types that need it (default: last 6 calendar months)."""
+        for record in self:
+            if not record.certificate_type_id or not record.certificate_type_id.requires_period:
+                continue
+            if record.period_from and record.period_to:
+                continue
+            anchor = record.request_date or fields.Date.context_today(record)
+            first_of_month = anchor.replace(day=1)
+            record.period_to = first_of_month - relativedelta(days=1)
+            record.period_from = (record.period_to + relativedelta(days=1)) - relativedelta(months=6)
+
+    @api.depends('employee_id', 'period_from', 'period_to')
+    def _compute_total_income(self):
+        for record in self:
+            payslips = record._get_payslips_for_period()
+            if payslips:
+                record.total_income = sum(p.gross_salary for p in payslips)
+                record.total_pdfo = sum(p.pdfo_amount for p in payslips)
+                record.total_military_tax = sum(p.military_tax_amount for p in payslips)
+                record.total_esv = sum(p.esv_amount for p in payslips)
+                record.total_net = sum(p.net_salary for p in payslips)
             else:
-                record.salary_amount = 0
+                record.total_income = record.total_income or 0
+                record.total_pdfo = record.total_pdfo or 0
+                record.total_military_tax = record.total_military_tax or 0
+                record.total_esv = record.total_esv or 0
+                record.total_net = record.total_net or 0
 
     @api.onchange('certificate_type_id')
     def _onchange_certificate_type_id(self):
@@ -201,33 +259,84 @@ class HrCertificate(models.Model):
             # Fallback: return template as-is
             return template
 
+    def _get_employee_version(self):
+        """Current active hr.version for the employee, or latest if no current."""
+        self.ensure_one()
+        if not self.employee_id:
+            return self.env['hr.version']
+        version = self.employee_id.current_version_id
+        if version:
+            return version
+        return self.env['hr.version'].search(
+            [('employee_id', '=', self.employee_id.id)],
+            order='date_version desc', limit=1,
+        )
+
+    def _get_hire_date(self):
+        """Initial employment start date — earliest contract_date_start across versions."""
+        self.ensure_one()
+        if not self.employee_id:
+            return False
+        version = self.env['hr.version'].search(
+            [('employee_id', '=', self.employee_id.id),
+             ('contract_date_start', '!=', False)],
+            order='contract_date_start asc', limit=1,
+        )
+        if version:
+            return version.contract_date_start
+        first_any = self.env['hr.version'].search(
+            [('employee_id', '=', self.employee_id.id)],
+            order='date_version asc', limit=1,
+        )
+        return first_any.date_version if first_any else False
+
+    def _get_payslips_for_period(self):
+        """Return done/paid payslips overlapping the requested period."""
+        self.ensure_one()
+        if not self.employee_id or not self.period_from or not self.period_to:
+            return self.env['hr.payslip'] if 'hr.payslip' in self.env else []
+        if 'hr.payslip' not in self.env:
+            return []
+        return self.env['hr.payslip'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', 'in', ('done', 'paid')),
+            ('date_from', '>=', self.period_from),
+            ('date_to', '<=', self.period_to),
+        ], order='date_from')
+
+    def _get_monthly_breakdown(self):
+        """List of dicts per payslip for table rendering in templates."""
+        return [{
+            'period': p.date_from.strftime('%m.%Y') if p.date_from else '',
+            'date_from': p.date_from,
+            'date_to': p.date_to,
+            'gross': p.gross_salary,
+            'pdfo': p.pdfo_amount,
+            'military_tax': p.military_tax_amount,
+            'esv': p.esv_amount,
+            'net': p.net_salary,
+        } for p in self._get_payslips_for_period()]
+
     def _get_render_context(self):
-        """Prepare context for QWeb template rendering"""
+        """Prepare context for QWeb template rendering."""
         self.ensure_one()
 
         employee = self.employee_id
         company = self.company_id
 
-        # Get company director
-        director = False
-        director_position = 'Директор'
-        if hasattr(company, 'director_id') and company.director_id:
-            director = company.director_id
-            director_position = director.job_id.name if director.job_id else 'Директор'
+        director = company.director_id
+        director_position = director.job_id.name if director and director.job_id else 'Директор'
+        accountant = company.accountant_id
+        hr_manager = company.hr_manager_id
 
-        # Get hire date from contract (if hr_contract module is installed)
-        hire_date = False
-        contract = False
-        if employee and 'hr.contract' in self.env:
-            contract = self.env['hr.contract'].search([
-                ('employee_id', '=', employee.id),
-                ('state', '=', 'open')
-            ], limit=1)
-            if contract:
-                hire_date = contract.date_start
-
-        # Calculate work experience
+        version = self._get_employee_version()
+        hire_date = self._get_hire_date()
         work_experience = self._calculate_work_experience(hire_date)
+
+        contract_type_ua = dict(
+            version._fields['contract_type_ua'].selection
+        ).get(version.contract_type_ua, '') if version and 'contract_type_ua' in version._fields else ''
+        is_fixed_term = bool(version.contract_date_end) if version else False
 
         return {
             'o': self,
@@ -236,16 +345,28 @@ class HrCertificate(models.Model):
             'company': company,
             'director': director,
             'director_position': director_position,
-            'contract': contract,
+            'accountant': accountant,
+            'hr_manager': hr_manager,
+            'version': version,
             'hire_date': hire_date,
+            'contract_end_date': version.contract_date_end if version else False,
+            'contract_type_ua': contract_type_ua,
+            'is_fixed_term': is_fixed_term,
+            'hire_order_number': version.hire_order_number if version and 'hire_order_number' in version._fields else '',
+            'hire_order_date': version.hire_order_date if version and 'hire_order_date' in version._fields else False,
+            'wage': version.wage if version else 0,
             'work_experience': work_experience,
+            'monthly_breakdown': self._get_monthly_breakdown(),
             'destination': self.destination or 'за місцем вимоги',
             'format_date': self._format_date,
             'format_money': self._format_money,
+            'amount_to_words': self._amount_to_words_ua,
+            'rnokpp': employee.rnokpp if employee else '',
+            'today': fields.Date.context_today(self),
         }
 
     def _calculate_work_experience(self, hire_date):
-        """Calculate work experience string"""
+        """Format work experience as 'X р. Y міс. Z дн.'"""
         if not hire_date:
             return ''
         delta = relativedelta(fields.Date.today(), hire_date)
@@ -254,19 +375,90 @@ class HrCertificate(models.Model):
             parts.append(f"{delta.years} р.")
         if delta.months:
             parts.append(f"{delta.months} міс.")
+        if delta.days:
+            parts.append(f"{delta.days} дн.")
         return ' '.join(parts) if parts else 'менше місяця'
 
     def _format_date(self, date_val, fmt='%d.%m.%Y'):
-        """Format date helper for templates"""
         if date_val:
             return date_val.strftime(fmt)
         return ''
 
     def _format_money(self, amount):
-        """Format monetary amount"""
-        if amount:
-            return f"{amount:,.2f}".replace(',', ' ')
-        return ''
+        if amount is None:
+            return '0,00'
+        return f"{amount:,.2f}".replace(',', ' ').replace('.', ',')
+
+    @staticmethod
+    def _amount_to_words_ua(amount):
+        """Render a monetary amount in Ukrainian words (грн / коп).
+
+        Used in legal salary certificates where the sum must be written
+        in words next to the figures.
+        """
+        if amount is None:
+            return ''
+        try:
+            amount = float(amount)
+        except (TypeError, ValueError):
+            return ''
+
+        ones_m = ['', 'один', 'два', 'три', 'чотири', "п'ять", 'шість', 'сім', 'вісім', "дев'ять"]
+        ones_f = ['', 'одна', 'дві', 'три', 'чотири', "п'ять", 'шість', 'сім', 'вісім', "дев'ять"]
+        teens = ['десять', 'одинадцять', 'дванадцять', 'тринадцять', 'чотирнадцять',
+                 "п'ятнадцять", 'шістнадцять', 'сімнадцять', 'вісімнадцять', "дев'ятнадцять"]
+        tens = ['', '', 'двадцять', 'тридцять', 'сорок', "п'ятдесят",
+                'шістдесят', 'сімдесят', 'вісімдесят', "дев'яносто"]
+        hundreds = ['', 'сто', 'двісті', 'триста', 'чотириста', "п'ятсот",
+                    'шістсот', 'сімсот', 'вісімсот', "дев'ятсот"]
+
+        def _group(n, feminine):
+            ones = ones_f if feminine else ones_m
+            parts = []
+            if n >= 100:
+                parts.append(hundreds[n // 100])
+                n %= 100
+            if 10 <= n < 20:
+                parts.append(teens[n - 10])
+                n = 0
+            if n >= 20:
+                parts.append(tens[n // 10])
+                n %= 10
+            if n > 0:
+                parts.append(ones[n])
+            return ' '.join(parts)
+
+        def _plural(n, forms):
+            n10, n100 = n % 10, n % 100
+            if 11 <= n100 <= 14:
+                return forms[2]
+            if n10 == 1:
+                return forms[0]
+            if 2 <= n10 <= 4:
+                return forms[1]
+            return forms[2]
+
+        whole = int(amount)
+        kop = int(round((amount - whole) * 100))
+
+        millions = whole // 1_000_000
+        thousands = (whole % 1_000_000) // 1000
+        units = whole % 1000
+
+        words = []
+        if millions:
+            words.append(_group(millions, feminine=False))
+            words.append(_plural(millions, ['мільйон', 'мільйони', 'мільйонів']))
+        if thousands:
+            words.append(_group(thousands, feminine=True))
+            words.append(_plural(thousands, ['тисяча', 'тисячі', 'тисяч']))
+        if units or not words:
+            words.append(_group(units, feminine=False) or 'нуль')
+        words.append('грн.')
+        words.append(f"{kop:02d}")
+        words.append('коп.')
+        result = ' '.join(words)
+        return result[0].upper() + result[1:]
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -13,7 +13,8 @@ class HrVacationBalance(models.Model):
         'hr.employee',
         string='Employee',
         required=True,
-        index=True
+        index=True,
+        check_company=True
     )
     leave_type_id = fields.Many2one(
         'hr.leave.type',
@@ -29,6 +30,7 @@ class HrVacationBalance(models.Model):
     company_id = fields.Many2one(
         'res.company',
         string='Company',
+        required=True,
         default=lambda self: self.env.company
     )
     
@@ -67,6 +69,11 @@ class HrVacationBalance(models.Model):
         compute='_compute_display_name',
         store=True
     )
+
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        self.employee_id = False
+        self.leave_type_id = False
 
     @api.depends('entitled_days', 'carried_over', 'used_days')
     def _compute_totals(self):
@@ -279,9 +286,32 @@ class HrVacationBalance(models.Model):
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': 'Vacation Compensation',
-                'message': f'Compensation for {self.remaining_days} unused days: {compensation:.2f} UAH',
+                'title': _('Vacation Compensation'),
+                'message': _('Compensation for %(days)s unused days: %(amount).2f UAH', days=self.remaining_days, amount=compensation),
                 'type': 'success',
                 'sticky': False,
+            }
+        }
+
+    def action_recalculate_all(self):
+        """
+        Recalculate or generate vacation balances for the current year
+        for all active employees.
+        """
+        current_year = fields.Date.today().year
+        self.generate_balances(year=current_year)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Recalculation Complete'),
+                'message': _('Vacation balances for %s have been updated for all active employees.', current_year),
+                'type': 'success',
+                'sticky': False,
+                'next': {
+                    'type': 'ir.actions.client',
+                    'tag': 'reload',
+                }
             }
         }
