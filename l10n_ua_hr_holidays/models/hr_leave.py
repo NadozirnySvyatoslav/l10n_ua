@@ -408,14 +408,22 @@ class HrLeave(models.Model):
                      '&', ('request_date_from', '>=', f'{year}-01-01'),
                           ('request_date_from', '<=', f'{year}-12-31'),
             ]
-            if leave.request_date_from:
+            # Apply the chronological "earlier than this leave" filter ONLY
+            # when the leave's start date falls within (or after) the year
+            # we are computing. For a brand-new draft, Odoo's hr.leave fills
+            # request_date_from with today() by default — applying the
+            # filter in that case would exclude future-year leaves and break
+            # the year-aggregate fallback.
+            year_start = fields.Date.from_string(f'{year}-01-01')
+            if leave.request_date_from and leave.request_date_from >= year_start:
                 domain.append(('request_date_from', '<', leave.request_date_from))
+
             # If this is an existing record (not a new one in the form), exclude it
             if leave._origin.id:
                 domain.append(('id', '!=', leave._origin.id))
 
             previous_leaves = self.env['hr.leave'].search(domain)
-            
+        
             # Sum the CALENDAR days of previous leaves
             used_before = sum(previous_leaves.mapped('calendar_days'))
 
