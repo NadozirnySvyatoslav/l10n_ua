@@ -378,7 +378,63 @@ class HrLeave(models.Model):
     # =================================================================================
     # TRIGGERS FOR CHRONOLOGICAL RECOMPUTATION
     # =================================================================================
-    
+   
+    # ------------------------------------------------------------------
+    # Inverse trigger: keep hr.vacation.balance rollup fields in sync
+    # with hr.leave. The stored used_days / planned_days fields on the
+    # balance row cannot @api.depends on a cross-model search, so we
+    # recompute affected balances explicitly whenever a leave is created,
+    # modified or deleted. Runs alongside _recompute_subsequent_leaves
+    # which keeps per-leave Balance Before/After in sync (different
+    # concern, same hook points).
+    # ------------------------------------------------------------------
+    _BALANCE_TRIGGER_FIELDS = frozenset({
+        'state', 'employee_id', 'holiday_status_id',
+        'date_from', 'date_to',
+        'request_date_from', 'request_date_to',
+        'vacation_year',
+    })
+
+    def _balance_keys(self):
+        """Return (employee_id, leave_type_id, year) tuples identifying
+        the hr.vacation.balance rows touched by leaves in self."""
+        keys = set()
+        for leave in self:
+            emp = leave.employee_id.id
+            ltype = leave.holiday_status_id.id
+            if not emp or not ltype:
+                continue
+            years = set()
+            if leave.vacation_year:
+                years.add(leave.vacation_year)
+            if leave.request_date_from:
+                years.add(leave.request_date_from.year)
+            if leave.request_date_to:
+                years.add(leave.request_date_to.year)
+            for y in years:
+                keys.add((emp, ltype, y))
+        return keys
+
+    @api.model
+    def _recompute_balances_for_keys(self, keys):
+        if not keys:
+            return
+        Balance = self.env['hr.vacation.balance'].sudo()
+        balances = Balance.browse()
+        for emp, ltype, y in keys:
+            balances |= Balance.search([
+                ('employee_id', '=', emp),
+                ('leave_type_id', '=', ltype),
+                ('year', '=', y),
+            ])
+        if balances:
+            balances.invalidate_recordset([
+                'used_days', 'planned_days',
+                'total_available', 'remaining_days',
+            ])
+            balances._compute_used_days()
+            balances._compute_totals()
+
     def _recompute_subsequent_leaves(self):
         """Helper method: forcibly updates the balance for leaves that come AFTER the current one."""
         for leave in self:
@@ -408,16 +464,30 @@ class HrLeave(models.Model):
         leaves = super().create(vals_list)
         # When a new leave is created (e.g., May), recompute the subsequent ones (October)
         leaves._recompute_subsequent_leaves()
+        # Refresh hr.vacation.balance rollup fields (used_days / planned_days).
+        leaves._recompute_balances_for_keys(leaves._balance_keys())
         return leaves
 
     def write(self, vals):
+        # Capture balance keys BEFORE the write so we also refresh rows
+        # we move away from (e.g. employee_id or vacation_year changed).
+        old_keys = (
+            self._balance_keys()
+            if self._BALANCE_TRIGGER_FIELDS & vals.keys()
+            else set()
+        )        
         res = super().write(vals)
         # If dates, status, or leave type change - trigger recomputation
         if any(field in vals for field in ['date_from', 'date_to', 'request_date_from', 'request_date_to', 'state', 'holiday_status_id']):
             self._recompute_subsequent_leaves()
+        if self._BALANCE_TRIGGER_FIELDS & vals.keys():
+            self._recompute_balances_for_keys(old_keys | self._balance_keys())         
         return res
 
     def unlink(self):
+        # Capture balance keys before deletion so we can refresh the
+        # rollup rows those leaves used to contribute to.
+        affected_balance_keys = self._balance_keys()
         # Before unlinking, remember which subsequent leaves need to be recomputed
         leaves_to_recompute = self.env['hr.leave']
         for leave in self:
@@ -438,6 +508,8 @@ class HrLeave(models.Model):
         if leaves_to_recompute:
             leaves_to_recompute._compute_remaining_before()
             leaves_to_recompute._compute_remaining_after()
+        # Refresh hr.vacation.balance rollup rows after deletion.
+        self._recompute_balances_for_keys(affected_balance_keys)            
         return res
 
     def action_calculate_vacation_pay(self):

@@ -202,17 +202,20 @@ class HrVacationScheduleLine(models.Model):
             if not line.employee_id or not line.schedule_id.year:
                 line.actual_days = 0
                 continue
-            
             year = line.schedule_id.year
             year_start = fields.Date.from_string(f'{year}-01-01')
-            year_end = fields.Date.from_string(f'{year}-12-31')
-            
+            year_end   = fields.Date.from_string(f'{year}-12-31')
             leaves = self.env['hr.leave'].search([
                 ('employee_id', '=', line.employee_id.id),
                 ('state', '=', 'validate'),
-                ('date_from', '>=', year_start),
-                ('date_to', '<=', year_end),
-                ('holiday_status_id.ua_leave_category', 'in', ['annual_basic', 'annual_additional']),
+                ('holiday_status_id.ua_leave_category', 'in',
+                    ['annual_basic', 'annual_additional']),
+                '|',
+                    ('vacation_year', '=', year),
+                    '&', '&',
+                        ('vacation_year', 'in', [False, 0]),
+                        ('request_date_from', '<=', year_end),
+                        ('request_date_to', '>=', year_start),
             ])
             line.actual_days = sum(leaves.mapped('number_of_days'))
 

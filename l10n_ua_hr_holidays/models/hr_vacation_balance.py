@@ -38,6 +38,15 @@ class HrVacationBalance(models.Model):
         string='Entitled Days',
         help='Days entitled for the year'
     )
+    entitled_days = fields.Float(
+        string='Entitled Days',
+        compute='_compute_entitled_days',
+        store=True,
+        readonly=False,
+        precompute=True,
+        help='Days entitled for the year. Defaults to leave type annual_days; '
+             'can be overridden manually (e.g. proportional for mid-year hires).'
+    )
     carried_over = fields.Float(
         string='Carried Over',
         help='Days carried from previous year'
@@ -70,6 +79,12 @@ class HrVacationBalance(models.Model):
         store=True
     )
 
+    @api.depends('leave_type_id')
+    def _compute_entitled_days(self):
+        for rec in self:
+            if rec.leave_type_id and not rec.entitled_days:
+                rec.entitled_days = rec.leave_type_id.annual_days or 0
+
     @api.onchange('company_id')
     def _onchange_company_id(self):
         self.employee_id = False
@@ -83,32 +98,32 @@ class HrVacationBalance(models.Model):
 
     @api.depends('employee_id', 'leave_type_id', 'year')
     def _compute_used_days(self):
+        HrLeave = self.env['hr.leave']
         for rec in self:
             if not rec.employee_id or not rec.leave_type_id or not rec.year:
                 rec.used_days = 0
                 rec.planned_days = 0
                 continue
-            
+
             year_start = fields.Date.from_string(f'{rec.year}-01-01')
             year_end = fields.Date.from_string(f'{rec.year}-12-31')
-            
-            # Approved leaves - use calendar_days per Ukrainian law
-            approved_leaves = self.env['hr.leave'].search([
+
+            base_domain = [
                 ('employee_id', '=', rec.employee_id.id),
                 ('holiday_status_id', '=', rec.leave_type_id.id),
-                ('state', '=', 'validate'),
-                ('date_from', '>=', year_start),
-                ('date_to', '<=', year_end),
-            ])
-            rec.used_days = sum(approved_leaves.mapped('calendar_days'))
-            
-            # Planned (not yet approved) - use calendar_days per Ukrainian law
-            planned_leaves = self.env['hr.leave'].search([
-                ('employee_id', '=', rec.employee_id.id),
-                ('holiday_status_id', '=', rec.leave_type_id.id),
-                ('state', 'in', ['draft', 'confirm']),
-                ('date_from', '>=', year_start),
-                ('date_to', '<=', year_end),
+                '|',
+                    ('vacation_year', '=', rec.year),
+                    '&', '&',
+                        ('vacation_year', 'in', [False, 0]),
+                        ('request_date_from', '<=', year_end),
+                        ('request_date_to', '>=', year_start),
+            ]
+
+            used_leaves = HrLeave.search(base_domain + [('state', '=', 'validate')])
+            rec.used_days = sum(used_leaves.mapped('calendar_days'))
+
+            planned_leaves = HrLeave.search(base_domain + [
+                ('state', 'in', ('draft', 'confirm', 'validate1')),
             ])
             rec.planned_days = sum(planned_leaves.mapped('calendar_days'))
 
@@ -292,6 +307,17 @@ class HrVacationBalance(models.Model):
                 'sticky': False,
             }
         }
+
+    def action_recalculate(self):
+        for rec in self:
+            if rec.leave_type_id and not rec.entitled_days:
+                rec.entitled_days = rec.leave_type_id.annual_days or 0
+        self.invalidate_recordset([
+            'used_days', 'planned_days', 'total_available', 'remaining_days',
+        ])
+        self._compute_used_days()
+        self._compute_totals()
+        return True
 
     def action_recalculate_all(self):
         """

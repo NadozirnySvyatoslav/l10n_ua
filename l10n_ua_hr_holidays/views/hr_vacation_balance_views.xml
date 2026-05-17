@@ -10,6 +10,7 @@
                     <button name="action_calculate_compensation" type="object"
                             string="Calculate Compensation" class="oe_highlight"
                             invisible="remaining_days &lt;= 0"/>
+                    <button name="action_recalculate" type="object" string="Recalculate"/>
                 </header>
                 <sheet>
                     <group>
