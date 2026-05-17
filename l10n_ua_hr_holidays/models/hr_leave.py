@@ -373,12 +373,19 @@ class HrLeave(models.Model):
     def _compute_remaining_before(self):
         """Computes the balance before the start of a specific leave in chronological order."""
         for leave in self:
-            if not leave.employee_id or not leave.holiday_status_id or not leave.request_date_from:
+            if not leave.employee_id or not leave.holiday_status_id:    
                 leave.remaining_days_before = 0
                 continue
-        
-            year = leave.vacation_year or leave.request_date_from.year
-            
+
+            # Resolve year from vacation_year first, then fall back to
+            # request_date_from. Without either, we cannot compute.
+            year = leave.vacation_year or (
+                leave.request_date_from.year if leave.request_date_from else False
+            )
+            if not year:
+                leave.remaining_days_before = 0
+                continue
+             
             # Get the initial total balance for the year (Entitled + Carried Over)
             balance = self.env['hr.vacation.balance'].search([
                 ('employee_id', '=', leave.employee_id.id),
@@ -389,6 +396,11 @@ class HrLeave(models.Model):
             total_available = balance.total_available if balance else (leave.holiday_status_id.annual_days or 0)
 
             # Find all EXISTING leaves for this year that start BEFORE the current one
+            # Find leaves of the same year. Chronological mode (request_date_from
+            # set on the leave): only earlier-starting leaves. Year-aggregate
+            # fallback (no request_date_from yet — e.g. a draft in the form
+            # with only vacation_year): all year's leaves so the value reflects
+            # "annual_days − already used/planned this year".
             domain = [
                 ('employee_id', '=', leave.employee_id.id),
                 ('holiday_status_id', '=', leave.holiday_status_id.id),
@@ -396,9 +408,10 @@ class HrLeave(models.Model):
                 ('request_date_from', '<', leave.request_date_from),
                 '|', ('vacation_year', '=', year),
                      '&', ('request_date_from', '>=', f'{year}-01-01'),
-                          ('request_date_from', '<=', f'{year}-12-31')
+                          ('request_date_from', '<=', f'{year}-12-31'),
             ]
-
+            if leave.request_date_from:
+                domain.append(('request_date_from', '<', leave.request_date_from))
             # If this is an existing record (not a new one in the form), exclude it
             if leave._origin.id:
                 domain.append(('id', '!=', leave._origin.id))

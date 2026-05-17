@@ -53,6 +53,8 @@ class TestHrLeave(TransactionCase):
             'name': 'Test Leave',
             'employee_id': self.employee.id,
             'holiday_status_id': self.leave_type_calendar.id,
+            'request_date_from': date(2026, 1, 15),
+            'request_date_to':   date(2026, 1, 21),
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
         })
