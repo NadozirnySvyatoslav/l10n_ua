@@ -33,11 +33,6 @@ class HrVacationBalance(models.Model):
         required=True,
         default=lambda self: self.env.company
     )
-    
-    entitled_days = fields.Float(
-        string='Entitled Days',
-        help='Days entitled for the year'
-    )
     entitled_days = fields.Float(
         string='Entitled Days',
         compute='_compute_entitled_days',

@@ -133,9 +133,20 @@ class HrLeave(models.Model):
                     'department_id': leave.employee_id.department_id.id,
                     'job_id': leave.employee_id.job_id.id,
                 })
+        # Per-leave Balance Before/After for subsequent leaves in same year.
+        leaves._recompute_subsequent_leaves()
+        # Rollup fields used_days / planned_days on hr.vacation.balance.
+        leaves._recompute_balances_for_keys(leaves._balance_keys())               
         return leaves
 
     def write(self, vals):
+        # Capture balance keys BEFORE the write so we also refresh rows
+        # we move away from (e.g. employee_id or vacation_year changed).
+        old_balance_keys = (
+            self._balance_keys()
+            if self._BALANCE_TRIGGER_FIELDS & vals.keys()
+            else set()
+        )        
         result = super().write(vals)
         # Add a check for _creating_leave_from_order to avoid order duplication
         if not self.env.context.get('_sync_order_leave') and not self.env.context.get('_creating_leave_from_order'):
@@ -165,6 +176,13 @@ class HrLeave(models.Model):
                     })
                     leave.with_context(_sync_order_leave=True).write({'order_id': order.id})
                     order.with_context(_sync_order_leave=True).write({'leave_id': leave.id})
+        # Per-leave Balance Before/After for subsequent leaves.
+        if any(f in vals for f in ('date_from', 'date_to', 'request_date_from',
+                                    'request_date_to', 'state', 'holiday_status_id')):
+            self._recompute_subsequent_leaves()
+        # Rollup fields on hr.vacation.balance.
+        if self._BALANCE_TRIGGER_FIELDS & vals.keys():
+            self._recompute_balances_for_keys(old_balance_keys | self._balance_keys())                   
         return result
 
     def _action_validate(self, *args, **kwargs):
@@ -180,6 +198,24 @@ class HrLeave(models.Model):
         return res
 
     def unlink(self):
+        # Capture balance keys before deletion so we can refresh the
+        # rollup rows those leaves used to contribute to.
+        affected_balance_keys = self._balance_keys()
+        # Capture subsequent leaves before deletion so we can refresh
+        # their per-leave Balance Before/After after super().unlink().
+        leaves_to_recompute = self.env['hr.leave']
+        for leave in self:
+            if leave.employee_id and leave.holiday_status_id and leave.request_date_from:
+                year = leave.vacation_year or leave.request_date_from.year
+                leaves_to_recompute |= self.env['hr.leave'].search([
+                    ('employee_id', '=', leave.employee_id.id),
+                    ('holiday_status_id', '=', leave.holiday_status_id.id),
+                    ('request_date_from', '>', leave.request_date_from),
+                    '|', ('vacation_year', '=', year),
+                         '&', ('request_date_from', '>=', f'{year}-01-01'),
+                              ('request_date_from', '<=', f'{year}-12-31'),
+                    ('id', 'not in', self.ids)
+                ])
         orders_to_delete = self.filtered(
             lambda l: l.order_id
             and l.state != 'validate'
@@ -188,6 +224,10 @@ class HrLeave(models.Model):
         res = super().unlink()
         if orders_to_delete:
             orders_to_delete.with_context(_sync_order_leave=True).unlink()
+        if leaves_to_recompute:
+            leaves_to_recompute._compute_remaining_before()
+            leaves_to_recompute._compute_remaining_after()
+        self._recompute_balances_for_keys(affected_balance_keys)
         return res
 
     @api.constrains('employee_id', 'holiday_status_id', 'date_from')
@@ -458,59 +498,6 @@ class HrLeave(models.Model):
                 subsequent_leaves._compute_remaining_after()
                 # 2. Store data to the database
                 subsequent_leaves.flush_recordset(['remaining_days_before', 'remaining_days_after'])
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        leaves = super().create(vals_list)
-        # When a new leave is created (e.g., May), recompute the subsequent ones (October)
-        leaves._recompute_subsequent_leaves()
-        # Refresh hr.vacation.balance rollup fields (used_days / planned_days).
-        leaves._recompute_balances_for_keys(leaves._balance_keys())
-        return leaves
-
-    def write(self, vals):
-        # Capture balance keys BEFORE the write so we also refresh rows
-        # we move away from (e.g. employee_id or vacation_year changed).
-        old_keys = (
-            self._balance_keys()
-            if self._BALANCE_TRIGGER_FIELDS & vals.keys()
-            else set()
-        )        
-        res = super().write(vals)
-        # If dates, status, or leave type change - trigger recomputation
-        if any(field in vals for field in ['date_from', 'date_to', 'request_date_from', 'request_date_to', 'state', 'holiday_status_id']):
-            self._recompute_subsequent_leaves()
-        if self._BALANCE_TRIGGER_FIELDS & vals.keys():
-            self._recompute_balances_for_keys(old_keys | self._balance_keys())         
-        return res
-
-    def unlink(self):
-        # Capture balance keys before deletion so we can refresh the
-        # rollup rows those leaves used to contribute to.
-        affected_balance_keys = self._balance_keys()
-        # Before unlinking, remember which subsequent leaves need to be recomputed
-        leaves_to_recompute = self.env['hr.leave']
-        for leave in self:
-            if leave.employee_id and leave.holiday_status_id and leave.request_date_from:
-                year = leave.vacation_year or leave.request_date_from.year
-                leaves_to_recompute |= self.env['hr.leave'].search([
-                    ('employee_id', '=', leave.employee_id.id),
-                    ('holiday_status_id', '=', leave.holiday_status_id.id),
-                    ('request_date_from', '>', leave.request_date_from),
-                    '|', ('vacation_year', '=', year),
-                         '&', ('request_date_from', '>=', f'{year}-01-01'),
-                              ('request_date_from', '<=', f'{year}-12-31'),
-                    ('id', 'not in', self.ids)
-                ])
-        res = super().unlink()
-        
-        # After unlinking, recompute the balance for the leaves kept in memory
-        if leaves_to_recompute:
-            leaves_to_recompute._compute_remaining_before()
-            leaves_to_recompute._compute_remaining_after()
-        # Refresh hr.vacation.balance rollup rows after deletion.
-        self._recompute_balances_for_keys(affected_balance_keys)            
-        return res
 
     def action_calculate_vacation_pay(self):
         """Calculate average daily salary and vacation pay"""
