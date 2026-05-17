@@ -395,7 +395,6 @@ class HrLeave(models.Model):
         
             total_available = balance.total_available if balance else (leave.holiday_status_id.annual_days or 0)
 
-            # Find all EXISTING leaves for this year that start BEFORE the current one
             # Find leaves of the same year. Chronological mode (request_date_from
             # set on the leave): only earlier-starting leaves. Year-aggregate
             # fallback (no request_date_from yet — e.g. a draft in the form
@@ -405,7 +404,6 @@ class HrLeave(models.Model):
                 ('employee_id', '=', leave.employee_id.id),
                 ('holiday_status_id', '=', leave.holiday_status_id.id),
                 ('state', 'not in', ['cancel', 'refuse']), # Count both planned and approved leaves
-                ('request_date_from', '<', leave.request_date_from),
                 '|', ('vacation_year', '=', year),
                      '&', ('request_date_from', '>=', f'{year}-01-01'),
                           ('request_date_from', '<=', f'{year}-12-31'),
