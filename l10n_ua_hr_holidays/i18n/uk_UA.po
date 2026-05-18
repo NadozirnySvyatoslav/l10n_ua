@@ -1082,3 +1082,94 @@ msgstr "Перерахунок завершено"
 #: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
 msgid "Vacation balances for %s have been updated for all active employees."
 msgstr "Залишки відпусток на %s рік оновлені для всіх активних співробітників."
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_vacation_schedule_line_view_form
+msgid "Period 1"
+msgstr "Період 1"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_vacation_schedule_line_view_form
+msgid "Period 2"
+msgstr "Період 2"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_vacation_schedule_line_view_form
+msgid "Period 3"
+msgstr "Період 3"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_vacation_schedule_line_view_form
+msgid "Schedule Line"
+msgstr "Рядок графіка відпусток"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_employee_vacation_summary_report_view_form
+msgid "Vacation Summary Report"
+msgstr "Підсумок відпусток"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_employee_vacation_summary_report_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_employee_vacation_summary_report_view_search
+msgid "Vacation Summary Reports"
+msgstr "Підсумки відпусток"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.actions.act_window,help:l10n_ua_hr_holidays.action_hr_vacation_schedule_line_calendar
+msgid "No vacation periods scheduled"
+msgstr "Періоди відпусток не заплановані"
+
+#. module: l10n_ua_hr_holidays
+#: model_terms:ir.actions.act_window,help:l10n_ua_hr_holidays.action_hr_vacation_schedule_line_calendar
+msgid "Fill in vacation periods in the schedule to see them here."
+msgstr "Заповніть періоди відпусток у графіку, щоб побачити їх тут."
+
+# --- Overrides for buttons rendered from core hr_holidays on hr.leave form ---
+
+#. module: l10n_ua_hr_holidays
+msgid "Back to Approval"
+msgstr "Повернути на затвердження"
+
+#. module: l10n_ua_hr_holidays
+msgid "Validate"
+msgstr "Затвердити"
+
+#. module: l10n_ua_hr_holidays
+msgid "Refuse"
+msgstr "Відмовити"
+
+#. module: l10n_ua_hr_holidays
+msgid "Mark as Draft"
+msgstr "Позначити як чернетку"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
+msgid "Vacation Compensation"
+msgstr "Компенсація за невикористану відпустку"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
+msgid "Compensation for %(days)s unused days: %(amount).2f UAH"
+msgstr "Компенсація за %(days)s невикористаних днів: %(amount).2f грн"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
+msgid ""
+"Employee %(employee)s has unused vacation days from %(year)s or earlier. "
+"According to Ukrainian law, vacation must be used within %(max_years)s years."
+msgstr ""
+"У працівника %(employee)s є невикористані дні відпустки за %(year)s рік або раніше. "
+"Згідно з українським законодавством, відпустку треба використати протягом %(max_years)s років."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
+msgid ""
+"Employee %(employee)s must work at least %(months)s months before first annual leave. "
+"Current experience: %(current)s months."
+msgstr ""
+"Працівник %(employee)s має відпрацювати щонайменше %(months)s місяців до першої щорічної відпустки. "
+"Поточний стаж: %(current)s місяців."
