@@ -46,6 +46,7 @@
                                     <field name="work_phone" optional="show"/>
                                     <field name="work_email" optional="show"/>
                                     <field name="category_ids" widget="many2many_tags" optional="hide" string="Теги"/>
+                                    <field name="departure_date" optional="hide" string="Дата звільнення"/>				    
                                 </list>
                             </field>
                         </page>

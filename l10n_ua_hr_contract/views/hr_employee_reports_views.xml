@@ -9,11 +9,10 @@
         <field name="model">hr.employee.list.report</field>
         <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_list_report_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='employee_ids']/list/field[@name='category_ids']"
-                   position="after">
+            <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
+                   position="before">
                 <field name="contract_type_ua" optional="hide"/>
                 <field name="is_main_workplace" optional="hide"/>
-                <field name="departure_date" optional="hide" string="Дата звільнення"/>
             </xpath>
         </field>
     </record>
@@ -24,7 +23,7 @@
         <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_military_report_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
-                   position="after">
+                   position="before">
                 <field name="contract_type_ua" optional="hide"/>
                 <field name="is_main_workplace" optional="hide"/>
             </xpath>
@@ -37,7 +36,7 @@
         <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_benefits_report_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
-                   position="after">
+                   position="before">
                 <field name="contract_type_ua" optional="hide"/>
                 <field name="is_main_workplace" optional="hide"/>
             </xpath>
