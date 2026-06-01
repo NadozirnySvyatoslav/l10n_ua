@@ -3,20 +3,46 @@ from odoo import models, fields, api
 def _was_employed_on(employee, as_of):
     """Return True if employee (active or archived) was employed on as_of date.
 
-    Applied to every candidate so the report lists only people whose
-    contract covered the report date.
+    Employment is detected by collecting every available "start of
+    employment" and "end of employment" date the schema may carry
+    (different Odoo versions / localizations name them differently) and
+    treating the employee as employed on as_of when any start <= as_of
+    and no end is strictly before as_of.
     """
     if not as_of:
         return True
-    versions = employee.version_ids.filtered('contract_date_start')
-    if versions:
-        return any(
-            v.contract_date_start <= as_of
-            and (not v.contract_date_end or v.contract_date_end >= as_of)
-            for v in versions
-        )
-    # Fallback when no contract version is available yet.
-    return bool(employee.hire_date) and employee.hire_date <= as_of
+
+    employee = employee.with_context(active_test=False)
+
+    def has(rec, name):
+        return name in rec._fields
+
+    starts = []
+    for v in employee.version_ids:
+        starts.append(v.contract_date_start)
+        if has(v, 'date_start'):
+            starts.append(v.date_start)
+        if has(v, 'date_version'):
+            starts.append(v.date_version)
+    starts.append(employee.hire_date)
+    if has(employee, 'first_contract_date'):
+        starts.append(employee.first_contract_date)
+
+    if not any(d and d <= as_of for d in starts):
+        return False
+
+    ends = []
+    for v in employee.version_ids:
+        ends.append(v.contract_date_end)
+        if has(v, 'date_end'):
+            ends.append(v.date_end)
+    if has(employee, 'departure_date'):
+        ends.append(employee.departure_date)
+    ends = [d for d in ends if d]
+
+    if not ends:
+        return True
+    return max(ends) >= as_of
 
 class HrEmployeeListReport(models.Model):
     """Employee List Report (Список працівників).

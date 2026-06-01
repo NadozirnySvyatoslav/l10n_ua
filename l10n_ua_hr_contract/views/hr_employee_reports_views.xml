@@ -12,7 +12,7 @@
                    position="after">
                 <field name="contract_type_ua" optional="hide"/>
                 <field name="is_main_workplace" optional="hide"/>
-                <field name="contract_date_end" optional="hide" string="Дата звільнення"/>
+		<field name="departure_date" optional="hide" string="Дата звільнення"/>
             </xpath>
         </field>
     </record>

@@ -33,6 +33,24 @@
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
 
+    <record id="hr_employee_list_report_company_rule" model="ir.rule">
+        <field name="name">Employee List Report: Multi-company</field>
+        <field name="model_id" ref="model_hr_employee_list_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="hr_employee_military_report_company_rule" model="ir.rule">
+        <field name="name">Military Personnel Report: Multi-company</field>
+        <field name="model_id" ref="model_hr_employee_military_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="hr_employee_benefits_report_company_rule" model="ir.rule">
+        <field name="name">Employees with Benefits Report: Multi-company</field>
+        <field name="model_id" ref="model_hr_employee_benefits_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
     <record id="hr_employee_child_rule" model="ir.rule">
         <field name="name">Employee Child: Access via Employee</field>
         <field name="model_id" ref="model_hr_employee_child"/>
