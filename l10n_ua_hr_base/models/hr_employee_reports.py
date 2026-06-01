@@ -157,7 +157,6 @@ class HrEmployeeMilitaryReport(models.Model):
         for rec in self:
             candidates = rec.env['hr.employee'].with_context(active_test=False).search([
                 ('company_id', '=', rec.company_id.id),
-                ('active', '=', True),
                 ('military_status', 'in', ['liable', 'reserved']),
             ])
             as_of = rec.date
@@ -252,7 +251,6 @@ class HrEmployeeBenefitsReport(models.Model):
         for rec in self:
             candidates = rec.env['hr.employee'].with_context(active_test=False).search([
                 ('company_id', '=', rec.company_id.id),
-                ('active', '=', True),
                 '|', '|', '|',
                 ('disability_group', 'not in', [False, 'none']),
                 ('chornobyl_category', 'not in', [False, 'none']),

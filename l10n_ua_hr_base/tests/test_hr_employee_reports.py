@@ -55,6 +55,7 @@ class TestHrEmployeeReports(TestHrUaBase):
         self.assertEqual(report.state, 'draft')
         
         report.action_generate()
+        report = report.with_context(active_test=False)
         self.assertEqual(report.state, 'generated')
         
         # Everyone employed on the report date (active or archived); others out.
