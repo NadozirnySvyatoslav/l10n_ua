@@ -154,6 +154,7 @@
                                     <field name="military_reservation" optional="show"/>
                                     <field name="military_reservation_until" optional="show"/>
                                     <field name="category_ids" widget="many2many_tags" optional="hide" string="Теги"/>
+				    <field name="departure_date" optional="hide" string="Дата звільнення"/>
                                 </list>
                             </field>
                         </page>
@@ -262,6 +263,7 @@
                                     <field name="veteran_status" optional="show"/>
                                     <field name="benefit_ids" widget="many2many_tags" optional="show" string="Інші пільги"/>
                                     <field name="category_ids" widget="many2many_tags" optional="hide" string="Теги"/>
+				    <field name="departure_date" optional="hide" string="Дата звільнення"/>
                                 </list>
                             </field>
                         </page>
