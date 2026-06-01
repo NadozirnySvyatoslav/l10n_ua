@@ -85,6 +85,11 @@ class HrEmployee(models.Model):
         related='current_version_id.termination_reason_ua_id',
         readonly=False
     )
+    contract_date_end = fields.Date(
+        related='current_version_id.contract_date_end',
+        readonly=True,
+        string='Contract End Date',
+    )
     probation_period_days = fields.Integer(
         related='current_version_id.probation_period_days',
         readonly=False

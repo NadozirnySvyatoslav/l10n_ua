@@ -1,5 +1,22 @@
 from odoo import models, fields, api
 
+def _was_employed_on(employee, as_of):
+    """Return True if employee (active or archived) was employed on as_of date.
+
+    Applied to every candidate so the report lists only people whose
+    contract covered the report date.
+    """
+    if not as_of:
+        return True
+    versions = employee.version_ids.filtered('contract_date_start')
+    if versions:
+        return any(
+            v.contract_date_start <= as_of
+            and (not v.contract_date_end or v.contract_date_end >= as_of)
+            for v in versions
+        )
+    # Fallback when no contract version is available yet.
+    return bool(employee.hire_date) and employee.hire_date <= as_of
 
 class HrEmployeeListReport(models.Model):
     """Employee List Report (Список працівників).
@@ -49,18 +66,23 @@ class HrEmployeeListReport(models.Model):
     @api.depends('employee_ids')
     def _compute_employee_count(self):
         for rec in self:
-            rec.employee_count = len(rec.employee_ids)
+            rec.employee_count = len(rec.with_context(active_test=False).employee_ids)
 
     def _domain_employees(self):
         self.ensure_one()
         return [
             ('company_id', '=', self.company_id.id),
-            ('active', '=', True),
         ]
 
     def action_generate(self):
         for rec in self:
-            employees = rec.env['hr.employee'].search(rec._domain_employees())
+            candidates = rec.env['hr.employee'].with_context(
+                active_test=False).search(rec._domain_employees())
+            as_of = rec.date
+            # Keep only employees (active or archived) employed on the date.
+            employees = candidates.filtered(
+                lambda e: _was_employed_on(e, as_of))
+
             rec.write({
                 'employee_ids': [(6, 0, employees.ids)],
                 'state': 'generated',
@@ -126,16 +148,21 @@ class HrEmployeeMilitaryReport(models.Model):
     @api.depends('employee_ids', 'employee_ids.military_reservation')
     def _compute_employee_count(self):
         for rec in self:
-            rec.employee_count = len(rec.employee_ids)
-            rec.reserved_count = len(rec.employee_ids.filtered('military_reservation'))
+            employees = rec.with_context(active_test=False).employee_ids
+            rec.employee_count = len(employees)
+            rec.reserved_count = len(employees.filtered('military_reservation'))
+
 
     def action_generate(self):
         for rec in self:
-            employees = rec.env['hr.employee'].search([
+            candidates = rec.env['hr.employee'].with_context(active_test=False).search([
                 ('company_id', '=', rec.company_id.id),
                 ('active', '=', True),
                 ('military_status', 'in', ['liable', 'reserved']),
             ])
+            as_of = rec.date
+            employees = candidates.filtered(
+                lambda e: _was_employed_on(e, as_of))
             rec.write({
                 'employee_ids': [(6, 0, employees.ids)],
                 'state': 'generated',
@@ -212,7 +239,7 @@ class HrEmployeeBenefitsReport(models.Model):
                  'employee_ids.chornobyl_category', 'employee_ids.veteran_status')
     def _compute_employee_count(self):
         for rec in self:
-            employees = rec.employee_ids
+            employees = rec.with_context(active_test=False).employee_ids
             rec.employee_count = len(employees)
             rec.disabled_count = len(employees.filtered(
                 lambda e: e.disability_group and e.disability_group != 'none'))
@@ -223,7 +250,7 @@ class HrEmployeeBenefitsReport(models.Model):
 
     def action_generate(self):
         for rec in self:
-            employees = rec.env['hr.employee'].search([
+            candidates = rec.env['hr.employee'].with_context(active_test=False).search([
                 ('company_id', '=', rec.company_id.id),
                 ('active', '=', True),
                 '|', '|', '|',
@@ -232,6 +259,9 @@ class HrEmployeeBenefitsReport(models.Model):
                 ('veteran_status', 'not in', [False, 'none']),
                 ('benefit_ids', '!=', False),
             ])
+            as_of = rec.date
+            employees = candidates.filtered(
+                lambda e: _was_employed_on(e, as_of))
             rec.write({
                 'employee_ids': [(6, 0, employees.ids)],
                 'state': 'generated',

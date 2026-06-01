@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Extend the Employee List Report embedded list with contract-related
+         optional columns. -->
+    <record id="hr_employee_list_report_view_form_contract" model="ir.ui.view">
+        <field name="name">hr.employee.list.report.form.contract</field>
+        <field name="model">hr.employee.list.report</field>
+        <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_list_report_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_ids']/list/field[@name='category_ids']"
+                   position="after">
+                <field name="contract_type_ua" optional="hide"/>
+                <field name="is_main_workplace" optional="hide"/>
+                <field name="contract_date_end" optional="hide" string="Дата звільнення"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
+

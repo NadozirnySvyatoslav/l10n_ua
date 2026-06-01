@@ -27,6 +27,7 @@
                         <group string="Параметри">
                             <field name="date" readonly="state != 'draft'"/>
                             <field name="company_id" groups="base.group_multi_company"
+                                   domain="[('id', 'in', allowed_company_ids)]"
                                    readonly="state != 'draft'"/>
                         </group>
                         <group string="Результат">
@@ -35,15 +36,16 @@
                     </group>
                     <notebook>
                         <page string="Працівники" name="employees">
-                            <field name="employee_ids" readonly="1">
+                            <field name="employee_ids" readonly="1" context="{'active_test': False}">				
                                 <list>
                                     <field name="name"/>
-                                    <field name="department_id"/>
-                                    <field name="job_id"/>
-                                    <field name="hire_date"/>
-                                    <field name="rnokpp"/>
-                                    <field name="work_phone"/>
-                                    <field name="work_email"/>
+                                    <field name="department_id" optional="show"/>
+                                    <field name="job_id" optional="show"/>
+                                    <field name="hire_date" optional="show"/>
+                                    <field name="rnokpp" optional="show"/>
+                                    <field name="work_phone" optional="show"/>
+                                    <field name="work_email" optional="show"/>
+                                    <field name="category_ids" widget="many2many_tags" optional="hide" string="Теги"/>
                                 </list>
                             </field>
                         </page>
@@ -129,6 +131,7 @@
                         <group string="Параметри">
                             <field name="date" readonly="state != 'draft'"/>
                             <field name="company_id" groups="base.group_multi_company"
+                                   domain="[('id', 'in', allowed_company_ids)]"
                                    readonly="state != 'draft'"/>
                         </group>
                         <group string="Результат">
@@ -138,18 +141,19 @@
                     </group>
                     <notebook>
                         <page string="Військовозобов'язані" name="employees">
-                            <field name="employee_ids" readonly="1">
+                            <field name="employee_ids" readonly="1" context="{'active_test': False}">
                                 <list>
                                     <field name="name"/>
-                                    <field name="birthday"/>
-                                    <field name="job_id"/>
-                                    <field name="military_rank_id"/>
-                                    <field name="military_specialty"/>
-                                    <field name="military_category"/>
-                                    <field name="military_fitness"/>
-                                    <field name="military_tcc_id"/>
-                                    <field name="military_reservation"/>
-                                    <field name="military_reservation_until"/>
+                                    <field name="birthday" optional="show"/>
+                                    <field name="job_id" optional="show"/>
+                                    <field name="military_rank_id" optional="show"/>
+                                    <field name="military_specialty" optional="show"/>
+                                    <field name="military_category" optional="show"/>
+                                    <field name="military_fitness" optional="show"/>
+                                    <field name="military_tcc_id" optional="show"/>
+                                    <field name="military_reservation" optional="show"/>
+                                    <field name="military_reservation_until" optional="show"/>
+                                    <field name="category_ids" widget="many2many_tags" optional="hide" string="Теги"/>
                                 </list>
                             </field>
                         </page>
@@ -237,6 +241,7 @@
                         <group string="Параметри">
                             <field name="date" readonly="state != 'draft'"/>
                             <field name="company_id" groups="base.group_multi_company"
+                                   domain="[('id', 'in', allowed_company_ids)]"
                                    readonly="state != 'draft'"/>
                         </group>
                         <group string="Результат">
@@ -248,14 +253,15 @@
                     </group>
                     <notebook>
                         <page string="Працівники з пільгами" name="employees">
-                            <field name="employee_ids" readonly="1">
+                            <field name="employee_ids" readonly="1" context="{'active_test': False}">
                                 <list>
                                     <field name="name"/>
-                                    <field name="job_id"/>
-                                    <field name="disability_group"/>
-                                    <field name="chornobyl_category"/>
-                                    <field name="veteran_status"/>
-                                    <field name="benefit_ids" widget="many2many_tags"/>
+                                    <field name="job_id" optional="show"/>
+                                    <field name="disability_group" optional="show"/>
+                                    <field name="chornobyl_category" optional="show"/>
+                                    <field name="veteran_status" optional="show"/>
+                                    <field name="benefit_ids" widget="many2many_tags" optional="show" string="Інші пільги"/>
+                                    <field name="category_ids" widget="many2many_tags" optional="hide" string="Теги"/>
                                 </list>
                             </field>
                         </page>
