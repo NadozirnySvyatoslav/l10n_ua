@@ -213,10 +213,9 @@ class L10nUaAsset(models.Model):
 
     def action_view_revaluations(self):
         self.ensure_one()
-        Line = self.env['l10n_ua.asset.revaluation.line']
-        revaluation_ids = Line.search([
-            ('asset_id', '=', self.id),
-        ]).mapped('revaluation_id').ids
+        revaluation_ids = self.revaluation_line_ids.filtered(
+            lambda l: l.state == 'confirmed'
+        ).mapped('revaluation_id').ids
         return {
             'name': _('Переоцінки %s') % self.name,
             'type': 'ir.actions.act_window',

@@ -451,3 +451,55 @@ class TestAssetRevaluation(TransactionCase):
         self.assertEqual(rev.state, 'draft')
         self.assertEqual(len(rev.line_ids), 1)
         self.assertEqual(rev.line_ids.asset_id, asset)
+
+    def test_confirm_refreshes_stale_snapshot(self):
+        """#101: якщо депреціація постилась між draft і confirm —
+        snapshot оновлюється з live значень асета.
+        """
+        asset = self._create_asset(original_value=100000)
+        asset.action_commission()
+        self._post_depreciation(asset, 20000)
+        # Створюємо draft зі snapshot accumulated=20000
+        rev = self.env['l10n_ua.asset.revaluation'].create({
+            **self._common_revaluation_vals(),
+            'line_ids': [(0, 0, {
+                'asset_id': asset.id,
+                'original_value_before': asset.original_value,
+                'accumulated_before': asset.accumulated_depreciation,
+                'fair_value': 100000,
+            })],
+        })
+        # Між створенням і confirm — пройшла ще одна амортизація
+        self._post_depreciation(asset, 5000, date_=date(2025, 5, 31))
+        # asset.accumulated_depreciation тепер 25000
+        self.assertAlmostEqual(asset.accumulated_depreciation, 25000, places=2)
+        # Підтверджуємо — snapshot має оновитися
+        rev.action_confirm()
+        line = rev.line_ids
+        self.assertAlmostEqual(line.accumulated_before, 25000, places=2)
+        # book_value_before = 100000 - 25000 = 75000
+        # index = 100000 / 75000 = 1.333...
+        # new_original = 100000 * 1.333... = 133333.33
+        # new_accumulated = 25000 * 1.333... = 33333.33
+        self.assertAlmostEqual(asset.original_value, 133333.33, places=2)
+        self.assertAlmostEqual(asset.book_value, 100000, places=0)
+
+    def test_confirm_rejects_written_off_asset(self):
+        """#110: action_confirm перевіряє стан асета."""
+        asset = self._create_asset()
+        asset.action_commission()
+        self._post_depreciation(asset, 10000)
+        rev = self.env['l10n_ua.asset.revaluation'].create({
+            **self._common_revaluation_vals(),
+            'line_ids': [(0, 0, {
+                'asset_id': asset.id,
+                'original_value_before': asset.original_value,
+                'accumulated_before': asset.accumulated_depreciation,
+                'fair_value': asset.book_value + 1000,
+            })],
+        })
+        # Списати асет
+        asset.action_write_off()
+        # Тепер confirm має впасти
+        with self.assertRaises(UserError):
+            rev.action_confirm()

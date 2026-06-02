@@ -30,7 +30,9 @@
                         <button name="action_view_move" type="object"
                                 class="oe_stat_button" icon="fa-pencil-square-o"
                                 invisible="not move_id">
-                            <field name="move_id" widget="statinfo" string="Проводка"/>
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Проводка</span>
+                            </div>
                         </button>
                     </div>
                     <div class="oe_title">
@@ -138,7 +140,7 @@
                         domain="[('state', '=', 'cancelled')]"/>
                 <separator/>
                 <filter string="Цей рік" name="filter_this_year"
-                        domain="[('date', '&gt;=', (context_today().replace(month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                        domain="[('date', '&gt;=', context_today().replace(month=1, day=1))]"/>
 
                 <group>
                     <filter string="Стан" name="groupby_state" domain="[]"

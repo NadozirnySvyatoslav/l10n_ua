@@ -9,6 +9,7 @@ class L10nUaAssetRevaluation(models.Model):
     _description = 'Переоцінка основних засобів'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date desc, id desc'
+    _check_company_auto = True
 
     name = fields.Char(
         string='Номер',
@@ -56,30 +57,35 @@ class L10nUaAssetRevaluation(models.Model):
         string='Журнал',
         domain="[('type', '=', 'general'), ('company_id', '=', company_id)]",
         help='Бухгалтерський журнал для проводок переоцінки',
+        check_company=True,
     )
     fixed_asset_account_id = fields.Many2one(
         'account.account',
         string='Рахунок ОЗ (10)',
         domain="[('company_ids', 'in', company_id)]",
         help='Рахунок первісної вартості ОЗ (за замовч. 10)',
+        check_company=True,
     )
     accumulated_depreciation_account_id = fields.Many2one(
         'account.account',
         string='Рахунок зносу (131)',
         domain="[('company_ids', 'in', company_id)]",
         help='Рахунок накопиченого зносу (за замовч. 131)',
+        check_company=True,
     )
     revaluation_surplus_account_id = fields.Many2one(
         'account.account',
         string='Дооцінка (411)',
         domain="[('company_ids', 'in', company_id)]",
         help='Капітал у дооцінках (за замовч. 411)',
+        check_company=True,
     )
     impairment_loss_account_id = fields.Many2one(
         'account.account',
         string='Уцінка (975)',
         domain="[('company_ids', 'in', company_id)]",
         help='Витрати на уцінку ОЗ (за замовч. 975)',
+        check_company=True,
     )
     other_income_account_id = fields.Many2one(
         'account.account',
@@ -87,12 +93,14 @@ class L10nUaAssetRevaluation(models.Model):
         domain="[('company_ids', 'in', company_id)]",
         help='Інші операційні доходи — використовується при дооцінці '
              'після попередньої уцінки (П(С)БО 7 п.20)',
+        check_company=True,
     )
     move_id = fields.Many2one(
         'account.move',
         string='Бухгалтерська проводка',
         readonly=True,
         copy=False,
+        check_company=True,
     )
 
     # --- Підсумки ---
@@ -150,33 +158,61 @@ class L10nUaAssetRevaluation(models.Model):
     def action_confirm(self):
         """Підтвердити переоцінку: створити коригувальні рядки амортизації,
         оновити первісну вартість ОЗ, створити account.move.
+
+        Бере row-level lock на документ, щоб уникнути race-condition
+        при double-click або паралельних викликах.
         """
+        # Acquire FOR UPDATE on this revaluation row so a concurrent
+        # confirm call serialises behind us instead of producing
+        # duplicate moves / adjustment rows.
+        if self.ids:
+            self.env.cr.execute(
+                'SELECT id FROM l10n_ua_asset_revaluation '
+                'WHERE id IN %s FOR UPDATE',
+                (tuple(self.ids),),
+            )
         for rec in self:
             if rec.state != 'draft':
                 raise UserError(_('Переоцінку можна підтвердити лише з чернетки.'))
             if not rec.line_ids:
                 raise UserError(_('Додайте хоча б один ОЗ до переоцінки.'))
+            # Server-side check that all referenced assets are still in
+            # an operable state — the form-level domain is only a UI hint.
+            bad_assets = rec.line_ids.filtered(
+                lambda l: l.asset_id.state not in ('open', 'paused')
+            ).mapped('asset_id')
+            if bad_assets:
+                raise UserError(_(
+                    'Не можна переоцінити ОЗ у стані відмінному від '
+                    '«В експлуатації» або «Призупинено»: %s'
+                ) % ', '.join(bad_assets.mapped('display_name')))
+            # Refresh snapshot from live values to avoid drift when
+            # depreciation was posted between draft creation and confirm.
+            rec.line_ids._refresh_snapshot()
             rec._validate_accounts()
             rec.line_ids._apply_to_assets()
             rec._create_account_move()
             rec.state = 'confirmed'
-            rec.message_post(body=_('Переоцінку підтверджено.'))
         return True
 
     def action_cancel(self):
-        """Скасувати переоцінку: повернути активам попередні значення,
-        видалити коригувальні рядки амортизації, скасувати account.move.
+        """Скасувати переоцінку: спершу скасувати проводку, потім
+        повернути активам попередні значення, видалити коригувальні
+        рядки амортизації.
+
+        Move cancel/draft може впасти (закритий період, узгоджені
+        рядки) — тому робимо це ПЕРЕД мутацією активів, щоб не
+        залишити неузгоджений стан.
         """
         for rec in self:
             if rec.state != 'confirmed':
                 raise UserError(_('Скасувати можна лише підтверджену переоцінку.'))
-            rec.line_ids._revert_from_assets()
             if rec.move_id:
                 if rec.move_id.state == 'posted':
                     rec.move_id.button_draft()
                 rec.move_id.button_cancel()
+            rec.line_ids._revert_from_assets()
             rec.state = 'cancelled'
-            rec.message_post(body=_('Переоцінку скасовано.'))
         return True
 
     def action_draft(self):
@@ -374,6 +410,7 @@ class L10nUaAssetRevaluationLine(models.Model):
     _name = 'l10n_ua.asset.revaluation.line'
     _description = 'Рядок переоцінки ОЗ'
     _order = 'revaluation_id, id'
+    _check_company_auto = True
 
     revaluation_id = fields.Many2one(
         'l10n_ua.asset.revaluation',
@@ -381,11 +418,17 @@ class L10nUaAssetRevaluationLine(models.Model):
         required=True,
         ondelete='cascade',
     )
+    company_id = fields.Many2one(
+        related='revaluation_id.company_id',
+        store=True,
+    )
     asset_id = fields.Many2one(
         'l10n_ua.asset',
         string='Основний засіб',
         required=True,
-        domain="[('state', 'in', ['open', 'paused'])]",
+        domain="[('state', 'in', ['open', 'paused']),"
+               " ('company_id', '=?', company_id)]",
+        check_company=True,
     )
 
     # Снапшот «до» (заморожується при створенні рядка)
@@ -497,40 +540,71 @@ class L10nUaAssetRevaluationLine(models.Model):
                  'original_value_before', 'accumulated_before')
     def _compute_revaluation(self):
         for line in self:
+            currency = line.currency_id or line.revaluation_id.currency_id
             book_before = line.book_value_before
-            if book_before > 0:
+            # Use currency.is_zero rather than raw `> 0` so a tiny rounding
+            # residue (e.g. 0.001) can't survive the guard and blow up index.
+            if currency and not currency.is_zero(book_before) and book_before > 0:
                 index = line.fair_value / book_before
             else:
                 index = 0.0
             line.revaluation_index = round(index, 6)
-            line.original_value_after = round(line.original_value_before * index, 2)
-            line.accumulated_after = round(line.accumulated_before * index, 2)
+            if currency:
+                line.original_value_after = currency.round(
+                    line.original_value_before * index)
+                line.accumulated_after = currency.round(
+                    line.accumulated_before * index)
+            else:
+                line.original_value_after = round(
+                    line.original_value_before * index, 2)
+                line.accumulated_after = round(
+                    line.accumulated_before * index, 2)
             line.book_value_after = line.original_value_after - line.accumulated_after
             line.original_change = line.original_value_after - line.original_value_before
             line.accumulated_change = line.accumulated_after - line.accumulated_before
             line.revaluation_amount = line.book_value_after - book_before
 
-            currency = line.currency_id or line.revaluation_id.currency_id
             if currency and currency.is_zero(line.revaluation_amount):
                 line.revaluation_type = 'none'
             elif line.revaluation_amount > 0:
                 line.revaluation_type = 'increase'
-            elif line.revaluation_amount < 0:
-                line.revaluation_type = 'decrease'
             else:
-                line.revaluation_type = 'none'
+                line.revaluation_type = 'decrease'
 
     @api.constrains('fair_value', 'book_value_before')
     def _check_fair_value(self):
         for line in self:
+            currency = line.currency_id or line.revaluation_id.currency_id
             if line.fair_value < 0:
                 raise ValidationError(_(
                     'Справедлива вартість не може бути від\'ємною.'
                 ))
-            if line.book_value_before <= 0:
+            # Use currency.compare_amounts so a tiny rounding tail
+            # (0.001) doesn't masquerade as positive book value.
+            if currency and currency.compare_amounts(line.book_value_before, 0) <= 0:
                 raise ValidationError(_(
                     'Залишкова вартість ОЗ "%s" повинна бути більше нуля для переоцінки.'
                 ) % line.asset_id.display_name)
+
+    def _refresh_snapshot(self):
+        """Оновити снапшот original_value_before / accumulated_before з
+        поточних значень асета. Викликається в action_confirm щоб уникнути
+        drift коли амортизація постилась між draft-creation і confirm.
+
+        Зберігається fair_value (вже введена користувачем) — індекс
+        і всі after-поля перерахуються через api.depends.
+        """
+        for line in self:
+            asset = line.asset_id
+            if not asset:
+                continue
+            updates = {}
+            if line.original_value_before != asset.original_value:
+                updates['original_value_before'] = asset.original_value
+            if line.accumulated_before != asset.accumulated_depreciation:
+                updates['accumulated_before'] = asset.accumulated_depreciation
+            if updates:
+                line.write(updates)
 
     def _apply_to_assets(self):
         """Застосувати переоцінку до ОЗ: створити коригувальний рядок амортизації
