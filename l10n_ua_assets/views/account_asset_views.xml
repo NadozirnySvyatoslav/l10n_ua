@@ -27,6 +27,9 @@
                     <button name="action_create_revaluation" string="Переоцінити"
                             type="object" class="btn-secondary"
                             invisible="state not in ('open', 'paused')"/>
+                    <button name="action_create_modernization" string="Модернізувати"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ('open', 'paused')"/>
                     <button name="action_draft" string="Повернути в чернетку"
                             type="object"
                             invisible="state == 'draft'"
@@ -49,6 +52,12 @@
                                 invisible="revaluation_count == 0">
                             <field name="revaluation_count" widget="statinfo"
                                    string="Переоцінок"/>
+                        </button>
+                        <button name="action_view_modernizations" type="object"
+                                class="oe_stat_button" icon="fa-wrench"
+                                invisible="modernization_count == 0">
+                            <field name="modernization_count" widget="statinfo"
+                                   string="Модернізацій"/>
                         </button>
                     </div>
                     <div class="oe_title">

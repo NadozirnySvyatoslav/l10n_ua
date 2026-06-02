@@ -41,4 +41,12 @@
         <field name="padding">4</field>
     </record>
 
+    <!-- Sequence: Asset Modernization -->
+    <record id="seq_asset_modernization" model="ir.sequence">
+        <field name="name">Модернізація ОЗ</field>
+        <field name="code">l10n_ua.asset.modernization</field>
+        <field name="prefix">МД-</field>
+        <field name="padding">4</field>
+    </record>
+
 </odoo>

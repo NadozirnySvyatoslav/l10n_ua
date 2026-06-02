@@ -32,6 +32,12 @@
               action="l10n_ua_asset_revaluation_action"
               sequence="15"/>
 
+    <menuitem id="menu_l10n_ua_asset_modernization"
+              name="Asset Modernizations"
+              parent="menu_l10n_ua_assets"
+              action="l10n_ua_asset_modernization_action"
+              sequence="17"/>
+
     <menuitem id="menu_l10n_ua_asset_groups"
               name="Asset Groups"
               parent="menu_l10n_ua_assets"

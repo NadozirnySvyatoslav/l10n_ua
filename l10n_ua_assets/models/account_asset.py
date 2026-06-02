@@ -155,6 +155,17 @@ class L10nUaAsset(models.Model):
              'negative = accumulated impairment loss recognised on 975',
     )
 
+    # --- Modernization history ---
+    modernization_line_ids = fields.One2many(
+        'l10n_ua.asset.modernization.line',
+        'asset_id',
+        string='Історія модернізацій',
+    )
+    modernization_count = fields.Integer(
+        compute='_compute_modernization_count',
+        string='Кількість модернізацій',
+    )
+
     # --- Computed ---
     depreciation_amount = fields.Monetary(
         string='Місячна амортизація',
@@ -236,6 +247,47 @@ class L10nUaAsset(models.Model):
             'res_model': 'l10n_ua.asset.revaluation',
             'view_mode': 'form',
             'res_id': revaluation.id,
+        }
+
+    @api.depends('modernization_line_ids', 'modernization_line_ids.state')
+    def _compute_modernization_count(self):
+        for asset in self:
+            asset.modernization_count = len(asset.modernization_line_ids.filtered(
+                lambda l: l.state == 'confirmed'))
+
+    def action_view_modernizations(self):
+        self.ensure_one()
+        mod_ids = self.modernization_line_ids.mapped('modernization_id').ids
+        return {
+            'name': _('Модернізації %s') % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'l10n_ua.asset.modernization',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', mod_ids)],
+        }
+
+    def action_create_modernization(self):
+        """Створити чернетку модернізації з цим ОЗ."""
+        self.ensure_one()
+        if self.state not in ('open', 'paused'):
+            raise UserError(_(
+                'Модернізувати можна лише ОЗ у стані "В експлуатації" або "Призупинено".'
+            ))
+        modernization = self.env['l10n_ua.asset.modernization'].create({
+            'date': fields.Date.context_today(self),
+            'line_ids': [(0, 0, {
+                'asset_id': self.id,
+                'original_value_before': self.original_value,
+                'useful_life_before': self.useful_life,
+                'amount': 0.0,
+            })],
+        })
+        return {
+            'name': _('Модернізація ОЗ'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'l10n_ua.asset.modernization',
+            'view_mode': 'form',
+            'res_id': modernization.id,
         }
 
     # --- Depreciation computation ---
