@@ -24,6 +24,9 @@
                             type="object" class="btn-danger"
                             invisible="state not in ('open', 'paused')"
                             confirm="Списати основний засіб?"/>
+                    <button name="action_create_revaluation" string="Переоцінити"
+                            type="object" class="btn-secondary"
+                            invisible="state not in ('open', 'paused')"/>
                     <button name="action_draft" string="Повернути в чернетку"
                             type="object"
                             invisible="state == 'draft'"
@@ -40,6 +43,14 @@
                            statusbar_visible="draft,open,close"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_revaluations" type="object"
+                                class="oe_stat_button" icon="fa-balance-scale"
+                                invisible="revaluation_count == 0">
+                            <field name="revaluation_count" widget="statinfo"
+                                   string="Переоцінок"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <label for="name"/>
                         <h1>
@@ -97,17 +108,50 @@
                             <field name="depreciation_line_ids">
                                 <list string="Амортизація" editable="bottom"
                                       decoration-muted="state == 'draft'"
-                                      decoration-success="state == 'posted'">
-                                    <field name="date"/>
-                                    <field name="amount" sum="Всього"/>
-                                    <field name="accumulated"/>
-                                    <field name="remaining"/>
+                                      decoration-success="state == 'posted'"
+                                      decoration-info="line_type == 'revaluation'"
+                                      delete="0">
+                                    <field name="date"
+                                           readonly="line_type == 'revaluation' or state == 'posted'"/>
+                                    <field name="line_type" widget="badge"
+                                           decoration-info="line_type == 'revaluation'"
+                                           optional="show" readonly="1"/>
+                                    <field name="amount" sum="Всього"
+                                           readonly="line_type == 'revaluation' or state == 'posted'"/>
+                                    <field name="accumulated"
+                                           readonly="line_type == 'revaluation' or state == 'posted'"/>
+                                    <field name="remaining"
+                                           readonly="line_type == 'revaluation' or state == 'posted'"/>
+                                    <field name="revaluation_id" optional="hide" readonly="1"/>
                                     <field name="state" widget="badge"
                                            decoration-info="state == 'draft'"
-                                           decoration-success="state == 'posted'"/>
+                                           decoration-success="state == 'posted'"
+                                           readonly="line_type == 'revaluation'"/>
                                     <button name="action_post" type="object"
                                             string="Провести" class="btn-sm btn-primary"
-                                            invisible="state != 'draft'"/>
+                                            invisible="state != 'draft' or line_type == 'revaluation'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Переоцінки" name="revaluations"
+                              invisible="not revaluation_line_ids">
+                            <field name="revaluation_line_ids" readonly="1">
+                                <list string="Історія переоцінок"
+                                      decoration-muted="state != 'confirmed'">
+                                    <field name="revaluation_id"/>
+                                    <field name="original_value_before"/>
+                                    <field name="accumulated_before"/>
+                                    <field name="fair_value"/>
+                                    <field name="revaluation_index"/>
+                                    <field name="original_value_after"/>
+                                    <field name="revaluation_amount" sum="Всього"/>
+                                    <field name="revaluation_type" widget="badge"
+                                           decoration-success="revaluation_type == 'increase'"
+                                           decoration-warning="revaluation_type == 'decrease'"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'confirmed'"
+                                           decoration-muted="state == 'cancelled'"/>
+                                    <field name="currency_id" column_invisible="1"/>
                                 </list>
                             </field>
                         </page>

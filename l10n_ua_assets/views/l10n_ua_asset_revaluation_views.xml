@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Revaluation Form View -->
+    <record id="l10n_ua_asset_revaluation_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.revaluation.form</field>
+        <field name="model">l10n_ua.asset.revaluation</field>
+        <field name="arch" type="xml">
+            <form string="Переоцінка ОЗ">
+                <header>
+                    <button name="action_confirm" string="Підтвердити"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Підтвердити переоцінку? Будуть створені проводки і змінено вартість ОЗ."/>
+                    <button name="action_cancel" string="Скасувати"
+                            type="object" class="btn-danger"
+                            invisible="state != 'confirmed'"
+                            confirm="Скасувати переоцінку? Вартість ОЗ буде повернуто, проводку скасовано."/>
+                    <button name="action_draft" string="Повернути в чернетку"
+                            type="object"
+                            invisible="state != 'cancelled'"/>
+                    <button name="action_print" string="Акт переоцінки"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_move" type="object"
+                                class="oe_stat_button" icon="fa-pencil-square-o"
+                                invisible="not move_id">
+                            <field name="move_id" widget="statinfo" string="Проводка"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="group_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Бухгалтерія">
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="fixed_asset_account_id" readonly="state != 'draft'"/>
+                            <field name="accumulated_depreciation_account_id" readonly="state != 'draft'"/>
+                            <field name="revaluation_surplus_account_id" readonly="state != 'draft'"/>
+                            <field name="impairment_loss_account_id" readonly="state != 'draft'"/>
+                            <field name="other_income_account_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Рядки переоцінки" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list string="Рядки переоцінки" editable="bottom"
+                                      decoration-success="revaluation_type == 'increase'"
+                                      decoration-warning="revaluation_type == 'decrease'"
+                                      decoration-muted="revaluation_type == 'none'">
+                                    <field name="asset_id"/>
+                                    <field name="original_value_before" readonly="1"/>
+                                    <field name="accumulated_before" readonly="1"/>
+                                    <field name="book_value_before" readonly="1"/>
+                                    <field name="fair_value"/>
+                                    <field name="revaluation_index" readonly="1" optional="show"/>
+                                    <field name="original_value_after" readonly="1" optional="show"/>
+                                    <field name="accumulated_after" readonly="1" optional="hide"/>
+                                    <field name="original_change" readonly="1" optional="hide"/>
+                                    <field name="accumulated_change" readonly="1" optional="hide"/>
+                                    <field name="revaluation_amount" readonly="1" sum="Підсумок"/>
+                                    <field name="revaluation_type" widget="badge"
+                                           decoration-success="revaluation_type == 'increase'"
+                                           decoration-warning="revaluation_type == 'decrease'"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_original_change"/>
+                                <field name="total_accumulated_change"/>
+                                <field name="total_net_change"
+                                       class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Примітки" name="note">
+                            <field name="note" placeholder="Підстава переоцінки, експертний висновок..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Revaluation List View -->
+    <record id="l10n_ua_asset_revaluation_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.revaluation.list</field>
+        <field name="model">l10n_ua.asset.revaluation</field>
+        <field name="arch" type="xml">
+            <list string="Переоцінки ОЗ"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'confirmed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="group_id"/>
+                <field name="total_original_change" sum="Всього"/>
+                <field name="total_net_change" sum="Всього"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'confirmed'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Revaluation Search View -->
+    <record id="l10n_ua_asset_revaluation_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.revaluation.search</field>
+        <field name="model">l10n_ua.asset.revaluation</field>
+        <field name="arch" type="xml">
+            <search string="Переоцінки ОЗ">
+                <field name="name"/>
+                <field name="group_id"/>
+                <field name="line_ids" string="ОЗ"
+                       filter_domain="[('line_ids.asset_id.name', 'ilike', self)]"/>
+
+                <filter string="Чернетки" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Підтверджені" name="filter_confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Скасовані" name="filter_cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Цей рік" name="filter_this_year"
+                        domain="[('date', '&gt;=', (context_today().replace(month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+
+                <group>
+                    <filter string="Стан" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Група ОЗ" name="groupby_group" domain="[]"
+                            context="{'group_by': 'group_id'}"/>
+                    <filter string="Дата" name="groupby_date" domain="[]"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Revaluation Action -->
+    <record id="l10n_ua_asset_revaluation_action" model="ir.actions.act_window">
+        <field name="name">Переоцінки ОЗ</field>
+        <field name="res_model">l10n_ua.asset.revaluation</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_asset_revaluation_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть першу переоцінку ОЗ
+            </p>
+            <p>
+                Переоцінка ОЗ — операція приведення вартості активу до справедливої.
+                Виконується згідно П(С)БО 7.
+            </p>
+        </field>
+    </record>
+
+</odoo>

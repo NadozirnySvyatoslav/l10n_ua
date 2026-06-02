@@ -33,4 +33,12 @@
         <field name="padding">4</field>
     </record>
 
+    <!-- Sequence: Asset Revaluation -->
+    <record id="seq_asset_revaluation" model="ir.sequence">
+        <field name="name">Переоцінка ОЗ</field>
+        <field name="code">l10n_ua.asset.revaluation</field>
+        <field name="prefix">ПО-</field>
+        <field name="padding">4</field>
+    </record>
+
 </odoo>

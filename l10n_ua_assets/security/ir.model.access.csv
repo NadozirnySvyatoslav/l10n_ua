@@ -7,3 +7,7 @@ access_l10n_ua_asset_depreciation_user,l10n_ua.asset.depreciation.user,model_l10
 access_l10n_ua_asset_depreciation_manager,l10n_ua.asset.depreciation.manager,model_l10n_ua_asset_depreciation,account.group_account_manager,1,1,1,1
 access_l10n_ua_mnma_user,l10n_ua.mnma.user,model_l10n_ua_mnma,account.group_account_user,1,1,1,0
 access_l10n_ua_mnma_manager,l10n_ua.mnma.manager,model_l10n_ua_mnma,account.group_account_manager,1,1,1,1
+access_l10n_ua_asset_revaluation_user,l10n_ua.asset.revaluation.user,model_l10n_ua_asset_revaluation,account.group_account_user,1,1,1,0
+access_l10n_ua_asset_revaluation_manager,l10n_ua.asset.revaluation.manager,model_l10n_ua_asset_revaluation,account.group_account_manager,1,1,1,1
+access_l10n_ua_asset_revaluation_line_user,l10n_ua.asset.revaluation.line.user,model_l10n_ua_asset_revaluation_line,account.group_account_user,1,1,1,0
+access_l10n_ua_asset_revaluation_line_manager,l10n_ua.asset.revaluation.line.manager,model_l10n_ua_asset_revaluation_line,account.group_account_manager,1,1,1,1

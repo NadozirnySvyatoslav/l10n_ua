@@ -26,6 +26,12 @@
               action="l10n_ua_mnma_action"
               sequence="10"/>
 
+    <menuitem id="menu_l10n_ua_asset_revaluation"
+              name="Asset Revaluations"
+              parent="menu_l10n_ua_assets"
+              action="l10n_ua_asset_revaluation_action"
+              sequence="15"/>
+
     <menuitem id="menu_l10n_ua_asset_groups"
               name="Asset Groups"
               parent="menu_l10n_ua_assets"
