@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================
+         INV-1: Інвентаризаційний опис основних засобів
+         ================================================================= -->
+
+    <record id="action_report_asset_inv1" model="ir.actions.report">
+        <field name="name">Інв-1 (інвентаризаційний опис)</field>
+        <field name="model">l10n_ua.asset.inventory</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_assets.report_asset_inv1_document</field>
+        <field name="report_file">l10n_ua_assets.report_asset_inv1_document</field>
+        <field name="print_report_name">'Інв-1_%s' % (object.name or '')</field>
+        <field name="binding_model_id" ref="model_l10n_ua_asset_inventory"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+    </record>
+
+    <template id="report_asset_inv1_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <div class="page ua-report">
+                        <t t-set="company" t-value="o.company_id"/>
+                        <t t-set="comp_partner" t-value="company.partner_id"/>
+
+                        <div class="company-header">
+                            <div class="company-name" t-field="company.name"/>
+                            <div class="small">(найменування підприємства)</div>
+                            <t t-if="comp_partner.company_registry">
+                                <div class="company-code">
+                                    ЄДРПОУ: <span t-field="comp_partner.company_registry"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="ua-report-title" style="margin: 20px 0 5px 0;">
+                            ІНВЕНТАРИЗАЦІЙНИЙ ОПИС<br/>
+                            <span style="font-size: 12pt;">основних засобів</span><br/>
+                            <span style="font-size: 10pt;">(типова форма Інв-1)</span>
+                        </div>
+
+                        <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
+                            № <strong t-esc="o.name"/>
+                            від
+                            <span t-field="o.date" t-options='{"widget": "date"}'/>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <p>
+                                На підставі наказу від
+                                <t t-if="o.order_date">
+                                    <span t-field="o.order_date" t-options='{"widget": "date"}'/>
+                                </t>
+                                <t t-else="">«___» ___________ 20__ р.</t>
+                                №&#160;<span t-esc="o.order_number or '_____'"/>
+                                комісія у складі:
+                            </p>
+                            <p>
+                                голова комісії —
+                                <strong>
+                                    <span t-esc="o.commission_chair_id.name or '________________________'"/>
+                                </strong>,
+                                члени комісії — ________________________, ________________________
+                            </p>
+                            <p>
+                                провела інвентаризацію основних засобів станом на
+                                <strong><span t-field="o.date" t-options='{"widget": "date"}'/></strong>.
+                            </p>
+                        </div>
+
+                        <table style="width: 100%; font-size: 9pt;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 4%;">№</th>
+                                    <th style="width: 25%;">Найменування</th>
+                                    <th style="width: 10%;">Інв. №</th>
+                                    <th style="width: 12%;">Первісна, грн</th>
+                                    <th style="width: 12%;">Знос, грн</th>
+                                    <th style="width: 12%;">Залишкова, грн</th>
+                                    <th style="width: 10%;">Знайдено</th>
+                                    <th style="width: 15%;">Примітки</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="non_surplus_lines" t-value="o.line_ids.filtered(lambda l: not l.is_surplus)"/>
+                                <t t-foreach="non_surplus_lines" t-as="line">
+                                    <tr>
+                                        <td class="text-center"><span t-esc="line_index + 1"/></td>
+                                        <td><span t-esc="line.asset_id.name"/></td>
+                                        <td class="text-center"
+                                            t-esc="line.asset_id.inventory_number or '—'"/>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.original_value"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.accumulated_depreciation"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.book_value"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <strong t-if="line.found">так</strong>
+                                            <strong t-else="" style="color: #b22222;">нестача</strong>
+                                        </td>
+                                        <td><span t-esc="line.condition_note or ''"/></td>
+                                    </tr>
+                                </t>
+                                <tr style="font-weight: bold;">
+                                    <td colspan="3" class="text-right">Разом:</td>
+                                    <td class="text-right">
+                                        <span t-esc="'%.2f' % sum(non_surplus_lines.mapped('original_value'))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="'%.2f' % sum(non_surplus_lines.mapped('accumulated_depreciation'))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="'%.2f' % sum(non_surplus_lines.mapped('book_value'))"/>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin: 20px 0; font-size: 10pt;">
+                            <p>
+                                Усього найменувань: <strong t-esc="o.line_count"/>
+                                (з них знайдено: <strong t-esc="o.matched_count"/>,
+                                нестачі: <strong t-esc="o.shortage_count"/>,
+                                лишків зафіксовано: <strong t-esc="o.surplus_count"/>).
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 30px;">
+                            <table class="no-border-all" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 35%;">Голова комісії</td>
+                                    <td style="width: 30%; border-bottom: 1px solid black;"></td>
+                                    <td style="width: 5%;"></td>
+                                    <td style="width: 30%; border-bottom: 1px solid black;">
+                                        <span t-esc="o.commission_chair_id.name or ''"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td>Члени комісії</td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td>МВО</td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- =================================================================
+         INV-3: Порівняльна відомість (тільки розбіжності)
+         ================================================================= -->
+
+    <record id="action_report_asset_inv3" model="ir.actions.report">
+        <field name="name">Інв-3 (порівняльна відомість)</field>
+        <field name="model">l10n_ua.asset.inventory</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_assets.report_asset_inv3_document</field>
+        <field name="report_file">l10n_ua_assets.report_asset_inv3_document</field>
+        <field name="print_report_name">'Інв-3_%s' % (object.name or '')</field>
+        <field name="binding_model_id" ref="model_l10n_ua_asset_inventory"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+    </record>
+
+    <template id="report_asset_inv3_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <div class="page ua-report">
+                        <t t-set="company" t-value="o.company_id"/>
+                        <t t-set="comp_partner" t-value="company.partner_id"/>
+
+                        <div class="company-header">
+                            <div class="company-name" t-field="company.name"/>
+                            <div class="small">(найменування підприємства)</div>
+                            <t t-if="comp_partner.company_registry">
+                                <div class="company-code">
+                                    ЄДРПОУ: <span t-field="comp_partner.company_registry"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="ua-report-title" style="margin: 20px 0 5px 0;">
+                            ПОРІВНЯЛЬНА ВІДОМІСТЬ<br/>
+                            <span style="font-size: 12pt;">результатів інвентаризації ОЗ</span><br/>
+                            <span style="font-size: 10pt;">(типова форма Інв-3)</span>
+                        </div>
+
+                        <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
+                            до інвентаризації № <strong t-esc="o.name"/>
+                            від
+                            <span t-field="o.date" t-options='{"widget": "date"}'/>
+                        </div>
+
+                        <!-- Нестачі -->
+                        <t t-set="shortage_lines" t-value="o.line_ids.filtered(lambda l: l.discrepancy == 'shortage')"/>
+                        <t t-if="shortage_lines">
+                            <h4 style="margin-top: 15px; color: #b22222;">Нестачі</h4>
+                            <table style="width: 100%; font-size: 9pt;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">№</th>
+                                        <th style="width: 30%;">Найменування</th>
+                                        <th style="width: 12%;">Інв. №</th>
+                                        <th style="width: 15%;">Первісна</th>
+                                        <th style="width: 13%;">Знос</th>
+                                        <th style="width: 15%;">Залишкова</th>
+                                        <th style="width: 10%;">Винний</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="shortage_lines" t-as="line">
+                                        <tr>
+                                            <td class="text-center"><span t-esc="line_index + 1"/></td>
+                                            <td><span t-esc="line.asset_id.name"/></td>
+                                            <td class="text-center"
+                                                t-esc="line.asset_id.inventory_number or '—'"/>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % line.original_value"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % line.accumulated_depreciation"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong t-esc="'%.2f' % line.book_value"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line.asset_id.responsible_id.name or '—'"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <tr style="font-weight: bold;">
+                                        <td colspan="3" class="text-right">Разом нестач:</td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % sum(shortage_lines.mapped('original_value'))"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % sum(shortage_lines.mapped('accumulated_depreciation'))"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % sum(shortage_lines.mapped('book_value'))"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- Лишки -->
+                        <t t-set="surplus_lines" t-value="o.line_ids.filtered(lambda l: l.discrepancy == 'surplus')"/>
+                        <t t-if="surplus_lines">
+                            <h4 style="margin-top: 15px; color: #1e6091;">Лишки</h4>
+                            <table style="width: 100%; font-size: 9pt;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">№</th>
+                                        <th style="width: 50%;">Найменування</th>
+                                        <th style="width: 20%;">Справедлива вартість</th>
+                                        <th style="width: 25%;">Створений ОЗ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="surplus_lines" t-as="line">
+                                        <tr>
+                                            <td class="text-center"><span t-esc="line_index + 1"/></td>
+                                            <td><span t-esc="line.surplus_name or '—'"/></td>
+                                            <td class="text-right">
+                                                <strong t-esc="'%.2f' % line.surplus_value"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line.created_asset_id.display_name or '—'"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <tr style="font-weight: bold;">
+                                        <td colspan="2" class="text-right">Разом лишків:</td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % sum(surplus_lines.mapped('surplus_value'))"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-if="not shortage_lines and not surplus_lines">
+                            <p style="margin-top: 20px;">
+                                <strong>Розбіжностей не виявлено.</strong>
+                                Фактична наявність ОЗ відповідає обліковим даним.
+                            </p>
+                        </t>
+
+                        <!-- Підсумок -->
+                        <div style="margin: 20px 0; font-size: 10pt;">
+                            <table class="no-border-all" style="width: 60%;">
+                                <tr>
+                                    <td>Сума нестач (залишкова вартість):</td>
+                                    <td class="text-right">
+                                        <strong t-esc="'%.2f грн.' % o.shortage_amount"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Сума лишків (справедлива вартість):</td>
+                                    <td class="text-right">
+                                        <strong t-esc="'%.2f грн.' % o.surplus_amount"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div style="margin-top: 30px;">
+                            <table class="no-border-all" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 35%;">Голова комісії</td>
+                                    <td style="width: 30%; border-bottom: 1px solid black;"></td>
+                                    <td style="width: 5%;"></td>
+                                    <td style="width: 30%; border-bottom: 1px solid black;">
+                                        <span t-esc="o.commission_chair_id.name or ''"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td>Головний бухгалтер</td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

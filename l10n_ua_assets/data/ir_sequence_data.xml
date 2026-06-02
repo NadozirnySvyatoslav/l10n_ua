@@ -49,4 +49,12 @@
         <field name="padding">4</field>
     </record>
 
+    <!-- Sequence: Asset Inventory -->
+    <record id="seq_asset_inventory" model="ir.sequence">
+        <field name="name">Інвентаризація ОЗ</field>
+        <field name="code">l10n_ua.asset.inventory</field>
+        <field name="prefix">ІНВ-</field>
+        <field name="padding">4</field>
+    </record>
+
 </odoo>
