@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_vacation_reserve_user,hr.vacation.reserve.user,model_hr_vacation_reserve,hr.group_hr_user,1,1,1,0
+access_hr_vacation_reserve_manager,hr.vacation.reserve.manager,model_hr_vacation_reserve,hr.group_hr_manager,1,1,1,1
+access_hr_vacation_reserve_line_user,hr.vacation.reserve.line.user,model_hr_vacation_reserve_line,hr.group_hr_user,1,1,1,1
+access_hr_vacation_reserve_line_manager,hr.vacation.reserve.line.manager,model_hr_vacation_reserve_line,hr.group_hr_manager,1,1,1,1

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hr_employee_form_vacation_reserve" model="ir.ui.view">
+        <field name="name">hr.employee.form.vacation.reserve</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']" position="inside">
+                <group string="Резерв відпусток">
+                    <field name="vacation_reserve_expense_account_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
