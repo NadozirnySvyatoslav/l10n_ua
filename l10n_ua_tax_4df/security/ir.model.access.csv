@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_l10n_ua_tax_4df_user,l10n_ua.tax.4df.user,model_l10n_ua_tax_4df,account.group_account_user,1,1,1,0
+access_l10n_ua_tax_4df_manager,l10n_ua.tax.4df.manager,model_l10n_ua_tax_4df,account.group_account_manager,1,1,1,1
+access_l10n_ua_tax_4df_line_4df_user,l10n_ua.tax.4df.line.4df.user,model_l10n_ua_tax_4df_line_4df,account.group_account_user,1,1,1,1
+access_l10n_ua_tax_4df_line_4df_manager,l10n_ua.tax.4df.line.4df.manager,model_l10n_ua_tax_4df_line_4df,account.group_account_manager,1,1,1,1
+access_l10n_ua_tax_4df_line_t1_user,l10n_ua.tax.4df.line.t1.user,model_l10n_ua_tax_4df_line_t1,account.group_account_user,1,1,1,1
+access_l10n_ua_tax_4df_line_t1_manager,l10n_ua.tax.4df.line.t1.manager,model_l10n_ua_tax_4df_line_t1,account.group_account_manager,1,1,1,1
