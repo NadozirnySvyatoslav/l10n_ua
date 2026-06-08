@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inventory Form -->
+    <record id="l10n_ua_asset_inventory_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.inventory.form</field>
+        <field name="model">l10n_ua.asset.inventory</field>
+        <field name="arch" type="xml">
+            <form string="Інвентаризація ОЗ">
+                <header>
+                    <button name="action_fill_lines" string="Заповнити рядки"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_add_surplus" string="Додати лишок"
+                            type="object"
+                            invisible="state not in ('draft', 'in_progress')"/>
+                    <button name="action_done" string="Завершити"
+                            type="object" class="btn-primary"
+                            invisible="state != 'in_progress'"
+                            confirm="Завершити інвентаризацію? Будуть створені проводки, нестачі будуть списані, лишки оприбутковані."/>
+                    <button name="action_cancel" string="Скасувати"
+                            type="object" class="btn-danger"
+                            invisible="state not in ('draft', 'in_progress')"/>
+                    <button name="action_draft" string="Повернути в чернетку"
+                            type="object"
+                            invisible="state != 'cancelled'"/>
+                    <button name="action_print_inv1" string="Інв-1 (опис)"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'draft'"/>
+                    <button name="action_print_inv3" string="Інв-3 (порівняльна)"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_move" type="object"
+                                class="oe_stat_button" icon="fa-pencil-square-o"
+                                invisible="not move_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Проводка</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="order_number" readonly="state == 'done'"
+                                   placeholder="№ наказу..."/>
+                            <field name="order_date" readonly="state == 'done'"/>
+                            <field name="commission_chair_id" readonly="state == 'done'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Фільтри для заповнення">
+                            <field name="filter_group_id" readonly="state != 'draft'"/>
+                            <field name="filter_responsible_id" readonly="state != 'draft'"/>
+                            <field name="filter_location" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Бухгалтерія" col="2">
+                        <group>
+                            <field name="journal_id" readonly="state == 'done'"/>
+                            <field name="fixed_asset_account_id" readonly="state == 'done'"/>
+                            <field name="accumulated_depreciation_account_id" readonly="state == 'done'"/>
+                        </group>
+                        <group>
+                            <field name="shortage_expense_account_id" readonly="state == 'done'"/>
+                            <field name="surplus_income_account_id" readonly="state == 'done'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Рядки інвентаризації" name="lines">
+                            <field name="line_ids" readonly="state == 'done' or state == 'cancelled'">
+                                <list string="Рядки" editable="bottom"
+                                      decoration-success="discrepancy == 'match'"
+                                      decoration-warning="discrepancy == 'shortage'"
+                                      decoration-info="discrepancy == 'surplus'">
+                                    <field name="asset_id"
+                                           readonly="is_surplus or processed"
+                                           required="not is_surplus"/>
+                                    <field name="surplus_name"
+                                           readonly="not is_surplus or processed"
+                                           invisible="not is_surplus"/>
+                                    <field name="original_value" readonly="not is_surplus or processed"
+                                           optional="hide"/>
+                                    <field name="accumulated_depreciation" readonly="1" optional="hide"/>
+                                    <field name="book_value" readonly="1"/>
+                                    <field name="surplus_value"
+                                           readonly="not is_surplus or processed"
+                                           invisible="not is_surplus"/>
+                                    <field name="found"
+                                           readonly="is_surplus or processed"/>
+                                    <field name="is_surplus" readonly="processed"/>
+                                    <field name="condition_note" optional="show"/>
+                                    <field name="discrepancy" widget="badge"
+                                           decoration-success="discrepancy == 'match'"
+                                           decoration-warning="discrepancy == 'shortage'"
+                                           decoration-info="discrepancy == 'surplus'"/>
+                                    <field name="processed" optional="hide"/>
+                                    <field name="created_asset_id" optional="hide" readonly="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="line_count"/>
+                                <field name="matched_count"/>
+                                <field name="shortage_count"/>
+                                <field name="surplus_count"/>
+                                <field name="shortage_amount"/>
+                                <field name="surplus_amount"
+                                       class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Примітки" name="notes">
+                            <field name="notes" placeholder="Примітки до інвентаризації..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Inventory List -->
+    <record id="l10n_ua_asset_inventory_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.inventory.list</field>
+        <field name="model">l10n_ua.asset.inventory</field>
+        <field name="arch" type="xml">
+            <list string="Інвентаризації ОЗ"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'in_progress'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="commission_chair_id"/>
+                <field name="line_count"/>
+                <field name="matched_count"/>
+                <field name="shortage_count"/>
+                <field name="surplus_count"/>
+                <field name="shortage_amount" sum="Усього нестач"/>
+                <field name="surplus_amount" sum="Усього лишків"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Inventory Search -->
+    <record id="l10n_ua_asset_inventory_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.inventory.search</field>
+        <field name="model">l10n_ua.asset.inventory</field>
+        <field name="arch" type="xml">
+            <search string="Інвентаризації ОЗ">
+                <field name="name"/>
+                <field name="order_number"/>
+                <field name="commission_chair_id"/>
+                <field name="filter_group_id" string="Група"/>
+
+                <filter string="Чернетки" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="У процесі" name="filter_in_progress"
+                        domain="[('state', '=', 'in_progress')]"/>
+                <filter string="Завершено" name="filter_done"
+                        domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="З нестачами" name="filter_has_shortage"
+                        domain="[('shortage_count', '>', 0)]"/>
+                <filter string="З лишками" name="filter_has_surplus"
+                        domain="[('surplus_count', '>', 0)]"/>
+
+                <group>
+                    <filter string="Стан" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Дата" name="groupby_date" domain="[]"
+                            context="{'group_by': 'date:month'}"/>
+                    <filter string="Голова комісії" name="groupby_chair" domain="[]"
+                            context="{'group_by': 'commission_chair_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="l10n_ua_asset_inventory_action" model="ir.actions.act_window">
+        <field name="name">Інвентаризації ОЗ</field>
+        <field name="res_model">l10n_ua.asset.inventory</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_asset_inventory_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть першу інвентаризацію ОЗ
+            </p>
+            <p>
+                Інвентаризація — звіряння фактичної наявності ОЗ зі обліковими
+                даними з виявленням нестач та лишків (Наказ Мінфіну №879).
+                Звіти: Інв-1 (опис), Інв-3 (порівняльна відомість).
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -49,6 +49,14 @@ class HrOrder(models.Model):
         string='Dismissal Reason',
         help='Legal basis for dismissal (e.g., "за власним бажанням, ст. 38 КЗпП України")'
     )
+    termination_reason_id = fields.Many2one(
+        'hr.termination.reason',
+        string='Termination Reason (from catalog)',
+        tracking=True,
+        help='Pick a structured termination reason from the legal catalog. '
+             'When set, the dismissal order will use its full_text and render '
+             'description_html (legal explanation) in the print template.',
+    )
 
     # Vacation-specific fields
     vacation_date_from = fields.Date(string='Vacation Start Date', tracking=True)
@@ -77,6 +85,12 @@ class HrOrder(models.Model):
         if self.employee_id:
             self.department_id = self.employee_id.department_id
             self.job_id = self.employee_id.job_id
+
+    @api.onchange('termination_reason_id')
+    def _onchange_termination_reason_id(self):
+        """Auto-fill dismissal_reason text from the picked catalog entry."""
+        if self.termination_reason_id and self.termination_reason_id.full_text:
+            self.dismissal_reason = self.termination_reason_id.full_text
 
     @api.onchange('company_id')
     def _onchange_company_id(self):

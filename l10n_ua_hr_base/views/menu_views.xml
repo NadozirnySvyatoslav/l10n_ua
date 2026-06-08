@@ -27,6 +27,12 @@
               parent="hr.hr_menu_hr_reports"
               sequence="70"/>
 
+    <menuitem id="menu_hr_military_op_report"
+              name="Оперативний військовий облік"
+              action="action_hr_military_op_report"
+              parent="hr.hr_menu_hr_reports"
+              sequence="71"/>
+
     <menuitem id="menu_hr_employee_benefits_report"
               name="Працівники з пільгами"
               action="action_hr_employee_benefits_report"

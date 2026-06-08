@@ -177,8 +177,14 @@
         </table>
 
         <p style="margin: 10px 0;"><strong>Дата звільнення:</strong> <t t-esc="format_date_ua(order.date_dismissal) if order.date_dismissal else format_date_ua(order.date)"/></p>
-        <p style="margin: 10px 0;"><strong>Причина звільнення:</strong> <t t-esc="order.dismissal_reason or 'за власним бажанням, ст. 38 КЗпП України'"/></p>
+        <p style="margin: 10px 0;"><strong>Причина звільнення:</strong> <t t-esc="order.dismissal_reason or (order.termination_reason_id and order.termination_reason_id.full_text) or 'за власним бажанням, ст. 38 КЗпП України'"/></p>
         <p style="margin: 10px 0;"><strong>Підстава:</strong> заява працівника</p>
+        <t t-if="order.termination_reason_id and order.termination_reason_id.description_html">
+            <div style="margin: 15px 0; padding: 10px; border-left: 3px solid #888; background: #f5f5f5; font-size: 11pt;">
+                <p style="margin: 0 0 5px 0; font-weight: bold;">Правова підстава:</p>
+                <t t-out="order.termination_reason_id.description_html"/>
+            </div>
+        </t>
     </div>
 
     <div style="margin-top: 40px;">

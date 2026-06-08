@@ -49,10 +49,22 @@ class HrTerminationReason(models.Model):
         ('two_months', 'Two Months Salary'),
         ('three_months', 'Three Months Salary'),
     ], string='Compensation Amount', default='none')
-    
+
     notice_days = fields.Integer(
         string='Notice Days',
         help='Days of advance notice required'
+    )
+
+    requires_union_consent = fields.Boolean(
+        string='Requires Union Consent',
+        help='Чи потрібна згода виборного органу первинної профспілкової організації '
+             '(ст. 43, 43¹ КЗпП України). При зміні власника на False — застосовується '
+             'особлива процедура без згоди профспілки.'
+    )
+    is_suspension = fields.Boolean(
+        string='Suspension (not termination)',
+        help='Це відсторонення від роботи (ст. 46 КЗпП), а не звільнення. '
+             'Залишається трудовий договір; контракт не закінчується.'
     )
     
     description = fields.Text(string='Description')

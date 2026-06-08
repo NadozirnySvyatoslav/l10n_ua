@@ -118,6 +118,102 @@ class TestPayslip(SalaryTestCase):
 
 
 @tagged('post_install', '-at_install')
+class TestPayslipPSPIntegration(TestPayslip):
+    """#96 — ПСП integration з полями hr.employee per ПК ст. 169.
+
+    Reuses TestPayslip's `_create_payslip_with_accrual` helper.
+    """
+
+    def test_psp_disability_group_1_gets_200(self):
+        """Disability group I → ПСП 200% (ПК 169.1.4 «б»)."""
+        self.employee.disability_group = '1'
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '200')
+
+    def test_psp_disability_group_2_gets_150(self):
+        """Disability group II → ПСП 150% (ПК 169.1.3 «б»)."""
+        self.employee.disability_group = '2'
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '150')
+
+    def test_psp_chornobyl_1_gets_200(self):
+        """Chornobyl categories 1-2 → ПСП 200% (ПК 169.1.4 «д»)."""
+        self.employee.chornobyl_category = '1'
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '200')
+
+    def test_psp_chornobyl_3_gets_150(self):
+        """Chornobyl categories 3-4 → ПСП 150%."""
+        self.employee.chornobyl_category = '3'
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '150')
+
+    def test_psp_combat_veteran_gets_200(self):
+        """Combat veteran → ПСП 200% (ПК 169.1.4 «ж»)."""
+        self.employee.veteran_status = 'combat'
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '200')
+
+    def test_psp_single_parent_with_dependent_gets_150(self):
+        """Single parent з утриманцем → ПСП 150% (ПК 169.1.3 «а»)."""
+        self.employee.is_single_parent = True
+        # Create a dependent child
+        self.env['hr.employee.child'].create({
+            'name': 'Дитина 1',
+            'birthday': date(2018, 5, 1),
+            'employee_id': self.employee.id,
+        })
+        self.employee.invalidate_recordset()
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '150')
+
+    def test_psp_priority_200_over_150(self):
+        """Якщо одночасно інвалідність I + одинокий батько → 200% (higher wins)."""
+        self.employee.disability_group = '1'
+        self.employee.is_single_parent = True
+        self.env['hr.employee.child'].create({
+            'name': 'Дитина 1',
+            'birthday': date(2018, 5, 1),
+            'employee_id': self.employee.id,
+        })
+        self.employee.invalidate_recordset()
+        payslip = self._create_payslip_with_accrual(5000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, '200')
+
+    def test_psp_no_benefits_gets_standard(self):
+        """Без особливих пільг → ПСП standard (зважаючи на income_limit)."""
+        payslip = self._create_payslip_with_accrual(3000)
+        payslip.invalidate_recordset()
+        self.assertEqual(payslip.psp_type, 'standard')
+
+    def test_psp_amount_for_multi_child_family(self):
+        """Сім'я з 2+ дітей → ПСП × N і вищий income_limit (ПК 169.4.1 «в»)."""
+        # Drive PSP amounts via subsistence_minimum (compute-stored values)
+        # subsistence=3000 → psp_standard=1500, income_limit=42000
+        self.psp_params.write({'subsistence_minimum': 3000})
+        # 3 children
+        for i in range(3):
+            self.env['hr.employee.child'].create({
+                'name': f'Дитина {i + 1}',
+                'birthday': date(2018 + i, 5, 1),
+                'employee_id': self.employee.id,
+            })
+        self.employee.invalidate_recordset()
+        payslip = self._create_payslip_with_accrual(8000)
+        payslip.invalidate_recordset()
+        self.assertTrue(payslip.psp_eligible)
+        # amount = standard × N children = 1500 × 3 = 4500
+        self.assertEqual(payslip.psp_amount, 4500)
+
+
+@tagged('post_install', '-at_install')
 class TestPayslipMultiCompany(SalaryTestCase):
     """Multi-company isolation для hr.payslip."""
 

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form -->
+    <record id="hr_vacation_reserve_view_form" model="ir.ui.view">
+        <field name="name">hr.vacation.reserve.form</field>
+        <field name="model">hr.vacation.reserve</field>
+        <field name="arch" type="xml">
+            <form string="Резерв відпусток">
+                <header>
+                    <button name="action_fill_lines" string="Заповнити рядки"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Підтвердити"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Підтвердити документ резерву? Буде створена бухгалтерська проводка."/>
+                    <button name="action_cancel" string="Скасувати"
+                            type="object" class="btn-danger"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_draft" string="Повернути в чернетку"
+                            type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_move" type="object"
+                                class="oe_stat_button" icon="fa-pencil-square-o"
+                                invisible="not move_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Проводка</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="period_start" readonly="state != 'draft'"/>
+                            <field name="period_end" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Бухгалтерія">
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="reserve_account_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Рядки" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom" string="Рядки">
+                                    <field name="employee_id"/>
+                                    <field name="expense_account_id"/>
+                                    <field name="days_accrued"/>
+                                    <field name="daily_average"/>
+                                    <field name="amount" sum="Усього"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="line_count"/>
+                                <field name="total_amount"
+                                       class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Примітки" name="note">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="hr_vacation_reserve_view_list" model="ir.ui.view">
+        <field name="name">hr.vacation.reserve.list</field>
+        <field name="model">hr.vacation.reserve</field>
+        <field name="arch" type="xml">
+            <list string="Резерв відпусток"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'confirmed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="line_count"/>
+                <field name="total_amount" sum="Усього"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'confirmed'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="hr_vacation_reserve_view_search" model="ir.ui.view">
+        <field name="name">hr.vacation.reserve.search</field>
+        <field name="model">hr.vacation.reserve</field>
+        <field name="arch" type="xml">
+            <search string="Резерв відпусток">
+                <field name="name"/>
+                <field name="line_ids" string="Працівник"
+                       filter_domain="[('line_ids.employee_id.name', 'ilike', self)]"/>
+
+                <filter string="Чернетки" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Підтверджені" name="filter_confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+
+                <group>
+                    <filter string="Стан" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Період" name="groupby_period" domain="[]"
+                            context="{'group_by': 'period_end:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="hr_vacation_reserve_action" model="ir.actions.act_window">
+        <field name="name">Резерв відпусток</field>
+        <field name="res_model">hr.vacation.reserve</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="hr_vacation_reserve_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Створіть перший документ резерву</p>
+            <p>
+                Щомісячне нарахування резерву відпусток згідно
+                П(С)БО 26 «Виплати працівникам». Дт витрат / Кт 471.
+            </p>
+        </field>
+    </record>
+
+</odoo>

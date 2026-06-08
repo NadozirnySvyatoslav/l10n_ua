@@ -8,7 +8,23 @@
             <list>
                 <field name="code"/>
                 <field name="name"/>
-                <field name="group_code"/>
+                <field name="level"/>
+                <field name="parent_id" optional="show"/>
+                <field name="group_code" optional="hide"/>
+                <field name="work_conditions"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_kp2010_hierarchy_tree" model="ir.ui.view">
+        <field name="name">hr.kp2010.hierarchy.tree</field>
+        <field name="model">hr.kp2010</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list string="Класифікатор професій" default_order="code" sample="1">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="level"/>
                 <field name="work_conditions"/>
             </list>
         </field>
@@ -24,6 +40,8 @@
                         <group>
                             <field name="code"/>
                             <field name="name"/>
+                            <field name="level" readonly="1"/>
+                            <field name="parent_id"/>
                         </group>
                         <group>
                             <field name="group_code"/>
@@ -32,6 +50,17 @@
                             <field name="active"/>
                         </group>
                     </group>
+                    <notebook>
+                        <page string="Дочірні рівні" invisible="not child_ids">
+                            <field name="child_ids" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="level"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -44,9 +73,21 @@
             <search string="Classifier of Professions">
                 <field name="code"/>
                 <field name="name"/>
+                <field name="parent_id"/>
+                <separator/>
+                <filter string="Розділи" name="level_1" domain="[('level', '=', '1')]"/>
+                <filter string="Підрозділи" name="level_2" domain="[('level', '=', '2')]"/>
+                <filter string="Класи" name="level_3" domain="[('level', '=', '3')]"/>
+                <filter string="Професії" name="level_4" domain="[('level', '=', '4')]"/>
                 <separator/>
                 <filter string="Hazardous" name="hazardous" domain="[('work_conditions', '=', 'hazardous')]"/>
                 <filter string="Heavy" name="heavy" domain="[('work_conditions', '=', 'heavy')]"/>
+                <group>
+                    <filter string="За рівнем" name="groupby_level" domain="[]"
+                            context="{'group_by': 'level'}"/>
+                    <filter string="За батьком" name="groupby_parent" domain="[]"
+                            context="{'group_by': 'parent_id'}"/>
+                </group>
             </search>
         </field>
     </record>

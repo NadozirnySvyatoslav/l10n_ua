@@ -107,14 +107,19 @@
                     </group>
                     <group>
                         <group string="Військовий облік">
-                            <field name="military_status"/>
-                            <field name="military_category" invisible="military_status not in ('liable', 'reserved')"/>
-                            <field name="military_rank_id" invisible="military_status not in ('liable', 'reserved')"/>
-                            <field name="military_specialty" invisible="military_status not in ('liable', 'reserved')"/>
-                            <field name="military_fitness" invisible="military_status not in ('liable', 'reserved')"/>
-                            <field name="military_document_number" invisible="military_status not in ('liable', 'reserved')"/>
-                            <field name="military_tcc_id" invisible="military_status not in ('liable', 'reserved')"/>
-                            <field name="military_reservation" invisible="military_status not in ('liable', 'reserved')"/>
+                            <field name="military_register_category"/>
+                            <field name="military_status" invisible="1"/>
+                            <field name="military_category" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_rank_id" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_specialty" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_fitness" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_medical_category" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_mlk_retest_date" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_mlk_retest_due_soon" invisible="not military_mlk_retest_date"
+                                   readonly="1"/>
+                            <field name="military_document_number" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_tcc_id" invisible="military_register_category == 'not_applicable'"/>
+                            <field name="military_reservation" invisible="military_register_category == 'not_applicable'"/>
                             <field name="military_reservation_until" invisible="not military_reservation"/>
                             <field name="military_reservation_expired" invisible="not military_reservation"/>
                             <field name="military_reservplus_id" invisible="not military_reservation"/>
@@ -171,8 +176,11 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_team']" position="after">
                 <separator/>
-                <filter string="Military Liable" name="military_liable" domain="[('military_status', '=', 'liable')]"/>
-                <filter string="Reserved" name="military_reserved" domain="[('military_status', '=', 'reserved')]"/>
+                <filter string="Призовники" name="military_conscripts" domain="[('military_register_category', '=', 'conscript')]"/>
+                <filter string="Військовозобов'язані" name="military_liable" domain="[('military_register_category', '=', 'liable')]"/>
+                <filter string="Резервісти" name="military_reservists" domain="[('military_register_category', '=', 'reservist')]"/>
+                <filter string="Reservation expired" name="military_res_expired" domain="[('military_reservation_expired', '=', True)]"/>
+                <filter string="ВЛК скоро (14 днів)" name="military_mlk_due_soon" domain="[('military_mlk_retest_due_soon', '=', True)]"/>
                 <separator/>
                 <filter string="With Disability" name="with_disability" domain="[('disability_group', '!=', 'none')]"/>
                 <filter string="Veterans" name="veterans" domain="[('veteran_status', '!=', 'none')]"/>

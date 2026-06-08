@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="cron_accrue_vacation_reserve" model="ir.cron">
+            <field name="name">HR: нарахування резерву відпусток</field>
+            <field name="model_id" ref="model_hr_vacation_reserve"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_accrue_vacation_reserve()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="active" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

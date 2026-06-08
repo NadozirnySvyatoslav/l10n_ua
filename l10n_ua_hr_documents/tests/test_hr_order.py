@@ -89,6 +89,15 @@ class TestHrOrder(TransactionCase):
         order = self._create_order('dismissal')
         self.assertEqual(order.order_type, 'dismissal')
 
+    def test_order_termination_reason_onchange(self):
+        """Picking termination_reason_id should auto-fill dismissal_reason text (#95)."""
+        reason = self.env.ref('l10n_ua_hr_contract.termination_reason_war_2136_art5')
+        order = self._create_order('dismissal')
+        order.termination_reason_id = reason
+        order._onchange_termination_reason_id()
+        self.assertEqual(order.dismissal_reason, reason.full_text)
+        self.assertIn('2136-IX', order.dismissal_reason)
+
     def test_order_types(self):
         """All 8 order types should be valid."""
         types = ['hiring', 'dismissal', 'transfer', 'vacation',

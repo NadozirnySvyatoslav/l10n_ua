@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Asset Revaluation Report Action -->
+    <record id="action_report_asset_revaluation" model="ir.actions.report">
+        <field name="name">Акт переоцінки ОЗ</field>
+        <field name="model">l10n_ua.asset.revaluation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_assets.report_asset_revaluation_document</field>
+        <field name="report_file">l10n_ua_assets.report_asset_revaluation_document</field>
+        <field name="print_report_name">'Акт_переоцінки_%s' % (object.name or '')</field>
+        <field name="binding_model_id" ref="model_l10n_ua_asset_revaluation"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+    </record>
+
+    <!-- Revaluation Act Template -->
+    <template id="report_asset_revaluation_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <div class="page ua-report">
+                        <t t-set="company" t-value="o.company_id"/>
+                        <t t-set="comp_partner" t-value="company.partner_id"/>
+
+                        <!-- Company header -->
+                        <div class="company-header">
+                            <div class="company-name" t-field="company.name"/>
+                            <div class="small">(найменування підприємства)</div>
+                            <t t-if="comp_partner.company_registry">
+                                <div class="company-code">
+                                    ЄДРПОУ: <span t-field="comp_partner.company_registry"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="ua-report-title" style="margin: 20px 0 5px 0;">
+                            АКТ<br/>
+                            <span style="font-size: 12pt;">переоцінки основних засобів</span>
+                        </div>
+
+                        <!-- Number and date -->
+                        <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
+                            № <strong t-esc="o.name"/>
+                            від
+                            <span t-field="o.date" t-options='{"widget": "date"}'/>
+                        </div>
+
+                        <!-- Commission text -->
+                        <div style="margin-bottom: 15px;">
+                            <p>
+                                Комісія у складі: голова комісії — ________________________,
+                                члени комісії — ________________________, ________________________
+                            </p>
+                            <p>
+                                провела переоцінку основних засобів станом на
+                                <strong><span t-field="o.date" t-options='{"widget": "date"}'/></strong>
+                                на підставі справедливої вартості, визначеної експертною оцінкою
+                                (П(С)БО 7 «Основні засоби», п. 16-21).
+                            </p>
+                            <t t-if="o.group_id">
+                                <p>
+                                    Група ОЗ, що переоцінюється:
+                                    <strong t-esc="o.group_id.code"/> —
+                                    <strong t-esc="o.group_id.name"/>
+                                </p>
+                            </t>
+                        </div>
+
+                        <!-- Revaluation lines table -->
+                        <table style="width: 100%; font-size: 9pt;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width: 4%;">№</th>
+                                    <th rowspan="2" style="width: 20%;">Найменування</th>
+                                    <th rowspan="2" style="width: 8%;">Інв. №</th>
+                                    <th colspan="3" class="text-center">До переоцінки</th>
+                                    <th rowspan="2" style="width: 8%;">Справедлива вартість</th>
+                                    <th rowspan="2" style="width: 6%;">Індекс</th>
+                                    <th colspan="3" class="text-center">Після переоцінки</th>
+                                    <th rowspan="2" style="width: 9%;">Δ (+дооц./-уц.)</th>
+                                </tr>
+                                <tr>
+                                    <th style="width: 8%;">Первісна</th>
+                                    <th style="width: 8%;">Знос</th>
+                                    <th style="width: 8%;">Залишк.</th>
+                                    <th style="width: 8%;">Первісна</th>
+                                    <th style="width: 8%;">Знос</th>
+                                    <th style="width: 8%;">Залишк.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <tr>
+                                        <td class="text-center"><span t-esc="line_index + 1"/></td>
+                                        <td><span t-esc="line.asset_id.name"/></td>
+                                        <td class="text-center" t-esc="line.asset_id.inventory_number or '—'"/>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.original_value_before"/></td>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.accumulated_before"/></td>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.book_value_before"/></td>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.fair_value"/></td>
+                                        <td class="text-right"><span t-esc="'%.4f' % line.revaluation_index"/></td>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.original_value_after"/></td>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.accumulated_after"/></td>
+                                        <td class="text-right"><span t-esc="'%.2f' % line.book_value_after"/></td>
+                                        <td class="text-right">
+                                            <strong t-esc="'%+.2f' % line.revaluation_amount"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr style="font-weight: bold;">
+                                    <td colspan="11" class="text-right">Разом:</td>
+                                    <td class="text-right">
+                                        <span t-esc="'%+.2f' % o.total_net_change"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Summary -->
+                        <div style="margin: 15px 0;">
+                            <table class="no-border-all" style="width: 60%;">
+                                <tr>
+                                    <td>Загальна зміна первісної вартості:</td>
+                                    <td class="text-right">
+                                        <strong t-esc="'%+.2f грн.' % o.total_original_change"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Загальна зміна накопиченого зносу:</td>
+                                    <td class="text-right">
+                                        <strong t-esc="'%+.2f грн.' % o.total_accumulated_change"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Чиста сума переоцінки:</td>
+                                    <td class="text-right">
+                                        <strong t-esc="'%+.2f грн.' % o.total_net_change"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <t t-if="o.note">
+                            <div style="margin: 15px 0;">
+                                <strong>Примітки:</strong>
+                                <p t-esc="o.note"/>
+                            </div>
+                        </t>
+
+                        <!-- Signatures -->
+                        <div style="margin-top: 30px;">
+                            <table class="no-border-all" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 35%;">Голова комісії</td>
+                                    <td style="width: 30%; border-bottom: 1px solid black;"></td>
+                                    <td style="width: 5%;"></td>
+                                    <td style="width: 30%; border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td>Члени комісії</td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                                <tr><td colspan="4" style="height: 15px;"></td></tr>
+                                <tr>
+                                    <td>Головний бухгалтер</td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                    <td></td>
+                                    <td style="border-bottom: 1px solid black;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td class="text-center small">(підпис)</td>
+                                    <td></td>
+                                    <td class="text-center small">(ПІБ)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

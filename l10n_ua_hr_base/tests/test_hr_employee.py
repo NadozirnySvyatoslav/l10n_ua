@@ -2,7 +2,7 @@
 
 from odoo.tests import tagged
 from odoo.exceptions import ValidationError
-from datetime import date
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 from .common import TestHrUaBase
@@ -255,3 +255,183 @@ class TestHrEmployeeMilitaryBenefits(TestHrUaBase):
         self.assertEqual(employee.military_status, 'liable')
         self.assertEqual(employee.military_category, '1')
         self.assertEqual(employee.military_fitness, 'fit')
+
+
+@tagged('post_install', '-at_install')
+class TestHrEmployeeMilitaryCompliance3621IX(TestHrUaBase):
+    """#88 — Закон 3621-IX від 04.05.2024: military_fitness selection."""
+
+    def test_fitness_values_no_legacy_limited(self):
+        """'limited' must not be a valid selection any more."""
+        employee = self._create_employee()
+        with self.assertRaises(ValueError):
+            employee.military_fitness = 'limited'
+
+    def test_fitness_new_values_accepted(self):
+        """Both new values must work."""
+        employee = self._create_employee(military_fitness='fit_support')
+        self.assertEqual(employee.military_fitness, 'fit_support')
+        employee.military_fitness = 'temp_unfit'
+        self.assertEqual(employee.military_fitness, 'temp_unfit')
+
+
+@tagged('post_install', '-at_install')
+class TestHrEmployeeMilitaryMedical402(TestHrUaBase):
+    """#89 — Наказ МОУ № 402: medical_category, military_mlk_retest_date."""
+
+    def test_medical_category_can_be_set(self):
+        for code in ('A', 'B', 'V', 'G', 'D'):
+            employee = self._create_employee(military_medical_category=code)
+            self.assertEqual(employee.military_medical_category, code)
+
+    def test_mlk_retest_due_soon_true_within_14_days(self):
+        employee = self._create_employee(
+            military_mlk_retest_date=date.today() + timedelta(days=7),
+        )
+        self.assertTrue(employee.military_mlk_retest_due_soon)
+
+    def test_mlk_retest_due_soon_false_when_far(self):
+        employee = self._create_employee(
+            military_mlk_retest_date=date.today() + timedelta(days=30),
+        )
+        self.assertFalse(employee.military_mlk_retest_due_soon)
+
+    def test_mlk_retest_due_soon_false_when_blank(self):
+        employee = self._create_employee()
+        self.assertFalse(employee.military_mlk_retest_due_soon)
+
+
+@tagged('post_install', '-at_install')
+class TestHrEmployeeMilitaryReservationNotifications(TestHrUaBase):
+    """#91 — ПКМУ № 1608: cron нагадування HR про прострочене бронювання."""
+
+    def _ensure_hr_officer(self, login_suffix):
+        """Make sure group_hr_ua_officer has at least one user (test isolation)."""
+        hr_group = self.env.ref('l10n_ua_hr_base.group_hr_ua_officer')
+        if not hr_group.user_ids:
+            self.env['res.users'].create({
+                'name': f'HR Officer Test {login_suffix}',
+                'login': f'hr_officer_test_{login_suffix}',
+                'group_ids': [(4, hr_group.id)],
+            })
+
+    def test_cron_marks_expired_and_runs_notify(self):
+        """Cron flag-ить прострочене бронювання і викликає _notify.
+
+        Стартовий стан: бронювання вже прострочене (compute сам ставить True
+        при створенні). Cron нічого не змінює (запис вже flagged), але метод
+        _notify все одно повинен виконуватися для employees що поточно flagged.
+        """
+        self._ensure_hr_officer('cron')
+        employee = self._create_employee(
+            military_reservation=True,
+            military_reservation_until=date.today() - timedelta(days=1),
+        )
+        # Compute auto-flags expired upon creation
+        self.assertTrue(employee.military_reservation_expired)
+        # Manually run notification to verify it works without errors
+        employee._notify_military_reservation_expired()
+        activities = employee.activity_ids.filtered(
+            lambda a: 'бронювання' in (a.summary or '').lower()
+        )
+        self.assertTrue(activities)
+
+    def test_notification_creates_activity(self):
+        """_notify створює activity для HR officer."""
+        self._ensure_hr_officer('act')
+        employee = self._create_employee(
+            military_reservation=True,
+            military_reservation_until=date.today() - timedelta(days=2),
+        )
+        employee._notify_military_reservation_expired()
+        activities = employee.activity_ids.filtered(
+            lambda a: 'бронювання' in (a.summary or '').lower()
+        )
+        self.assertTrue(activities,
+                         'Notification повинна створити activity з ключовим словом "бронювання"')
+
+    def test_notification_idempotent(self):
+        """Повторний виклик не дублює activity."""
+        self._ensure_hr_officer('idem')
+        employee = self._create_employee(
+            military_reservation=True,
+            military_reservation_until=date.today() - timedelta(days=2),
+        )
+        employee._notify_military_reservation_expired()
+        first_count = len(employee.activity_ids.filtered(
+            lambda a: 'бронювання' in (a.summary or '').lower()
+        ))
+        employee._notify_military_reservation_expired()
+        second_count = len(employee.activity_ids.filtered(
+            lambda a: 'бронювання' in (a.summary or '').lower()
+        ))
+        self.assertEqual(first_count, second_count,
+                          'Повторні виклики не повинні додавати activity')
+
+
+@tagged('post_install', '-at_install')
+class TestHrEmployeeSinglePaymentSecurity(TestHrUaBase):
+    """#97 — is_single_parent захищено group_hr_ua_officer, attachments на child."""
+
+    def test_is_single_parent_writable_by_hr_officer(self):
+        """HR officer може писати is_single_parent."""
+        employee = self._create_employee()
+        # Поточний користувач у тестах є admin → HR officer member by inheritance
+        employee.is_single_parent = True
+        self.assertTrue(employee.is_single_parent)
+
+    def test_is_single_parent_blocked_for_simple_user(self):
+        """Звичайний користувач (без HR officer) НЕ повинен бачити поле."""
+        # Create a user in only hr.group_hr_user (without UA officer escalation)
+        # NOTE: l10n_ua hr setup auto-implies UA-user from hr_user, so we need a
+        # group strictly without HR access at all.
+        plain_user = self.env['res.users'].create({
+            'name': 'Plain User',
+            'login': 'plain_user_97',
+            'group_ids': [(6, 0, [self.env.ref('base.group_user').id])],
+        })
+        employee = self._create_employee()
+        # As a plain user with no HR access, accessing the field should be denied
+        # (read access). We verify the field has groups attribute.
+        field = employee._fields['is_single_parent']
+        self.assertEqual(field.groups, 'l10n_ua_hr_base.group_hr_ua_officer',
+                          'is_single_parent must require l10n_ua_hr_base.group_hr_ua_officer')
+
+    def test_child_supporting_documents_attachment(self):
+        """hr.employee.child може мати М2М attachment'и для підтверджуючих документів."""
+        employee = self._create_employee()
+        child = self.env['hr.employee.child'].create({
+            'name': 'Дитина-Тест',
+            'birthday': date(2018, 5, 1),
+            'employee_id': employee.id,
+        })
+        attachment = self.env['ir.attachment'].create({
+            'name': 'birth_cert.pdf',
+            'res_model': 'hr.employee.child',
+            'res_id': child.id,
+            'type': 'binary',
+            'datas': b'JVBERi0=',  # mini PDF marker
+        })
+        child.birth_cert_attachment_ids = [(4, attachment.id)]
+        self.assertIn(attachment, child.birth_cert_attachment_ids)
+
+
+@tagged('post_install', '-at_install')
+class TestHrEmployeeMilitaryRegister1487(TestHrUaBase):
+    """#90 — ПКМУ № 1487: military_register_category selection."""
+
+    def test_register_category_default(self):
+        employee = self._create_employee()
+        self.assertEqual(employee.military_register_category, 'not_applicable')
+
+    def test_register_category_all_values(self):
+        for code in ('conscript', 'liable', 'reservist', 'not_applicable'):
+            employee = self._create_employee(military_register_category=code)
+            self.assertEqual(employee.military_register_category, code)
+
+    def test_legacy_military_status_still_usable(self):
+        """Legacy military_status field stays — for historical data and reports."""
+        employee = self._create_employee(military_status='liable',
+                                          military_register_category='liable')
+        self.assertEqual(employee.military_status, 'liable')
+        self.assertEqual(employee.military_register_category, 'liable')

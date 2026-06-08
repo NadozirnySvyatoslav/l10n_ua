@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form -->
+    <record id="l10n_ua_tax_4df_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.tax.4df.form</field>
+        <field name="model">l10n_ua.tax.4df</field>
+        <field name="arch" type="xml">
+            <form string="4ДФ">
+                <header>
+                    <button name="action_generate" string="Згенерувати"
+                            type="object" class="btn-primary"
+                            invisible="state == 'submitted'"
+                            confirm="Згенерувати рядки з payslips? Існуючі дані буде перезаписано."/>
+                    <button name="action_generate_xml" string="Сформувати XML"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'draft'"/>
+                    <button name="action_submit" string="Подано"
+                            type="object" class="btn-primary"
+                            invisible="state != 'generated'"/>
+                    <button name="action_draft" string="Повернути в чернетку"
+                            type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,generated,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="year" readonly="state != 'draft'"/>
+                            <field name="quarter" readonly="state != 'draft'"/>
+                            <field name="form_code" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="submission_date" readonly="1"
+                                   invisible="not submission_date"/>
+                            <field name="xml_filename" readonly="1"
+                                   invisible="not xml_filename"/>
+                            <field name="xml_file" filename="xml_filename"
+                                   readonly="1" invisible="not xml_file"/>
+                        </group>
+                    </group>
+                    <group string="Підсумки">
+                        <group>
+                            <field name="total_employees"/>
+                            <field name="total_accrued"/>
+                        </group>
+                        <group>
+                            <field name="total_pdfo"/>
+                            <field name="total_military"/>
+                            <field name="total_esv_base"/>
+                            <field name="total_esv"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Додаток 4ДФ (ПДФО/ВЗ)" name="t_4df">
+                            <field name="line_4df_ids" readonly="state == 'submitted'">
+                                <list editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="rnokpp"/>
+                                    <field name="income_type"/>
+                                    <field name="income_sign"/>
+                                    <field name="accrued_amount" sum="Усього"/>
+                                    <field name="paid_amount"/>
+                                    <field name="pdfo_amount" sum="Усього ПДФО"/>
+                                    <field name="military_amount" sum="Усього ВЗ"/>
+                                    <field name="date_hire" optional="show"/>
+                                    <field name="date_termination" optional="show"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Додаток 1 (ЄСВ)" name="t1">
+                            <field name="line_t1_ids" readonly="state == 'submitted'">
+                                <list editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="rnokpp"/>
+                                    <field name="accrued_amount" sum="Нараховано"/>
+                                    <field name="esv_base" sum="База ЄСВ"/>
+                                    <field name="esv_amount" sum="ЄСВ"/>
+                                    <field name="months_count"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Примітки" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="l10n_ua_tax_4df_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.tax.4df.list</field>
+        <field name="model">l10n_ua.tax.4df</field>
+        <field name="arch" type="xml">
+            <list string="4ДФ"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'generated'"
+                  decoration-success="state == 'submitted'">
+                <field name="name"/>
+                <field name="year"/>
+                <field name="quarter"/>
+                <field name="form_code"/>
+                <field name="total_employees"/>
+                <field name="total_accrued" sum="Усього"/>
+                <field name="total_pdfo" sum="ПДФО"/>
+                <field name="total_military" sum="ВЗ"/>
+                <field name="total_esv" sum="ЄСВ"/>
+                <field name="submission_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'generated'"
+                       decoration-success="state == 'submitted'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="l10n_ua_tax_4df_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.tax.4df.search</field>
+        <field name="model">l10n_ua.tax.4df</field>
+        <field name="arch" type="xml">
+            <search string="4ДФ">
+                <field name="year"/>
+                <field name="quarter"/>
+                <filter string="Чернетки" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Згенеровано" name="filter_generated"
+                        domain="[('state', '=', 'generated')]"/>
+                <filter string="Подано" name="filter_submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+                <group>
+                    <filter string="Рік" name="groupby_year" domain="[]"
+                            context="{'group_by': 'year'}"/>
+                    <filter string="Стан" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="l10n_ua_tax_4df_action" model="ir.actions.act_window">
+        <field name="name">4ДФ</field>
+        <field name="res_model">l10n_ua.tax.4df</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_tax_4df_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Створіть перший звіт 4ДФ</p>
+            <p>
+                Об'єднана квартальна звітність з ПДФО/ВЗ/ЄСВ. Замінила
+                1ДФ та Д5 з 01.01.2021. Форма J0501T01 (юрособа) / F0501T01 (ФОП).
+            </p>
+        </field>
+    </record>
+
+</odoo>

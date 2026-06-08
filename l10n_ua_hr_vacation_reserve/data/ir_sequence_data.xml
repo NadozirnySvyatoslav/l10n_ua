@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="seq_hr_vacation_reserve" model="ir.sequence">
+        <field name="name">Резерв відпусток</field>
+        <field name="code">hr.vacation.reserve</field>
+        <field name="prefix">РВ-</field>
+        <field name="padding">4</field>
+    </record>
+
+</odoo>
