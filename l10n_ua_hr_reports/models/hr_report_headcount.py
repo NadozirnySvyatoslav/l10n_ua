@@ -130,13 +130,12 @@ class HrReportHeadcount(models.Model):
 
         # Find all employees with active contracts on this date
         # Using hr.version to check employment period
-        versions = self.env['hr.version'].search([
+        versions = self.env['hr.version'].with_context(active_test=False).search([
             ('employee_id.company_id', '=', self.company_id.id),
-            ('employee_id.active', '=', True),
             ('contract_date_start', '<=', check_date),
             '|',
             ('contract_date_end', '=', False),
-            ('contract_date_end', '>=', check_date),
+            ('contract_date_end', '>', check_date),
         ])
 
         for version in versions:

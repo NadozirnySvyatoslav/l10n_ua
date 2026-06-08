@@ -182,6 +182,24 @@ class HrOrder(models.Model):
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
+        for order in self.filtered(lambda o: o.order_type == 'dismissal' and o.employee_id):
+            order._apply_dismissal()
+
+    def _apply_dismissal(self):
+        """Apply a confirmed dismissal order to the employee:
+        close the current contract version and archive the employee."""
+        self.ensure_one()
+        employee = self.employee_id
+        dismissal_date = self.date_dismissal or self.date
+        version = employee.current_version_id
+        if version:
+            version.write({
+                'contract_date_end': dismissal_date,
+                'termination_order_number': self.name,
+                'termination_order_date': self.date,
+            })
+        if employee.active:
+            employee.active = False
 
     def action_cancel(self):
         self.write({'state': 'cancelled'})
@@ -189,7 +207,23 @@ class HrOrder(models.Model):
             order.leave_id.message_post(
                 body=_('Linked vacation order %s was cancelled. Leave state is unchanged.', order.name)
             )
+        for order in self.filtered(lambda o: o.order_type == 'dismissal' and o.employee_id):
+            order._revert_dismissal()
         return True
+
+    def _revert_dismissal(self):
+        """Revert the effects of a previously confirmed dismissal order."""
+        self.ensure_one()
+        employee = self.employee_id
+        version = employee.with_context(active_test=False).current_version_id
+        if version and version.termination_order_number == self.name:
+            version.write({
+                'contract_date_end': False,
+                'termination_order_number': False,
+                'termination_order_date': False,
+            })
+        if not employee.active:
+            employee.with_context(active_test=False).active = True
 
     def unlink(self):
         leaves = self.mapped('leave_id')
