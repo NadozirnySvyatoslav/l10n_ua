@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="mail_template_military_reservation_expired" model="mail.template">
+            <field name="name">HR UA: Прострочене військове бронювання</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="subject">Прострочене бронювання: {{ object.name }}</field>
+            <field name="email_from">{{ object.company_id.email or user.email_formatted }}</field>
+            <field name="lang">{{ object.user_id.lang or user.lang or 'uk_UA' }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Verdana, Arial, sans-serif; font-size: 14px;">
+                    <p>Шановні колеги,</p>
+                    <p>
+                        Бронювання військовозобов'язаного <strong t-out="object.name"/> прострочено:
+                    </p>
+                    <ul>
+                        <li>Працівник: <strong t-out="object.name"/></li>
+                        <li>Посада: <span t-out="object.job_id.name or '—'"/></li>
+                        <li>Підрозділ: <span t-out="object.department_id.name or '—'"/></li>
+                        <li>Бронювалося до: <strong t-out="object.military_reservation_until"/></li>
+                        <li t-if="object.military_reservplus_id">
+                            ID в Резерв+: <span t-out="object.military_reservplus_id"/>
+                        </li>
+                        <li t-if="object.military_tcc_id">
+                            ТЦК: <span t-out="object.military_tcc_id.name"/>
+                        </li>
+                    </ul>
+                    <p>
+                        Згідно з <strong>ПКМУ № 1608 від 08.12.2025</strong>, роботодавець зобов'язаний
+                        самостійно контролювати ліміти бронювання та своєчасно анульовувати прострочені відстрочки.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

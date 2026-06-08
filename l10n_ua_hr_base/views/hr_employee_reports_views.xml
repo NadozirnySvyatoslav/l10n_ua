@@ -212,6 +212,86 @@
     </record>
 
     <!-- ====================================================== -->
+    <!-- Військовий облік: відомість оперативного обліку (#92)  -->
+    <!-- ====================================================== -->
+
+    <record id="hr_military_op_report_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.military.operational.report.form</field>
+        <field name="model">hr.employee.military.operational.report</field>
+        <field name="arch" type="xml">
+            <form string="Відомість оперативного військового обліку">
+                <header>
+                    <button name="action_generate" string="Сформувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" string="Редагувати" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_from" readonly="state == 'generated'"/>
+                            <field name="date_to" readonly="state == 'generated'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" readonly="state == 'generated'"
+                                   groups="base.group_multi_company"/>
+                            <field name="line_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Записи журналу">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="event_type"/>
+                                    <field name="description"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_military_op_report_view_list" model="ir.ui.view">
+        <field name="name">hr.employee.military.operational.report.list</field>
+        <field name="model">hr.employee.military.operational.report</field>
+        <field name="arch" type="xml">
+            <list string="Відомості оперативного обліку">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="line_count"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'generated'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_hr_military_op_report" model="ir.actions.act_window">
+        <field name="name">Оперативний військовий облік</field>
+        <field name="res_model">hr.employee.military.operational.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть відомість оперативного військового обліку
+            </p>
+            <p>
+                Журнал змін за період: прийом/звільнення військовозобов'язаних
+                + зміни категорії обліку, придатності, бронювання. Подається до ТЦК.
+            </p>
+        </field>
+    </record>
+
+    <!-- ====================================================== -->
     <!-- Employees with Benefits Report (Працівники з пільгами)  -->
     <!-- ====================================================== -->
 

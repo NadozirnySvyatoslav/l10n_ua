@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Base',
-    'version': '19.0.1.0.2',
+    'version': '19.0.1.0.5',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR localization base module',
     'description': """
@@ -40,6 +40,7 @@ This module is required for all other l10n_ua_hr_* modules.
         'data/hr_military_tcc_data.xml',
         'data/ir_sequence_data.xml',
         'data/ir_cron.xml',
+        'data/mail_template_data.xml',
         'data/report_paperformat_data.xml',
         'views/hr_employee_views.xml',
         'views/hr_employee_child_views.xml',

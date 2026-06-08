@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_res_company_form_vacation_reserve" model="ir.ui.view">
+        <field name="name">res.company.form.vacation.reserve</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Резерв відпусток" name="vacation_reserve">
+                    <group>
+                        <group string="Бухгалтерія">
+                            <field name="vacation_reserve_journal_id"/>
+                            <field name="vacation_reserve_account_id"/>
+                            <field name="vacation_payable_account_id"/>
+                            <field name="vacation_reserve_default_expense_account_id"/>
+                        </group>
+                        <group string="Параметри нарахування">
+                            <field name="vacation_reserve_frequency"/>
+                            <field name="vacation_reserve_annual_days"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

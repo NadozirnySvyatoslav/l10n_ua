@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_hr_vacation_reserve"
+              name="Vacation Reserve"
+              parent="hr_holidays.menu_hr_holidays_root"
+              action="hr_vacation_reserve_action"
+              sequence="30"
+              groups="hr.group_hr_user"/>
+
+</odoo>

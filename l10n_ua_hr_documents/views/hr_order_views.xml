@@ -48,6 +48,8 @@
                             <field name="is_fixed_term" invisible="order_type != 'hiring'"/>
                             <field name="date_end" invisible="order_type != 'hiring' or not is_fixed_term"/>
                             <field name="date_dismissal" invisible="order_type != 'dismissal'"/>
+                            <field name="termination_reason_id" invisible="order_type != 'dismissal'"
+                                   options="{'no_create': True}"/>
                             <field name="dismissal_reason" invisible="order_type != 'dismissal'"/>
                             <field name="holiday_status_id" invisible="order_type != 'vacation'" required="order_type == 'vacation'" readonly="bool(leave_id)"/>
                             <field name="vacation_date_from" invisible="order_type != 'vacation'" required="order_type == 'vacation'"/>

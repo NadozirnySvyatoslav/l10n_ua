@@ -36,6 +36,16 @@ class HrEmployeeChild(models.Model):
                                    help='Manual marker. Aggregate count on the employee uses age/student/disability logic regardless.')
     age = fields.Integer(string='Age', compute='_compute_age', store=True)
 
+    # Supporting documents (ПК ст. 169.4.1 — підстава для ПСП на утриманця)
+    birth_cert_attachment_ids = fields.Many2many(
+        'ir.attachment',
+        'hr_employee_child_attachment_rel',
+        'child_id', 'attachment_id',
+        string='Підтверджуючі документи',
+        help='Свідоцтво про народження, довідка з ВНЗ (для студентів), '
+             'висновок МСЕК (для дітей-інвалідів). Підстава для ПСП за ПК 169.4.1.',
+    )
+
     @api.depends('birthday')
     def _compute_age(self):
         today = date.today()

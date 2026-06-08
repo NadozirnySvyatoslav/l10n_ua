@@ -121,3 +121,50 @@ class TestHrVersion(ContractTestCase):
             termination_reason_ua_id=reason.id,
         )
         self.assertEqual(version.termination_reason_ua_id.article, '38')
+
+    def test_termination_reason_war_2136_records_present(self):
+        """ЗУ 2136-IX ст. 5 і ст. 6 — повинні бути у data-fixture (#93)."""
+        art5 = self.env.ref(
+            'l10n_ua_hr_contract.termination_reason_war_2136_art5',
+            raise_if_not_found=False,
+        )
+        art6 = self.env.ref(
+            'l10n_ua_hr_contract.termination_reason_war_2136_art6',
+            raise_if_not_found=False,
+        )
+        self.assertTrue(art5, 'ст. 5 ЗУ 2136-IX must be in data fixture')
+        self.assertTrue(art6, 'ст. 6 ЗУ 2136-IX must be in data fixture')
+        self.assertEqual(art5.category, 'own_will')
+        self.assertEqual(art6.category, 'employer_initiative')
+        self.assertTrue(art5.description_html)
+        self.assertTrue(art6.description_html)
+        # ст. 6 has 10-day notice (war-time accelerated termination)
+        self.assertEqual(art6.notice_days, 10)
+
+    def test_termination_reason_kzpp_additional_records(self):
+        """КЗпП ст. 38¹, 38², 41 п.1.1-1.5, 43¹, 46 — повинні бути у data-fixture (#94)."""
+        for xml_id in [
+            'termination_reason_38_1',
+            'termination_reason_38_2',
+            'termination_reason_41_p11',
+            'termination_reason_41_p12',
+            'termination_reason_41_p13',
+            'termination_reason_41_p14',
+            'termination_reason_41_p15',
+            'termination_reason_43_1',
+            'termination_reason_46',
+        ]:
+            rec = self.env.ref(f'l10n_ua_hr_contract.{xml_id}', raise_if_not_found=False)
+            self.assertTrue(rec, f'{xml_id} must be in data fixture')
+            self.assertTrue(rec.description_html, f'{xml_id} must have description_html')
+
+    def test_termination_reason_special_flags(self):
+        """Boolean fields requires_union_consent / is_suspension must be set on appropriate records."""
+        # ст. 43¹ — звільнення без згоди профспілки → requires_union_consent=False
+        art_43_1 = self.env.ref('l10n_ua_hr_contract.termination_reason_43_1')
+        self.assertFalse(art_43_1.requires_union_consent)
+        self.assertFalse(art_43_1.is_suspension)
+
+        # ст. 46 — відсторонення (не звільнення) → is_suspension=True
+        art_46 = self.env.ref('l10n_ua_hr_contract.termination_reason_46')
+        self.assertTrue(art_46.is_suspension)

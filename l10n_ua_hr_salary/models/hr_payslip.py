@@ -115,7 +115,7 @@ class HrPayslip(models.Model):
         ('standard', 'Standard (50%)'),
         ('150', '150%'),
         ('200', '200%'),
-    ], string='PSP Type', default='none',
+    ], string='PSP Type',
        compute='_compute_psp_type', store=True, readonly=False)
 
     # Flags for special tax regimes
@@ -262,20 +262,64 @@ class HrPayslip(models.Model):
             payslip.is_disability = is_disability
             payslip.is_diia_city = is_diia_city
 
-    @api.depends('employee_id')
+    @api.depends('employee_id',
+                 'employee_id.disability_group',
+                 'employee_id.chornobyl_category',
+                 'employee_id.veteran_status',
+                 'employee_id.is_single_parent',
+                 'employee_id.dependents_count',
+                 'employee_id.benefit_ids')
     def _compute_psp_type(self):
-        """Automatically determine PSP type based on employee benefits"""
-        for payslip in self:
-            psp_type = 'none'
+        """Determine PSP type per ПК ст. 169.
 
-            if payslip.employee_id and hasattr(payslip.employee_id, 'benefit_ids'):
-                benefits = payslip.employee_id.benefit_ids
-                if benefits:
-                    # Find benefit with highest PSP type
-                    psp_priority = {'none': 0, 'standard': 1, '150': 2, '200': 3}
-                    for benefit in benefits:
-                        if benefit.psp_type and psp_priority.get(benefit.psp_type, 0) > psp_priority.get(psp_type, 0):
-                            psp_type = benefit.psp_type
+        Priority (highest wins): 200% > 150% > standard > none
+
+        200% applies to (ст. 169.1.4):
+        - Disability group I
+        - Chornobyl categories 1, 2
+        - Combat / war veterans
+
+        150% applies to (ст. 169.1.3):
+        - Disability groups II, III
+        - Chornobyl categories 3, 4
+        - Single parents with at least 1 dependent
+        - Any explicit benefit marked psp_type='150'
+
+        Standard applies to (ст. 169.1.1) any employee meeting income threshold.
+
+        Final PSP type is the maximum of all applicable rules + any benefit's
+        own psp_type setting.
+        """
+        psp_priority = {'none': 0, 'standard': 1, '150': 2, '200': 3}
+        for payslip in self:
+            employee = payslip.employee_id
+            if not employee:
+                payslip.psp_type = 'none'
+                continue
+
+            psp_type = 'standard'  # baseline — final eligibility checked in _compute_psp
+
+            # --- 200% rules (highest priority) ---
+            if employee.disability_group == '1':
+                psp_type = '200'
+            elif employee.chornobyl_category in ('1', '2'):
+                psp_type = '200'
+            elif employee.veteran_status in ('combat', 'war'):
+                psp_type = '200'
+
+            # --- 150% rules (only if not already 200%) ---
+            if psp_type != '200':
+                if employee.disability_group in ('2', '3'):
+                    psp_type = '150'
+                elif employee.chornobyl_category in ('3', '4'):
+                    psp_type = '150'
+                elif employee.is_single_parent and employee.dependents_count >= 1:
+                    psp_type = '150'
+
+            # --- Benefit-level overrides (catalog `psp_type`) ---
+            for benefit in employee.benefit_ids:
+                if benefit.psp_type and psp_priority.get(benefit.psp_type, 0) > psp_priority.get(psp_type, 0):
+                    psp_type = benefit.psp_type
 
             payslip.psp_type = psp_type
 
@@ -299,28 +343,59 @@ class HrPayslip(models.Model):
                 and self.employee_id.company_id != self.company_id:
             self.employee_id = False
 
-    @api.depends('gross_salary', 'psp_type')
+    @api.depends('gross_salary', 'psp_type', 'employee_id.dependents_count',
+                 'employee_id.is_single_parent')
     def _compute_psp(self):
+        """Compute PSP eligibility and amount per ПК ст. 169.
+
+        Eligibility: gross_salary ≤ income_limit (or income_limit × dependents_count
+        for multi-dependent families — ПК 169.4.1, п. «в»).
+
+        Amount: base PSP (by psp_type) + extra PSP for each dependent beyond the first
+        (only if employee has 2+ children — ПК 169.1.2, п. «б»).
+        Single parent gets double base PSP × dependents_count (covers «двойна ПСП»).
+        """
         for payslip in self:
             params = self.env['hr.psp.parameters'].get_parameters(payslip.date_to)
             if not params:
                 payslip.psp_eligible = False
                 payslip.psp_amount = 0.0
                 continue
-            
-            payslip.psp_eligible = payslip.gross_salary <= params.income_limit
-            
-            if payslip.psp_eligible and payslip.psp_type != 'none':
-                if payslip.psp_type == 'standard':
-                    payslip.psp_amount = params.psp_standard
-                elif payslip.psp_type == '150':
-                    payslip.psp_amount = params.psp_150
-                elif payslip.psp_type == '200':
-                    payslip.psp_amount = params.psp_200
-                else:
-                    payslip.psp_amount = 0.0
-            else:
+
+            employee = payslip.employee_id
+            dependents = employee.dependents_count if employee else 0
+
+            # Income limit for families with 2+ dependents is multiplied by N children
+            # (ПК 169.4.1 п. «в») — allows higher-earning parents to still qualify
+            effective_limit = params.income_limit
+            if dependents >= 2:
+                effective_limit = params.income_limit * dependents
+
+            payslip.psp_eligible = payslip.gross_salary <= effective_limit
+
+            if not (payslip.psp_eligible and payslip.psp_type != 'none'):
                 payslip.psp_amount = 0.0
+                continue
+
+            # Base PSP per psp_type
+            if payslip.psp_type == 'standard':
+                base = params.psp_standard
+            elif payslip.psp_type == '150':
+                base = params.psp_150
+            elif payslip.psp_type == '200':
+                base = params.psp_200
+            else:
+                base = 0.0
+
+            # Extra ПСП на дітей (ст. 169.1.2):
+            # When employee has 2+ dependents — additional PSP applies per child
+            # (base PSP × N children). Single parent gets 150% PSP per child.
+            if employee and dependents >= 2:
+                # multiply base by number of dependent children
+                # Single parent multiplier is captured by psp_type='150' choice in _compute_psp_type
+                payslip.psp_amount = base * dependents
+            else:
+                payslip.psp_amount = base
 
     @api.depends(
         'accrual_ids.amount',

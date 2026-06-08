@@ -1,3 +1,5 @@
+from datetime import date
+
 from odoo import models, fields, api
 
 
@@ -134,7 +136,8 @@ class HrEmployeeMilitaryReport(models.Model):
             employees = rec.env['hr.employee'].search([
                 ('company_id', '=', rec.company_id.id),
                 ('active', '=', True),
-                ('military_status', 'in', ['liable', 'reserved']),
+                ('military_register_category', 'in',
+                    ['conscript', 'liable', 'reservist']),
             ])
             rec.write({
                 'employee_ids': [(6, 0, employees.ids)],
@@ -150,6 +153,155 @@ class HrEmployeeMilitaryReport(models.Model):
         return self.env.ref(
             'l10n_ua_hr_base.action_report_hr_employee_military'
         ).report_action(self)
+
+
+class HrEmployeeMilitaryOperationalReport(models.Model):
+    """Відомість оперативного військового обліку — журнал змін за період (ПКМУ № 1487).
+
+    Tracks military-related events during a date range: hires, dismissals,
+    register_category changes, reservation changes. Source data comes from
+    mail.message tracking values on hr.employee (military_* fields are tracked
+    automatically by Odoo's mail.thread when @tracking is set on the model).
+    """
+    _name = 'hr.employee.military.operational.report'
+    _description = 'Військовий облік: відомість оперативного обліку'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'date_to desc, id desc'
+
+    name = fields.Char(compute='_compute_name', store=True)
+    date_from = fields.Date(
+        string='Період з',
+        required=True,
+        default=lambda self: date.today().replace(day=1),
+        tracking=True,
+    )
+    date_to = fields.Date(
+        string='Період до',
+        required=True,
+        default=fields.Date.context_today,
+        tracking=True,
+    )
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        required=True,
+    )
+    line_ids = fields.One2many(
+        'hr.employee.military.operational.report.line',
+        'report_id',
+        string='Записи журналу',
+    )
+    line_count = fields.Integer(
+        compute='_compute_line_count', store=True,
+    )
+    state = fields.Selection(
+        [('draft', 'Draft'), ('generated', 'Generated')],
+        default='draft',
+        tracking=True,
+    )
+
+    @api.depends('date_from', 'date_to')
+    def _compute_name(self):
+        for rec in self:
+            if rec.date_from and rec.date_to:
+                rec.name = (
+                    f"Оперативний облік {rec.date_from.strftime('%d.%m.%Y')} – "
+                    f"{rec.date_to.strftime('%d.%m.%Y')}"
+                )
+            else:
+                rec.name = "Оперативний військовий облік"
+
+    @api.depends('line_ids')
+    def _compute_line_count(self):
+        for rec in self:
+            rec.line_count = len(rec.line_ids)
+
+    def action_generate(self):
+        """Build journal from hr.order events + employee tracking changes."""
+        self.ensure_one()
+        self.line_ids.unlink()
+        lines = []
+        Order = self.env.get('hr.order')
+
+        # 1) Hires + dismissals from hr.order (if l10n_ua_hr_documents installed)
+        if Order is not None:
+            orders = Order.search([
+                ('date', '>=', self.date_from),
+                ('date', '<=', self.date_to),
+                ('order_type', 'in', ['hiring', 'dismissal']),
+                ('company_id', '=', self.company_id.id),
+                ('state', '!=', 'cancelled'),
+            ])
+            for order in orders:
+                if not order.employee_id or order.employee_id.military_register_category == 'not_applicable':
+                    continue
+                event = 'Прийом на роботу' if order.order_type == 'hiring' else 'Звільнення'
+                lines.append((0, 0, {
+                    'date': order.date,
+                    'employee_id': order.employee_id.id,
+                    'event_type': order.order_type,
+                    'description': f'{event} (наказ № {order.name})',
+                }))
+
+        # 2) Tracked field changes from mail.message
+        domain = [
+            ('model', '=', 'hr.employee'),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+        ]
+        messages = self.env['mail.message'].search(domain)
+        tracked_fields = (
+            'military_register_category', 'military_fitness',
+            'military_reservation', 'military_reservation_until',
+            'military_medical_category',
+        )
+        for msg in messages:
+            for tracking in msg.tracking_value_ids:
+                if tracking.field_id.name not in tracked_fields:
+                    continue
+                employee = self.env['hr.employee'].browse(msg.res_id)
+                if not employee.exists() or employee.company_id != self.company_id:
+                    continue
+                lines.append((0, 0, {
+                    'date': msg.date.date(),
+                    'employee_id': employee.id,
+                    'event_type': 'change',
+                    'description': (
+                        f'{tracking.field_id.field_description}: '
+                        f'{tracking.old_value_char or tracking.old_value_text or "—"} → '
+                        f'{tracking.new_value_char or tracking.new_value_text or "—"}'
+                    ),
+                }))
+
+        self.write({
+            'line_ids': lines,
+            'state': 'generated',
+        })
+        return True
+
+    def action_draft(self):
+        self.line_ids.unlink()
+        self.write({'state': 'draft'})
+
+
+class HrEmployeeMilitaryOperationalReportLine(models.Model):
+    _name = 'hr.employee.military.operational.report.line'
+    _description = 'Запис журналу оперативного обліку'
+    _order = 'date, id'
+
+    report_id = fields.Many2one(
+        'hr.employee.military.operational.report',
+        required=True, ondelete='cascade', index=True,
+    )
+    date = fields.Date(required=True)
+    employee_id = fields.Many2one('hr.employee', required=True)
+    event_type = fields.Selection([
+        ('hiring', 'Прийом на роботу'),
+        ('dismissal', 'Звільнення'),
+        ('change', 'Зміна стану'),
+    ], required=True)
+    description = fields.Char()
 
 
 class HrEmployeeBenefitsReport(models.Model):

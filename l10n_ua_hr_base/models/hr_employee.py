@@ -1,6 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-from datetime import date
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 
@@ -72,7 +72,21 @@ class HrEmployee(models.Model):
         ('reserved', 'Reserved'),
         ('exempt', 'Exempt'),
         ('not_applicable', 'Not Applicable'),
-    ], string='Military Status', default='not_applicable')
+    ], string='Military Status (legacy)', default='not_applicable',
+        help='Legacy field — kept for backward compatibility. '
+             'Use military_register_category for the official ПКМУ № 1487 categorization.')
+    military_register_category = fields.Selection([
+        ('conscript', 'Призовник'),
+        ('liable', 'Військовозобов\'язаний'),
+        ('reservist', 'Резервіст'),
+        ('not_applicable', 'Не підлягає обліку'),
+    ], string='Категорія військового обліку',
+        default='not_applicable',
+        tracking=True,
+        help='Категорія військового обліку за ПКМУ № 1487 від 30.12.2022. '
+             'Призовник — особа призовного віку, не пройшла строкову службу. '
+             'Військовозобов\'язаний — у запасі. '
+             'Резервіст — добровільний оперативний резерв.')
     military_category = fields.Selection([
         ('1', 'Category 1'),
         ('2', 'Category 2'),
@@ -82,10 +96,37 @@ class HrEmployee(models.Model):
     military_specialty = fields.Char(string='Military Specialty (VOS)',
                                       help='Military Occupational Specialty')
     military_fitness = fields.Selection([
-        ('fit', 'Fit for Service'),
-        ('limited', 'Limited Fitness'),
-        ('unfit', 'Unfit for Service'),
-    ], string='Military Fitness')
+        ('fit', 'Придатний'),
+        ('fit_support', 'Придатний до служби в частинах забезпечення'),
+        ('temp_unfit', 'Тимчасово непридатний'),
+        ('unfit', 'Непридатний'),
+    ], string='Придатність до служби',
+        tracking=True,
+        help='Категорії за Законом № 3621-IX від 04.05.2024. '
+             'Статус «обмежено придатний» (legacy «limited») скасовано — '
+             'мігруються в «Тимчасово непридатний».')
+    military_medical_category = fields.Selection([
+        ('A', 'А — придатний без обмежень'),
+        ('B', 'Б — придатний з незначними обмеженнями'),
+        ('V', 'В — обмежено придатний (медичний висновок)'),
+        ('G', 'Г — тимчасово непридатний'),
+        ('D', 'Д — непридатний'),
+    ], string='Медична категорія (ВЛК)',
+        help='Категорія за Наказом Міністерства оборони України № 402 — '
+             'Положення про військово-лікарську експертизу, розклад хвороб. '
+             'Категорія «В» зберігається як медичний висновок, навіть якщо у '
+             '`military_fitness` обрано іншу категорію придатності.')
+    military_mlk_retest_date = fields.Date(
+        string='Дата повторного ВЛК',
+        help='Запланована дата повторного проходження військово-лікарської комісії '
+             '(Закон № 4235-IX про продовження строку повторної ВЛК до 05.06.2025). '
+             'За 14 днів до цієї дати створюється activity для HR.')
+    military_mlk_retest_due_soon = fields.Boolean(
+        string='ВЛК скоро',
+        compute='_compute_military_mlk_retest_due_soon',
+        store=True,
+        help='True, якщо повторна ВЛК заплановано протягом наступних 14 днів. '
+             'Оновлюється щоденним cron-ом.')
     military_document_number = fields.Char(string='Military Document Number')
     military_tcc_id = fields.Many2one('hr.military.tcc', string='TCC',
                                        help='Territorial Recruitment Center')
@@ -140,7 +181,10 @@ class HrEmployee(models.Model):
                                        help='Children under 18, or students (up to 23), or disabled children of any age — PSP-eligible.')
     is_single_parent = fields.Boolean(
         string='Single Parent',
-        help='Sole carer of dependent children. Used by payroll for elevated PSP (150% of base amount).')
+        groups='l10n_ua_hr_base.group_hr_ua_officer',
+        help='Sole carer of dependent children. Used by payroll for elevated PSP (150% of base amount). '
+             'Зміна цього поля захищена групою HR Officer — впливає на розрахунок ПДФО, '
+             'тому звичайний користувач не повинен мати змогу його редагувати.')
 
     # === Work Experience & Bank ===
     hire_date = fields.Date(string='Hire Date')
@@ -215,12 +259,24 @@ class HrEmployee(models.Model):
                 and employee.military_reservation_until < today
             )
 
+    @api.depends('military_mlk_retest_date')
+    def _compute_military_mlk_retest_due_soon(self):
+        today = date.today()
+        for employee in self:
+            if not employee.military_mlk_retest_date:
+                employee.military_mlk_retest_due_soon = False
+                continue
+            delta = (employee.military_mlk_retest_date - today).days
+            employee.military_mlk_retest_due_soon = 0 <= delta <= 14
+
     @api.model
     def _cron_check_military_reservation_expired(self):
         """Daily cron: flag employees whose reservation end date has just passed.
 
         The stored compute depends on (military_reservation, military_reservation_until)
         and won't refire on calendar advance, so the cron writes the flag directly.
+        For newly-expired (False → True transition), notifies HR officers via email
+        and activity (ПКМУ № 1608 — обов'язок роботодавця контролювати ліміти).
         """
         today = date.today()
         stale = self.search([
@@ -229,8 +285,102 @@ class HrEmployee(models.Model):
             ('military_reservation_until', '<', today),
             ('military_reservation_expired', '=', False),
         ])
-        if stale:
-            stale.write({'military_reservation_expired': True})
+        if not stale:
+            return
+        stale.write({'military_reservation_expired': True})
+        # Notify HR officers about newly-expired reservations
+        stale._notify_military_reservation_expired()
+
+    def _notify_military_reservation_expired(self):
+        """Post chatter message + schedule activity for HR officers when reservation expires.
+
+        Uses mail.template for body rendering, then message_post with HR partners
+        in partner_ids — this triggers emails to HR officers via mail thread.
+        """
+        template = self.env.ref(
+            'l10n_ua_hr_base.mail_template_military_reservation_expired',
+            raise_if_not_found=False,
+        )
+        activity_type = self.env.ref(
+            'mail.mail_activity_data_todo', raise_if_not_found=False,
+        )
+        hr_group = self.env.ref(
+            'l10n_ua_hr_base.group_hr_ua_officer', raise_if_not_found=False,
+        )
+        hr_users = hr_group.user_ids if hr_group else self.env['res.users']
+        hr_partners = hr_users.partner_id
+
+        for employee in self:
+            # Render body from template if available, else use a default body
+            body_html = _('<p>⚠️ Військове бронювання працівника <strong>%s</strong> '
+                          'прострочено (до %s). Згідно з ПКМУ № 1608 потрібне '
+                          'переоформлення або зняття з обліку.</p>',
+                          employee.name, employee.military_reservation_until)
+            if template:
+                try:
+                    rendered = template._render_field('body_html', [employee.id])
+                    body_html = rendered.get(employee.id) or body_html
+                except Exception:
+                    pass
+            # Post in employee chatter and notify HR officers via partner_ids
+            employee.message_post(
+                body=body_html,
+                subtype_xmlid='mail.mt_comment',
+                partner_ids=hr_partners.ids if hr_partners else [],
+            )
+            # Activity for the first HR officer (head-of-line)
+            if activity_type and hr_users:
+                manager = hr_users[0]
+                existing = employee.activity_ids.filtered(
+                    lambda a: a.activity_type_id == activity_type
+                    and 'бронювання' in (a.summary or '').lower()
+                )
+                if not existing:
+                    employee.activity_schedule(
+                        'mail.mail_activity_data_todo',
+                        user_id=manager.id,
+                        summary=_('Прострочене військове бронювання'),
+                        note=_('Бронювання працівника %s прострочено '
+                               '(до %s). Оформіть нове або зніміть з обліку.',
+                               employee.name,
+                               employee.military_reservation_until),
+                    )
+
+    @api.model
+    def _cron_check_military_mlk_retest(self):
+        """Daily cron: flag employees whose ВЛК retest date is within 14 days.
+
+        The stored compute depends on military_mlk_retest_date only,
+        so without daily refresh the boolean would stay stale.
+        Also schedules a mail.activity for HR officers on newly-due records.
+        """
+        today = date.today()
+        in_14_days = today + timedelta(days=14)
+        due_employees = self.search([
+            ('military_mlk_retest_date', '>=', today),
+            ('military_mlk_retest_date', '<=', in_14_days),
+        ])
+        # Refresh the boolean for the in-window set
+        due_employees._compute_military_mlk_retest_due_soon()
+        # Activity scheduling
+        activity_type = self.env.ref('mail.mail_activity_data_todo', raise_if_not_found=False)
+        if not activity_type:
+            return
+        for emp in due_employees:
+            existing = emp.activity_ids.filtered(
+                lambda a: a.activity_type_id == activity_type
+                and 'ВЛК' in (a.summary or '')
+            )
+            if existing:
+                continue
+            emp.activity_schedule(
+                'mail.mail_activity_data_todo',
+                date_deadline=emp.military_mlk_retest_date,
+                summary='Повторна ВЛК',
+                note=(f'У співробітника <b>{emp.name}</b> заплановано повторну '
+                      f'військово-лікарську комісію на {emp.military_mlk_retest_date}. '
+                      'Узгодьте з ТЦК.'),
+            )
 
     @api.depends('hire_date')
     def _compute_work_experience_company(self):

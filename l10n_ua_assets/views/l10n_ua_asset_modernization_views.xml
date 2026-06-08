@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Modernization Form -->
+    <record id="l10n_ua_asset_modernization_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.modernization.form</field>
+        <field name="model">l10n_ua.asset.modernization</field>
+        <field name="arch" type="xml">
+            <form string="Модернізація ОЗ">
+                <header>
+                    <button name="action_confirm" string="Підтвердити"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Підтвердити модернізацію? Будуть створені проводки і збільшено вартість ОЗ."/>
+                    <button name="action_cancel" string="Скасувати"
+                            type="object" class="btn-danger"
+                            invisible="state != 'confirmed'"
+                            confirm="Скасувати модернізацію? Вартість ОЗ повернеться, проводку буде скасовано."/>
+                    <button name="action_draft" string="Повернути в чернетку"
+                            type="object"
+                            invisible="state != 'cancelled'"/>
+                    <button name="action_print" string="Акт модернізації"
+                            type="object" class="btn-secondary"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_move" type="object"
+                                class="oe_stat_button" icon="fa-pencil-square-o"
+                                invisible="not move_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Проводка</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="document_reference" readonly="state != 'draft'"
+                                   placeholder="№ договору від..."/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Бухгалтерія">
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="fixed_asset_account_id" readonly="state != 'draft'"/>
+                            <field name="source_account_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Рядки модернізації" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list string="Рядки" editable="bottom">
+                                    <field name="asset_id"/>
+                                    <field name="work_description"/>
+                                    <field name="original_value_before" readonly="1"/>
+                                    <field name="amount"/>
+                                    <field name="original_value_after" readonly="1"/>
+                                    <field name="useful_life_before" readonly="1" optional="hide"/>
+                                    <field name="useful_life_extension"/>
+                                    <field name="useful_life_after" readonly="1" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="total_amount"
+                                       class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Опис робіт" name="description">
+                            <field name="description"
+                                   placeholder="Детальний опис робіт з модернізації..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Modernization List -->
+    <record id="l10n_ua_asset_modernization_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.modernization.list</field>
+        <field name="model">l10n_ua.asset.modernization</field>
+        <field name="arch" type="xml">
+            <list string="Модернізації ОЗ"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'confirmed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="document_reference"/>
+                <field name="total_amount" sum="Всього"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'confirmed'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Modernization Search -->
+    <record id="l10n_ua_asset_modernization_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.asset.modernization.search</field>
+        <field name="model">l10n_ua.asset.modernization</field>
+        <field name="arch" type="xml">
+            <search string="Модернізації ОЗ">
+                <field name="name"/>
+                <field name="document_reference"/>
+                <field name="line_ids" string="ОЗ"
+                       filter_domain="[('line_ids.asset_id.name', 'ilike', self)]"/>
+
+                <filter string="Чернетки" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Підтверджені" name="filter_confirmed"
+                        domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Скасовані" name="filter_cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+
+                <group>
+                    <filter string="Стан" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Дата" name="groupby_date" domain="[]"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="l10n_ua_asset_modernization_action" model="ir.actions.act_window">
+        <field name="name">Модернізації ОЗ</field>
+        <field name="res_model">l10n_ua.asset.modernization</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_asset_modernization_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Створіть першу модернізацію ОЗ
+            </p>
+            <p>
+                Модернізація / реконструкція ОЗ — збільшення первісної вартості
+                на витрати, що приводять до збільшення майбутніх економічних
+                вигод (П(С)БО 7 п.14).
+            </p>
+        </field>
+    </record>
+
+</odoo>

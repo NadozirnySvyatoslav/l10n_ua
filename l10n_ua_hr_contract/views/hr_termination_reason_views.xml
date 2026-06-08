@@ -32,6 +32,10 @@
                             <field name="compensation_amount" invisible="not requires_compensation"/>
                             <field name="notice_days"/>
                         </group>
+                        <group string="Особлива процедура">
+                            <field name="requires_union_consent"/>
+                            <field name="is_suspension"/>
+                        </group>
                     </group>
                     <group>
                         <field name="full_text"/>
@@ -39,6 +43,11 @@
                     <group>
                         <field name="description"/>
                     </group>
+                    <notebook>
+                        <page string="Пояснення підстави (для шаблонів наказів)">
+                            <field name="description_html" widget="html" nolabel="1"/>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -57,6 +66,8 @@
                 <field name="paragraph"/>
                 <field name="requires_compensation"/>
                 <field name="notice_days"/>
+                <field name="requires_union_consent" optional="hide"/>
+                <field name="is_suspension" optional="hide"/>
                 <field name="active"/>
             </list>
         </field>

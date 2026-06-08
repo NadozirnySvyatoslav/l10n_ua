@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_l10n_ua_tax_4df"
+              name="4DF Reports"
+              parent="l10n_ua_account_base.menu_l10n_ua_accounting"
+              action="l10n_ua_tax_4df_action"
+              sequence="60"
+              groups="account.group_account_user"/>
+
+</odoo>
