@@ -179,7 +179,7 @@ class TelegramBotMessage(models.Model):
 
         return message
 
-    def _post_to_partner_chatter(self):
+    def _post_to_partner_chatter(self, att_bytes=None, att_name=None):
         """Post telegram message to partner's chatter"""
         self.ensure_one()
 
@@ -229,6 +229,8 @@ class TelegramBotMessage(models.Model):
             from odoo import SUPERUSER_ID
             partner_sudo = partner.with_user(SUPERUSER_ID)
 
+            attachments = [(att_name or 'file', att_bytes)] if att_bytes else None
+
             if self.direction == 'incoming':
                 # Incoming message - author is the telegram user (partner)
                 partner_sudo.message_post(
@@ -236,6 +238,7 @@ class TelegramBotMessage(models.Model):
                     message_type='comment',
                     subtype_xmlid='mail.mt_note',
                     author_id=partner.id,
+                    attachments=attachments,
                 )
             else:
                 # Outgoing message - posted by system/bot
@@ -243,6 +246,7 @@ class TelegramBotMessage(models.Model):
                     body=body,
                     message_type='comment',
                     subtype_xmlid='mail.mt_note',
+                    attachments=attachments,
                 )
         except Exception as e:
             _logger.warning(f"Failed to post to partner chatter: {e}")

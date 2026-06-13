@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_telegram_send_wizard_form" model="ir.ui.view">
+        <field name="name">telegram.send.wizard.form</field>
+        <field name="model">telegram.send.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Telegram message">
+                <group>
+                    <field name="partner_id" invisible="1"/>
+                    <field name="recipient_label" readonly="1"/>
+                    <field name="chat_id" options="{'no_create': True, 'no_open': True}"/>
+                </group>
+                <field name="message_text" placeholder="Текст повідомлення для клієнта..."/>
+                <field name="attachment_ids" widget="many2many_binary"
+                       string="Фото / файли"/>
+                <footer>
+                    <button name="action_send" type="object" string="Надіслати" class="btn-primary"/>
+                    <button string="Скасувати" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
