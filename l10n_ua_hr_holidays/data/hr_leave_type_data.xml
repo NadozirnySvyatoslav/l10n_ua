@@ -7,7 +7,7 @@
             <field name="ua_leave_category">annual_basic</field>
             <field name="annual_days">24</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">work</field>
+            <field name="period_type">work</field>
             <field name="is_transferable">True</field>
             <field name="requires_experience">True</field>
             <field name="min_experience_months">6</field>
@@ -23,7 +23,7 @@
             <field name="ua_leave_category">annual_additional</field>
             <field name="annual_days">7</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">work</field>
+            <field name="period_type">work</field>
             <field name="is_transferable">True</field>
             <field name="is_paid">True</field>
             <field name="payment_source">employer</field>
@@ -35,7 +35,7 @@
             <field name="name">Навчальна відпустка</field>
             <field name="ua_leave_category">educational</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">employer</field>
@@ -47,7 +47,7 @@
             <field name="name">Творча відпустка</field>
             <field name="ua_leave_category">creative</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">employer</field>
@@ -60,7 +60,7 @@
             <field name="ua_leave_category">social_children</field>
             <field name="annual_days">10</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">employer</field>
@@ -72,7 +72,7 @@
             <field name="name">Відпустка без збереження зарплати</field>
             <field name="ua_leave_category">unpaid</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">False</field>
             <field name="request_unit">day</field>
@@ -84,7 +84,7 @@
             <field name="ua_leave_category">unpaid</field>
             <field name="annual_days">15</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">False</field>
             <field name="request_unit">day</field>
@@ -96,7 +96,7 @@
             <field name="ua_leave_category">maternity</field>
             <field name="annual_days">126</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">fss</field>
@@ -108,7 +108,7 @@
             <field name="name">Відпустка для догляду за дитиною до 3 років</field>
             <field name="ua_leave_category">childcare</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">False</field>
             <field name="request_unit">day</field>
@@ -119,7 +119,7 @@
             <field name="name">Лікарняний</field>
             <field name="ua_leave_category">sick</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">mixed</field>
@@ -176,7 +176,7 @@
             <field name="ua_leave_category">chornobyl</field>
             <field name="annual_days">16</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">employer</field>
@@ -189,7 +189,7 @@
             <field name="ua_leave_category">veteran</field>
             <field name="annual_days">14</field>
             <field name="is_calendar_days">True</field>
-	    <field name="period_type">calendar</field>
+            <field name="period_type">calendar</field>
             <field name="is_transferable">False</field>
             <field name="is_paid">True</field>
             <field name="payment_source">employer</field>
