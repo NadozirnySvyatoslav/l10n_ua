@@ -33,6 +33,14 @@ class HrLeaveType(models.Model):
         default=True,
         help='If checked, vacation is counted in calendar days'
     )
+    period_type = fields.Selection([
+        ('calendar', 'Calendar Year'),
+        ('work', 'Work Year'),
+    ], string='Accounting Period', default='calendar', required=True,
+        help='Calendar Year: Jan 1 – Dec 31. '
+             'Work Year: 12-month period from the employee hire_date '
+             '(per Ukrainian Vacation Law art. 6, 7, 8, 10).'
+    )
     is_transferable = fields.Boolean(
         string='Transferable',
         default=True,

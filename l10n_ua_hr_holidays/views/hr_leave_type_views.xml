@@ -12,6 +12,7 @@
                         <field name="ua_leave_category"/>
                         <field name="annual_days"/>
                         <field name="is_calendar_days"/>
+                        <field name="period_type"/>
                         <field name="min_continuous_days"/>
                     </group>
                     <group>

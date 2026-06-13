@@ -392,6 +392,30 @@ class HrEmployee(models.Model):
             else:
                 employee.work_experience_company = 0.0
 
+    def _get_work_year_for_date(self, ref_date):
+        """Return (period_start, period_end, period_index) of the work year
+        containing ref_date, anchored to the employee's hire_date.
+
+        Used by l10n_ua_hr_holidays to accrue annual vacations per the
+        Ukrainian Vacation Law (work year = 12 months from hire_date).
+
+        Falls back to current_version_id.contract_date_start when hire_date
+        is empty. Returns (False, False, 0) when neither anchor is available
+        or ref_date precedes the hire date.
+        """
+        self.ensure_one()
+        anchor = self.hire_date
+        if not anchor:
+            version = self.current_version_id
+            anchor = version.contract_date_start if version else False
+        if not anchor or not ref_date or ref_date < anchor:
+            return (False, False, 0)
+        delta = relativedelta(ref_date, anchor)
+        period_index = delta.years + 1
+        period_start = anchor + relativedelta(years=period_index - 1)
+        period_end = anchor + relativedelta(years=period_index) - relativedelta(days=1)
+        return (period_start, period_end, period_index)
+
     @api.onchange('actual_same_as_registration')
     def _onchange_actual_same_as_registration(self):
         if self.actual_same_as_registration:
