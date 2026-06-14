@@ -49,6 +49,20 @@ class HrOrder(models.Model):
         string='Dismissal Reason',
         help='Legal basis for dismissal (e.g., "за власним бажанням, ст. 38 КЗпП України")'
     )
+    previous_departure_date = fields.Date(
+        string='Previous Departure Date (backup)',
+        copy=False,
+        readonly=True,
+        help='Internal: saves employee.departure_date before this dismissal '
+             'order was applied, so cancellation can restore it.',
+    )
+    previous_departure_date_saved = fields.Boolean(
+        copy=False,
+        readonly=True,
+        default=False,
+        help='Internal: True if previous_departure_date holds a backed-up value '
+             '(needed because False is a legitimate previous value).',
+    )
     termination_reason_id = fields.Many2one(
         'hr.termination.reason',
         string='Termination Reason (from catalog)',
@@ -219,7 +233,15 @@ class HrOrder(models.Model):
                 'termination_order_number': self.name,
                 'termination_order_date': self.date,
             })
-        if hasattr(employee, 'departure_date') and not employee.departure_date:
+        if hasattr(employee, 'departure_date'):
+            # Back up the previous value once per apply/revert cycle so revert
+            # restores exactly what was there before this order — independent of
+            # later manual edits.
+            if not self.previous_departure_date_saved:
+                self.write({
+                    'previous_departure_date': employee.departure_date or False,
+                    'previous_departure_date_saved': True,
+                })
             employee.departure_date = dismissal_date
         if employee.active:
             employee.active = False
@@ -237,9 +259,8 @@ class HrOrder(models.Model):
     def _revert_dismissal(self):
         """Revert the effects of a previously confirmed dismissal order.
 
-        We match versions by termination_order_number == self.name so
-        that revert is safe when several dismissal orders existed for
-        the same employee.
+        We match versions by termination_order_number == self.name so revert
+        is safe when several dismissal orders existed for the same employee.
         """
         self.ensure_one()
         employee = self.employee_id
@@ -252,8 +273,13 @@ class HrOrder(models.Model):
                 'termination_order_number': False,
                 'termination_order_date': False,
             })
-        if hasattr(employee, 'departure_date') and employee.departure_date == (self.date_dismissal or self.date):
-            employee.departure_date = False
+        if hasattr(employee, 'departure_date') and self.previous_departure_date_saved:
+            employee.with_context(active_test=False).departure_date = \
+                self.previous_departure_date or False
+            self.write({
+                'previous_departure_date': False,
+                'previous_departure_date_saved': False,
+            })
         if not employee.active:
             employee.with_context(active_test=False).active = True
 

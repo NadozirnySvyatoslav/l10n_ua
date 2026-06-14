@@ -119,44 +119,77 @@ class HrReportHeadcount(models.Model):
         return True
 
     def _count_employees_on_date(self, check_date):
-        """Count employees on a specific date.
+        """Count unique employees on a specific date.
 
-        Counts unique employees: an employee with several hr.version
-        rows (promotion, transfer, salary change) must be counted once.
-        For each employee we pick the version actual on `check_date` —
-        the one with the greatest `date_version <= check_date`.
-
-        Returns tuple (headcount, fte):
-        - headcount: number of full-time employees
-        - fte: full-time equivalent (includes part-time workers proportionally)
+        For each employee we pick the version whose date_version is the
+        greatest among `date_version <= check_date` (and treat NULL as
+        "no scheduled change" → use only as fallback when no dated
+        version exists).
         """
         headcount = 0
         fte = 0.0
 
-        # Find all version rows covering check_date; we'll dedup by employee below.
         versions = self.env['hr.version'].with_context(active_test=False).search([
             ('employee_id.company_id', '=', self.company_id.id),
             ('contract_date_start', '<=', check_date),
             '|',
             ('contract_date_end', '=', False),
             ('contract_date_end', '>', check_date),
-        ], order='date_version desc, id desc')
+        ])
 
-        # Deduplicate by employee_id — keep the version actual on check_date
-        # (the first one due to descending order on date_version).
-        seen_employees = set()
-        actual_versions = self.env['hr.version']
-        for version in versions:
-            employee_id = version.employee_id.id
-            if employee_id in seen_employees:
+        # Pick one version per employee: greatest date_version that is <= check_date.
+        # NULL date_version is treated as "−infinity" so any dated version wins;
+        # this is robust regardless of SQL NULL-ordering.
+        by_employee = {}
+        for v in versions:
+            if v.date_version and v.date_version > check_date:
+                # Future-scheduled version (e.g., promotion next month) — skip.
                 continue
-            if version.date_version and version.date_version > check_date:
-                # Future version (e.g., promotion scheduled for next month) — skip.
+            emp_id = v.employee_id.id
+            existing = by_employee.get(emp_id)
+            if existing is None:
+                by_employee[emp_id] = v
                 continue
-            seen_employees.add(employee_id)
-            actual_versions |= version
+            # Compare: dated version always beats NULL; same date → greater id.
+            new_key = (v.date_version or date.min, v.id)
+            cur_key = (existing.date_version or date.min, existing.id)
+            if new_key > cur_key:
+                by_employee[emp_id] = v
+
+        actual_versions = self.env['hr.version'].browse(
+            [v.id for v in by_employee.values()]
+        )
 
         for version in actual_versions:
+            employee = version.employee_id
+
+            # Effective end of employment for this employee.
+            # Primary signal: contract_date_end on the picked version
+            # (set by _apply_dismissal across all versions).
+            # Fallback: employee.departure_date — standard Odoo field set
+            # by the built-in departure wizard and by _apply_dismissal.
+            # Catches legacy dismissals that archived the employee +
+            # set departure_date but never propagated contract_date_end
+            # to hr.version.
+            effective_end = version.contract_date_end
+            if not effective_end and 'departure_date' in employee._fields:
+                effective_end = employee.departure_date
+
+            if effective_end and effective_end <= check_date:
+                # Employee was terminated on or before check_date.
+                continue
+
+            # Safety net for broken data: an archived employee with no
+            # termination date anywhere (manual archive bypassing both
+            # _apply_dismissal and Odoo's departure wizard). We don't
+            # know when they actually left, so we exclude conservatively
+            # — better than counting them forever.
+            # Trade-off: past-period reports for such records will
+            # under-count; fix the data (set departure_date or run a
+            # confirmed dismissal order) to restore them.
+            if not employee.active and not effective_end:
+                continue
+
             work_rate = 1.0
             if hasattr(version, 'work_rate') and version.work_rate:
                 work_rate = version.work_rate
