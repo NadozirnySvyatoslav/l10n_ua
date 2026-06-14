@@ -20,7 +20,9 @@
         'views/telegram_bot_views.xml',
         'views/telegram_command_views.xml',
         'views/telegram_chat_views.xml',
+        'views/res_partner_views.xml',
         'views/menu_views.xml',
+        'wizard/telegram_send_wizard_views.xml',
         'data/default_commands.xml',
     ],
     'images': [

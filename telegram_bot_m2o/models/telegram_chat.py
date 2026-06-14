@@ -1,6 +1,7 @@
 import json
 import logging
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -440,3 +441,37 @@ class ResPartner(models.Model):
         string='Telegram Username',
         help='Telegram username without @',
     )
+    telegram_chat_ids = fields.One2many(
+        'telegram.bot.chat', 'partner_id', string='Telegram Chats',
+    )
+    telegram_chat_count = fields.Integer(
+        string='Telegram Chats', compute='_compute_telegram_chat_count',
+    )
+
+    @api.depends('telegram_chat_ids')
+    def _compute_telegram_chat_count(self):
+        for partner in self:
+            partner.telegram_chat_count = len(partner.telegram_chat_ids)
+
+    def action_open_telegram_send(self):
+        """Open the wizard to send a Telegram message to this contact."""
+        self.ensure_one()
+        chat = self.env['telegram.bot.chat'].search(
+            [('partner_id', '=', self.id), ('state', '!=', 'blocked')],
+            order='last_message_date desc, id desc', limit=1,
+        ) or self.env['telegram.bot.chat'].search(
+            [('partner_id', '=', self.id)], order='id desc', limit=1,
+        )
+        if not chat:
+            raise UserError(_("This contact has no linked Telegram chat."))
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _("Send Telegram message"),
+            'res_model': 'telegram.send.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_partner_id': self.id,
+                'default_chat_id': chat.id,
+            },
+        }
