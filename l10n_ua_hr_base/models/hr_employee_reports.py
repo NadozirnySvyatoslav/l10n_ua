@@ -5,11 +5,20 @@ from odoo import models, fields, api
 def _was_employed_on(employee, as_of):
     """Return True if employee (active or archived) was employed on as_of date.
 
-    Employment is detected by collecting every available "start of
-    employment" and "end of employment" date the schema may carry
-    (different Odoo versions / localizations name them differently) and
-    treating the employee as employed on as_of when any start <= as_of
-    and no end is strictly before as_of.
+    Employment is detected per-version: at least one contract version has a
+    start date <= as_of AND either no end date or an end date >= as_of.
+    This handles rehires correctly — e.g. a fixed-term version that ended
+    in 2023 followed by an open-ended version starting in 2024 keeps the
+    employee 'employed' in 2025 via the second version, even though the
+    first version's end date is earlier than as_of.
+
+    The day of departure is included on purpose (end >= as_of): the last
+    working day still counts as employed. This snapshot semantics differs
+    from headcount reports that use strict > to count active days only.
+
+    Falls back to employee-level hire_date / departure_date when no contract
+    version carries dates. Reading uses active_test=False so archived
+    employees' versions stay visible.
     """
     if not as_of:
         return True
@@ -19,32 +28,37 @@ def _was_employed_on(employee, as_of):
     def has(rec, name):
         return name in rec._fields
 
-    starts = []
+    has_any_version_date = False
     for v in employee.version_ids:
-        starts.append(v.contract_date_start)
+        starts = [v.contract_date_start]
         if has(v, 'date_start'):
             starts.append(v.date_start)
         if has(v, 'date_version'):
             starts.append(v.date_version)
-    starts.append(employee.hire_date)
-    if has(employee, 'first_contract_date'):
-        starts.append(employee.first_contract_date)
-
-    if not any(d and d <= as_of for d in starts):
-        return False
-
-    ends = []
-    for v in employee.version_ids:
-        ends.append(v.contract_date_end)
+        ends = [v.contract_date_end]
         if has(v, 'date_end'):
             ends.append(v.date_end)
-    if has(employee, 'departure_date'):
-        ends.append(employee.departure_date)
-    ends = [d for d in ends if d]
 
-    if not ends:
-        return True
-    return max(ends) >= as_of
+        version_starts = [d for d in starts if d]
+        version_ends = [d for d in ends if d]
+        if version_starts or version_ends:
+            has_any_version_date = True
+        if not any(s <= as_of for s in version_starts):
+            continue
+        if not version_ends or max(version_ends) >= as_of:
+            return True
+
+    if has_any_version_date:
+        return False
+
+    hire_candidates = [employee.hire_date]
+    if has(employee, 'first_contract_date'):
+        hire_candidates.append(employee.first_contract_date)
+    if not any(d and d <= as_of for d in hire_candidates):
+        return False
+
+    departure = employee.departure_date if has(employee, 'departure_date') else False
+    return not departure or departure >= as_of
 
 class HrEmployeeListReport(models.Model):
     """Employee List Report (Список працівників).
