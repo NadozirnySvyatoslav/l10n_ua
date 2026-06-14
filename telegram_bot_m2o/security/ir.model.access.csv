@@ -11,3 +11,4 @@ access_telegram_bot_chat_user,telegram.bot.chat.user,model_telegram_bot_chat,gro
 access_telegram_bot_chat_manager,telegram.bot.chat.manager,model_telegram_bot_chat,group_telegram_bot_manager,1,1,1,1
 access_telegram_bot_message_user,telegram.bot.message.user,model_telegram_bot_message,group_telegram_bot_user,1,0,0,0
 access_telegram_bot_message_manager,telegram.bot.message.manager,model_telegram_bot_message,group_telegram_bot_manager,1,1,1,1
+access_telegram_send_wizard,telegram.send.wizard,model_telegram_send_wizard,base.group_user,1,1,1,1
