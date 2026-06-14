@@ -201,20 +201,29 @@ class HrOrder(models.Model):
 
     def _apply_dismissal(self):
         """Apply a confirmed dismissal order to the employee:
-        close the current contract version and archive the employee."""
+        close ALL contract versions and archive the employee.
+
+        We write contract_date_end to every hr.version of the employee:
+        Odoo core syncs contract_date_end across versions only on
+        `create_version`, not on direct `write`. Historical versions
+        would otherwise keep `contract_date_end = False` and slip
+        through the report filter `('contract_date_end', '=', False)`.
+        """
         self.ensure_one()
         employee = self.employee_id
         dismissal_date = self.date_dismissal or self.date
-        version = employee.current_version_id
-        if version:
-            version.write({
+        versions = employee.with_context(active_test=False).version_ids
+        if versions:
+            versions.write({
                 'contract_date_end': dismissal_date,
                 'termination_order_number': self.name,
                 'termination_order_date': self.date,
             })
+        if hasattr(employee, 'departure_date') and not employee.departure_date:
+            employee.departure_date = dismissal_date
         if employee.active:
             employee.active = False
-
+    
     def action_cancel(self):
         self.write({'state': 'cancelled'})
         for order in self.filtered(lambda o: o.leave_id):
@@ -226,16 +235,25 @@ class HrOrder(models.Model):
         return True
 
     def _revert_dismissal(self):
-        """Revert the effects of a previously confirmed dismissal order."""
+        """Revert the effects of a previously confirmed dismissal order.
+
+        We match versions by termination_order_number == self.name so
+        that revert is safe when several dismissal orders existed for
+        the same employee.
+        """
         self.ensure_one()
         employee = self.employee_id
-        version = employee.with_context(active_test=False).current_version_id
-        if version and version.termination_order_number == self.name:
-            version.write({
+        versions = employee.with_context(active_test=False).version_ids.filtered(
+            lambda v: v.termination_order_number == self.name
+        )
+        if versions:
+            versions.write({
                 'contract_date_end': False,
                 'termination_order_number': False,
                 'termination_order_date': False,
             })
+        if hasattr(employee, 'departure_date') and employee.departure_date == (self.date_dismissal or self.date):
+            employee.departure_date = False
         if not employee.active:
             employee.with_context(active_test=False).active = True
 

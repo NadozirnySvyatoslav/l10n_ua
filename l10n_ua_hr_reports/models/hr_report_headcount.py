@@ -121,6 +121,11 @@ class HrReportHeadcount(models.Model):
     def _count_employees_on_date(self, check_date):
         """Count employees on a specific date.
 
+        Counts unique employees: an employee with several hr.version
+        rows (promotion, transfer, salary change) must be counted once.
+        For each employee we pick the version actual on `check_date` —
+        the one with the greatest `date_version <= check_date`.
+
         Returns tuple (headcount, fte):
         - headcount: number of full-time employees
         - fte: full-time equivalent (includes part-time workers proportionally)
@@ -128,23 +133,34 @@ class HrReportHeadcount(models.Model):
         headcount = 0
         fte = 0.0
 
-        # Find all employees with active contracts on this date
-        # Using hr.version to check employment period
+        # Find all version rows covering check_date; we'll dedup by employee below.
         versions = self.env['hr.version'].with_context(active_test=False).search([
             ('employee_id.company_id', '=', self.company_id.id),
             ('contract_date_start', '<=', check_date),
             '|',
             ('contract_date_end', '=', False),
             ('contract_date_end', '>', check_date),
-        ])
+        ], order='date_version desc, id desc')
 
+        # Deduplicate by employee_id — keep the version actual on check_date
+        # (the first one due to descending order on date_version).
+        seen_employees = set()
+        actual_versions = self.env['hr.version']
         for version in versions:
-            # Get work rate (e.g., 1.0 for full-time, 0.5 for half-time)
+            employee_id = version.employee_id.id
+            if employee_id in seen_employees:
+                continue
+            if version.date_version and version.date_version > check_date:
+                # Future version (e.g., promotion scheduled for next month) — skip.
+                continue
+            seen_employees.add(employee_id)
+            actual_versions |= version
+
+        for version in actual_versions:
             work_rate = 1.0
             if hasattr(version, 'work_rate') and version.work_rate:
                 work_rate = version.work_rate
             elif hasattr(version, 'staffing_line_id') and version.staffing_line_id:
-                # Try to get from staffing table
                 staffing = version.staffing_line_id
                 if hasattr(staffing, 'units') and staffing.units:
                     work_rate = staffing.units
