@@ -12,6 +12,7 @@
                 <field name="employee_id"/>
                 <field name="subject"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
             </list>
         </field>
     </record>
@@ -37,7 +38,7 @@
                             <field name="subject"/>
                         </group>
                         <group>
-                            <field name="company_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             <field name="employee_id"
                                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"/>
                             <field name="department_id"
