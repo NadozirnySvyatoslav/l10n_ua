@@ -59,8 +59,8 @@ TRANSLATIONS = {
     "Employment End Date": "Дата закінчення працевлаштування",
     "Fixed-term Contract": "Строковий трудовий договір",
     "Employment Type": "Тип зайнятості",
-    "Main place of work": "за основним місцем роботи",
-    "Concurrent employment": "за сумісництвом",
+    "Main place of work": "За основним місцем роботи",
+    "Concurrent employment": "За сумісництвом",
 
     # Placeholders in templates
     "<strong>Підрозділ:</strong>": "<strong>Підрозділ:</strong>",

@@ -1078,9 +1078,9 @@ msgstr "Тип зайнятості"
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__main
 msgid "Main place of work"
-msgstr "за основним місцем роботи"
+msgstr "За основним місцем роботи"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__secondary
 msgid "Concurrent employment"
-msgstr "за сумісництвом"
+msgstr "За сумісництвом"
