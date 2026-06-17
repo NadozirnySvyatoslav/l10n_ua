@@ -291,7 +291,7 @@
                                     <tr>
                                         <td class="text-center" t-esc="row_num"/>
                                         <td><span t-field="line.name"/></td>
-                                        <td class="text-center" t-esc="line.product_uom.name if line.product_uom else '-'"/>
+                                        <td class="text-center" t-esc="line.product_uom.name.id if line.product_uom.id else '-'"/>
                                         <td class="text-right" t-esc="'%.2f' % line.product_uom_qty"/>
                                         <td class="text-right" t-esc="'%.2f' % line.price_unit"/>
                                         <td t-if="has_discount" class="text-right" t-esc="'%.1f' % line.discount if line.discount else ''"/>

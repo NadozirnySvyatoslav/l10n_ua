@@ -3,6 +3,7 @@ access_l10n_ua_koatuu_user,l10n_ua.koatuu.user,model_l10n_ua_koatuu,l10n_ua_acco
 access_l10n_ua_koatuu_manager,l10n_ua.koatuu.manager,model_l10n_ua_koatuu,l10n_ua_account_base.group_ua_manager,1,1,1,1
 access_l10n_ua_kved_user,l10n_ua.kved.user,model_l10n_ua_kved,l10n_ua_account_base.group_ua_user,1,0,0,0
 access_l10n_ua_kved_manager,l10n_ua.kved.manager,model_l10n_ua_kved,l10n_ua_account_base.group_ua_manager,1,1,1,1
+access_l10n_ua_kved_all,l10n_ua.kved.all,model_l10n_ua_kved,base.group_user,1,0,0,0
 access_l10n_ua_tax_office_user,l10n_ua.tax.office.user,model_l10n_ua_tax_office,l10n_ua_account_base.group_ua_user,1,0,0,0
 access_l10n_ua_tax_office_manager,l10n_ua.tax.office.manager,model_l10n_ua_tax_office,l10n_ua_account_base.group_ua_manager,1,1,1,1
 access_l10n_ua_legal_form_user,l10n_ua.legal.form.user,model_l10n_ua_legal_form,l10n_ua_account_base.group_ua_user,1,0,0,0
