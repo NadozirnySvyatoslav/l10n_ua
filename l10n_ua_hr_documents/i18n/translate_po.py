@@ -54,6 +54,14 @@ TRANSLATIONS = {
     "Date From": "Дата з",
     "Date To": "Дата до",
 
+    # Hiring Order Fields
+    "Employment Start Date": "Дата початку працевлаштування",
+    "Employment End Date": "Дата закінчення працевлаштування",
+    "Fixed-term Contract": "Строковий трудовий договір",
+    "Employment Type": "Тип зайнятості",
+    "Main place of work": "за основним місцем роботи",
+    "Concurrent employment": "за сумісництвом",
+
     # Placeholders in templates
     "<strong>Підрозділ:</strong>": "<strong>Підрозділ:</strong>",
     "<strong>Посада:</strong>": "<strong>Посада:</strong>",

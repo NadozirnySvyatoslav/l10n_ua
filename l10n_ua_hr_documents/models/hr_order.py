@@ -38,6 +38,10 @@ class HrOrder(models.Model):
         string='Fixed-term Contract',
         help='Check if this is a fixed-term (строковий) contract'
     )
+    employment_form = fields.Selection([
+        ('main', 'Main place of work'),
+        ('secondary', 'Concurrent employment'),
+    ], string='Employment Type', tracking=True)
 
     # Dismissal-specific fields
     date_dismissal = fields.Date(
