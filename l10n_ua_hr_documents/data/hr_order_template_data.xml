@@ -72,7 +72,7 @@
                 <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
             </tr>
             <tr>
-                <td style="padding: 5px;">Тип зайнятості:</td>
+                <td style="padding: 5px;">Працевлаштування:</td>
                 <td style="padding: 5px; border-bottom: 1px solid #000;">
                     <span t-if="order.employment_form" t-field="order.employment_form"/>
                     <t t-else="">________________________________</t>

@@ -1,4 +1,10 @@
+import logging
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
+from psycopg2 import IntegrityError
+
+_SYNC_EXC = (UserError, ValidationError, IntegrityError)
+_logger = logging.getLogger(__name__)
 
 class HrOrder(models.Model):
     _name = 'hr.order'
@@ -180,6 +186,7 @@ class HrOrder(models.Model):
                 order.leave_id.with_context(_sync_order_leave=True).write(
                     {'order_id': order.id}
                 )
+        orders._sync_hiring_to_employee()
         return orders
 
     def write(self, vals):
@@ -195,8 +202,142 @@ class HrOrder(models.Model):
                         'date_from': fields.Datetime.from_string(str(order.vacation_date_from)) if order.vacation_date_from else False,
                         'date_to': fields.Datetime.from_string(str(order.vacation_date_to)) if order.vacation_date_to else False,
                     })
+        if vals.keys() & {'order_type', 'employee_id', 'job_id', 'date', 'date_start', 'date_end', 'is_fixed_term'}:
+            self._sync_hiring_to_employee()
 
         return result
+
+    def _sync_failure(self, exc):
+        """Convert a sync exception into a UserError so it surfaces as a modal
+        dialog the user must dismiss before continuing. Overlapping-contract
+        failures get a tailored, actionable message."""
+        text = str(exc)
+        if 'contract running' in text or 'active versions' in text \
+                or 'overlap' in text.lower():
+            return UserError(_(
+                "Cannot update the employee contract: this employee already "
+                "has an active contract during the selected period.\n\n"
+                "Please either:\n"
+                "- Change the start date so that it does not overlap with the "
+                "existing contract, or\n"
+                "- Create a new employee if this employee should have multiple "
+                "active contracts."
+            ))
+        return UserError(_(
+            "Failed to sync hiring order data to the employee record.\n\n"
+            "Details: %s",
+            text,
+        ))
+
+    def _sync_hiring_to_employee(self):
+        """Sync hiring order data to the employee record.
+
+        Three writes happen, each guarded by its own savepoint so a failure in
+        one does not abort the order transaction or the other writes:
+
+        1. Employee-level fields (``job_id``, ``hire_date``).
+        2. Current version metadata (``hire_order_number``, ``hire_order_date``,
+           ``job_id``) — so the employee form immediately reflects the latest
+           order; these fields do not interact with contract period overlap
+           checks.
+        3. A dedicated contract version covering the order's period
+           (``contract_date_start``/``contract_date_end``) — created or updated
+           in place, matched first by ``hire_order_number`` and then by
+           ``date_version``.
+        """
+        Version = self.env['hr.version']
+        for order in self.filtered(lambda o: o.order_type == 'hiring' and o.employee_id):
+            order_no = order.name if order.name and order.name != 'New' else False
+
+            # 1. Employee-level fields
+            emp_vals = {}
+            if order.job_id:
+                emp_vals['job_id'] = order.job_id.id
+            hire_date_val = order.date_start or order.date
+            if hire_date_val:
+                emp_vals['hire_date'] = hire_date_val
+            if emp_vals:
+                try:
+                    with self.env.cr.savepoint():
+                        order.employee_id.write(emp_vals)
+                except _SYNC_EXC as exc:
+                    _logger.warning(
+                        "Hiring order %s: cannot sync to employee %s: %s",
+                        order.name, order.employee_id.display_name, exc,
+                    )
+                    raise self._sync_failure(exc) from exc
+
+            # 2. Current version metadata (visible on the employee form)
+            current = order.employee_id.current_version_id
+            if current:
+                current_vals = {}
+                if order_no:
+                    current_vals['hire_order_number'] = order_no
+                if order.date:
+                    current_vals['hire_order_date'] = order.date
+                if order.job_id:
+                    current_vals['job_id'] = order.job_id.id
+                if current_vals:
+                    try:
+                        with self.env.cr.savepoint():
+                            current.sudo().write(current_vals)
+                    except _SYNC_EXC as exc:
+                        _logger.warning(
+                            "Hiring order %s: cannot sync metadata to current version of %s: %s",
+                            order.name, order.employee_id.display_name, exc,
+                        )
+                        raise self._sync_failure(exc) from exc
+
+            # 3. Contract version for the new employment period
+            version_start = order.date_start or order.date
+            if not version_start:
+                continue
+
+            version_vals = {
+                'contract_date_start': order.date_start or False,
+                'hire_order_date': order.date or False,
+            }
+            if order_no:
+                version_vals['hire_order_number'] = order_no
+            if order.job_id:
+                version_vals['job_id'] = order.job_id.id
+            if order.is_fixed_term:
+                version_vals['contract_date_end'] = order.date_end or False
+            else:
+                version_vals['contract_date_end'] = False
+
+            existing = Version.browse()
+            if order_no:
+                existing = Version.search([
+                    ('employee_id', '=', order.employee_id.id),
+                    ('hire_order_number', '=', order_no),
+                ], limit=1)
+            if not existing:
+                existing = Version.search([
+                    ('employee_id', '=', order.employee_id.id),
+                    ('date_version', '=', version_start),
+                ], limit=1)
+
+            try:
+                with self.env.cr.savepoint():
+                    if existing:
+                        version_vals['date_version'] = version_start
+                        existing.sudo().write(version_vals)
+                    else:
+                        version_vals['date_version'] = version_start
+                        version_vals['employee_id'] = order.employee_id.id
+                        template = order.employee_id.current_version_id
+                        if template:
+                            template.sudo().copy(version_vals)
+                        else:
+                            version_vals.setdefault('company_id', order.company_id.id)
+                            Version.sudo().create(version_vals)
+            except _SYNC_EXC as exc:
+                _logger.warning(
+                    "Hiring order %s: cannot sync to contract version of %s: %s",
+                    order.name, order.employee_id.display_name, exc,
+                )
+                raise self._sync_failure(exc) from exc
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
