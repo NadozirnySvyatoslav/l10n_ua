@@ -24,7 +24,7 @@
     <template id="report_hr_employee_military_document">
         <t t-call="web.basic_layout">
             <t t-set="company" t-value="report_doc.company_id or env.company"/>
-            <t t-set="employees" t-value="report_doc.employee_ids"/>
+            <t t-set="employees" t-value="report_doc.with_context(active_test=False).employee_ids"/>
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
 
                 <div style="text-align: center; margin-bottom: 20px;">

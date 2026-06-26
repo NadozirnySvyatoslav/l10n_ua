@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Append contract columns to the Employee List PDF report. -->
+    <template id="report_hr_employee_list_document_contract"
+              inherit_id="l10n_ua_hr_base.report_hr_employee_list_document">
+
+        <xpath expr="//thead/tr" position="inside">
+            <th style="border: 1px solid #000; padding: 4px; width: 10%;">Тип Договору</th>
+            <th style="border: 1px solid #000; padding: 4px; width: 8%;">Основне місце</th>
+            <th style="border: 1px solid #000; padding: 4px; width: 8%;">Дата звільнення</th>
+        </xpath>
+
+        <xpath expr="//tbody/t[@t-foreach='employees']/tr" position="inside">
+            <t t-set="contract_type_labels" t-value="{
+                'permanent': 'Безстроковий',
+                'fixed_term': 'Строковий',
+                'contract': 'Контракт',
+                'civil': 'ЦПХ',
+                'gig': 'Гіг-контракт (Дія.City)',
+                'author': 'Авторський',
+                'seasonal': 'Сезонний',
+                'temporary': 'Тимчасовий',
+            }"/>
+            <td style="border: 1px solid #000; padding: 4px; font-size: 8pt;">
+                <t t-esc="contract_type_labels.get(employee.contract_type_ua, '')"/>
+            </td>
+            <td style="border: 1px solid #000; padding: 4px; text-align: center;">
+                <t t-if="employee.is_main_workplace">Так</t>
+                <t t-else="">Ні</t>
+            </td>
+            <td style="border: 1px solid #000; padding: 4px; text-align: center;">
+                <t t-if="employee.departure_date">
+                    <t t-esc="employee.departure_date.strftime('%d.%m.%Y')"/>
+                </t>
+            </td>
+        </xpath>
+
+    </template>
+
+</odoo>
+

@@ -1054,3 +1054,67 @@ msgstr "Запис відпустки"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__holiday_status_id
 msgid "Leave Type"
 msgstr "Тип відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_start
+msgid "Employment Start Date"
+msgstr "Дата початку працевлаштування"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_end
+msgid "Employment End Date"
+msgstr "Дата закінчення працевлаштування"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__is_fixed_term
+msgid "Fixed-term Contract"
+msgstr "Строковий трудовий договір"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__employment_form
+msgid "Employment Type"
+msgstr "Тип зайнятості"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__main
+msgid "Main place of work"
+msgstr "За основним місцем роботи"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__secondary
+msgid "Concurrent employment"
+msgstr "За сумісництвом"
+
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Cannot update the employee contract: this employee already has an active "
+"contract during the selected period.\n"
+"\n"
+"Please either:\n"
+"- Change the start date so that it does not overlap with the existing "
+"contract, or\n"
+"- Create a new employee if this employee should have multiple active "
+"contracts."
+msgstr ""
+"Не вдалось оновити контракт співробітника: цей співробітник уже має активний "
+"контракт у вибраному періоді.\n"
+"\n"
+"Будь ласка:\n"
+"- Змініть дату початку, щоб вона не перетиналася з існуючим контрактом, або\n"
+"- Створіть нового співробітника, якщо у цього співробітника має бути "
+"декілька активних контрактів."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Failed to sync hiring order data to the employee record.\n"
+"\n"
+"Details: %s"
+msgstr ""
+"Не вдалось синхронізувати дані наказу з карткою співробітника.\n"
+"\n"
+"Подробиці: %s"

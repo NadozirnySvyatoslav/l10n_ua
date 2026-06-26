@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Add contract-related optional columns to the embedded employee
+         list of every employee report. -->
+
+    <record id="hr_employee_list_report_view_form_contract" model="ir.ui.view">
+        <field name="name">hr.employee.list.report.form.contract</field>
+        <field name="model">hr.employee.list.report</field>
+        <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_list_report_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
+                   position="before">
+                <field name="contract_type_ua" optional="hide"/>
+                <field name="is_main_workplace" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_employee_military_report_view_form_contract" model="ir.ui.view">
+        <field name="name">hr.employee.military.report.form.contract</field>
+        <field name="model">hr.employee.military.report</field>
+        <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_military_report_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
+                   position="before">
+                <field name="contract_type_ua" optional="hide"/>
+                <field name="is_main_workplace" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_employee_benefits_report_view_form_contract" model="ir.ui.view">
+        <field name="name">hr.employee.benefits.report.form.contract</field>
+        <field name="model">hr.employee.benefits.report</field>
+        <field name="inherit_id" ref="l10n_ua_hr_base.hr_employee_benefits_report_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
+                   position="before">
+                <field name="contract_type_ua" optional="hide"/>
+                <field name="is_main_workplace" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

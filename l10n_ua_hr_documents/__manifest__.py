@@ -30,6 +30,7 @@ Requires l10n_ua_hr_base module.
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/hr_order_security.xml',
         'data/ir_sequence_data.xml',
         'data/hr_order_type_data.xml',
         'data/hr_order_template_data.xml',

@@ -1174,3 +1174,27 @@ msgid ""
 msgstr ""
 "Працівник %(employee)s має відпрацювати щонайменше %(months)s місяців до першої щорічної відпустки. "
 "Поточний стаж: %(current)s місяців."
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_leave_type__period_type
+msgid "Accounting Period"
+msgstr "Обліковий період"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__period_type__calendar
+msgid "Calendar Year"
+msgstr "Календарний рік"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__period_type__work
+msgid "Work Year"
+msgstr "Робочий рік"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_leave_type__period_type
+msgid ""
+"Calendar Year: Jan 1 – Dec 31. Work Year: 12-month period from the employee "
+"hire_date (per Ukrainian Vacation Law art. 6, 7, 8, 10)."
+msgstr ""
+"Календарний рік: 1 січня – 31 грудня. Робочий рік: 12-місячний період від "
+"дати прийняття працівника на роботу (згідно зі ст. 6, 7, 8, 10 ЗУ «Про відпустки»)."

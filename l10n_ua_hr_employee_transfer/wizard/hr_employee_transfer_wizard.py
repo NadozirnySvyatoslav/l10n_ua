@@ -7,22 +7,32 @@ from odoo.exceptions import UserError
 PERSONAL_FIELDS = [
     # Standard Odoo personal data
     'name', 'gender', 'birthday', 'place_of_birth', 'country_of_birth',
-    'marital', 'private_phone', 'private_email', 'private_street',
+    'country_id', 'identification_id', 'lang',
+    'marital', 'spouse_complete_name', 'spouse_birthdate',
+    'private_phone', 'private_email', 'private_street',
     'private_street2', 'private_city', 'private_zip', 'private_state_id',
     'private_country_id',
+    # Work contact info shown directly under the name in the form header
+    'job_title', 'work_phone', 'mobile_phone', 'work_email',
     # Ukrainian-specific personal data from l10n_ua_hr_base
-    'rnokpp', 'document_type', 'passport_series', 'passport_number',
+    'rnokpp', 'document_type', 'passport_series',
+    'passport_id', 'passport_expiration_date',
     'passport_issued_by', 'passport_issued_date', 'passport_record_number',
     'registration_address', 'registration_region_id', 'registration_city',
     'registration_zip', 'actual_address', 'actual_same_as_registration',
-    'education_level_id', 'diploma_series', 'diploma_number', 'diploma_date',
-    'military_status', 'military_category', 'military_rank_id',
-    'military_specialty', 'military_fitness', 'military_document_number',
+    'education_level_id', 'study_school', 'study_field',
+    'diploma_series', 'diploma_number', 'diploma_date',
+    'military_status', 'military_register_category', 'military_category',
+    'military_rank_id', 'military_specialty', 'military_fitness',
+    'military_medical_category', 'military_mlk_retest_date',
+    'military_document_number',
     'military_tcc_id', 'military_reservation', 'military_reservation_until',
     'military_reservplus_id',
     'disability_group', 'disability_reason', 'disability_document',
     'disability_date_from', 'disability_date_to',
     'chornobyl_category', 'veteran_status', 'spouse_rnokpp',
+    # Work experience (company experience recomputes from new hire_date)
+    'work_experience_total', 'insurance_experience',
 ]
 
 
@@ -110,15 +120,18 @@ class HrEmployeeTransferWizard(models.TransientModel):
                 vals[fname] = value.id if value else False
             else:
                 vals[fname] = value
+        vals['hire_date'] = self.hire_date
         if not self.copy_documents:
-            for fname in ('passport_series', 'passport_number', 'passport_issued_by',
-                          'passport_issued_date', 'passport_record_number',
+            for fname in ('passport_series', 'passport_id', 'passport_expiration_date',
+                          'passport_issued_by', 'passport_issued_date',
+                          'passport_record_number',
                           'diploma_series', 'diploma_number', 'diploma_date',
-                          'education_level_id'):
+                          'education_level_id', 'study_school', 'study_field'):
                 vals.pop(fname, None)
         if not self.copy_family_data:
-            vals.pop('spouse_rnokpp', None)
-            vals.pop('marital', None)
+            for fname in ('spouse_rnokpp', 'spouse_complete_name',
+                          'spouse_birthdate', 'marital'):
+                vals.pop(fname, None)
         return vals
 
     def _copy_children(self, new_employee):

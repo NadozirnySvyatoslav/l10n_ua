@@ -38,6 +38,7 @@ Requires l10n_ua_hr_base module.
         'data/hr_work_schedule_data.xml',
         'data/hr_termination_reason_data.xml',
         'views/hr_allowance_type_views.xml',
+        'views/hr_employee_reports_views.xml',
         'views/hr_version_allowance_views.xml',
         'views/hr_version_views.xml',
         'views/hr_version_salary_change_views.xml',
@@ -47,6 +48,7 @@ Requires l10n_ua_hr_base module.
         'views/hr_termination_reason_views.xml',
         'views/hr_employee_views.xml',
         'views/menu_views.xml',
+        'report/hr_employee_list_report_inherit.xml',
     ],
     'demo': [
     ],

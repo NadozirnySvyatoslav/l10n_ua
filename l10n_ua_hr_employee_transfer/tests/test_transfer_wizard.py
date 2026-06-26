@@ -27,6 +27,16 @@ class TestEmployeeTransfer(TransactionCase):
             'name': 'Іван Петренко',
             'company_id': cls.company_a.id,
             'rnokpp': '1234567899',
+            'birthday': date(1990, 3, 15),
+            'passport_id': '123456789',
+            'document_type': 'id_card',
+            'work_phone': '+380501112233',
+            'mobile_phone': '+380671112233',
+            'work_email': 'ivan@example.com',
+            'private_phone': '+380931112233',
+            'private_email': 'ivan.private@example.com',
+            'job_title': 'Інженер',
+            'hire_date': date(2020, 1, 10),
         })
 
     def _make_wizard(self, **overrides):
@@ -103,3 +113,27 @@ class TestEmployeeTransfer(TransactionCase):
     def test_vacation_reset_is_default(self):
         wizard = self._make_wizard()
         self.assertEqual(wizard.vacation_transfer_mode, 'reset')
+
+    def test_transfer_copies_personal_and_contact_fields(self):
+        wizard = self._make_wizard()
+        wizard.action_transfer()
+        new_employee = self.source_employee.next_employee_id
+        # Hire date must reflect the wizard's target hire date, not the source's.
+        self.assertEqual(new_employee.hire_date, date(2026, 5, 1))
+        # Birthday and passport must be carried over (fields previously dropped).
+        self.assertEqual(new_employee.birthday, date(1990, 3, 15))
+        self.assertEqual(new_employee.passport_id, '123456789')
+        self.assertEqual(new_employee.document_type, 'id_card')
+        # Header contact info shown right under the name.
+        self.assertEqual(new_employee.work_phone, '+380501112233')
+        self.assertEqual(new_employee.mobile_phone, '+380671112233')
+        self.assertEqual(new_employee.work_email, 'ivan@example.com')
+        self.assertEqual(new_employee.private_phone, '+380931112233')
+        self.assertEqual(new_employee.private_email, 'ivan.private@example.com')
+        self.assertEqual(new_employee.job_title, 'Інженер')
+
+    def test_documents_not_copied_when_flag_off(self):
+        wizard = self._make_wizard(copy_documents=False)
+        wizard.action_transfer()
+        new_employee = self.source_employee.next_employee_id
+        self.assertFalse(new_employee.passport_id)

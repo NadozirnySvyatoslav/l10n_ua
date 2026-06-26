@@ -70,8 +70,15 @@ class TestHrEmployeeChild(TestHrUaBase):
 
     def test_child_is_disabled(self):
         """Test is_disabled field."""
-        child = self._create_child(is_disabled=True)
+        child = self._create_child(is_disabled=True, disability_group='2')
         self.assertTrue(child.is_disabled)
+        self.assertEqual(child.disability_group, '2')
+
+    def test_child_is_disabled_requires_group(self):
+        """Disabled child without group must raise ValidationError."""
+        from odoo.exceptions import ValidationError
+        with self.assertRaises(ValidationError):
+            self._create_child(is_disabled=True)
 
     def test_child_rnokpp_validation(self):
         """Test RNOKPP validation for child."""

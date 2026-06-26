@@ -29,6 +29,6 @@
               name="Generate Report"
               parent="hr.hr_menu_hr_reports"
               action="action_hr_report_wizard"
-              sequence="50"/>
+              sequence="100"/>
 
 </odoo>

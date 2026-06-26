@@ -24,7 +24,7 @@
     <template id="report_hr_employee_list_document">
         <t t-call="web.basic_layout">
             <t t-set="company" t-value="report_doc.company_id or env.company"/>
-            <t t-set="employees" t-value="report_doc.employee_ids"/>
+            <t t-set="employees" t-value="report_doc.with_context(active_test=False).employee_ids"/>
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
 
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -66,7 +66,7 @@
                                     <t t-esc="employee.job_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-				    <t t-set="hire_dt" t-value="employee.hire_date"/>
+                                    <t t-set="hire_dt" t-value="employee.hire_date"/>
                                     <t t-if="not hire_dt">
                                         <t t-set="vdates" t-value="employee.version_ids.filtered('contract_date_start').mapped('contract_date_start')"/>
                                         <t t-if="vdates">

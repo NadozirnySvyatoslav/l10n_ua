@@ -54,6 +54,18 @@ TRANSLATIONS = {
     "Date From": "Дата з",
     "Date To": "Дата до",
 
+    # Hiring Order Fields
+    "Employment Start Date": "Дата початку працевлаштування",
+    "Employment End Date": "Дата закінчення працевлаштування",
+    "Fixed-term Contract": "Строковий трудовий договір",
+    "Employment Type": "Тип зайнятості",
+    "Main place of work": "За основним місцем роботи",
+    "Concurrent employment": "За сумісництвом",
+
+    # Sync errors
+    "Cannot update the employee contract: this employee already has an active contract during the selected period.\n\nPlease either:\n- Change the start date so that it does not overlap with the existing contract, or\n- Create a new employee if this employee should have multiple active contracts.": "Не вдалось оновити контракт співробітника: цей співробітник уже має активний контракт у вибраному періоді.\n\nБудь ласка:\n- Змініть дату початку, щоб вона не перетиналася з існуючим контрактом, або\n- Створіть нового співробітника, якщо у цього співробітника має бути декілька активних контрактів.",
+    "Failed to sync hiring order data to the employee record.\n\nDetails: %s": "Не вдалось синхронізувати дані наказу з карткою співробітника.\n\nПодробиці: %s",
+
     # Placeholders in templates
     "<strong>Підрозділ:</strong>": "<strong>Підрозділ:</strong>",
     "<strong>Посада:</strong>": "<strong>Посада:</strong>",
