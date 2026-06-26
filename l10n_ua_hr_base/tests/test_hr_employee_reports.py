@@ -51,20 +51,20 @@ class TestHrEmployeeReports(TestHrUaBase):
             'company_id': self.company.id,
             'date': '2026-01-01',
         })
-        
+
         self.assertEqual(report.state, 'draft')
-        
+
         report.action_generate()
         report = report.with_context(active_test=False)
         self.assertEqual(report.state, 'generated')
-        
+
         # Everyone employed on the report date (active or archived); others out.
         self.assertIn(employee_1, report.employee_ids)
         self.assertIn(emp_archived_then, report.employee_ids)
         self.assertNotIn(emp_future, report.employee_ids)
-        self.assertNotIn(emp_archived_before, report.employee_ids)        
+        self.assertNotIn(emp_archived_before, report.employee_ids)
         self.assertNotIn(employee_2, report.employee_ids)
-        
+
         self.assertEqual(report.employee_count, 2)
 
     def test_hr_employee_military_report(self):
@@ -130,7 +130,7 @@ class TestHrEmployeeReports(TestHrUaBase):
             'company_id': self.company.id,
             'date': '2026-01-01',
         })
-        
+
         report.action_generate()
         report = report.with_context(active_test=False)
         self.assertIn(employee_1, report.employee_ids)
