@@ -23,12 +23,14 @@ class TestBankExport(SalaryTestCase):
         cls.env['ir.config_parameter'].sudo().set_param(
             'hr_ua.validate_rnokpp', 'False')
         cls.employee.rnokpp = '1234567890'
-        partner = cls.env['res.partner'].create({'name': 'Петренко О.М.'})
+        # The native bank_account_ids only accepts accounts held by the
+        # employee's own work contact, which hr.employee.create provisions.
+        cls.iban = 'UA213223130000026007233566001'
         cls.bank = cls.env['res.partner.bank'].create({
-            'acc_number': '26001234567890',
-            'partner_id': partner.id,
+            'acc_number': cls.iban,
+            'partner_id': cls.employee.work_contact_id.id,
         })
-        cls.employee.bank_account_id = cls.bank.id
+        cls.employee.bank_account_ids = [(4, cls.bank.id)]
 
     def _done_payslip(self):
         slip = self.env['hr.payslip'].create({
@@ -63,7 +65,7 @@ class TestBankExport(SalaryTestCase):
         self.assertEqual(len(payments), 1)
         p = payments[0]
         self.assertEqual(p.findtext('Rnokpp'), '1234567890')
-        self.assertEqual(p.findtext('Account'), '26001234567890')
+        self.assertEqual(p.findtext('Account'), self.iban)
         self.assertEqual(p.findtext('Amount'), f'{slip.net_salary:.2f}')
         self.assertEqual(p.findtext('Purpose'), 'Заробітна плата за 06.2025')
         self.assertEqual(root.get('count'), '1')
@@ -86,7 +88,7 @@ class TestBankExport(SalaryTestCase):
 
     def test_missing_account_raises(self):
         self._done_payslip()
-        self.employee.bank_account_id = False
+        self.employee.bank_account_ids = [(5, 0, 0)]
         wiz = self._wizard(file_format='xml')
         with self.assertRaises(UserError):
             wiz.action_generate()
@@ -144,10 +146,65 @@ class TestBankExport(SalaryTestCase):
         text = base64.b64decode(wiz.file_data).decode('cp1251')
         self.assertIn('Content-Type=doc/pay_sheet', text)
         self.assertIn('ONFLOW_TYPE=Заробітна плата', text)
-        self.assertIn('CARD_HOLDERS.0.CARD_NUM=26001234567890', text)
+        self.assertIn('CARD_HOLDERS.0.CARD_NUM=%s' % self.iban, text)
         self.assertIn('CARD_HOLDERS.0.CARD_HOLDER_INN=1234567890', text)
         self.assertIn('CARD_HOLDERS.0.AMOUNT=%.2f' % slip.net_salary, text)
         self.assertIn('PERIOD=06,2025', text)
+
+    # --- Ukrainian IBAN carried onto the native bank_account_ids ---
+
+    def test_primary_account_used_for_export(self):
+        """With several accounts the export must pay the primary one."""
+        second = self.env['res.partner.bank'].create({
+            'acc_number': 'UA913223130000026007233566002',
+            'partner_id': self.employee.work_contact_id.id,
+        })
+        self.employee.bank_account_ids = [(4, second.id)]
+        self.assertEqual(len(self.employee.bank_account_ids), 2)
+        expected = self.employee.primary_bank_account_id
+        self.assertTrue(expected)
+        self._done_payslip()
+        wiz = self._wizard(file_format='xml')
+        wiz.action_generate()
+        root = etree.fromstring(base64.b64decode(wiz.file_data))
+        payments = root.findall('Payment')
+        self.assertEqual(len(payments), 1)
+        self.assertEqual(payments[0].findtext('Account'), expected.acc_number)
+
+    def test_iban_written_without_spaces(self):
+        """A grouped IBAN reaches the bank file as 29 contiguous characters."""
+        self.bank.acc_number = 'UA21 3223 1300 0002 6007 2335 6600 1'
+        self._done_payslip()
+        wiz = self._wizard(file_format='xml')
+        wiz.action_generate()
+        root = etree.fromstring(base64.b64decode(wiz.file_data))
+        account = root.findall('Payment')[0].findtext('Account')
+        self.assertEqual(account, self.iban)
+        self.assertEqual(len(account), 29)
+
+    def test_ua_iban_fits_dbf_field_width(self):
+        """A 29-char IBAN must survive the fixed-width DBF fields untruncated.
+
+        build_dbf pads or slices silently, so a field declared too narrow
+        would ship a mangled account number with no error at all.
+        """
+        self._done_payslip()
+        transit = self.env['res.partner.bank'].create({
+            'acc_number': 'UA983053990000026007233566003',
+            'partner_id': self.bank.partner_id.id,
+        })
+        wiz = self._wizard(file_format='ifobs')
+        wiz.transit_account_id = transit.id
+        wiz.salary_project_code = '12345'
+        wiz.action_generate()
+        # DBF is binary, so the account is looked for as encoded bytes.
+        encoded_iban = self.iban.encode('cp1251')
+        zf = zipfile.ZipFile(io.BytesIO(base64.b64decode(wiz.file_data)))
+        self.assertIn(encoded_iban, zf.read('Amounts.dbf'))
+
+        wiz_dbf = self._wizard(file_format='dbf')
+        wiz_dbf.action_generate()
+        self.assertIn(encoded_iban, base64.b64decode(wiz_dbf.file_data))
 
     def test_run_defaults_period(self):
         run = self.env['hr.payslip.run'].create({

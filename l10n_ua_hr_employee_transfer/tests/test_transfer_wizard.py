@@ -179,6 +179,51 @@ class TestEmployeeTransfer(TransactionCase):
         new_employee = self.source_employee.next_employee_id
         self.assertFalse(new_employee.passport_id)
 
+    def test_transfer_links_salary_accounts(self):
+        """Salary accounts follow the employee onto the target card.
+
+        Only the accounts the source used for payroll are linked; a private
+        account of the same contact is copied but left unlinked.
+        """
+        source_contact = self.source_employee.work_contact_id
+        salary_account = self.env['res.partner.bank'].create({
+            'acc_number': 'UA213223130000026007233566001',
+            'partner_id': source_contact.id,
+            'allow_out_payment': True,
+        })
+        private_account = self.env['res.partner.bank'].create({
+            'acc_number': 'UA913223130000026007233566002',
+            'partner_id': source_contact.id,
+        })
+        self.source_employee.bank_account_ids = [(4, salary_account.id)]
+
+        wizard = self._make_wizard()
+        wizard.action_transfer()
+        new_employee = self.source_employee.next_employee_id
+
+        linked = new_employee.bank_account_ids
+        self.assertEqual(len(linked), 1)
+        self.assertNotIn(linked.id, (salary_account.id, private_account.id))
+        self.assertEqual(linked.acc_number, salary_account.acc_number)
+        self.assertEqual(linked.partner_id, new_employee.work_contact_id)
+        self.assertEqual(linked.company_id, self.company_b)
+        # copy=False on allow_out_payment: the copy must arrive untrusted.
+        self.assertFalse(linked.allow_out_payment)
+        # Both accounts are still copied, only one of them is linked.
+        self.assertEqual(len(new_employee.work_contact_id.bank_ids), 2)
+
+    def test_bank_accounts_not_copied_when_flag_off(self):
+        source_contact = self.source_employee.work_contact_id
+        account = self.env['res.partner.bank'].create({
+            'acc_number': 'UA213223130000026007233566001',
+            'partner_id': source_contact.id,
+        })
+        self.source_employee.bank_account_ids = [(4, account.id)]
+        wizard = self._make_wizard(copy_bank_accounts=False)
+        wizard.action_transfer()
+        new_employee = self.source_employee.next_employee_id
+        self.assertFalse(new_employee.bank_account_ids)
+
     # --- #154: авто-версія контракту + форма П-7 ---
 
     def _source_with_version(self):

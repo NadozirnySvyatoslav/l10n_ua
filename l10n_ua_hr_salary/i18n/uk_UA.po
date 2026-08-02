@@ -823,6 +823,16 @@ msgid "Next Activity Type"
 msgstr "Тип наступної активності"
 
 #. module: l10n_ua_hr_salary
+#: code:addons/l10n_ua_hr_salary/wizard/hr_payslip_bank_export.py:0
+#, python-format
+msgid ""
+"No bank account (IBAN) for employees:\n"
+"- %s"
+msgstr ""
+"Немає банківського рахунку (IBAN) у працівників:\n"
+"- %s"
+
+#. module: l10n_ua_hr_salary
 #: model:ir.model.fields.selection,name:l10n_ua_hr_salary.selection__hr_payslip__psp_type__none
 msgid "None"
 msgstr "Немає"

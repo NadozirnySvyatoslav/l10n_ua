@@ -4,6 +4,12 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
+# Fields copied verbatim into the target employee's create() values. Only
+# scalars and Many2one belong here: _prepare_new_employee_vals reads `value.id`,
+# which raises on a multi-record set. `bank_account_ids` in particular must
+# never be listed — it would both break on that read and carry over accounts
+# owned by the source partner and source company. Bank accounts are handled by
+# _copy_bank_accounts, which re-creates them under the target contact.
 PERSONAL_FIELDS = [
     # Standard Odoo personal data
     'name', 'gender', 'birthday', 'place_of_birth', 'country_of_birth',
@@ -82,7 +88,7 @@ class HrEmployeeTransferWizard(models.TransientModel):
     currency_id = fields.Many2one(
         'res.currency', related='target_company_id.currency_id')
 
-    copy_bank_accounts = fields.Boolean(string='Копіювати банківські рахунки', default=True)
+    copy_bank_accounts = fields.Boolean(string='Copy Bank Accounts', default=True)
     copy_documents = fields.Boolean(string='Копіювати особові документи', default=True)
     copy_family_data = fields.Boolean(string='Копіювати сімейні дані (діти, подружжя)', default=True)
 
@@ -193,17 +199,39 @@ class HrEmployeeTransferWizard(models.TransientModel):
             Child.sudo().create(copy_vals)
 
     def _copy_bank_accounts(self, new_employee):
+        """Re-create the source accounts under the target contact and link them.
+
+        Every account of the source work contact is copied, as before, but only
+        those the source employee used for payroll are linked to the new
+        `bank_account_ids`: the rest are private accounts that never took part
+        in a salary payment.
+
+        The copies satisfy the native domain by construction — their partner is
+        the target work contact and their company is the target company — which
+        is exactly why the link cannot be made through PERSONAL_FIELDS instead.
+        `allow_out_payment` has copy=False, so a copied account arrives
+        untrusted and an officer has to authorise outgoing payments explicitly.
+        """
         if not self.copy_bank_accounts or not self.source_employee_id.work_contact_id:
             return
-        source_partner = self.source_employee_id.work_contact_id
+        source = self.source_employee_id
         target_partner = new_employee.work_contact_id
         if not target_partner:
             return
-        for bank in source_partner.bank_ids:
+        Bank = self.env['res.partner.bank'].sudo()
+        copied_by_source = {}
+        for bank in source.work_contact_id.bank_ids:
             copy_vals = bank.copy_data()[0]
             copy_vals['partner_id'] = target_partner.id
             copy_vals['company_id'] = self.target_company_id.id
-            self.env['res.partner.bank'].sudo().create(copy_vals)
+            copied_by_source[bank.id] = Bank.create(copy_vals)
+        salary_accounts = [
+            copied_by_source[bank.id].id
+            for bank in source.bank_account_ids
+            if bank.id in copied_by_source
+        ]
+        if salary_accounts:
+            new_employee.sudo().bank_account_ids = [(6, 0, salary_accounts)]
 
     def _create_new_version(self, new_employee):
         """Налаштувати версію трудового договору для прийнятого працівника.

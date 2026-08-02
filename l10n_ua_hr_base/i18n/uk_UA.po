@@ -124,21 +124,6 @@ msgid "Bachelor's Degree"
 msgstr "Бакалавр"
 
 #. module: l10n_ua_hr_base
-#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__bank_account_id
-msgid "Bank Account"
-msgstr "Банківський рахунок"
-
-#. module: l10n_ua_hr_base
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_employee_form_inherit_ua
-msgid "Bank Details"
-msgstr "Банківські реквізити"
-
-#. module: l10n_ua_hr_base
-#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__bank_account_id
-msgid "Bank account for salary payment"
-msgstr "Банківський рахунок для виплати зарплати"
-
-#. module: l10n_ua_hr_base
 #: model:hr.education.level,name:l10n_ua_hr_base.education_level_basic_secondary
 msgid "Basic Secondary Education"
 msgstr "Базова середня освіта"

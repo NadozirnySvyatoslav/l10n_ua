@@ -93,7 +93,10 @@ class HrPayslipBankExport(models.TransientModel):
             if amount <= 0:
                 skipped_zero += 1
                 continue
-            bank = employee.bank_account_id
+            # One payment per employee: the native primary account is the one
+            # ranked first in salary_distribution, or the only account when no
+            # distribution is set.
+            bank = employee.primary_bank_account_id
             if not bank or not bank.acc_number:
                 missing_account.append(employee.name)
                 continue
@@ -109,7 +112,7 @@ class HrPayslipBankExport(models.TransientModel):
             })
         if missing_account:
             raise UserError(_(
-                'Немає банківського рахунку (IBAN) у працівників:\n- %s'
+                'No bank account (IBAN) for employees:\n- %s'
             ) % '\n- '.join(missing_account))
         if not rows:
             raise UserError(_(

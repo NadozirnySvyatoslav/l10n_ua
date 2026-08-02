@@ -15,6 +15,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: l10n_ua_hr_employee_transfer
+#: model:ir.model.fields,field_description:l10n_ua_hr_employee_transfer.field_hr_employee_transfer_wizard__copy_bank_accounts
+msgid "Copy Bank Accounts"
+msgstr "Копіювати банківські рахунки"
+
+#. module: l10n_ua_hr_employee_transfer
 #: model:ir.model.fields,field_description:l10n_ua_hr_employee_transfer.field_hr_employee_transfer_wizard__vacation_period_mode
 msgid "Vacation Work Year"
 msgstr "Робочий рік відпустки"

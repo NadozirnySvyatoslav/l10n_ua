@@ -220,7 +220,7 @@ class HrEmployee(models.Model):
              'Зміна цього поля захищена групою HR Officer — впливає на розрахунок ПДФО, '
              'тому звичайний користувач не повинен мати змогу його редагувати.')
 
-    # === Work Experience & Bank ===
+    # === Work Experience ===
     hire_date = fields.Date(
         string='Hire Date', compute='_compute_hire_date',
         store=True, readonly=False, tracking=True,
@@ -234,8 +234,11 @@ class HrEmployee(models.Model):
                                             compute='_compute_work_experience_company')
     insurance_experience = fields.Float(string='Insurance Experience (years)',
                                          help='Insurance experience for sick leave calculation')
-    bank_account_id = fields.Many2one('res.partner.bank', string='Bank Account',
-                                       help='Bank account for salary payment')
+    # === Bank ===
+    # Use Odoo core field: bank_account_ids (several accounts, salary
+    # distribution, tracking, and a domain tying the account to the
+    # employee's own work contact)
+    # bank_account_id - REMOVED, use bank_account_ids from core
 
     # === Related fields from hr.job (readonly) ===
     job_kp_code = fields.Char(

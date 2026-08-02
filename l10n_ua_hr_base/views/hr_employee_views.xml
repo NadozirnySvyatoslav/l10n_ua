@@ -110,9 +110,6 @@
                             <field name="work_experience_company"/>
                             <field name="insurance_experience"/>
                         </group>
-                        <group string="Банківські реквізити">
-                            <field name="bank_account_id"/>
-                        </group>
                     </group>
                     <group>
                         <group string="Військовий облік">
