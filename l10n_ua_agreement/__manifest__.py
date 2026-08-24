@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Agreements (Договори)',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Sales/Localization',
     'summary': 'Договори з клієнтами: шаблони, додаткові угоди, підпис (sign_oca), '
                'продажі та періодичні рахунки',
