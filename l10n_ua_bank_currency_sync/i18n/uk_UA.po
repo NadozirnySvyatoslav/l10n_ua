@@ -24,13 +24,11 @@ msgstr "Курс валюти"
 #. module: l10n_ua_bank_currency_sync
 #: model:ir.model,name:l10n_ua_bank_currency_sync.model_res_currency_rate_provider
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_currency_sync.res_currency_rate_provider_view_form
-#: model:res.currency.rate.provider,_description:l10n_ua_bank_currency_sync.model_res_currency_rate_provider
 msgid "Currency Rate Provider"
 msgstr "Провайдер курсів валют"
 
 #. module: l10n_ua_bank_currency_sync
 #: model:ir.model,name:l10n_ua_bank_currency_sync.model_l10n_ua_currency_sync_wizard
-#: model:l10n_ua.currency.sync.wizard,_description:l10n_ua_bank_currency_sync.model_l10n_ua_currency_sync_wizard
 msgid "Currency Sync Wizard"
 msgstr "Майстер синхронізації валют"
 
