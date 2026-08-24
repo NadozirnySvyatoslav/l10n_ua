@@ -23,22 +23,22 @@ msgstr "'Банківська_виписка_%s_%s' % (object.date_from, object.
 #. module: l10n_ua_bank_sync
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_journal_dashboard_kanban
 msgid "<i class=\"fa fa-refresh me-1\"/> Sync"
-msgstr ""
+msgstr "<i class=\"fa fa-refresh me-1\"/> Синхронізувати"
 
 #. module: l10n_ua_bank_sync
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
 msgid "<span class=\"o_stat_text\">Journal Entry</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Запис журналу</span>"
 
 #. module: l10n_ua_bank_sync
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_statement_view_form
 msgid "<span class=\"o_stat_text\">Sync Job</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Завдання синхронізації</span>"
 
 #. module: l10n_ua_bank_sync
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_sync_job_view_form
 msgid "<span class=\"o_stat_text\">View Logs</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Журнал подій</span>"
 
 #. module: l10n_ua_bank_sync
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_journal_dashboard_kanban
@@ -1181,6 +1181,11 @@ msgstr "Сира відповідь від API банку, збережена я
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_search
 msgid "Reconciled"
 msgstr "Звірено"
+
+#. module: l10n_ua_bank_sync
+#: model:ir.ui.menu,name:l10n_ua_bank_sync.menu_ua_bank_reconcile_models
+msgid "Reconciliation Models"
+msgstr "Шаблони узгодження"
 
 #. module: l10n_ua_bank_sync
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.report_bank_statement
