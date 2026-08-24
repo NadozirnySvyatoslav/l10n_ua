@@ -23,6 +23,7 @@ msgstr "Премія працівника"
 
 #. module: l10n_ua_hr_salary_bonus
 #: model:ir.model,name:l10n_ua_hr_salary_bonus.model_hr_bonus_type
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary_bonus.field_hr_bonus__bonus_type_id
 msgid "Bonus Type"
 msgstr "Тип премії"
 
@@ -35,11 +36,6 @@ msgstr "Номер"
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary_bonus.field_hr_bonus__employee_id
 msgid "Employee"
 msgstr "Працівник"
-
-#. module: l10n_ua_hr_salary_bonus
-#: model:ir.model.fields,field_description:l10n_ua_hr_salary_bonus.field_hr_bonus__bonus_type_id
-msgid "Bonus Type"
-msgstr "Тип премії"
 
 #. module: l10n_ua_hr_salary_bonus
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary_bonus.field_hr_bonus__date
@@ -143,6 +139,9 @@ msgstr "Бонусна система увімкнена"
 
 #. module: l10n_ua_hr_salary_bonus
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary_bonus.field_hr_employee__bonus_ids
+#: model:ir.actions.act_window,name:l10n_ua_hr_salary_bonus.action_hr_bonus
+#: model:ir.ui.menu,name:l10n_ua_hr_salary_bonus.menu_hr_bonus_root
+#: model:ir.ui.menu,name:l10n_ua_hr_salary_bonus.menu_hr_bonus
 msgid "Bonuses"
 msgstr "Премії"
 
@@ -152,26 +151,7 @@ msgid "Bonus Count"
 msgstr "Кількість премій"
 
 #. module: l10n_ua_hr_salary_bonus
-#: model:ir.actions.act_window,name:l10n_ua_hr_salary_bonus.action_hr_bonus
-msgid "Bonuses"
-msgstr "Премії"
-
-#. module: l10n_ua_hr_salary_bonus
 #: model:ir.actions.act_window,name:l10n_ua_hr_salary_bonus.action_hr_bonus_type
-msgid "Bonus Types"
-msgstr "Типи премій"
-
-#. module: l10n_ua_hr_salary_bonus
-#: model:ir.ui.menu,name:l10n_ua_hr_salary_bonus.menu_hr_bonus_root
-msgid "Bonuses"
-msgstr "Премії"
-
-#. module: l10n_ua_hr_salary_bonus
-#: model:ir.ui.menu,name:l10n_ua_hr_salary_bonus.menu_hr_bonus
-msgid "Bonuses"
-msgstr "Премії"
-
-#. module: l10n_ua_hr_salary_bonus
 #: model:ir.ui.menu,name:l10n_ua_hr_salary_bonus.menu_hr_bonus_type
 msgid "Bonus Types"
 msgstr "Типи премій"
