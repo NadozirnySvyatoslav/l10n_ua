@@ -99,9 +99,12 @@
               groups="l10n_ua_account_base.group_ua_accountant"
               sequence="30"/>
 
-    <!-- ==================== Звітність → Звітність ==================== -->
+    <!-- ==================== Звітність → Бухгалтерські звіти ==================== -->
+    <!-- Не «Фінансова звітність»: у секції поруч із формами Ф№1-Ф№3 лежать
+         облікові регістри (ОСВ, журнали-ордери, головна книга), які до
+         фінзвітності не належать. -->
     <menuitem id="menu_ua_reports"
-              name="Reports"
+              name="Accounting Reports"
               parent="account.menu_finance_reports"
               groups="l10n_ua_account_base.group_ua_accountant"
               sequence="2"/>
@@ -153,14 +156,12 @@
               sequence="50"/>
 
     <!-- ==================== Налаштування ==================== -->
-    <!-- План рахунків і Журнали не переоголошуються: ядро вже має ті самі
-         actions у Configuration → Accounting. -->
-    <menuitem id="menu_ua_config_directories"
-              name="Directories"
-              parent="account.menu_finance_configuration"
-              action="l10n_ua_account_base.l10n_ua_koatuu_action"
-              groups="l10n_ua_account_base.group_ua_accountant"
-              sequence="40"/>
+    <!-- Тут навмисно порожньо. План рахунків і Журнали дає ядро
+         (Configuration → Accounting), а українські довідники — парасолька
+         «Ukraine» з l10n_ua_account_base, яка висить під тим самим
+         Configuration і, крім КОАТУУ, тримає ще КВЕД і типи субконто.
+         Власний пункт «Довідники» був би другим шляхом до тих самих даних
+         (антипатерн H1, #190). -->
 
     <!-- ПДВ (l10n_ua_account_vat) та Основні засоби (l10n_ua_assets) навмисно
          НЕ оголошуються тут: їхні actions уже мають єдиний дім у модулях-фічах

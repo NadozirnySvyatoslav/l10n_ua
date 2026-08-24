@@ -32,8 +32,11 @@
 його Invoices / Vendor Bills / План рахунків / Журнали (H2). Домен вкладено в
 `account.menu_finance`, який перейменовано на «Бухоблік»: звіти → `menu_finance_reports`,
 каса й банк → `menu_finance_entries`, закриття та інвентаризація → `account_closing_menu`,
-акти послуг → `menu_finance_receivables`, авансові звіти → `menu_finance_payables`,
-довідники → `menu_finance_configuration`. Оскільки батьки тепер належать ядру,
+акти послуг → `menu_finance_receivables`, авансові звіти → `menu_finance_payables`.
+Власний пункт «Довідники» знято: під тим самим `menu_finance_configuration` уже
+висить парасолька «Ukraine» (`l10n_ua_account_base`) з КОАТУУ, КВЕД і типами
+субконто — другий шлях до тих самих даних був би антипатерном H1.
+Оскільки батьки тепер належать ядру,
 кожна UA-гілка несе `groups="l10n_ua_account_base.group_ua_accountant"` явно —
 гейтингу єдиного кореня більше немає.
 

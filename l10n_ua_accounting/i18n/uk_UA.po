@@ -2820,14 +2820,9 @@ msgid "Ukrainian Cash Orders"
 msgstr "Українські касові ордери"
 
 #. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config_directories
-msgid "Directories"
-msgstr "Довідники"
-
-#. module: l10n_ua_accounting
 #: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports
-msgid "Reports"
-msgstr "Звітність"
+msgid "Accounting Reports"
+msgstr "Бухгалтерські звіти"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_cash_order_number
