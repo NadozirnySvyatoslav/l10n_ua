@@ -275,6 +275,17 @@ class TestCashflowReport(AccountingTestCase):
 
         self.assertEqual(matched.mapped('account_id'), self.acc_customers)
 
+    def test_drill_down_works_for_the_other_rows(self):
+        """3095 збирається з проводок, тож має деталізацію нарівні з рештою."""
+        self._post_move(self.acc_bank, self.acc_other_income, 300.0)
+        report = self._computed_report()
+        line = report.line_ids.filtered(lambda l: l.code == '3095')
+
+        action = line.action_view_move_lines()
+        matched = self.env['account.move.line'].search(action['domain'])
+
+        self.assertEqual(matched.mapped('account_id'), self.acc_other_income)
+
     def test_drill_down_is_disabled_for_computed_rows(self):
         report = self._computed_report()
         subtotal = report.line_ids.filtered(lambda l: l.code == '3195')

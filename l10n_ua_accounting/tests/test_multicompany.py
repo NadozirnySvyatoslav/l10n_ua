@@ -61,6 +61,7 @@ class TestAccountingMultiCompany(TransactionCase):
             'l10n_ua_accounting.l10n_ua_aging_report_company_rule',
             'l10n_ua_accounting.l10n_ua_balance_report_company_rule',
             'l10n_ua_accounting.l10n_ua_pnl_report_company_rule',
+            'l10n_ua_accounting.l10n_ua_cashflow_report_company_rule',
         ]
         for xmlid in rule_xmlids:
             rule = self.env.ref(xmlid)

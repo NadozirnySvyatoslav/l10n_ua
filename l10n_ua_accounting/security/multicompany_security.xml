@@ -80,5 +80,14 @@
             </field>
         </record>
 
+        <record id="l10n_ua_cashflow_report_company_rule" model="ir.rule">
+            <field name="name">Звіт про рух грошових коштів: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_cashflow_report"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
     </data>
 </odoo>

@@ -85,10 +85,13 @@ CASHFLOW_LINES = [
     (260, 'cash_end', 'Залишок коштів на кінець року', '3415', '', 'total'),
 ]
 
-# Рядки-залишки й підсумки не збираються з проводок, а рахуються окремо.
+# Рядки-залишки й підсумки не збираються з проводок, а рахуються окремо, тож
+# деталізації в проводки не мають. «Інші надходження/витрачання» сюди не
+# входять: вони наповнюються з проводок, чий контр-рахунок не має власного
+# рядка бланка, і деталізуються нарівні з рештою.
 COMPUTED_KEYS = {
-    'op_in_other', 'op_out_other', 'net_operating', 'net_investing',
-    'net_financing', 'net_cash_flow', 'cash_start', 'fx_effect', 'cash_end',
+    'net_operating', 'net_investing', 'net_financing', 'net_cash_flow',
+    'cash_start', 'fx_effect', 'cash_end',
 }
 
 SECTION_SIGNS = {
