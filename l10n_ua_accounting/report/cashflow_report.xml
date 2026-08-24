@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Cash Flow Report Action -->
+    <record id="action_report_cashflow" model="ir.actions.report">
+        <field name="name">Cash Flow Statement (Form №3)</field>
+        <field name="model">l10n_ua.cashflow.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_accounting.report_cashflow_document</field>
+        <field name="report_file">l10n_ua_accounting.report_cashflow_document</field>
+        <field name="print_report_name">'ЗРГК_%s_%s' % (object.date_from, object.date_to)</field>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+    </record>
+
+    <!-- Cash Flow Report Template -->
+    <template id="report_cashflow_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="report">
+                <t t-call="web.external_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <div class="page ua-report">
+                        <!-- Header -->
+                        <div class="text-center mb-2">
+                            <div class="small">Додаток 1 до Національного положення (стандарту)</div>
+                            <div class="small">бухгалтерського обліку 1 «Загальні вимоги до фінансової звітності»</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-8">
+                                <table class="table-borderless" style="width: 100%;">
+                                    <tr>
+                                        <td style="width: 120px;">Підприємство</td>
+                                        <td class="border-bottom"><span t-field="report.company_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="report.company_id.company_registry">
+                                        <td>за ЄДРПОУ</td>
+                                        <td class="border-bottom"><span t-field="report.company_id.company_registry"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-4 text-right">
+                                <div class="small">КОДИ</div>
+                                <table class="small" style="float: right;">
+                                    <tr>
+                                        <td class="border">Дата (рік, місяць, число)</td>
+                                        <td class="border text-center" t-esc="report.date_to.strftime('%Y.%m.%d')"/>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="ua-report-title">
+                            ЗВІТ ПРО РУХ ГРОШОВИХ КОШТІВ<br/>
+                            (за прямим методом)
+                        </div>
+                        <div class="ua-report-subtitle mb-3">
+                            за <span t-field="report.date_from" t-options='{"widget": "date"}'/> -
+                            <span t-field="report.date_to" t-options='{"widget": "date"}'/> р.
+                        </div>
+
+                        <div class="small text-center mb-2">Форма № 3</div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">Стаття</th>
+                                    <th style="width: 10%;">Код рядка</th>
+                                    <th style="width: 20%;">За звітний період</th>
+                                    <th style="width: 20%;">За аналогічний період попереднього року</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="current_section" t-value="None"/>
+                                <t t-foreach="report.line_ids.sorted('sequence')" t-as="line">
+                                    <!-- Заголовок розділу друкується перед його першим рядком:
+                                         бланк вимагає римські підзаголовки I–III. -->
+                                    <tr t-if="line.section and line.section != current_section" class="bold">
+                                        <td colspan="4" t-esc="report._section_title(line.section)"/>
+                                    </tr>
+                                    <t t-set="current_section" t-value="line.section or current_section"/>
+
+                                    <!-- Витрачання друкуються в дужках -->
+                                    <tr t-if="line.line_type == 'detail' and report._is_outflow_line(line)">
+                                        <td t-esc="line.name"/>
+                                        <td class="text-center" t-esc="line.code"/>
+                                        <td class="text-right" t-esc="'(%.0f)' % line.current_amount"/>
+                                        <td class="text-right" t-esc="'(%.0f)' % line.previous_amount"/>
+                                    </tr>
+                                    <tr t-if="line.line_type == 'detail' and not report._is_outflow_line(line)">
+                                        <td t-esc="line.name"/>
+                                        <td class="text-center" t-esc="line.code"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                    </tr>
+                                    <tr t-if="line.line_type == 'subtotal'" class="bold">
+                                        <td t-esc="line.name"/>
+                                        <td class="text-center" t-esc="line.code"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                    </tr>
+                                    <tr t-if="line.line_type == 'total'" class="bold" style="border-top: 2px solid black;">
+                                        <td t-esc="line.name"/>
+                                        <td class="text-center" t-esc="line.code"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5">
+                            <div class="col-6">
+                                <div class="signature-row">
+                                    <span>Керівник</span>
+                                    <span class="signature-line"></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="signature-row">
+                                    <span>Головний бухгалтер</span>
+                                    <span class="signature-line"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

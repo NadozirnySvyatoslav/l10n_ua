@@ -1,8 +1,8 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '19.0.7.0.1',
+    'version': '19.0.7.1.0',
     'category': 'Accounting/Localization',
-    'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L',
+    'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
 Ukraine Accounting Suite
 ========================
@@ -30,6 +30,7 @@ Complete Ukrainian accounting functionality for Odoo:
 **Financial Statements:**
 * Balance Sheet (Баланс, Форма №1)
 * Profit & Loss Statement (Звіт про фінансові результати, Форма №2)
+* Cash Flow Statement, direct method (Звіт про рух грошових коштів, Форма №3)
 * Automatic calculation from Chart of Accounts
 * Comparison with previous period
 * PDF export
@@ -72,6 +73,7 @@ Dependencies:
         'data/period_closing_data.xml',
         'data/cash_limit_cron.xml',
         'data/currency_exchange_data.xml',
+        'data/account_menu_data.xml',
         # Views
         'views/res_company_views.xml',
         'views/account_payment_views.xml',
@@ -80,6 +82,7 @@ Dependencies:
         'views/advance_report_views.xml',
         'views/l10n_ua_balance_report_views.xml',
         'views/l10n_ua_pnl_report_views.xml',
+        'views/l10n_ua_cashflow_report_views.xml',
         'views/l10n_ua_period_closing_views.xml',
         'views/l10n_ua_currency_revaluation_views.xml',
         'views/l10n_ua_currency_exchange_views.xml',
@@ -99,6 +102,7 @@ Dependencies:
         'report/reconciliation_act_report.xml',
         'report/balance_sheet_report.xml',
         'report/pnl_report.xml',
+        'report/cashflow_report.xml',
         'report/service_act_report.xml',
         'report/advance_report_report.xml',
         'report/payment_order_report.xml',
@@ -107,6 +111,7 @@ Dependencies:
     ],
     'demo': [],
     'images': ['static/description/banner.png'],
+    'post_init_hook': 'post_init_hook',
     'installable': True,
     'application': True,
     'auto_install': False,

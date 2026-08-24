@@ -17,7 +17,6 @@
 |----:|----|-------|--------|--------|-------|------|
 | 30 | `menu_hr_payroll_root` | Payroll | group_hr_ua_user ✅ | hr_salary | власний апп | апп (seq→band) |
 | 45 | `menu_marketplace_root` | Marketplaces | group_marketplace_user ✅ | marketplace_base | власний апп | апп |
-| 51 | `menu_ua_accounting_root` | Accounting | group_ua_accountant | accounting | власний апп | апп |
 | 53 | `menu_ua_bank_root` | Bank | group_ua_accountant | bank_sync | власний апп | апп |
 | 54 | `menu_ua_tax_root` | Taxes UA | group_ua_tax_accountant | tax | власний апп | апп |
 | 55 | `menu_l10n_ua_education_root` | Освіта (UA) | group_ua_education_user | education_base | власний апп | апп (✅ власна іконка) |
@@ -27,6 +26,16 @@
 | 100 | `menu_l10n_ua_budget_root` | Бюджетний облік (UA) | group_ua_budget_user | budget_base | Finance→Config | під Accounting-апп |
 
 > ⚠ = діри/баги, зафіксовані для виправлення (див. [menu_architecture.md](menu_architecture.md)).
+
+**Знятий корінь:** `menu_ua_accounting_root` (Accounting, seq 51,
+`l10n_ua_accounting`) видалено — він стояв поруч із рідним аппом Odoo і повторював
+його Invoices / Vendor Bills / План рахунків / Журнали (H2). Домен вкладено в
+`account.menu_finance`, який перейменовано на «Бухоблік»: звіти → `menu_finance_reports`,
+каса й банк → `menu_finance_entries`, закриття та інвентаризація → `account_closing_menu`,
+акти послуг → `menu_finance_receivables`, авансові звіти → `menu_finance_payables`,
+довідники → `menu_finance_configuration`. Оскільки батьки тепер належать ядру,
+кожна UA-гілка несе `groups="l10n_ua_account_base.group_ua_accountant"` явно —
+гейтингу єдиного кореня більше немає.
 
 **Знятий корінь:** `menu_hr_timesheet_root` (Timesheet, seq 50, `hr_attendance_sheet`)
 видалено — його мітка дублювала core Timesheets (`hr_timesheet`), а українською

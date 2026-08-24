@@ -1,68 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Root Menu: Accounting UA -->
-    <menuitem id="menu_ua_accounting_root"
-              name="Accounting"
-              sequence="51"
-              groups="l10n_ua_account_base.group_ua_accountant"
-              web_icon="l10n_ua_accounting,static/description/icon.png"/>
+    <!-- ====================================================================
+         Українські пункти вкладено в рідний застосунок обліку
+         (`account.menu_finance`, перейменований на «Бухоблік»).
 
-    <!-- ==================== Documents ==================== -->
-    <menuitem id="menu_ua_docs"
-              name="Documents"
-              parent="menu_ua_accounting_root"
-              sequence="10"/>
+         Власного кореня «Accounting» більше немає: він стояв поруч із рідним
+         апом Odoo, повторював його Invoices / Vendor Bills / План рахунків /
+         Журнали і давав два шляхи до одних даних (антипатерн H2,
+         docs/menu_architecture.md). Кожен UA-пункт тепер живе в тій секції
+         ядра, до якої належить за змістом.
 
-    <!-- Invoices filter: Customer Invoices -->
-    <record id="action_ua_invoices" model="ir.actions.act_window">
-        <field name="name">Invoices</field>
-        <field name="res_model">account.move</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
-        <field name="context">{'default_move_type': 'out_invoice'}</field>
-    </record>
+         Гейтинг: раніше достатньо було закрити корінь — усе піддерево
+         ховалося разом із ним. Тепер батьки належать ядру, тому кожна UA-гілка
+         несе `groups="l10n_ua_account_base.group_ua_accountant"` явно.
+         ==================================================================== -->
 
-    <menuitem id="menu_ua_docs_invoices"
-              name="Invoices"
-              parent="menu_ua_docs"
-              action="action_ua_invoices"
-              sequence="10"/>
-
-    <!-- Service Acts -->
+    <!-- ==================== Клієнти ==================== -->
     <menuitem id="menu_ua_docs_service_acts"
               name="Service Acts"
-              parent="menu_ua_docs"
+              parent="account.menu_finance_receivables"
               action="action_service_act"
-              sequence="20"/>
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="25"/>
 
-    <!-- Vendor Bills -->
-    <record id="action_ua_vendor_bills" model="ir.actions.act_window">
-        <field name="name">Vendor Bills</field>
-        <field name="res_model">account.move</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund'))]</field>
-        <field name="context">{'default_move_type': 'in_invoice'}</field>
-    </record>
-
-    <menuitem id="menu_ua_docs_vendor_bills"
-              name="Vendor Bills"
-              parent="menu_ua_docs"
-              action="action_ua_vendor_bills"
-              sequence="15"/>
-
-    <!-- Advance Reports -->
+    <!-- ==================== Постачальники ==================== -->
     <menuitem id="menu_ua_docs_advance_reports"
               name="Advance Reports"
-              parent="menu_ua_docs"
+              parent="account.menu_finance_payables"
               action="action_advance_report"
-              sequence="40"/>
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="25"/>
 
-    <!-- ==================== Cash & Bank ==================== -->
+    <!-- ==================== Бухгалтерія → Каса та банк ==================== -->
     <menuitem id="menu_ua_cash_bank"
               name="Cash and Bank"
-              parent="menu_ua_accounting_root"
-              sequence="20"/>
+              parent="account.menu_finance_entries"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="10"/>
 
     <menuitem id="menu_ua_cash_pko"
               name="Income Cash Orders (PKO)"
@@ -76,6 +51,12 @@
               action="action_account_payment_vko"
               sequence="20"/>
 
+    <menuitem id="menu_ua_payment_orders"
+              name="Payment Orders"
+              parent="menu_ua_cash_bank"
+              action="action_account_payment_pd"
+              sequence="25"/>
+
     <menuitem id="menu_ua_cash_book"
               name="Cash Book"
               parent="menu_ua_cash_bank"
@@ -88,31 +69,42 @@
               action="action_reconciliation_act_wizard"
               sequence="40"/>
 
-    <menuitem id="menu_ua_payment_orders"
-              name="Payment Orders"
+    <menuitem id="menu_ua_currency_exchange"
+              name="Currency Purchase / Sale"
               parent="menu_ua_cash_bank"
-              action="action_account_payment_pd"
-              sequence="25"/>
+              action="l10n_ua_currency_exchange_action"
+              sequence="60"/>
 
-    <!-- Bank statements - link to bank sync module if installed -->
-    <!-- <menuitem id="menu_ua_bank_statements"
-              name="Bank Statements"
-              parent="menu_ua_cash_bank"
-              action="l10n_ua_bank_sync.action_bank_statement"
-              sequence="50"/> -->
+    <!-- ==================== Бухгалтерія → Закриття ==================== -->
+    <!-- `account.account_closing_menu` — рідна секція закриття періоду.
+         Процедури закриття UA стають поруч із нею, а не окремою гілкою. -->
+    <menuitem id="menu_ua_period_closing"
+              name="Period Closing"
+              parent="account.account_closing_menu"
+              action="l10n_ua_period_closing_action"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="10"/>
 
-    <!-- VAT (ПДВ) та Fixed Assets (Основні засоби) навмисно НЕ оголошуються тут.
-         Їхні actions уже мають єдиний дім у модулях-фічах (антипатерн H1, #190):
-           • ПДВ  → l10n_ua_account_vat  (апп «Taxes UA» → VAT)
-           • ОЗ   → l10n_ua_assets       (апп «Ukraine» → Fixed Assets)
-         Дублювати їх під «Accounting» = два шляхи до одних даних. Див.
-         docs/menu_registry.md (H1) та docs/menu_architecture.md. -->
+    <menuitem id="menu_ua_currency_revaluation"
+              name="Currency Revaluation"
+              parent="account.account_closing_menu"
+              action="l10n_ua_currency_revaluation_action"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="20"/>
 
-    <!-- ==================== Reports ==================== -->
+    <menuitem id="menu_ua_stock_inventory_act"
+              name="Inventory Act"
+              parent="account.account_closing_menu"
+              action="action_inventory_act_wizard"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="30"/>
+
+    <!-- ==================== Звітність → Звітність UA ==================== -->
     <menuitem id="menu_ua_reports"
-              name="Reports"
-              parent="menu_ua_accounting_root"
-              sequence="40"/>
+              name="Ukrainian Reports"
+              parent="account.menu_finance_reports"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="2"/>
 
     <menuitem id="menu_ua_reports_osv"
               name="Trial Balance"
@@ -140,74 +132,38 @@
               action="l10n_ua_aging_report_action"
               sequence="27"/>
 
-    <!-- Balance Sheet (Form No.1) - stored reports -->
+    <!-- Три форми фінансової звітності за НП(С)БО 1 друкуються поспіль і в
+         тому ж порядку, що й у наказі Мінфіну № 73: Ф№1, Ф№2, Ф№3. -->
     <menuitem id="menu_ua_reports_balance"
               name="Balance Sheet (Form No.1)"
               parent="menu_ua_reports"
               action="action_balance_report"
               sequence="30"/>
 
-    <!-- P&L (Form No.2) - stored reports -->
     <menuitem id="menu_ua_reports_pnl"
-              name="P&amp;L Statement (Form No.2)"
+              name="Income and Expenses (P&amp;L)"
               parent="menu_ua_reports"
               action="action_pnl_report"
               sequence="40"/>
 
-    <!-- ==================== Period Closing ==================== -->
-    <menuitem id="menu_ua_period_closing"
-              name="Period Closing"
+    <menuitem id="menu_ua_reports_cashflow"
+              name="Cash Flow Statement"
               parent="menu_ua_reports"
-              action="l10n_ua_period_closing_action"
+              action="action_cashflow_report"
               sequence="50"/>
 
-    <menuitem id="menu_ua_currency_revaluation"
-              name="Currency Revaluation"
-              parent="menu_ua_reports"
-              action="l10n_ua_currency_revaluation_action"
-              sequence="55"/>
-
-    <menuitem id="menu_ua_currency_exchange"
-              name="Купівля/продаж валюти"
-              parent="menu_ua_cash_bank"
-              action="l10n_ua_currency_exchange_action"
-              sequence="60"/>
-
-    <!-- ==================== Inventory ==================== -->
-    <menuitem id="menu_ua_stock"
-              name="Inventory"
-              parent="menu_ua_accounting_root"
-              sequence="45"/>
-
-    <menuitem id="menu_ua_stock_inventory_act"
-              name="Inventory Act"
-              parent="menu_ua_stock"
-              action="action_inventory_act_wizard"
-              sequence="10"/>
-
-    <!-- ==================== Configuration ==================== -->
-    <menuitem id="menu_ua_config"
-              name="Configuration"
-              parent="menu_ua_accounting_root"
-              sequence="90"/>
-
-    <menuitem id="menu_ua_config_chart"
-              name="Chart of Accounts"
-              parent="menu_ua_config"
-              action="account.action_account_form"
-              sequence="10"/>
-
-    <menuitem id="menu_ua_config_journals"
-              name="Journals"
-              parent="menu_ua_config"
-              action="account.action_account_journal_form"
-              sequence="20"/>
-
-    <!-- Link to Ukraine directories from l10n_ua_account_base -->
+    <!-- ==================== Налаштування ==================== -->
+    <!-- План рахунків і Журнали не переоголошуються: ядро вже має ті самі
+         actions у Configuration → Accounting. -->
     <menuitem id="menu_ua_config_directories"
-              name="Directories"
-              parent="menu_ua_config"
+              name="Ukrainian Directories"
+              parent="account.menu_finance_configuration"
               action="l10n_ua_account_base.l10n_ua_koatuu_action"
-              sequence="30"/>
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="40"/>
+
+    <!-- ПДВ (l10n_ua_account_vat) та Основні засоби (l10n_ua_assets) навмисно
+         НЕ оголошуються тут: їхні actions уже мають єдиний дім у модулях-фічах
+         (антипатерн H1, #190). Дублювати їх = два шляхи до одних даних. -->
 
 </odoo>

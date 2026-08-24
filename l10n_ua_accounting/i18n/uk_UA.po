@@ -6,8 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-31 21:08+0000\n"
-"PO-Revision-Date: 2026-01-31 21:08+0000\n"
+"PO-Revision-Date: 2026-08-24 09:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -18,1355 +17,11 @@ msgstr ""
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_journal__ua_pko_sequence_id
-msgid "PKO Sequence"
-msgstr "Послідовність ПКО"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_journal__ua_pko_sequence_id
-msgid "Sequence for Ukrainian Cash Receipt Orders (ПКО)"
-msgstr "Послідовність для прибуткових касових ордерів (ПКО)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_journal__ua_vko_sequence_id
-msgid "VKO Sequence"
-msgstr "Послідовність ВКО"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_journal__ua_vko_sequence_id
-msgid "Sequence for Ukrainian Cash Disbursement Orders (ВКО)"
-msgstr "Послідовність для видаткових касових ордерів (ВКО)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_cash_order_number
-msgid "Cash Order Number"
-msgstr "Номер касового ордера"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_cash_order_number
-msgid "Ukrainian cash order number (auto-generated for cash journals)"
-msgstr "Номер українського касового ордера (автоматично для касових журналів)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_payment_basis
-msgid "Payment Basis"
-msgstr "Підстава платежу"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_payment_basis
-msgid "Basis/reason for this cash operation (підстава)"
-msgstr "Підстава/причина касової операції"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_cash_person
-msgid "Cash Person"
-msgstr "Особа"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_cash_person
-msgid "Person who received (for VKO) or paid (for PKO) cash"
-msgstr "Особа, яка отримала (для ВКО) або внесла (для ПКО) готівку"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_person_document
-msgid "Person Document"
-msgstr "Документ особи"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_person_document
-msgid "Document of the person (passport, ID card)"
-msgstr "Документ особи (паспорт, ID-картка)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_appendix
-msgid "Appendix"
-msgstr "Додатки"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_appendix
-msgid "List of appendix documents (додатки)"
-msgstr "Перелік додаткових документів"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_cash_order_type
-msgid "Cash Order Type"
-msgstr "Тип касового ордера"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__is_ua_cash_order
-msgid "Is Cash Order"
-msgstr "Є касовим ордером"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_service_act
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_service_act
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__act_id
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Service Act"
-msgstr "Акт наданих послуг"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__name
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__name
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Number"
-msgstr "Номер"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__date
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__date
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__date
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Date"
-msgstr "Дата"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__partner_id
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Customer"
-msgstr "Замовник"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_act_wizard__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__company_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__company_id
-msgid "Company"
-msgstr "Компанія"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__currency_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__currency_id
-msgid "Currency"
-msgstr "Валюта"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__contract_number
-msgid "Contract Number"
-msgstr "Номер договору"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__contract_number
-msgid "Reference to the contract under which services are provided"
-msgstr "Посилання на договір, за яким надаються послуги"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__contract_date
-msgid "Contract Date"
-msgstr "Дата договору"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__period_from
-msgid "Period From"
-msgstr "Період з"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__period_from
-msgid "Start date of service period"
-msgstr "Дата початку періоду надання послуг"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__period_to
-msgid "Period To"
-msgstr "Період по"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__period_to
-msgid "End date of service period"
-msgstr "Дата закінчення періоду надання послуг"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__line_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__line_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__line_ids
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Lines"
-msgstr "Рядки"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__amount_untaxed
-msgid "Untaxed Amount"
-msgstr "Сума без податків"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__amount_tax
-msgid "Tax Amount"
-msgstr "Сума податків"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__total_amount
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__amount_total
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_total
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__line_type__total
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report_line__line_type__total
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pd_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_list
-msgid "Total"
-msgstr "Разом"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__draft
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report__state__draft
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_period_closing__state__draft
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report__state__draft
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__draft
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Draft"
-msgstr "Чернетка"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report__state__confirmed
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report__state__confirmed
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__confirmed
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Confirmed"
-msgstr "Підтверджено"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__invoiced
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Invoiced"
-msgstr "Виставлено рахунок"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__cancelled
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__cancelled
-msgid "Cancelled"
-msgstr "Скасовано"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__state
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__state
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Status"
-msgstr "Статус"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__invoice_id
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__invoice
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Invoice"
-msgstr "Рахунок"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__note
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__note
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__note
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__note
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__note
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Notes"
-msgstr "Примітки"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Only draft acts can be confirmed."
-msgstr "Тільки чернеткові акти можна підтвердити."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Cannot confirm an act without lines."
-msgstr "Неможливо підтвердити акт без рядків."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Cannot reset an invoiced act to draft."
-msgstr "Неможливо повернути в чернетку акт з виставленим рахунком."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Cannot cancel an invoiced act."
-msgstr "Неможливо скасувати акт з виставленим рахунком."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Only confirmed acts can be invoiced."
-msgstr "Тільки підтверджені акти можна виставити рахунком."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Invoice already exists for this act."
-msgstr "Рахунок для цього акту вже існує."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "No invoice exists for this act."
-msgstr "Рахунок для цього акту не існує."
-
-#. module: l10n_ua_accounting
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_service_act_line
-msgid "Service Act Line"
-msgstr "Рядок акту наданих послуг"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__sequence
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__sequence
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__sequence
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__sequence
-msgid "Sequence"
-msgstr "Послідовність"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__product_id
-msgid "Service"
-msgstr "Послуга"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__description
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__name
-msgid "Description"
-msgstr "Опис"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__quantity
-msgid "Quantity"
-msgstr "Кількість"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__uom_id
-msgid "Unit of Measure"
-msgstr "Одиниця виміру"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_unit
-msgid "Unit Price"
-msgstr "Ціна за одиницю"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__tax_ids
-msgid "Taxes"
-msgstr "Податки"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_subtotal
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__line_type__subtotal
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report_line__line_type__subtotal
-msgid "Subtotal"
-msgstr "Підсумок"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_tax
-msgid "Tax"
-msgstr "Податок"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_advance_report
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_advance_report
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__report_id
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-msgid "Advance Report"
-msgstr "Авансовий звіт"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__employee_id
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-msgid "Employee"
-msgstr "Працівник"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__purpose
-msgid "Purpose"
-msgstr "Призначення"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__purpose
-msgid "Purpose of the advance (business trip, purchase, etc.)"
-msgstr "Призначення авансу (відрядження, закупівля тощо)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__advance_date
-msgid "Advance Date"
-msgstr "Дата видачі авансу"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__advance_date
-msgid "Date when advance was given to employee"
-msgstr "Дата видачі авансу працівнику"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__advance_amount
-msgid "Advance Received"
-msgstr "Отриманий аванс"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__advance_amount
-msgid "Amount received by employee"
-msgstr "Сума, отримана працівником"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__previous_balance
-msgid "Previous Balance"
-msgstr "Попередній залишок"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__previous_balance
-msgid "Balance from previous advance report"
-msgstr "Залишок з попереднього авансового звіту"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__line_ids
-msgid "Expense Lines"
-msgstr "Рядки витрат"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__total_expenses
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__total_expenses
-msgid "Total Expenses"
-msgstr "Загальні витрати"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__balance
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__balance
-msgid "Balance"
-msgstr "Залишок"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__balance
-msgid "Positive = employee owes, Negative = company owes"
-msgstr "Додатний = борг працівника, Від'ємний = борг компанії"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__submitted
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-msgid "Submitted"
-msgstr "Подано"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__approved
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-msgid "Approved"
-msgstr "Затверджено"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__posted
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-msgid "Posted"
-msgstr "Проведено"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__move_id
-msgid "Journal Entry"
-msgstr "Проводка"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__approved_by
-msgid "Approved By"
-msgstr "Затвердив"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__approved_date
-msgid "Approved Date"
-msgstr "Дата затвердження"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Only draft reports can be submitted."
-msgstr "Тільки чернеткові звіти можна подати."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Cannot submit a report without expense lines."
-msgstr "Неможливо подати звіт без рядків витрат."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Only submitted reports can be approved."
-msgstr "Тільки подані звіти можна затвердити."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Only approved reports can be posted."
-msgstr "Тільки затверджені звіти можна провести."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Cannot reset a posted report to draft."
-msgstr "Неможливо повернути проведений звіт у чернетку."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Cannot cancel a posted report."
-msgstr "Неможливо скасувати проведений звіт."
-
-#. module: l10n_ua_accounting
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_advance_report_line
-msgid "Advance Report Line"
-msgstr "Рядок авансового звіту"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__receipt
-msgid "Receipt/Check"
-msgstr "Чек/Квитанція"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__ticket
-msgid "Ticket"
-msgstr "Квиток"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_cash_order_type__other
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_payment_order_type__other
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__other
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__other
-msgid "Other"
-msgstr "Інше"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__document_type
-msgid "Document Type"
-msgstr "Тип документа"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__document_number
-msgid "Document Number"
-msgstr "Номер документа"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__document_date
-msgid "Document Date"
-msgstr "Дата документа"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__partner_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__partner_id
-msgid "Vendor"
-msgstr "Постачальник"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__transport
-msgid "Transport"
-msgstr "Транспорт"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__accommodation
-msgid "Accommodation"
-msgstr "Проживання"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__meals
-msgid "Meals"
-msgstr "Харчування"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__fuel
-msgid "Fuel"
-msgstr "Пальне"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__supplies
-msgid "Office Supplies"
-msgstr "Канцтовари"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__expense_type
-msgid "Expense Type"
-msgstr "Тип витрат"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__amount
-msgid "Amount"
-msgstr "Сума"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__attachment_ids
-msgid "Attachments"
-msgstr "Вкладення"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report_line__attachment_ids
-msgid "Attach receipt/invoice scan"
-msgstr "Прикріпити скан чека/рахунку"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__note
-msgid "Note"
-msgstr "Примітка"
-
-#. module: l10n_ua_accounting
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_cash_book_wizard
-msgid "Cash Book Wizard"
-msgstr "Майстер касової книги"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__journal_id
-msgid "Cash Journal"
-msgstr "Касовий журнал"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__date_from
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__date_from
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__date_from
-msgid "Date From"
-msgstr "Дата з"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__date_to
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__date_to
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__date_to
-msgid "Date To"
-msgstr "Дата по"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/wizard/cash_book_wizard.py:0
-#: code:addons/l10n_ua_accounting/wizard/reconciliation_act_wizard.py:0
-msgid "Date From must be before or equal to Date To."
-msgstr "Дата початку має бути раніше або дорівнювати даті закінчення."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/wizard/cash_book_wizard.py:0
-msgid "Cash journal must have a default account configured."
-msgstr "Касовий журнал повинен мати налаштований рахунок за замовчуванням."
-
-#. module: l10n_ua_accounting
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_reconciliation_act_wizard
-msgid "Reconciliation Act Wizard"
-msgstr "Майстер акту звірки"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__partner_id
-msgid "Partner"
-msgstr "Контрагент"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_reconciliation_act_wizard__account_type__receivable
-msgid "Receivable (Customers)"
-msgstr "Дебіторська (Покупці)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_reconciliation_act_wizard__account_type__payable
-msgid "Payable (Vendors)"
-msgstr "Кредиторська (Постачальники)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_reconciliation_act_wizard__account_type__both
-msgid "Both"
-msgstr "Обидва"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__account_type
-msgid "Account Type"
-msgstr "Тип рахунку"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__include_unreconciled_only
-msgid "Unreconciled Only"
-msgstr "Тільки незвірені"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__include_unreconciled_only
-msgid "Show only unreconciled entries"
-msgstr "Показувати тільки незвірені записи"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__date_to
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
-msgid "Report Date"
-msgstr "Дата звіту"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__comparison_date
-msgid "Comparison Date"
-msgstr "Дата порівняння"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__comparison_date
-msgid "Date for comparison column (typically end of previous year)"
-msgstr "Дата для порівняльної колонки (зазвичай кінець попереднього року)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__comparison_date_from
-msgid "Comparison Period Start"
-msgstr "Початок порівняльного періоду"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__comparison_date_to
-msgid "Comparison Period End"
-msgstr "Кінець порівняльного періоду"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_exchange_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_period_closing_view_form
-msgid "Accounts"
-msgstr "Рахунки"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_service_act
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs_service_acts
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
-msgid "Service Acts"
-msgstr "Акти наданих послуг"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_advance_report
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs_advance_reports
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-msgid "Advance Reports"
-msgstr "Авансові звіти"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_account_payment_pko
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_pko
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
-msgid "Income Cash Orders (PKO)"
-msgstr "ПКО (Прибуткові)"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_account_payment_vko
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_vko
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
-msgid "Expense Cash Orders (VKO)"
-msgstr "ВКО (Видаткові)"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_cash_book_wizard
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_cash_book
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_book
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
-msgid "Cash Book"
-msgstr "Касова книга"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_balance_sheet
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_balance
-msgid "Balance Sheet (Form No.1)"
-msgstr "Баланс (Форма №1)"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_form_ua_buttons
-msgid "Print ПКО"
-msgstr "Друк ПКО"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_form_ua_buttons
-msgid "Print ВКО"
-msgstr "Друк ВКО"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_journal_form_ua
-msgid "Ukrainian Cash Orders"
-msgstr "Українські касові ордери"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_journal_form_ua
-msgid "Create UA Sequences"
-msgstr "Створити UA послідовності"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Confirm"
-msgstr "Підтвердити"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Create Invoice"
-msgstr "Створити рахунок"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "View Invoice"
-msgstr "Переглянути рахунок"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Print"
-msgstr "Друк"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Reset to Draft"
-msgstr "Повернути в чернетку"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Cancel"
-msgstr "Скасувати"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Service Period"
-msgstr "Період надання послуг"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
-msgid "Additional notes..."
-msgstr "Додаткові примітки..."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_service_act
-msgid "Create your first Service Act"
-msgstr "Створіть свій перший Акт наданих послуг"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-msgid "Submit"
-msgstr "Подати"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-msgid "Approve"
-msgstr "Затвердити"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-msgid "Post"
-msgstr "Провести"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-msgid "Expenses"
-msgstr "Витрати"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
-msgid "Approval"
-msgstr "Затвердження"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
-msgid "To Approve"
-msgstr "На затвердження"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_advance_report
-msgid "Create your first Advance Report"
-msgstr "Створіть свій перший авансовий звіт"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
-msgid "View Entries"
-msgstr "Переглянути записи"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Export XLSX"
-msgstr "Експорт XLSX"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_reconciliation_act_wizard
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_reconciliation_act
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
-msgid "Reconciliation Statement"
-msgstr "Акт звірки взаєморозрахунків"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_pnl
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_pnl_report
-msgid "P&L Statement (Form №2)"
-msgstr "Звіт про фінансові результати (Форма №2)"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_pko
-msgid "PKO (Cash Receipt Order)"
-msgstr "ПКО (Прибутковий касовий ордер)"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.report,name:l10n_ua_accounting.action_report_vko
-msgid "VKO (Cash Disbursement Order)"
-msgstr "ВКО (Видатковий касовий ордер)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_cash_order_type__pko
-msgid "PKO (Receipt)"
-msgstr "ПКО (Прибутковий)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_cash_order_type__vko
-msgid "VKO (Disbursement)"
-msgstr "ВКО (Видатковий)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__state
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__state
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__state
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__state
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
-msgid "State"
-msgstr "Стан"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__name
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__name
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__name
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__name
-msgid "Name"
-msgstr "Назва"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
-msgid "PKO No."
-msgstr "№ ПКО"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
-msgid "Basis"
-msgstr "Підстава"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
-msgid "VKO No."
-msgstr "№ ВКО"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
-msgid "Received By"
-msgstr "Отримав"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_accounting_root
-msgid "Accounting"
-msgstr "Бухгалтерія"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs
-msgid "Documents"
-msgstr "Документи"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_ua_invoices
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs_invoices
-msgid "Invoices"
-msgstr "Рахунки"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_ua_vendor_bills
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs_vendor_bills
-msgid "Vendor Bills"
-msgstr "Рахунки постачальників"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_bank
-msgid "Cash and Bank"
-msgstr "Каса та банк"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reconciliation
-msgid "Reconciliation Acts"
-msgstr "Акти звірки"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_payment_orders
-msgid "Payment Orders"
-msgstr "Платіжні доручення"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports
-msgid "Reports"
-msgstr "Звітність"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_osv
-msgid "Trial Balance"
-msgstr "Оборотно-сальдова відомість"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_journal_orders
-msgid "Journal Orders"
-msgstr "Журнали-ордери"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_general_ledger
-msgid "General Ledger"
-msgstr "Головна книга"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_aging
-msgid "Aging Reports"
-msgstr "Заборгованість"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_pnl
-msgid "P&L Statement (Form No.2)"
-msgstr "Звіт про фін. результати (Форма №2)"
-
-#. module: l10n_ua_accounting
-#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_period_closing
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_period_closing
-msgid "Period Closing"
-msgstr "Закриття періоду"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_stock
-msgid "Inventory"
-msgstr "Склад"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_stock_inventory_act
-msgid "Inventory Act"
-msgstr "Інвентаризаційний опис"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config
-msgid "Configuration"
-msgstr "Налаштування"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config_chart
-msgid "Chart of Accounts"
-msgstr "План рахунків"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config_journals
-msgid "Journals"
-msgstr "Журнали"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config_directories
-msgid "Directories"
-msgstr "Довідники"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Advance report %s"
-msgstr "Авансовий звіт %s"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
-msgid "Amount to pay cannot be negative."
-msgstr "Сума до сплати не може бути від'ємною."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
-msgid "Amount to pay cannot exceed amount due."
-msgstr "Сума до сплати не може перевищувати суму боргу."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_list
-msgid "Assets"
-msgstr "Активи"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-msgid "Balance Sheet"
-msgstr "Баланс"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.action_balance_report
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_list
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
-msgid "Balance Sheets"
-msgstr "Баланси"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Calculate"
-msgstr "Розрахувати"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_balance_report.py:0
-#: code:addons/l10n_ua_accounting/models/l10n_ua_pnl_report.py:0
-msgid "Calculate the report before confirming."
-msgstr "Розрахуйте звіт перед підтвердженням."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Can only close from draft state."
-msgstr "Можна закрити лише зі стану чернетки."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Can only compute in draft state."
-msgstr "Можна розрахувати лише в стані чернетки."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Can only reset to draft from reversed state."
-msgstr "Можна повернути в чернетку лише зі скасованого стану."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Can only reverse a closed period."
-msgstr "Можна скасувати лише закритий період."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Cannot post a report with zero total expenses."
-msgstr "Неможливо провести звіт із нульовими загальними витратами."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "Cannot post a report without expense lines."
-msgstr "Неможливо провести звіт без рядків витрат."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_balance_report.py:0
-#: code:addons/l10n_ua_accounting/models/l10n_ua_pnl_report.py:0
-msgid "Cannot recalculate a confirmed report. Set it back to draft first."
-msgstr ""
-"Неможливо перерахувати підтверджений звіт. Спочатку поверніть його в "
-"чернетку."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Comparison Period"
-msgstr "Період для порівняння"
-
-#. module: l10n_ua_accounting
-#: model:ir.actions.act_window,name:l10n_ua_accounting.l10n_ua_currency_revaluation_action
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_currency_revaluation
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_revaluation_view_form
-msgid "Currency Revaluation"
-msgstr "Переоцінка валюти"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_revaluation_view_list
-msgid "Currency Revaluations"
-msgstr "Переоцінки валюти"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-msgid "Current"
-msgstr "Поточний"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__current_amount
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__current_amount
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Current Period"
-msgstr "Поточний період"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/wizard/reconciliation_act_wizard.py:0
-msgid "Journal Entries - %s"
-msgstr "Проводки - %s"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_list
-msgid "Liabilities"
-msgstr "Пасиви"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Missing accounts: %s. Please configure them on the closing form."
-msgstr "Відсутні рахунки: %s. Будь ласка, налаштуйте їх у формі закриття."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "No P&L account balances found for this period."
-msgstr ""
-"Не знайдено залишків на рахунках прибутків і збитків для цього періоду."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid ""
-"No accountable-persons settlement account (372) found. Configure it in the "
-"company settings (Ukrainian accounting)."
-msgstr ""
-"Не знайдено рахунок розрахунків з підзвітними особами (372). Налаштуйте його "
-"в налаштуваннях компанії (Бухгалтерія України)."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid ""
-"No journal for advance reports. Configure a general journal for company "
-"\"%s\"."
-msgstr ""
-"Немає журналу для авансових звітів. Налаштуйте загальний журнал для компанії "
-"\"%s\"."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
-msgid "No payment orders to create. Check amounts."
-msgstr "Немає платіжних доручень для створення. Перевірте суми."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Only one active closing per period is allowed."
-msgstr "Дозволено лише одне активне закриття на період."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-msgid "Parameters"
-msgstr "Параметри"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Period %s already has an active closing entry."
-msgstr "Період %s вже має активну проводку закриття."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_tax_period.py:0
-msgid ""
-"Period %s has an active closing entry. Reverse the closing first before "
-"reopening."
-msgstr ""
-"Період %s має активну проводку закриття. Спочатку скасуйте закриття перед "
-"повторним відкриттям."
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
-msgid "Period %s is not open."
-msgstr "Період %s не відкритий."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
-msgid "Period End"
-msgstr "Кінець періоду"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-msgid "Previous"
-msgstr "Попередній"
-
-#. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__previous_amount
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__previous_amount
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Previous Period"
-msgstr "Попередній період"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Print PDF"
-msgstr "Друк PDF"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Report Lines"
-msgstr "Рядки звіту"
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Reporting Period"
-msgstr "Звітний період"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/service_act.py:0
-msgid "Service Act %s"
-msgstr "Акт наданих послуг %s"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid ""
-"Set an expense account on line \"%s\" (or a default expense account in the "
-"company settings) before posting."
-msgstr ""
-"Встановіть рахунок витрат у рядку \"%s\" (або рахунок витрат за "
-"замовчуванням у налаштуваннях компанії) перед проведенням."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
-msgid "Set to Draft"
-msgstr "Зробити чернеткою"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/advance_report.py:0
-msgid "This report already has a journal entry."
-msgstr "Цей звіт вже має проводку."
-
-#. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
-msgid "Totals"
-msgstr "Підсумки"
-
-#. module: l10n_ua_accounting
-#. odoo-python
-#: code:addons/l10n_ua_accounting/models/l10n_ua_balance_report.py:0
-#: code:addons/l10n_ua_accounting/models/l10n_ua_pnl_report.py:0
-msgid "xlsxwriter is not installed. Run: pip install xlsxwriter"
-msgstr "xlsxwriter не встановлено. Виконайте: pip install xlsxwriter"
-
-#. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_vko_document
 msgid ""
 "\"<span class=\"signature-line\" style=\"min-width: 30px;\"/>\"\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 80px;\"/>\n"
-"                                20<span class=\"signature-line\" style=\"min-"
-"width: 30px;\"/> р."
+"                                <span class=\"signature-line\" style=\"min-width: 80px;\"/>\n"
+"                                20<span class=\"signature-line\" style=\"min-width: 30px;\"/> р."
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1399,6 +54,11 @@ msgstr ""
 #. module: l10n_ua_accounting
 #: model:ir.actions.report,print_report_name:l10n_ua_accounting.action_report_vko
 msgid "'ВКО-%s' % (object.ua_cash_order_number or object.name)"
+msgstr ""
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,print_report_name:l10n_ua_accounting.action_report_cashflow
+msgid "'ЗРГК_%s_%s' % (object.date_from, object.date_to)"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1589,10 +249,8 @@ msgid ""
 "<span>Видав касир</span>\n"
 "                                <span class=\"signature-line\"/>\n"
 "                                <span class=\"small\">(підпис)</span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>\n"
-"                                <span class=\"small\">(прізвище, ініціали)</"
-"span>"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>\n"
+"                                <span class=\"small\">(прізвище, ініціали)</span>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1614,12 +272,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pko_document
 msgid ""
 "<span>Головний бухгалтер</span>\n"
-"                                    <span class=\"signature-line\" "
-"style=\"min-width: 50px;\"/>"
+"                                    <span class=\"signature-line\" style=\"min-width: 50px;\"/>"
 msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid ""
 "<span>Головний бухгалтер</span>\n"
@@ -1632,10 +290,8 @@ msgid ""
 "<span>Головний бухгалтер</span>\n"
 "                                <span class=\"signature-line\"/>\n"
 "                                <span class=\"small\">(підпис)</span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>\n"
-"                                <span class=\"small\">(прізвище, ініціали)</"
-"span>"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>\n"
+"                                <span class=\"small\">(прізвище, ініціали)</span>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1657,8 +313,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pko_document
 msgid ""
 "<span>Касир</span>\n"
-"                                    <span class=\"signature-line\" "
-"style=\"min-width: 50px;\"/>"
+"                                    <span class=\"signature-line\" style=\"min-width: 50px;\"/>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1674,10 +329,8 @@ msgid ""
 "<span>Касир</span>\n"
 "                                <span class=\"signature-line\"/>\n"
 "                                <span class=\"small\">(підпис)</span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>\n"
-"                                <span class=\"small\">(прізвище, ініціали)</"
-"span>"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>\n"
+"                                <span class=\"small\">(прізвище, ініціали)</span>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1686,10 +339,8 @@ msgid ""
 "<span>Керівник підприємства</span>\n"
 "                                <span class=\"signature-line\"/>\n"
 "                                <span class=\"small\">(підпис)</span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>\n"
-"                                <span class=\"small\">(прізвище, ініціали)</"
-"span>"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>\n"
+"                                <span class=\"small\">(прізвище, ініціали)</span>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1701,6 +352,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid ""
 "<span>Керівник</span>\n"
@@ -1711,15 +363,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_vko_document
 msgid ""
 "<span>Назва документа </span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 200px;\"/>\n"
+"                                <span class=\"signature-line\" style=\"min-width: 200px;\"/>\n"
 "                                <br/>\n"
 "                                <span>№ </span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>\n"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>\n"
 "                                <span> від </span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1749,10 +398,8 @@ msgid ""
 "<span>Перевірив бухгалтер</span>\n"
 "                                <span class=\"signature-line\"/>\n"
 "                                <span class=\"small\">(підпис)</span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 100px;\"/>\n"
-"                                <span class=\"small\">(прізвище, ініціали)</"
-"span>"
+"                                <span class=\"signature-line\" style=\"min-width: 100px;\"/>\n"
+"                                <span class=\"small\">(прізвище, ініціали)</span>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1774,8 +421,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_vko_document
 msgid ""
 "<span>Підпис </span>\n"
-"                                <span class=\"signature-line\" style=\"min-"
-"width: 150px;\"/>"
+"                                <span class=\"signature-line\" style=\"min-width: 150px;\"/>"
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -1832,6 +478,11 @@ msgid "AR/AP Aging Report (Звіт про заборгованість)"
 msgstr "Звіт про заборгованість (AR/AP)"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__accommodation
+msgid "Accommodation"
+msgstr "Проживання"
+
+#. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_account_account
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__account_id
 msgid "Account"
@@ -1844,6 +495,11 @@ msgid "Account Codes"
 msgstr "Коди рахунків"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__account_type
+msgid "Account Type"
+msgstr "Тип рахунку"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report_line__account_id
 msgid ""
 "Account debited for this expense when the report is posted. If empty, the "
@@ -1853,9 +509,16 @@ msgstr ""
 "заповнено, використовується типовий рахунок витрат компанії."
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_exchange_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_period_closing_view_form
+msgid "Accounts"
+msgstr "Рахунки"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_needaction
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction
@@ -1868,6 +531,7 @@ msgstr "Необхідна дія"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_ids
@@ -1880,6 +544,7 @@ msgstr "Дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_exception_decoration
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_decoration
@@ -1892,6 +557,7 @@ msgstr "Оформлення виключення дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_state
@@ -1904,6 +570,7 @@ msgstr "Стан дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_type_icon
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_type_icon
@@ -1911,6 +578,50 @@ msgstr "Стан дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "Іконка типу дії"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Additional notes..."
+msgstr "Додаткові примітки..."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__advance_date
+msgid "Advance Date"
+msgstr "Дата видачі авансу"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__advance_amount
+msgid "Advance Received"
+msgstr "Отриманий аванс"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_advance_report
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_advance_report
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__report_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+msgid "Advance Report"
+msgstr "Авансовий звіт"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_advance_report_line
+msgid "Advance Report Line"
+msgstr "Рядок авансового звіту"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_advance_report
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs_advance_reports
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+msgid "Advance Reports"
+msgstr "Авансові звіти"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Advance report %s"
+msgstr "Авансовий звіт %s"
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_advance_report
@@ -1927,9 +638,24 @@ msgid "Aging Report Line"
 msgstr "Рядок звіту про заборгованість"
 
 #. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_aging
+msgid "Aging Reports"
+msgstr "Заборгованість"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__amount
+msgid "Amount"
+msgstr "Сума"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__amount_residual
 msgid "Amount Due"
 msgstr "Сума боргу"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__advance_amount
+msgid "Amount received by employee"
+msgstr "Сума, отримана працівником"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__amount_to_pay
@@ -1937,14 +663,68 @@ msgid "Amount to Pay"
 msgstr "Сума до оплати"
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
+msgid "Amount to pay cannot be negative."
+msgstr "Сума до сплати не може бути від'ємною."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
+msgid "Amount to pay cannot exceed amount due."
+msgstr "Сума до сплати не може перевищувати суму боргу."
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__analytic_precision
 msgid "Analytic Precision"
 msgstr "Аналітична точність"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_appendix
+msgid "Appendix"
+msgstr "Додатки"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+msgid "Approval"
+msgstr "Затвердження"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+msgid "Approve"
+msgstr "Затвердити"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__approved
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+msgid "Approved"
+msgstr "Затверджено"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__approved_by
+msgid "Approved By"
+msgstr "Затвердив"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__approved_date
+msgid "Approved Date"
+msgstr "Дата затвердження"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_list
+msgid "Assets"
+msgstr "Активи"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report_line__attachment_ids
+msgid "Attach receipt/invoice scan"
+msgstr "Прикріпити скан чека/рахунку"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_attachment_count
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_attachment_count
@@ -1952,6 +732,28 @@ msgstr "Аналітична точність"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_attachment_count
 msgid "Attachment Count"
 msgstr "Кількість вкладень"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__attachment_ids
+msgid "Attachments"
+msgstr "Вкладення"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__balance
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__balance
+msgid "Balance"
+msgstr "Залишок"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+msgid "Balance Sheet"
+msgstr "Баланс"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_balance_sheet
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_balance
+msgid "Balance Sheet (Form No.1)"
+msgstr "Баланс (Форма №1)"
 
 #. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_balance_report
@@ -1964,9 +766,21 @@ msgid "Balance Sheet Line"
 msgstr "Рядок балансу"
 
 #. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_balance_report
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
+msgid "Balance Sheets"
+msgstr "Баланси"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__balance_type
 msgid "Balance Type"
 msgstr "Тип сальдо"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__previous_balance
+msgid "Balance from previous advance report"
+msgstr "Залишок з попереднього авансового звіту"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__journal_id
@@ -1974,9 +788,209 @@ msgid "Bank Journal"
 msgstr "Банківський журнал"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
+msgid "Basis"
+msgstr "Підстава"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_payment_basis
+msgid "Basis/reason for this cash operation (підстава)"
+msgstr "Підстава/причина касової операції"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__line_ids
 msgid "Bills to Pay"
 msgstr "Рахунки до оплати"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_reconciliation_act_wizard__account_type__both
+msgid "Both"
+msgstr "Обидва"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Calculate"
+msgstr "Розрахувати"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_balance_report.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_cashflow_report.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_pnl_report.py:0
+msgid "Calculate the report before confirming."
+msgstr "Розрахуйте звіт перед підтвердженням."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Can only close from draft state."
+msgstr "Можна закрити лише зі стану чернетки."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Can only compute in draft state."
+msgstr "Можна розрахувати лише в стані чернетки."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Can only reset to draft from reversed state."
+msgstr "Можна повернути в чернетку лише зі скасованого стану."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Can only reverse a closed period."
+msgstr "Можна скасувати лише закритий період."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__cancelled
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__cancelled
+msgid "Cancelled"
+msgstr "Скасовано"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Cannot cancel a posted report."
+msgstr "Неможливо скасувати проведений звіт."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Cannot cancel an invoiced act."
+msgstr "Неможливо скасувати акт з виставленим рахунком."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Cannot confirm an act without lines."
+msgstr "Неможливо підтвердити акт без рядків."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Cannot post a report with zero total expenses."
+msgstr "Неможливо провести звіт із нульовими загальними витратами."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Cannot post a report without expense lines."
+msgstr "Неможливо провести звіт без рядків витрат."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_balance_report.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_cashflow_report.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_pnl_report.py:0
+msgid "Cannot recalculate a confirmed report. Set it back to draft first."
+msgstr ""
+"Неможливо перерахувати підтверджений звіт. Спочатку поверніть його в "
+"чернетку."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Cannot reset a posted report to draft."
+msgstr "Неможливо повернути проведений звіт у чернетку."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Cannot reset an invoiced act to draft."
+msgstr "Неможливо повернути в чернетку акт з виставленим рахунком."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Cannot submit a report without expense lines."
+msgstr "Неможливо подати звіт без рядків витрат."
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_cash_book_wizard
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_cash_book
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_book
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
+msgid "Cash Book"
+msgstr "Касова книга"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_cash_book_wizard
+msgid "Cash Book Wizard"
+msgstr "Майстер касової книги"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_cashflow_report
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_cashflow
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+msgid "Cash Flow Statement"
+msgstr "Рух грошових коштів (Cashflow)"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_cashflow
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_cashflow_report
+msgid "Cash Flow Statement (Form №3)"
+msgstr "Звіт про рух грошових коштів (Форма №3)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_cashflow_report_line
+msgid "Cash Flow Statement Line"
+msgstr "Рядок звіту про рух грошових коштів"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
+msgid "Cash Flow Statements"
+msgstr "Звіти про рух грошових коштів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__journal_id
+msgid "Cash Journal"
+msgstr "Касовий журнал"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_cash_order_number
+msgid "Cash Order Number"
+msgstr "Номер касового ордера"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_cash_order_type
+msgid "Cash Order Type"
+msgstr "Тип касового ордера"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_cash_person
+msgid "Cash Person"
+msgstr "Особа"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_bank
+msgid "Cash and Bank"
+msgstr "Каса та банк"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__cash_end
+msgid "Cash at End"
+msgstr "Залишок коштів на кінець"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/wizard/cash_book_wizard.py:0
+msgid "Cash journal must have a default account configured."
+msgstr "Касовий журнал повинен мати налаштований рахунок за замовчуванням."
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_period_closing__state__closed
@@ -2027,9 +1041,93 @@ msgid "Companies"
 msgstr "Компанії"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_act_wizard__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__company_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
+msgid "Company"
+msgstr "Компанія"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__comparison_date
+msgid "Comparison Date"
+msgstr "Дата порівняння"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Comparison Period"
+msgstr "Період для порівняння"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__comparison_date_to
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__comparison_date_to
+msgid "Comparison Period End"
+msgstr "Кінець порівняльного періоду"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__comparison_date_from
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__comparison_date_from
+msgid "Comparison Period Start"
+msgstr "Початок порівняльного періоду"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Confirm"
+msgstr "Підтвердити"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report__state__confirmed
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report__state__confirmed
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report__state__confirmed
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__confirmed
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Confirmed"
+msgstr "Підтверджено"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__contract_date
+msgid "Contract Date"
+msgstr "Дата договору"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__contract_number
+msgid "Contract Number"
+msgstr "Номер договору"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Create Invoice"
+msgstr "Створити рахунок"
+
+#. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_payment_order_wizard
 msgid "Create Payment Orders from Vendor Bills"
 msgstr "Створення платіжних доручень з рахунків"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_journal_form_ua
+msgid "Create UA Sequences"
+msgstr "Створити UA послідовності"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_advance_report
+msgid "Create your first Advance Report"
+msgstr "Створіть свій перший авансовий звіт"
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_balance_report
@@ -2037,9 +1135,19 @@ msgid "Create your first Balance Sheet report"
 msgstr "Створіть свій перший Баланс"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_cashflow_report
+msgid "Create your first Cash Flow Statement"
+msgstr "Створіть свій перший Звіт про рух грошових коштів"
+
+#. module: l10n_ua_accounting
 #: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_pnl_report
 msgid "Create your first P&amp;L Statement"
 msgstr "Створіть свій перший звіт про фінансові результати"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_service_act
+msgid "Create your first Service Act"
+msgstr "Створіть свій перший Акт наданих послуг"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__create_uid
@@ -2049,6 +1157,8 @@ msgstr "Створіть свій перший звіт про фінансов�
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__create_uid
@@ -2073,6 +1183,8 @@ msgstr "Створив"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__create_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__create_date
@@ -2095,6 +1207,51 @@ msgid "Credit"
 msgstr "Кредит"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__currency_id
+msgid "Currency"
+msgstr "Валюта"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_currency_exchange
+msgid "Currency Purchase / Sale"
+msgstr "Купівля/продаж валюти"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.l10n_ua_currency_revaluation_action
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_currency_revaluation
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_revaluation_view_form
+msgid "Currency Revaluation"
+msgstr "Переоцінка валюти"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_revaluation_view_list
+msgid "Currency Revaluations"
+msgstr "Переоцінки валюти"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+msgid "Current"
+msgstr "Поточний"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__section__asset_current
 msgid "Current Assets"
 msgstr "Оборотні активи"
@@ -2105,12 +1262,75 @@ msgid "Current Liabilities"
 msgstr "Поточні зобов'язання"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__current_amount
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__current_amount
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__current_amount
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Current Period"
+msgstr "Поточний період"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__partner_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Customer"
+msgstr "Замовник"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Date"
+msgstr "Дата"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__date_from
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__date_from
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__date_from
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__date_from
+msgid "Date From"
+msgstr "Дата з"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/wizard/cash_book_wizard.py:0
+#: code:addons/l10n_ua_accounting/wizard/reconciliation_act_wizard.py:0
+msgid "Date From must be before or equal to Date To."
+msgstr "Дата початку має бути раніше або дорівнювати даті закінчення."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__date_to
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__date_to
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__date_to
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__date_to
+msgid "Date To"
+msgstr "Дата по"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__comparison_date
+msgid "Date for comparison column (typically end of previous year)"
+msgstr "Дата для порівняльної колонки (зазвичай кінець попереднього року)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__advance_date
+msgid "Date when advance was given to employee"
+msgstr "Дата видачі авансу працівнику"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__debit
 msgid "Debit"
 msgstr "Дебет"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__description
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__name
+msgid "Description"
+msgstr "Опис"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__line_type__detail
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report_line__line_type__detail
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report_line__line_type__detail
 msgid "Detail"
 msgstr "Детально"
@@ -2126,6 +1346,8 @@ msgstr "Детально"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__display_name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__display_name
@@ -2150,6 +1372,57 @@ msgid "Distribution Analytic Account"
 msgstr "Аналітичний рахунок"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__document_date
+msgid "Document Date"
+msgstr "Дата документа"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__document_number
+msgid "Document Number"
+msgstr "Номер документа"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__document_type
+msgid "Document Type"
+msgstr "Тип документа"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_person_document
+msgid "Document of the person (passport, ID card)"
+msgstr "Документ особи (паспорт, ID-картка)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_period_closing__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Draft"
+msgstr "Чернетка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__employee_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+msgid "Employee"
+msgstr "Працівник"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
+msgid "End Date"
+msgstr "Дата завершення"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__period_to
+msgid "End date of service period"
+msgstr "Дата закінчення періоду надання послуг"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__section__equity
 msgid "Equity"
 msgstr "Власний капітал"
@@ -2165,9 +1438,49 @@ msgid "Expense Account"
 msgstr "Рахунок витрат"
 
 #. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_account_payment_vko
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_vko
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
+msgid "Expense Cash Orders (VKO)"
+msgstr "ВКО (Видаткові)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__line_ids
+msgid "Expense Lines"
+msgstr "Рядки витрат"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__expense_type
+msgid "Expense Type"
+msgstr "Тип витрат"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+msgid "Expenses"
+msgstr "Витрати"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Export XLSX"
+msgstr "Експорт XLSX"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report_line__section__financing
+msgid "Financing Activities"
+msgstr "Фінансова діяльність"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__flow_key
+msgid "Flow Key"
+msgstr "Ключ потоку"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_follower_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_follower_ids
@@ -2180,6 +1493,7 @@ msgstr "Підписники"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_partner_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_partner_ids
@@ -2192,6 +1506,7 @@ msgstr "Підписники (Партнери)"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__activity_type_icon
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_type_icon
@@ -2201,9 +1516,20 @@ msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Іконка Font Awesome, напр. fa-tasks"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__fuel
+msgid "Fuel"
+msgstr "Пальне"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_general_ledger
+msgid "General Ledger"
+msgstr "Головна книга"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__has_message
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__has_message
@@ -2223,6 +1549,8 @@ msgstr "Є повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__id
@@ -2245,6 +1573,7 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_exception_icon
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_icon
@@ -2257,6 +1586,7 @@ msgstr "Значок"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__activity_exception_icon
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_icon
@@ -2269,6 +1599,7 @@ msgstr "Іконка для визначення виключення дії."
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__message_needaction
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction
@@ -2279,15 +1610,42 @@ msgstr "Якщо позначено, то нові повідомлення бу
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__message_has_sms_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_account_payment_pko
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_pko
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
+msgid "Income Cash Orders (PKO)"
+msgstr "ПКО (Прибуткові)"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_pnl
+msgid "Income and Expenses (P&L)"
+msgstr "Доходи і витрати (P&L)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__flow_key
+msgid "Internal key that ties the line to its classification rule."
+msgstr "Внутрішній ключ, що прив’язує рядок до правила класифікації."
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
@@ -2296,9 +1654,44 @@ msgid "Internal notes..."
 msgstr "Внутрішні примітки..."
 
 #. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_stock_inventory_act
+msgid "Inventory Act"
+msgstr "Інвентаризаційний опис"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report_line__section__investing
+msgid "Investing Activities"
+msgstr "Інвестиційна діяльність"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__invoice_id
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__invoice
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Invoice"
+msgstr "Рахунок"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Invoice already exists for this act."
+msgstr "Рахунок для цього акту вже існує."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__invoiced
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Invoiced"
+msgstr "Виставлено рахунок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__is_ua_cash_order
+msgid "Is Cash Order"
+msgstr "Є касовим ордером"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_is_follower
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_is_follower
@@ -2319,6 +1712,27 @@ msgid "Journal"
 msgstr "Журнал"
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/wizard/reconciliation_act_wizard.py:0
+msgid "Journal Entries - %s"
+msgstr "Проводки - %s"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__move_id
+msgid "Journal Entry"
+msgstr "Проводка"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+msgid "Journal Items"
+msgstr "Проводки"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_journal_orders
+msgid "Journal Orders"
+msgstr "Журнали-ордери"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__write_uid
@@ -2326,6 +1740,8 @@ msgstr "Журнал"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__write_uid
@@ -2350,6 +1766,8 @@ msgstr "Востаннє оновив"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cash_book_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__write_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation_line__write_date
@@ -2367,16 +1785,37 @@ msgid "Last Updated on"
 msgstr "Останнє оновлення"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_list
+msgid "Liabilities"
+msgstr "Пасиви"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__name
 msgid "Line Name"
 msgstr "Назва рядка"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__line_type
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__line_type
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__line_type
 msgid "Line Type"
 msgstr "Тип рядка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__line_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__line_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__line_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Lines"
+msgstr "Рядки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_appendix
+msgid "List of appendix documents (додатки)"
+msgstr "Перелік додаткових документів"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__lock_period
@@ -2389,9 +1828,15 @@ msgid "Long-term Liabilities"
 msgstr "Довгострокові зобов'язання"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__meals
+msgid "Meals"
+msgstr "Харчування"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_has_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error
@@ -2404,6 +1849,7 @@ msgstr "Помилка доставлення повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_ids
@@ -2413,9 +1859,16 @@ msgid "Messages"
 msgstr "Повідомлення"
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Missing accounts: %s. Please configure them on the closing form."
+msgstr "Відсутні рахунки: %s. Будь ласка, налаштуйте їх у формі закриття."
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__my_activity_date_deadline
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__my_activity_date_deadline
@@ -2423,6 +1876,20 @@ msgstr "Повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr "Дедлайн моєї дії"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__name
+msgid "Name"
+msgstr "Назва"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__net_cash_flow
+msgid "Net Cash Flow"
+msgstr "Чистий рух коштів"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__net_profit
@@ -2435,21 +1902,10 @@ msgid "Net Result"
 msgstr "Чистий результат"
 
 #. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_calendar_event_id
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_calendar_event_id
-msgid "Next Activity Calendar Event"
-msgstr "Наступна подія календаря дій"
-
-#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_date_deadline
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_date_deadline
@@ -2462,6 +1918,7 @@ msgstr "Дедлайн наступної дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_summary
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_summary
@@ -2474,6 +1931,7 @@ msgstr "Підсумок наступної дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_type_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_type_id
@@ -2483,14 +1941,82 @@ msgid "Next Activity Type"
 msgstr "Тип наступної дії"
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "No P&L account balances found for this period."
+msgstr ""
+"Не знайдено залишків на рахунках прибутків і збитків для цього періоду."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid ""
+"No accountable-persons settlement account (372) found. Configure it in the "
+"company settings (Ukrainian accounting)."
+msgstr ""
+"Не знайдено рахунок розрахунків з підзвітними особами (372). Налаштуйте його"
+" в налаштуваннях компанії (Бухгалтерія України)."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "No invoice exists for this act."
+msgstr "Рахунок для цього акту не існує."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid ""
+"No journal for advance reports. Configure a general journal for company "
+"\"%s\"."
+msgstr ""
+"Немає журналу для авансових звітів. Налаштуйте загальний журнал для компанії"
+" \"%s\"."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
+msgid "No payment orders to create. Check amounts."
+msgstr "Немає платіжних доручень для створення. Перевірте суми."
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__section__asset_noncurrent
 msgid "Non-current Assets"
 msgstr "Необоротні активи"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__note
+msgid "Note"
+msgstr "Примітка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__note
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__note
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__note
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__note
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__note
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__note
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Notes"
+msgstr "Примітки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__name
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Number"
+msgstr "Номер"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_needaction_counter
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction_counter
@@ -2503,6 +2029,7 @@ msgstr "Кількість дій"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_has_error_counter
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error_counter
@@ -2515,6 +2042,7 @@ msgstr "Кількість помилок"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__message_needaction_counter
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction_counter
@@ -2527,6 +2055,7 @@ msgstr "Кількість повідомлень, які вимагають д�
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__message_has_error_counter
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error_counter
@@ -2534,6 +2063,60 @@ msgstr "Кількість повідомлень, які вимагають д�
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__supplies
+msgid "Office Supplies"
+msgstr "Канцтовари"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Only approved reports can be posted."
+msgstr "Тільки затверджені звіти можна провести."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Only confirmed acts can be invoiced."
+msgstr "Тільки підтверджені акти можна виставити рахунком."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Only draft acts can be confirmed."
+msgstr "Тільки чернеткові акти можна підтвердити."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Only draft reports can be submitted."
+msgstr "Тільки чернеткові звіти можна подати."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Only one active closing per period is allowed."
+msgstr "Дозволено лише одне активне закриття на період."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "Only submitted reports can be approved."
+msgstr "Тільки подані звіти можна затвердити."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report_line__section__operating
+msgid "Operating Activities"
+msgstr "Операційна діяльність"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_cash_order_type__other
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_payment_order_type__other
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__other
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__other
+msgid "Other"
+msgstr "Інше"
 
 #. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_pnl_report_line
@@ -2546,11 +2129,57 @@ msgid "P&L Statement"
 msgstr "Звіт про фінансові результати"
 
 #. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_pnl
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_pnl_report
+msgid "P&L Statement (Form №2)"
+msgstr "Звіт про фінансові результати (Форма №2)"
+
+#. module: l10n_ua_accounting
 #: model:ir.actions.act_window,name:l10n_ua_accounting.action_pnl_report
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
 msgid "P&L Statements"
 msgstr "Звіти про фінансові результати"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_pko
+msgid "PKO (Cash Receipt Order)"
+msgstr "ПКО (Прибутковий касовий ордер)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_cash_order_type__pko
+msgid "PKO (Receipt)"
+msgstr "ПКО (Прибутковий)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
+msgid "PKO No."
+msgstr "№ ПКО"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_journal__ua_pko_sequence_id
+msgid "PKO Sequence"
+msgstr "Послідовність ПКО"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+msgid "Parameters"
+msgstr "Параметри"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__partner_id
+msgid "Partner"
+msgstr "Контрагент"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_reconciliation_act_wizard__account_type__payable
+msgid "Payable (Vendors)"
+msgstr "Кредиторська (Постачальники)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_payment_basis
+msgid "Payment Basis"
+msgstr "Підстава платежу"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__payment_date
@@ -2578,6 +2207,11 @@ msgid "Payment Order Wizard Line"
 msgstr "Рядок майстра платіжних доручень"
 
 #. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_payment_orders
+msgid "Payment Orders"
+msgstr "Платіжні доручення"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_payment_purpose
 msgid "Payment Purpose"
 msgstr "Призначення платежу"
@@ -2589,8 +2223,25 @@ msgstr "Платежі"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__period_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
 msgid "Period"
 msgstr "Період"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Period %s already has an active closing entry."
+msgstr "Період %s вже має активну проводку закриття."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_tax_period.py:0
+msgid ""
+"Period %s has an active closing entry. Reverse the closing first before "
+"reopening."
+msgstr ""
+"Період %s має активну проводку закриття. Спочатку скасуйте закриття перед "
+"повторним відкриттям."
 
 #. module: l10n_ua_accounting
 #. odoo-python
@@ -2601,21 +2252,135 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Period %s is not open."
+msgstr "Період %s не відкритий."
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_period_closing
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_period_closing
+msgid "Period Closing"
+msgstr "Закриття періоду"
+
+#. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_period_closing_line
 msgid "Period Closing Line"
 msgstr "Рядок закриття періоду"
 
 #. module: l10n_ua_accounting
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__rating_ids
-#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__rating_ids
-msgid "Ratings"
-msgstr "Оцінювання"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
+msgid "Period End"
+msgstr "Кінець періоду"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__period_from
+msgid "Period From"
+msgstr "Період з"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__period_to
+msgid "Period To"
+msgstr "Період по"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_payment__ua_person_document
+msgid "Person Document"
+msgstr "Документ особи"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_cash_person
+msgid "Person who received (for VKO) or paid (for PKO) cash"
+msgstr "Особа, яка отримала (для ВКО) або внесла (для ПКО) готівку"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__balance
+msgid "Positive = employee owes, Negative = company owes"
+msgstr "Додатний = борг працівника, Від'ємний = борг компанії"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+msgid "Post"
+msgstr "Провести"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__posted
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+msgid "Posted"
+msgstr "Проведено"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+msgid "Previous"
+msgstr "Попередній"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__previous_balance
+msgid "Previous Balance"
+msgstr "Попередній залишок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__previous_amount
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__previous_amount
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__previous_amount
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Previous Period"
+msgstr "Попередній період"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Print"
+msgstr "Друк"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Print PDF"
+msgstr "Друк PDF"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_form_ua_buttons
+msgid "Print ВКО"
+msgstr "Друк ВКО"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_form_ua_buttons
+msgid "Print ПКО"
+msgstr "Друк ПКО"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__purpose
+msgid "Purpose"
+msgstr "Призначення"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__purpose
+msgid "Purpose of the advance (business trip, purchase, etc.)"
+msgstr "Призначення авансу (відрядження, закупівля тощо)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__quantity
+msgid "Quantity"
+msgstr "Кількість"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__receipt
+msgid "Receipt/Check"
+msgstr "Чек/Квитанція"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_reconciliation_act_wizard__account_type__receivable
+msgid "Receivable (Customers)"
+msgstr "Дебіторська (Покупці)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
+msgid "Received By"
+msgstr "Отримав"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__partner_bank_id
@@ -2623,15 +2388,62 @@ msgid "Recipient Account"
 msgstr "Рахунок отримувача"
 
 #. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_reconciliation_act_wizard
+msgid "Reconciliation Act Wizard"
+msgstr "Майстер акту звірки"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reconciliation
+msgid "Reconciliation Acts"
+msgstr "Акти звірки"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_reconciliation_act_wizard
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_reconciliation_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
+msgid "Reconciliation Statement"
+msgstr "Акт звірки взаєморозрахунків"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__contract_number
+msgid "Reference to the contract under which services are provided"
+msgstr "Посилання на договір, за яким надаються послуги"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__report_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__report_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__report_id
 msgid "Report"
 msgstr "Звіт"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__date_to
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
+msgid "Report Date"
+msgstr "Дата звіту"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Report Lines"
+msgstr "Рядки звіту"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Reporting Period"
+msgstr "Звітний період"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Reset to Draft"
+msgstr "Повернути в чернетку"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_user_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_user_id
@@ -2662,12 +2474,27 @@ msgstr "Сторновано"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__code
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__code
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__code
 msgid "Row Code"
 msgstr "Код рядка"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__section
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__section
 msgid "Section"
 msgstr "Розділ"
 
@@ -2677,9 +2504,65 @@ msgid "Section Header"
 msgstr "Заголовок розділу"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__sequence
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report_line__sequence
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report_line__sequence
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__sequence
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__sequence
+msgid "Sequence"
+msgstr "Послідовність"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_journal__ua_vko_sequence_id
+msgid "Sequence for Ukrainian Cash Disbursement Orders (ВКО)"
+msgstr "Послідовність для видаткових касових ордерів (ВКО)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_journal__ua_pko_sequence_id
+msgid "Sequence for Ukrainian Cash Receipt Orders (ПКО)"
+msgstr "Послідовність для прибуткових касових ордерів (ПКО)"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_account_journal__ua_pd_sequence_id
 msgid "Sequence for Ukrainian Payment Orders (ПД)"
 msgstr ""
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__product_id
+msgid "Service"
+msgstr "Послуга"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_service_act
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_service_act
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__act_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Service Act"
+msgstr "Акт наданих послуг"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/service_act.py:0
+msgid "Service Act %s"
+msgstr "Акт наданих послуг %s"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_service_act_line
+msgid "Service Act Line"
+msgstr "Рядок акту наданих послуг"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_service_act
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_docs_service_acts
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Service Acts"
+msgstr "Акти наданих послуг"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "Service Period"
+msgstr "Період надання послуг"
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_service_act
@@ -2691,6 +2574,16 @@ msgstr ""
 "                та є підставою для виставлення рахунків."
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid ""
+"Set an expense account on line \"%s\" (or a default expense account in the "
+"company settings) before posting."
+msgstr ""
+"Встановіть рахунок витрат у рядку \"%s\" (або рахунок витрат за "
+"замовчуванням у налаштуваннях компанії) перед проведенням."
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__lock_period
 msgid "Set period lock date on company to prevent backdated entries"
 msgstr ""
@@ -2698,9 +2591,51 @@ msgstr ""
 "записів минулою датою"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+msgid "Set to Draft"
+msgstr "Зробити чернеткою"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__include_unreconciled_only
+msgid "Show only unreconciled entries"
+msgstr "Показувати тільки незвірені записи"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__period_from
+msgid "Start date of service period"
+msgstr "Дата початку періоду надання послуг"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__state
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
+msgid "State"
+msgstr "Стан"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+msgid "Statement Lines"
+msgstr "Рядки звіту"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__state
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+msgid "Status"
+msgstr "Статус"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__activity_state
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_state
@@ -2718,9 +2653,81 @@ msgstr ""
 "Заплановано: майбутні дії."
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+msgid "Submit"
+msgstr "Подати"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__submitted
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+msgid "Submitted"
+msgstr "Подано"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_subtotal
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__line_type__subtotal
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report_line__line_type__subtotal
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report_line__line_type__subtotal
+msgid "Subtotal"
+msgstr "Підсумок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_tax
+msgid "Tax"
+msgstr "Податок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__amount_tax
+msgid "Tax Amount"
+msgstr "Сума податків"
+
+#. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_tax_period
 msgid "Tax Period"
 msgstr "Податковий період"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__tax_ids
+msgid "Taxes"
+msgstr "Податки"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_cashflow_report.py:0
+msgid "The start date must not be after the end date."
+msgstr "Дата початку не може бути пізнішою за дату завершення."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/advance_report.py:0
+msgid "This report already has a journal entry."
+msgstr "Цей звіт вже має проводку."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__document_type__ticket
+msgid "Ticket"
+msgstr "Квиток"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+msgid "To Approve"
+msgstr "На затвердження"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard__total_amount
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__amount_total
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_total
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__line_type__total
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report_line__line_type__total
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report_line__line_type__total
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pd_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_list
+msgid "Total"
+msgstr "Разом"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__total_assets
@@ -2743,6 +2750,12 @@ msgid "Total Debit"
 msgstr "Всього по Дебету"
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__total_expenses
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__total_expenses
+msgid "Total Expenses"
+msgstr "Загальні витрати"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__total_gain
 msgid "Total Gain"
 msgstr "Загальний дохід"
@@ -2763,6 +2776,22 @@ msgid "Total Revenue"
 msgstr "Загальний дохід"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
+msgid "Totals"
+msgstr "Підсумки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report_line__expense_type__transport
+msgid "Transport"
+msgstr "Транспорт"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_osv
+msgid "Trial Balance"
+msgstr "Оборотно-сальдова відомість"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__turnover_type
 msgid "Turnover Type"
 msgstr "Тип обороту"
@@ -2776,6 +2805,7 @@ msgstr "Тип"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__activity_exception_decoration
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_decoration
@@ -2785,10 +2815,51 @@ msgid "Type of the exception activity on record."
 msgstr "Тип дії виключення на записі."
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_journal_form_ua
+msgid "Ukrainian Cash Orders"
+msgstr "Українські касові ордери"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config_directories
+msgid "Ukrainian Directories"
+msgstr "Довідники UA"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports
+msgid "Ukrainian Reports"
+msgstr "Звітність UA"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_cash_order_number
+msgid "Ukrainian cash order number (auto-generated for cash journals)"
+msgstr "Номер українського касового ордера (автоматично для касових журналів)"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_payment_order_number
 msgid "Ukrainian payment order number (auto-generated for bank journals)"
 msgstr ""
-"Номер платіжного доручення (генерується автоматично для банківських журналів)"
+"Номер платіжного доручення (генерується автоматично для банківських "
+"журналів)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__price_unit
+msgid "Unit Price"
+msgstr "Ціна за одиницю"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__uom_id
+msgid "Unit of Measure"
+msgstr "Одиниця виміру"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__include_unreconciled_only
+msgid "Unreconciled Only"
+msgstr "Тільки незвірені"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__amount_untaxed
+msgid "Untaxed Amount"
+msgstr "Сума без податків"
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_balance_report
@@ -2805,14 +2876,53 @@ msgstr ""
 "№2)."
 
 #. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_vko
+msgid "VKO (Cash Disbursement Order)"
+msgstr "ВКО (Видатковий касовий ордер)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__account_payment__ua_cash_order_type__vko
+msgid "VKO (Disbursement)"
+msgstr "ВКО (Видатковий)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_vko_list
+msgid "VKO No."
+msgstr "№ ВКО"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_account_journal__ua_vko_sequence_id
+msgid "VKO Sequence"
+msgstr "Послідовність ВКО"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__partner_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__partner_id
+msgid "Vendor"
+msgstr "Постачальник"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_payment_order_wizard_line__bill_id
 msgid "Vendor Bill"
 msgstr "Рахунок від постачальника"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
+msgid "View Entries"
+msgstr "Переглянути записи"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+msgid "View Invoice"
+msgstr "Переглянути рахунок"
+
+#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__website_message_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__website_message_ids
@@ -2825,6 +2935,7 @@ msgstr "Повідомлення з веб-сайту"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_advance_report__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_aging_report__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__website_message_ids
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_exchange__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_currency_revaluation__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__website_message_ids
@@ -2839,10 +2950,29 @@ msgid "Wizard"
 msgstr "Майстер"
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pko_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_vko_document
+msgid "_______________________"
+msgstr ""
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_payment_order_document
+msgid "______________________________________________________"
+msgstr ""
+
+#. module: l10n_ua_accounting
 #. odoo-python
 #: code:addons/l10n_ua_accounting/wizard/payment_order_wizard.py:0
 msgid "id"
 msgstr ""
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_balance_report.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_cashflow_report.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_pnl_report.py:0
+msgid "xlsxwriter is not installed. Run: pip install xlsxwriter"
+msgstr "xlsxwriter не встановлено. Виконайте: pip install xlsxwriter"
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_advance_report_document
@@ -3081,12 +3211,9 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_inventory_act
 msgid ""
 "Всі товарно-матеріальні цінності, пойменовані в цьому\n"
-"                                    інвентаризаційному описі, комісією "
-"перевірені в натурі\n"
-"                                    в моїй (нашій) присутності і внесені в "
-"опис, у зв'язку\n"
-"                                    з чим претензій до інвентаризаційної "
-"комісії не маю (не маємо)."
+"                                    інвентаризаційному описі, комісією перевірені в натурі\n"
+"                                    в моїй (нашій) присутності і внесені в опис, у зв'язку\n"
+"                                    з чим претензій до інвентаризаційної комісії не маю (не маємо)."
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -3148,6 +3275,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "Дата (рік, місяць, число)"
 msgstr ""
@@ -3246,6 +3374,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "Додаток 1 до Національного положення (стандарту)"
 msgstr ""
@@ -3337,6 +3466,13 @@ msgid "ЗАТВЕРДЖУЮ"
 msgstr ""
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
+msgid ""
+"ЗВІТ ПРО РУХ ГРОШОВИХ КОШТІВ<br/>\n"
+"                            (за прямим методом)"
+msgstr ""
+
+#. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid ""
 "ЗВІТ ПРО ФІНАНСОВІ РЕЗУЛЬТАТИ<br/>\n"
@@ -3344,6 +3480,7 @@ msgid ""
 msgstr ""
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "За аналогічний період попереднього року"
 msgstr ""
@@ -3359,6 +3496,7 @@ msgid "За документом:"
 msgstr ""
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "За звітний період"
 msgstr ""
@@ -3481,6 +3619,14 @@ msgid "Звіт про заборгованість"
 msgstr ""
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_cashflow_report
+msgid ""
+"Звіт про рух грошових коштів за прямим методом (Форма №3,\n"
+"                НП(С)БО 1). Рух класифікується за кореспондуючими рахунками:\n"
+"                операційна, інвестиційна та фінансова діяльність."
+msgstr ""
+
+#. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_aging_report_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_aging_report_view_search
 msgid "Звіти про заборгованість"
@@ -3498,6 +3644,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "КОДИ"
 msgstr ""
@@ -3540,6 +3687,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "Код рядка"
 msgstr ""
@@ -3644,7 +3792,6 @@ msgstr ""
 #. module: l10n_ua_accounting
 #: model:ir.actions.act_window,name:l10n_ua_accounting.l10n_ua_currency_exchange_action
 #: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_currency_exchange
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_currency_exchange
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_exchange_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_exchange_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_currency_exchange_view_search
@@ -4269,6 +4416,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "Підприємство"
 msgstr ""
@@ -4483,6 +4631,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "Стаття"
 msgstr ""
@@ -4490,8 +4639,8 @@ msgstr ""
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__analytic_distribution
 msgid ""
-"Стаття руху грошових коштів та інша аналітика. Передається на counterpart та "
-"write-off рядки журнальних проводок при підтвердженні платежу. Не "
+"Стаття руху грошових коштів та інша аналітика. Передається на counterpart та"
+" write-off рядки журнальних проводок при підтвердженні платежу. Не "
 "передається на ліквідну (cash) сторону."
 msgstr ""
 
@@ -4649,6 +4798,11 @@ msgid "Форма № 2"
 msgstr ""
 
 #. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
+msgid "Форма № 3"
+msgstr ""
+
+#. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_period_closing_view_form
 msgid "Фінансові результати (79x)"
 msgstr ""
@@ -4698,6 +4852,7 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "бухгалтерського обліку 1 «Загальні вимоги до фінансової звітності»"
 msgstr ""
@@ -4763,17 +4918,14 @@ msgid "доходу (711)"
 msgstr ""
 
 #. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_service_act_document
-msgid "з"
-msgstr ""
-
-#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "за"
 msgstr ""
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_cashflow_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
 msgid "за ЄДРПОУ"
 msgstr ""
@@ -4820,12 +4972,6 @@ msgid "прийняті."
 msgstr ""
 
 #. module: l10n_ua_accounting
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_balance_sheet_document
-#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pnl_document
-msgid "р."
-msgstr ""
-
-#. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_pko_document
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_vko_document
 msgid "рахунок"
@@ -4867,16 +5013,16 @@ msgstr ""
 #. odoo-python
 #: code:addons/l10n_ua_accounting/models/account_journal.py:0
 msgid ""
-"⚠️ Ліміт каси перевищено! Залишок: %(balance)s %(currency)s, ліміт: %(limit)s "
-"%(currency)s."
+"⚠️ Ліміт каси перевищено! Залишок: %(balance)s %(currency)s, ліміт: "
+"%(limit)s %(currency)s."
 msgstr ""
 
 #. module: l10n_ua_accounting
 #. odoo-python
 #: code:addons/l10n_ua_accounting/models/account_payment.py:0
 msgid ""
-"⚠️ Увага! Залишок каси (%(balance)s %(currency)s) перевищує ліміт (%(limit)s %"
-"(currency)s)."
+"⚠️ Увага! Залишок каси (%(balance)s %(currency)s) перевищує ліміт (%(limit)s"
+" %(currency)s)."
 msgstr ""
 
 #. module: l10n_ua_accounting
@@ -4891,11 +5037,6 @@ msgstr ""
 "Бухгалтерія України: ПКО/ВКО, Касова книга, Баланс, Звіт про фін. результати"
 
 #. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_vat
-msgid "VAT"
-msgstr "ПДВ"
-
-#. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_assets
-msgid "Fixed Assets"
-msgstr "Основні засоби"
+#: model:ir.ui.menu,name:account.menu_finance
+msgid "Accounting"
+msgstr "Бухоблік"

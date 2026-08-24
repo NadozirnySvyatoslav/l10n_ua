@@ -11,3 +11,4 @@ from . import test_advance_report
 from . import test_multicompany
 from . import test_currency_revaluation
 from . import test_currency_exchange
+from . import test_cashflow

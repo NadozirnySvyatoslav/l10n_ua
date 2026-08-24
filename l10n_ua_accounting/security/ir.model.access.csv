@@ -9,6 +9,8 @@ access_balance_report_user,l10n_ua.balance.report.user,model_l10n_ua_balance_rep
 access_balance_report_line_user,l10n_ua.balance.report.line.user,model_l10n_ua_balance_report_line,account.group_account_user,1,1,1,1
 access_pnl_report_user,l10n_ua.pnl.report.user,model_l10n_ua_pnl_report,account.group_account_user,1,1,1,1
 access_pnl_report_line_user,l10n_ua.pnl.report.line.user,model_l10n_ua_pnl_report_line,account.group_account_user,1,1,1,1
+access_cashflow_report_user,l10n_ua.cashflow.report.user,model_l10n_ua_cashflow_report,account.group_account_user,1,1,1,1
+access_cashflow_report_line_user,l10n_ua.cashflow.report.line.user,model_l10n_ua_cashflow_report_line,account.group_account_user,1,1,1,1
 access_period_closing_user,l10n_ua.period.closing.user,model_l10n_ua_period_closing,account.group_account_user,1,1,1,1
 access_period_closing_line_user,l10n_ua.period.closing.line.user,model_l10n_ua_period_closing_line,account.group_account_user,1,1,1,1
 access_payment_order_wizard_user,l10n_ua.payment.order.wizard.user,model_l10n_ua_payment_order_wizard,account.group_account_user,1,1,1,1

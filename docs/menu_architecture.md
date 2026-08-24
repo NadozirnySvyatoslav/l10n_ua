@@ -36,7 +36,6 @@ UA-«парасольки» всередині `Accounting → Configuration`, �
 | 30 | `menu_hr_payroll_root` | Payroll | **немає** | власна | l10n_ua_hr_salary |
 | 45 | `menu_marketplace_root` | Marketplaces | **немає** | власна | l10n_ua_marketplace_base |
 | ~~50~~ | ~~`menu_hr_timesheet_root`~~ | ~~Timesheet~~ | — | — | знято, вкладено в `hr.menu_hr_root` (H2) |
-| 51 | `menu_ua_accounting_root` | Accounting | group_ua_accountant | власна | l10n_ua_accounting |
 | 53 | `menu_ua_bank_root` | Bank | group_ua_accountant | власна | l10n_ua_bank_sync |
 | 54 | `menu_ua_tax_root` | Taxes UA | group_ua_tax_accountant | власна | l10n_ua_tax |
 | 55 | `menu_l10n_ua_education_root` | Освіта (UA) | group_ua_education_user | **чужа (`hr,…`)** | l10n_ua_education_base |
@@ -85,7 +84,12 @@ UA-«парасольки» всередині `Accounting → Configuration`, �
   вкладено в застосунок «Співробітники» (`hr.menu_hr_root`, seq 16) під міткою
   «Табель П-5», конфіг — у `menu_hr_ua_configuration`. Українською «Табель» і
   «Табелі» (core) відрізнялися однією літерою, що збивало користувачів.
-  Accounting/Bank лишаються відкритими.
+  **✅ Виправлено для Accounting:** корінь `menu_ua_accounting_root` знято, домен
+  розчинено в рідних секціях `account.menu_finance`, а сам апп перейменовано на
+  «Бухоблік». Дублікати (Invoices, Vendor Bills, План рахунків, Журнали) прибрано
+  — ядро вже дає ті самі actions. Деталі й точки вкладення — у
+  [`menu_registry.md`](menu_registry.md).
+  Bank лишається відкритим.
 
 - **H3. Негейтовані чутливі корені** (issue #191): `menu_hr_payroll_root`,
   `menu_hr_timesheet_root`, `menu_marketplace_root`, `menu_telegram_bot_root` —

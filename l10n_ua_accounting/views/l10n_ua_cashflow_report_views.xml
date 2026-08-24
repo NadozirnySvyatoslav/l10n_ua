@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cashflow_report_form" model="ir.ui.view">
+        <field name="name">l10n_ua.cashflow.report.form</field>
+        <field name="model">l10n_ua.cashflow.report</field>
+        <field name="arch" type="xml">
+            <form string="Cash Flow Statement">
+                <header>
+                    <button name="action_compute" type="object"
+                            string="Calculate" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_confirm" type="object"
+                            string="Confirm" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object"
+                            string="Set to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_print" type="object"
+                            string="Print" class="btn-secondary"
+                            invisible="not line_ids"/>
+                    <button name="action_export_xlsx" type="object"
+                            string="Export XLSX"
+                            invisible="not line_ids"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Period">
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Comparison Period">
+                            <field name="comparison_date_from" readonly="state != 'draft'"/>
+                            <field name="comparison_date_to" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Totals">
+                            <field name="net_cash_flow"/>
+                            <field name="cash_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Statement Lines" name="lines">
+                            <field name="line_ids" readonly="1">
+                                <list decoration-bf="line_type in ('subtotal', 'total')"
+                                      decoration-info="line_type == 'subtotal'"
+                                      decoration-primary="line_type == 'total'">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="section" optional="show"/>
+                                    <field name="line_type" column_invisible="True"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="current_amount" sum="Total"/>
+                                    <field name="previous_amount" optional="show"/>
+                                    <button name="action_view_move_lines" type="object"
+                                            icon="fa-search" title="Journal Items"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cashflow_report_list" model="ir.ui.view">
+        <field name="name">l10n_ua.cashflow.report.list</field>
+        <field name="model">l10n_ua.cashflow.report</field>
+        <field name="arch" type="xml">
+            <list string="Cash Flow Statements">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="net_cash_flow" sum="Total"/>
+                <field name="cash_end"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'confirmed'"
+                       decoration-warning="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cashflow_report_search" model="ir.ui.view">
+        <field name="name">l10n_ua.cashflow.report.search</field>
+        <field name="model">l10n_ua.cashflow.report</field>
+        <field name="arch" type="xml">
+            <search string="Cash Flow Statements">
+                <field name="name"/>
+                <field name="company_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <separator/>
+                <group>
+                    <filter string="Company" name="groupby_company" domain="[]"
+                            context="{'group_by': 'company_id'}"/>
+                    <filter string="End Date" name="groupby_date_to" domain="[]"
+                            context="{'group_by': 'date_to:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cashflow_report" model="ir.actions.act_window">
+        <field name="name">Cash Flow Statement</field>
+        <field name="res_model">l10n_ua.cashflow.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Cash Flow Statement
+            </p>
+            <p>
+                Звіт про рух грошових коштів за прямим методом (Форма №3,
+                НП(С)БО 1). Рух класифікується за кореспондуючими рахунками:
+                операційна, інвестиційна та фінансова діяльність.
+            </p>
+        </field>
+    </record>
+
+</odoo>
