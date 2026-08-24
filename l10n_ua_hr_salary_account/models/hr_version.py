@@ -11,3 +11,13 @@ class HrVersion(models.Model):
              'підрозділу. Застосовується до рядків витрат (Дт 91/92/93/94, ЄСВ) '
              'у зарплатних проводках.',
     )
+
+    # Віджет analytic_distribution тягне analytic_precision з тієї самої моделі
+    # (fieldDependencies у JS). Модель не успадковує analytic.mixin — вона має
+    # власне окреме поле розподілу — тому точність оголошується явно, як це
+    # робить сам analytic.mixin.
+    analytic_precision = fields.Integer(
+        store=False,
+        default=lambda self: self.env['decimal.precision'].precision_get(
+            'Percentage Analytic'),
+    )

@@ -138,3 +138,19 @@ class TestSalaryAnalyticDistribution(SalaryTestCase):
         # Порожній розподіл → порожній ключ
         self.assertEqual(Run._analytic_key(False), ())
         self.assertEqual(Run._analytic_key({}), ())
+
+    # --- Залежності віджета analytic_distribution ---
+
+    def test_widget_reads_analytic_precision(self):
+        """Віджет analytic_distribution дочитує analytic_precision з моделі.
+
+        Поле salary_analytic_distribution показане цим віджетом у формах
+        працівника і підрозділу. JS оголошує analytic_precision у
+        fieldDependencies, тож web_read просить його на тій самій моделі —
+        і без явного поля картка падає з «Invalid field 'analytic_precision'».
+        """
+        for record in (self.employee, self.version, self.department):
+            with self.subTest(model=record._name):
+                self.assertIn('analytic_precision', record._fields)
+                value = record.read(['analytic_precision'])[0]
+                self.assertIsInstance(value['analytic_precision'], int)
