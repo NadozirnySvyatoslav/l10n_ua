@@ -99,9 +99,9 @@
               groups="l10n_ua_account_base.group_ua_accountant"
               sequence="30"/>
 
-    <!-- ==================== Звітність → Звітність UA ==================== -->
+    <!-- ==================== Звітність → Звітність ==================== -->
     <menuitem id="menu_ua_reports"
-              name="Ukrainian Reports"
+              name="Reports"
               parent="account.menu_finance_reports"
               groups="l10n_ua_account_base.group_ua_accountant"
               sequence="2"/>
@@ -156,7 +156,7 @@
     <!-- План рахунків і Журнали не переоголошуються: ядро вже має ті самі
          actions у Configuration → Accounting. -->
     <menuitem id="menu_ua_config_directories"
-              name="Ukrainian Directories"
+              name="Directories"
               parent="account.menu_finance_configuration"
               action="l10n_ua_account_base.l10n_ua_koatuu_action"
               groups="l10n_ua_account_base.group_ua_accountant"

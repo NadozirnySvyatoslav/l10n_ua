@@ -2821,13 +2821,13 @@ msgstr "Українські касові ордери"
 
 #. module: l10n_ua_accounting
 #: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_config_directories
-msgid "Ukrainian Directories"
-msgstr "Довідники UA"
+msgid "Directories"
+msgstr "Довідники"
 
 #. module: l10n_ua_accounting
 #: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports
-msgid "Ukrainian Reports"
-msgstr "Звітність UA"
+msgid "Reports"
+msgstr "Звітність"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_account_payment__ua_cash_order_number
