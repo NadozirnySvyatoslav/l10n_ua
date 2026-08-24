@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Bank Sync Base',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian bank synchronization base module',
     'description': """
@@ -45,6 +45,7 @@ from this module and implement bank-specific API calls.
     ],
     'demo': [],
     'images': ['static/description/icon.png'],
+    'post_init_hook': 'post_init_hook',
     'installable': True,
     'application': False,
     'auto_install': False,

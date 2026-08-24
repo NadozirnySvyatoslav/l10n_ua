@@ -193,6 +193,7 @@ msgstr "Залишки"
 
 #. module: l10n_ua_bank_sync
 #: model:ir.model,name:l10n_ua_bank_sync.model_res_bank
+#: model:ir.ui.menu,name:l10n_ua_bank_sync.menu_ua_bank_root
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
 msgid "Bank"
 msgstr "Банк"
@@ -288,11 +289,6 @@ msgstr "Банківська транзакція"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_search
 msgid "Bank Transactions"
 msgstr "Банківські транзакції"
-
-#. module: l10n_ua_bank_sync
-#: model:ir.ui.menu,name:l10n_ua_bank_sync.menu_ua_bank_root
-msgid "Bank UA"
-msgstr "Банк UA"
 
 #. module: l10n_ua_bank_sync
 #: model:ir.model.fields.selection,name:l10n_ua_bank_sync.selection__l10n_ua_bank_statement__statement_type__both
