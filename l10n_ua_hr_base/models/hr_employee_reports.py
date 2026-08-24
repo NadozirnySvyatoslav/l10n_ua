@@ -6,6 +6,24 @@ from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api, _
+from odoo.tools.sql import column_exists
+
+
+def _company_signatory(env, field_name):
+    """Підписант із картки компанії, стійкий до оновлення бази.
+
+    Поля-підписанти на res_company і поля звітів, що беруть їх за
+    замовчуванням, з'явилися одним релізом. Під час оновлення Odoo ініціалізує
+    нову колонку звіту раніше, ніж додає колонку на res_company, а
+    `_init_column` обчислює default навіть для порожньої таблиці — читання
+    поля компанії падає з UndefinedColumn і валить оновлення бази цілком.
+    Поки колонки немає, підписант лишається порожнім: користувач обере його
+    у формі.
+    """
+    if not column_exists(env.cr, 'res_company', field_name):
+        return False
+    return env.company[field_name]
+
 
 def _was_employed_on(employee, as_of):
     """Return True if employee (active or archived) was employed on as_of date.
@@ -205,11 +223,11 @@ class HrEmployeeMilitaryReport(models.Model):
     # військового обліку, після чого їх реєструє служба діловодства.
     director_id = fields.Many2one(
         'hr.employee', string='Керівник',
-        default=lambda self: self.env.company.director_id,
+        default=lambda self: _company_signatory(self.env, 'director_id'),
     )
     military_officer_id = fields.Many2one(
         'hr.employee', string='Відповідальний за військовий облік',
-        default=lambda self: self.env.company.military_officer_id,
+        default=lambda self: _company_signatory(self.env, 'military_officer_id'),
     )
     registration_ref = fields.Char(
         string='Реєстраційний номер',
@@ -652,11 +670,11 @@ class HrEmployeeMilitaryOperationalReport(models.Model):
     # тими самими групами, що й Списки. Обидва подання будуються з одних даних.
     director_id = fields.Many2one(
         'hr.employee', string='Керівник',
-        default=lambda self: self.env.company.director_id,
+        default=lambda self: _company_signatory(self.env, 'director_id'),
     )
     military_officer_id = fields.Many2one(
         'hr.employee', string='Відповідальний за військовий облік',
-        default=lambda self: self.env.company.military_officer_id,
+        default=lambda self: _company_signatory(self.env, 'military_officer_id'),
     )
 
     def _get_operational_rows(self):
