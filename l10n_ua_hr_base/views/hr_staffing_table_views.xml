@@ -14,7 +14,8 @@
                 <field name="salary"/>
                 <field name="total_salary_fund"/>
                 <field name="date_from"/>
-                <field name="date_to"/>
+                <field name="date_end"/>
+                <field name="date_to" optional="hide"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-muted="state == 'archived'"/>
             </list>
         </field>
@@ -27,7 +28,11 @@
             <form>
                 <header>
                     <button name="action_approve" string="Approve" type="object" class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_archive" string="Archive" type="object" invisible="state != 'approved'"/>
+                    <!-- Only a draft may be discarded. An approved line is the record
+                         payroll reads: archiving it would hand the position back
+                         to the salary of the period before, without a word. An
+                         approval made by mistake is undone with "Set to Draft". -->
+                    <button name="action_archive" string="Archive" type="object" invisible="state != 'draft'"/>
                     <button name="action_draft" string="Set to Draft" type="object" invisible="state not in ('approved', 'archived')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
                 </header>
@@ -65,12 +70,21 @@
                         </group>
                         <group string="Validity">
                             <field name="date_from"/>
-                            <field name="date_to"/>
+                            <!-- Read-only, and derived: a line runs until the
+                                 next approved one of the same position starts.
+                                 The date that is entered by hand lives with the
+                                 order that carries it, below. -->
+                            <field name="date_end"/>
                         </group>
                     </group>
                     <group string="Approval">
                         <field name="order_number"/>
                         <field name="order_date"/>
+                        <!-- Not a second end date: this is the order that ends
+                             the position itself, after which no line follows.
+                             An ordinary line needs nothing here — it is
+                             superseded by the next one on its own. -->
+                        <field name="date_to"/>
                     </group>
                 </sheet>
                 <chatter/>
@@ -86,6 +100,16 @@
                 <field name="department_id"/>
                 <field name="job_id"/>
                 <separator/>
+                <!-- Approved now spans history: a superseded line keeps its
+                     approved state so that a past payslip still resolves to the
+                     salary of its own month. "In force" is the one to look at
+                     day to day, and the one the printed staffing table needs —
+                     summing superseded lines alongside current ones would
+                     double the staff units and the payroll fund. Whether a line
+                     still applies depends on its siblings, so the filter goes
+                     through `is_current` rather than a domain over dates. -->
+                <filter string="In Force" name="in_force"
+                        domain="[('is_current', '=', True)]"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
                 <filter string="Archived" name="archived" domain="[('state', '=', 'archived')]"/>
@@ -148,7 +172,7 @@
         <field name="name">Staffing Table</field>
         <field name="res_model">hr.staffing.table</field>
         <field name="view_mode">list,form,pivot,kanban</field>
-        <field name="context">{'search_default_approved': 1}</field>
+        <field name="context">{'search_default_in_force': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first staffing table entry

@@ -1336,6 +1336,7 @@ msgid "Night Surcharge (%)"
 msgstr "Доплата за нічні (%)"
 
 #. module: l10n_ua_hr_salary
+#. odoo-python
 #: code:addons/l10n_ua_hr_salary/wizard/hr_payslip_bank_export.py:0
 #, python-format
 msgid ""

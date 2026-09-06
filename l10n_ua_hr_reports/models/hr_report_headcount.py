@@ -160,6 +160,27 @@ class HrReportHeadcount(models.Model):
             [v.id for v in by_employee.values()]
         )
 
+        # The staffing line is resolved for `check_date` rather than read off
+        # `version.staffing_line_id`. That field answers for the version's own
+        # period, and for the ordinary open-ended Ukrainian contract that means
+        # today: a report for March would then count the staff units the
+        # position carries in September. Worse, the field is computed and not
+        # stored, so within one transaction every day of the month would share
+        # the same answer.
+        #
+        # `with_company`, not `sudo`: the staffing table is read through a rule
+        # on the companies ticked in the switcher, so a report for a company
+        # left out would silently resolve nothing and count everyone as one
+        # full unit. Stating the report's own company raises instead of
+        # miscounting.
+        Staffing = self.env['hr.staffing.table'].with_company(self.company_id)
+        staffing_keys = {
+            version.id: (version.company_id.id, version.department_id.id,
+                         version.job_id.id, check_date)
+            for version in actual_versions
+        }
+        staffing_lines = Staffing._resolve_batch(list(staffing_keys.values()))
+
         for version in actual_versions:
             employee = version.employee_id
 
@@ -193,9 +214,9 @@ class HrReportHeadcount(models.Model):
             work_rate = 1.0
             if version.work_rate:
                 work_rate = version.work_rate
-            elif version.staffing_line_id:
-                staffing = version.staffing_line_id
-                if staffing.units:
+            else:
+                staffing = staffing_lines.get(staffing_keys[version.id])
+                if staffing and staffing.units:
                     work_rate = staffing.units
 
             if work_rate >= 1.0:

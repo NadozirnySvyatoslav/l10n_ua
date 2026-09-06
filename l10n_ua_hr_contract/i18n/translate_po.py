@@ -288,24 +288,6 @@ TRANSLATIONS = {
     # Staffing
     "Staffing": "Штатний розпис",
     "Staffing Position": "Штатна позиція",
-    "Staffing Version": "Версія штатного розпису",
-    "Status:": "Статус:",
-    "Staffing Salary": "Оклад за розписом",
-    "Salary Range": "Діапазон",
-    "Outside the staffing table": "Поза штатним розписом",
-    "at least %s": "не менше %s",
-    "at most %s": "не більше %s",
-    "Wage %(wage)s is outside the staffing table range: the line of %(date)s "
-    "\"%(position)s\" provides for %(range)s. Please review the staffing table.":
-        "Оклад %(wage)s виходить за вилку штатного розпису: рядок від %(date)s "
-        "«%(position)s» передбачає %(range)s. Перегляньте штатний розпис.",
-    "Staffing table line matching the department and the job of this version "
-    "on the date it is in force. Not filled in by hand: the position is "
-    "entered once, in the native Job Position field, and the staffing line "
-    "follows from it.":
-        "Рядок штатного розпису, що відповідає підрозділу й посаді цієї версії "
-        "на дату її чинності. Не заповнюється вручну: посада вводиться один "
-        "раз у штатному полі «Посада», а рядок розпису виводиться з неї.",
 
     # Hiring
     "Hiring": "Прийняття на роботу",

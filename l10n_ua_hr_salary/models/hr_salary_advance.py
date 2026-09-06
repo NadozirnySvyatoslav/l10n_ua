@@ -95,10 +95,23 @@ class HrSalaryAdvance(models.Model):
                     # Курс — на дату виплати авансу: аванс середини місяця й
                     # зарплата в кінці рахуються кожне за своїм.
                     wage = version._l10n_ua_wage_in_company_currency(advance.date)
-                    if not wage and version.staffing_line_id:
-                        # Штатний розпис ведеться у валюті компанії, тож
-                        # перераховувати тут нема чого.
-                        wage = version.staffing_line_id.salary or 0.0
+                    # Same gate as the payslip (`_get_effective_wage`). Where
+                    # a company has turned the fallback off, the payslip
+                    # calculates zero; paying an advance from the staffing
+                    # table anyway would leave that payslip deducting an
+                    # advance it never earned.
+                    setting = (advance.company_id
+                               or version.company_id).wage_from_staffing
+                    if not wage and (setting or 'both') in ('fallback', 'both'):
+                        # The staffing table is asked about the payment
+                        # date too, not read off the version, which answers
+                        # for today. It is kept in the company currency, so
+                        # there is nothing to convert here.
+                        staffing = self.env['hr.staffing.table'].with_company(
+                            version.company_id)._resolve(
+                                version.company_id, version.department_id,
+                                version.job_id, advance.date)
+                        wage = staffing.salary or 0.0
             advance.gross_amount = round(wage * advance.wage_percent / 100, 2)
 
     @api.depends(

@@ -89,7 +89,6 @@ class HrVersion(models.Model):
         'hr.staffing.table',
         string='Staffing Position',
         compute='_compute_staffing_line_id',
-        compute_sudo=True,
         groups="hr.group_hr_user",
         help='Staffing table line matching the department and the job of this '
              'version on the date it is in force. Not filled in by hand: the '
@@ -295,32 +294,41 @@ class HrVersion(models.Model):
         sibling_dates = defaultdict(list)
         employees = self.employee_id
         if employees:
-            for version in self.env['hr.version'].search(
-                    [('employee_id', 'in', employees.ids)]):
-                sibling_dates[version.employee_id.id].append(version.date_version)
+            # Grouped in the database rather than read into records. Two columns
+            # are wanted here, but reading a field off a searched recordset makes
+            # the ORM fetch every stored field of hr.version — over a hundred of
+            # them — for every version of every employee in the set. The largest
+            # set this compute ever sees is the one the 19.0.7.0.0 migration
+            # hands it: every version that ever carried a staffing line.
+            for employee, dates in self.env['hr.version']._read_group(
+                    [('employee_id', 'in', employees.ids)],
+                    groupby=['employee_id'],
+                    aggregates=['date_version:array_agg']):
+                sibling_dates[employee.id] = dates
 
+        Staffing = self.env['hr.staffing.table']
+        # `contract_date_*` are restricted to hr.group_hr_manager and the
+        # reference date needs them, so those two reads — and only those — are
+        # elevated. The resolution itself stays under the user: a line they may
+        # not see is not found, which a search does quietly, and whatever comes
+        # back is therefore something the reader may read.
+        contract_dates = {
+            version.id: (version.contract_date_start, version.contract_date_end)
+            for version in self.sudo()
+        }
         keys = {}
         for version in self:
-            ref_date = version._staffing_ref_date(
+            contract_start, contract_end = contract_dates[version.id]
+            ref_date = Staffing._reference_date(
+                version.date_version, contract_start, contract_end,
                 sibling_dates.get(version.employee_id.id, ()), today)
             keys[version.id] = (
                 version.company_id.id, version.department_id.id,
                 version.job_id.id, ref_date,
             )
-        resolved = self.env['hr.staffing.table']._resolve_batch(list(keys.values()))
+        resolved = Staffing._resolve_batch(list(keys.values()))
         for version in self:
             version.staffing_line_id = resolved.get(keys[version.id], False)
-
-    def _staffing_ref_date(self, sibling_dates, today):
-        """Date this version is read against — see `_reference_date`.
-
-        The rule itself lives on `hr.staffing.table`, because the employee card
-        asks the same question about fields it is still editing.
-        """
-        self.ensure_one()
-        return self.env['hr.staffing.table']._reference_date(
-            self.date_version, self.contract_date_start,
-            self.contract_date_end, sibling_dates, today)
 
     @api.onchange('job_id', 'department_id')
     def _onchange_job_suggest_wage(self):
@@ -329,11 +337,17 @@ class HrVersion(models.Model):
         Triggered by the position rather than by `staffing_line_id`: the latter
         is a computed field now, and an onchange on a computed field is not a
         trigger worth depending on.
+
+        The setting is read from the company of the version, not from the one
+        that happens to be active in the switcher. Whether a wage is suggested
+        from the staffing table is a policy of the company employing the
+        person, and an officer working across two of them would otherwise carry
+        one company's policy onto the other's card.
         """
         if not self.staffing_line_id:
             return
 
-        company = self.env.company
+        company = self.company_id or self.env.company
         setting = company.wage_from_staffing or 'both'
 
         if setting in ('suggest', 'both'):
@@ -350,20 +364,31 @@ class HrVersion(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         versions = super().create(vals_list)
-        versions._warn_wage_out_of_staffing_range()
+        # The wage travels from the values that were written rather than being
+        # read back off the record: `wage` is restricted to hr.group_hr_manager,
+        # and a plain HR officer creating a card would otherwise read a field
+        # the ORM is entitled to refuse them. Whoever set a wage was allowed to
+        # set it. It also narrows the note to a wage somebody actually entered.
+        wages = {version.id: vals['wage']
+                 for version, vals in zip(versions, vals_list) if vals.get('wage')}
+        if wages:
+            versions.browse(wages.keys())._warn_wage_out_of_staffing_range(wages)
         return versions
 
     def write(self, vals):
         if 'wage' not in vals:
             return super().write(vals)
-        # Only versions whose wage actually moves deserve a note: saving the
-        # same form twice must not post the same warning twice.
+        # Reading the old wage here is safe by construction: field groups gate
+        # reading and writing together, so a caller who got `wage` past write()
+        # can read it. Only versions whose wage actually moves deserve a note —
+        # saving the same form twice must not post the same warning twice.
         changed = self.filtered(lambda version: version.wage != vals['wage'])
         result = super().write(vals)
-        changed._warn_wage_out_of_staffing_range()
+        changed._warn_wage_out_of_staffing_range(
+            dict.fromkeys(changed.ids, vals['wage']))
         return result
 
-    def _warn_wage_out_of_staffing_range(self):
+    def _warn_wage_out_of_staffing_range(self, wage_by_id):
         """Note in the employee's chatter when the wage leaves the staffing range.
 
         Deliberately not a constraint. Ukrainian salaries — and the ranges
@@ -371,25 +396,54 @@ class HrVersion(models.Model):
         rewritten, so a blocking check would reliably stop the very operation
         that must not be stopped: a pay rise. The numbers are stated, the
         decision stays with the HR officer.
+
+        The note names the range but never the wage. `wage` is restricted to
+        hr.group_hr_manager, while a chatter message has no field-level access
+        control of any kind: printing the figure there would hand it to every HR
+        officer who can open the card, permanently. The figure is already in the
+        chatter where it belongs — `wage` is tracked, and Odoo filters tracking
+        values by field access (`mail.tracking.value._filter_has_field_access`),
+        so a manager sees the new amount and nobody else does. The range itself
+        is not secret: the staffing table is readable by every HR officer.
+
+        Silent while a module is being installed or upgraded. The note is meant
+        for a wage an HR officer has just set, not for records a migration
+        happens to touch on its way past: a script that writes wages in bulk
+        would otherwise fill hundreds of chatters with warnings nobody asked
+        for, about decisions nobody made today. `registry.ready` is the same
+        signal core uses to keep install-time writes quiet.
+
+        :param wage_by_id: the wage each version was just given, by version id.
+            Passed in rather than read back — see `create`.
         """
+        if not self.env.registry.ready:
+            return
+        # Nothing to say to somebody who may not see the field in the first
+        # place, and nothing this method reads would be theirs to read.
+        if not self._has_field_access(self._fields['wage'], 'read'):
+            return
+
         today = fields.Date.context_today(self)
         for version in self:
             employee = version.employee_id
-            if not (employee and version.wage):
+            wage = wage_by_id.get(version.id)
+            if not (employee and wage):
                 continue
-            line = version.sudo().staffing_line_id
+            # Read plainly, not elevated. The field itself no longer runs
+            # as superuser, and a note about a staffing line the writer
+            # may not see would be a note about data they cannot check.
+            line = version.staffing_line_id
             if not line or not (line.salary_min or line.salary_max):
                 continue
-            wage = version._staffing_comparable_wage(line, today)
+            wage = version._staffing_comparable_wage(line, today, wage)
             below = line.salary_min and wage < line.salary_min
             above = line.salary_max and wage > line.salary_max
             if not (below or above):
                 continue
             employee.message_post(body=_(
-                'Wage %(wage)s is outside the staffing table range: the line '
-                'of %(date)s "%(position)s" provides for %(range)s. '
-                'Please review the staffing table.',
-                wage=formatLang(self.env, wage, currency_obj=line.currency_id),
+                'The wage set on the version of %(date)s is outside the '
+                'staffing table range: the line "%(position)s" provides for '
+                '%(range)s. Please review the staffing table.',
                 date=format_date(self.env, line.date_from),
                 position=line.name,
                 range=version._staffing_range_label(line),
@@ -405,27 +459,30 @@ class HrVersion(models.Model):
             return _('at least %s', low)
         return _('at most %s', high)
 
-    def _staffing_comparable_wage(self, line, today):
-        """The wage expressed in the currency of the staffing line.
+    def _staffing_comparable_wage(self, line, today, wage):
+        """`wage` expressed in the currency of the staffing line.
 
         The range is denominated in the line's currency while the wage may be
         set in another one (foreign-currency contracts, Diia.City gigs).
         Comparing the raw numbers would report a wage of 1 000 USD as falling
         below a minimum of 16 000 UAH. The conversion is the shared one from
-        l10n_ua_hr_base, so the figure quoted in the note is the figure payroll
-        will work with.
+        l10n_ua_hr_base, so the comparison uses the rate payroll will use.
+
+        The amount is an argument rather than `self.wage`: it is the value the
+        caller has just written, and the caller is the one who was allowed to
+        write it.
         """
         self.ensure_one()
         company = self.company_id or self.env.company
         date = self.date_version or today
         try:
-            wage = self._l10n_ua_wage_in_company_currency(date)
+            converted = self._l10n_ua_wage_in_company_currency(date, wage=wage)
         except UserError:
             # No rate for that day. A note is not a blocking check, so the raw
             # figure beats silence: the wage may well be out of range, and the
             # missing rate is already reported where it does block - payroll.
-            return self.wage
+            return wage
         if line.currency_id and line.currency_id != company.currency_id:
             return company.currency_id._convert(
-                wage, line.currency_id, company, date)
-        return wage
+                converted, line.currency_id, company, date)
+        return converted

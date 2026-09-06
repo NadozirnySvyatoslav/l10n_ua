@@ -21,14 +21,15 @@ msgid "Підлягає військовому обліку"
 msgstr "Підлягає військовому обліку"
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_employee.py:0
 msgid ""
 "Military accounting applies to citizens of Ukraine only (art. 1 of Law No "
-"2232-XII). %(employee)s has the nationality %(country)s — clear the military "
-"register category or correct the nationality."
+"2232-XII). %(employee)s has the nationality %(country)s — clear the military"
+" register category or correct the nationality."
 msgstr ""
-"Військовий облік ведеться лише щодо громадян України (ст. 1 Закону "
-"№ 2232-XII). У %(employee)s зазначено громадянство %(country)s — приберіть "
+"Військовий облік ведеться лише щодо громадян України (ст. 1 Закону № "
+"2232-XII). У %(employee)s зазначено громадянство %(country)s — приберіть "
 "категорію військового обліку або виправте громадянство."
 
 #. module: l10n_ua_hr_base
@@ -68,8 +69,12 @@ msgstr "Іконка типу активності"
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__registration_same_as_actual
-msgid "When checked, registration address fields are automatically copied from native Odoo private_* fields."
-msgstr "Якщо увімкнено, адреса реєстрації автоматично копіюється з приватної адреси проживання та приховується з форми."
+msgid ""
+"When checked, registration address fields are automatically copied from "
+"native Odoo private_* fields."
+msgstr ""
+"Якщо увімкнено, адреса реєстрації автоматично копіюється з приватної адреси "
+"проживання та приховується з форми."
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__address
@@ -329,7 +334,8 @@ msgstr "Код з Класифікатора професій (КП 2010)"
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_department__koatuu_code
-msgid "Code of the Classification of Administrative-Territorial Units of Ukraine"
+msgid ""
+"Code of the Classification of Administrative-Territorial Units of Ukraine"
 msgstr "Код Класифікатора адміністративно-територіальних одиниць України"
 
 #. module: l10n_ua_hr_base
@@ -429,8 +435,10 @@ msgstr "Випробувальний термін за замовчування�
 
 #. module: l10n_ua_hr_base
 #: model_terms:ir.actions.act_window,help:l10n_ua_hr_base.action_hr_staffing_table
-msgid "Define positions, staff units, and salaries for your organization structure."
-msgstr "Визначте посади, штатні одиниці та оклади для структури вашої організації."
+msgid ""
+"Define positions, staff units, and salaries for your organization structure."
+msgstr ""
+"Визначте посади, штатні одиниці та оклади для структури вашої організації."
 
 #. module: l10n_ua_hr_base
 #: model:ir.model,name:l10n_ua_hr_base.model_hr_department
@@ -638,11 +646,6 @@ msgstr "Навчальний заклад"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__date_from
 msgid "Effective From"
 msgstr "Діє з"
-
-#. module: l10n_ua_hr_base
-#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__date_to
-msgid "Effective Until"
-msgstr "Діє до"
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__email
@@ -1477,7 +1480,8 @@ msgstr "Реєстраційний номер облікової картки п
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__rnokpp
-msgid "Registration Number of the Taxpayer Account Card (Individual Tax Number)"
+msgid ""
+"Registration Number of the Taxpayer Account Card (Individual Tax Number)"
 msgstr "Реєстраційний номер облікової картки платника податків (ІПН)"
 
 #. module: l10n_ua_hr_base
@@ -1950,7 +1954,9 @@ msgstr "Згенерувати"
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__employee_number
-msgid "Personnel number of the employee according to Ukrainian legislation (Табельний номер)"
+msgid ""
+"Personnel number of the employee according to Ukrainian legislation "
+"(Табельний номер)"
 msgstr "Табельний номер працівника згідно з українським законодавством"
 
 #. module: l10n_ua_hr_base
@@ -1987,3 +1993,143 @@ msgstr "Вулиця реєстрації"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__registration_street2
 msgid "Registration Street 2"
 msgstr "Вулиця реєстрації 2"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_staffing_table_one_approved_line_per_start_date
+msgid ""
+"This position already has an approved staffing line starting on that date. "
+"Correct the existing line instead of adding a second one."
+msgstr ""
+"Ця позиція вже має затверджений рядок штатного розпису, що починається цією "
+"датою. Виправте наявний рядок замість того, щоб додавати другий."
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_staffing_table_search
+msgid "In Force"
+msgstr "Чинні"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__date_end
+msgid "Effective Until"
+msgstr "Діє до"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__date_to
+msgid "Position Discontinued"
+msgstr "Посаду скасовано"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__is_current
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_staffing_table_search
+msgid "In Force"
+msgstr "Чинні"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_staffing_table__date_to
+msgid ""
+"Set only when the position itself ends and no new line follows. A line is "
+"superseded by the next approved line of the same position on its own, and "
+"needs no end date for that."
+msgstr ""
+"Заповнюйте лише тоді, коли посада скасовується і наступного рядка не буде. "
+"Рядок і без цього перестає діяти, коли починається наступний затверджений "
+"рядок тієї самої позиції."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_staffing_table__date_end
+msgid ""
+"Last day this line applies: the day before the next approved line of this "
+"position starts, or the day the position was discontinued, whichever comes "
+"first."
+msgstr ""
+"Останній день дії цього рядка: день перед початком наступного затвердженого "
+"рядка цієї позиції або день скасування посади — залежно від того, що настає "
+"раніше."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_staffing_table.py:0
+msgid ""
+"This staffing line applies from %(date)s, which is already past. Any payslip"
+" recalculated for a period from that date will use it — let payroll know "
+"before that happens."
+msgstr ""
+"Цей рядок штатного розпису діє з %(date)s, тобто заднім числом. Будь-який "
+"розрахунковий листок, перерахований за період від цієї дати, братиме саме "
+"його — попередьте бухгалтерію, перш ніж це станеться."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_staffing_table.py:0
+msgid ""
+"An approved staffing line cannot be archived: it is what payslips are "
+"calculated from, and removing it would quietly return the position to the "
+"salary of the period before. Use \"Set to Draft\" to undo an approval, or "
+"fill in \"Position Discontinued\" if the position itself has ended."
+msgstr ""
+"Затверджений рядок штатного розпису не можна архівувати: саме з нього "
+"рахуються розрахункові листки, і його вилучення тихо повернуло б позиції "
+"оклад попереднього періоду. Щоб скасувати затвердження, скористайтесь "
+"кнопкою «В чернетку», а якщо посада справді припинила існувати — заповніть "
+"«Посаду скасовано»."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_staffing_table.py:0
+msgid ""
+"An approved staffing line cannot be deleted: payslips are calculated from "
+"it, and removing it would change what every recalculation of those periods "
+"produces — leaving nothing behind to explain why. Use \"Set to Draft\" first"
+" if the line was approved by mistake."
+msgstr ""
+"Затверджений рядок штатного розпису не можна видалити: саме з нього "
+"рахуються розрахункові листки, і його вилучення змінило б результат кожного "
+"перерахунку за ті періоди, не лишивши жодного пояснення. Якщо рядок "
+"затверджено помилково — спершу поверніть його кнопкою «В чернетку»."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_staffing_table.py:0
+msgid ""
+"This line has already been superseded by the approved line of %(date)s, so "
+"it is history: the payslips of its period are calculated from it. Undo the "
+"later approval first, if that is what you meant."
+msgstr ""
+"Цей рядок уже витіснено затвердженим рядком від %(date)s, тобто він став "
+"історією: саме з нього рахуються листки свого періоду. Якщо ви мали на увазі"
+" саме це — спершу скасуйте затвердження пізнішого рядка."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_staffing_table.py:0
+msgid ""
+"This position is discontinued on %(date)s while %(units)s staff unit(s) are "
+"still filled. From that date the staffing table has no answer for it, and an"
+" employee whose wage comes from the table is calculated at zero. Move them "
+"before then, or lift the date."
+msgstr ""
+"Посаду скасовано з %(date)s, але %(units)s штатної одиниці досі зайнято. "
+"Після цієї дати штатний розпис не дає для неї відповіді, і працівник, чий "
+"оклад береться з розпису, рахуватиметься як нуль. Переведіть таких "
+"працівників до цієї дати або зніміть її."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_staffing_table.py:0
+msgid ""
+"This line no longer covers the periods it did: it now starts on %(date)s. A "
+"payslip recalculated for a month it used to cover falls through to an "
+"earlier line, or to nothing at all."
+msgstr ""
+"Цей рядок більше не покриває періоди, які покривав: тепер він діє з "
+"%(date)s. Розрахунковий листок, перерахований за місяць, який він раніше "
+"покривав, провалиться на давніший рядок або взагалі ні на що."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"A position cannot be discontinued on %(discontinued)s, before the staffing "
+"line describing it starts on %(start)s."
+msgstr ""
+"Посаду не можна скасувати %(discontinued)s: рядок штатного розпису, який її "
+"описує, починає діяти лише %(start)s."

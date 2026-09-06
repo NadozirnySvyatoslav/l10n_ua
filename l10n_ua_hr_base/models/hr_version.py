@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 class HrVersion(models.Model):
     _inherit = 'hr.version'
 
-    def _l10n_ua_wage_in_company_currency(self, date=None):
+    def _l10n_ua_wage_in_company_currency(self, date=None, wage=None):
         """Оклад у валюті компанії на задану дату.
 
         `wage` зберігається в тій валюті, яку задано у версії, а всі
@@ -29,9 +29,15 @@ class HrVersion(models.Model):
         Дата потрібна, бо курс змінюється: аванс середини місяця, відпустка
         в липні та довідка за минулий рік мають рахуватись кожне за своїм
         курсом, а не за сьогоднішнім.
+
+        `wage` may be passed in, and then the field is not read at all. That
+        matters to whoever has just written it: the field is restricted to
+        `hr.group_hr_manager`, and reading it back would mean asking the ORM
+        for something it is entitled to refuse. Whoever could write it could
+        read it.
         """
         self.ensure_one()
-        wage = self.wage or 0.0
+        wage = (self.wage if wage is None else wage) or 0.0
         currency = getattr(self, 'salary_currency_id', False)
         company = self.company_id or self.env.company
         company_currency = company.currency_id

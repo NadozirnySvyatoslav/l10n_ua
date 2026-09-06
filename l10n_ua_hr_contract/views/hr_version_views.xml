@@ -37,16 +37,16 @@
                      span: text of an inline element standing among <field>
                      siblings is extracted together with its markup, so it
                      never matches a plain msgid. `string` always does. -->
-                <label for="staffing_date_from" string="Staffing Version"
+                <label for="staffing_line_start" string="Staffing Version"
                        invisible="not staffing_line_id"/>
-                <label for="staffing_date_from" string="Outside the staffing table"
+                <label for="staffing_line_start" string="Outside the staffing table"
                        invisible="staffing_line_id"/>
                 <!-- The row itself is always rendered, empty or not: a visible
                      <label> claims the label cell of the group, so hiding its
                      partner would shift every following cell by one and break
                      the pairing of the fields below. -->
                 <div class="o_row">
-                    <field name="staffing_date_from" readonly="1" class="oe_inline"
+                    <field name="staffing_line_start" readonly="1" class="oe_inline"
                            invisible="not staffing_line_id"/>
                     <label for="staffing_state" string="Status:" class="oe_inline"
                            invisible="not staffing_line_id"/>
@@ -91,14 +91,14 @@
                          The "Staffing" group moved to the Work tab, next to
                          the position it is derived from. -->
                     <group>
-                        <group string="Накази">
+                        <group string="Orders">
                             <field name="hire_order_number"/>
                             <field name="hire_order_date"/>
                             <field name="termination_order_number"/>
                             <field name="termination_order_date"/>
                             <field name="termination_reason_ua_id"/>
                         </group>
-                        <group string="Умови праці">
+                        <group string="Working Conditions">
                             <field name="work_conditions"/>
                             <field name="work_conditions_class" invisible="work_conditions == 'normal'"/>
                             <field name="work_conditions_subclass" invisible="work_conditions == 'normal'"/>
@@ -107,7 +107,7 @@
                         </group>
                     </group>
                     <group>
-                        <group string="Випробувальний термін">
+                        <group string="Probation">
                             <field name="probation_period_days"/>
                             <field name="probation_end_date"/>
                         </group>

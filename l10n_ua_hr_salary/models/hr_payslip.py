@@ -728,6 +728,18 @@ class HrPayslip(models.Model):
         Оклад може бути встановлений в іноземній валюті (#206) — тут він
         перераховується у валюту компанії за курсом розрахункового листка,
         тож усі похідні розрахунки (оклад, доплати, індексація) — у гривні.
+
+        The staffing table is asked about the period rather than read off
+        the version: `version.staffing_line_id` answers the card's question —
+        which position applies now — while a payslip asks which one applied
+        then. The difference shows on a recalculation: without this, a payslip
+        for March recomputed in September would take the salary approved in
+        June.
+
+        The anchor is the start of the period, the same one the choice of
+        version already stands on (`_compute_version_id`). Neither mechanism
+        notices a change in the middle of a month; proration will come
+        separately, and for versions and staffing lines at once.
         """
         wage = version.wage or 0.0
 
@@ -735,10 +747,21 @@ class HrPayslip(models.Model):
             # Check company setting for staffing table fallback
             setting = self.company_id.wage_from_staffing or 'both'
             if setting in ('fallback', 'both'):
-                if version.staffing_line_id:
-                    staffing = version.staffing_line_id
-                    if staffing.salary:
-                        wage = staffing.salary
+                # `with_company`, not `sudo`: the staffing table is read
+                # through a rule on `company_id in company_ids`, that is, on
+                # the companies ticked in the switcher. Without this the wage
+                # would depend on what the officer happens to have selected,
+                # and read zero for a company left out. `with_company` states
+                # that the payslip's own company is the one being calculated,
+                # and raises AccessError when there is no right to it — where
+                # sudo would quietly calculate somebody else's.
+                staffing = self.env['hr.staffing.table'].with_company(
+                    version.company_id)._resolve(
+                        version.company_id, version.department_id,
+                        version.job_id,
+                        self.date_from or fields.Date.context_today(self))
+                if staffing.salary:
+                    wage = staffing.salary
 
         return self._convert_salary_to_company(wage)
 
