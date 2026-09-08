@@ -8,6 +8,26 @@ from .hr_employee import REGISTRATION_ADDRESS_MAP
 _logger = logging.getLogger(__name__)
 
 
+def _l10n_ua_has_rate(env, currency, company, date):
+    """Whether the rate table can answer for `currency` on `date`.
+
+    `_convert` quietly falls back to 1.0 when it finds nothing, which turns a
+    missing rate into a number that looks calculated. Two places have to refuse
+    instead — the wage on a version and the salary on a staffing line — so the
+    lookup they both refuse on lives here: the latest rate on or before the
+    date, belonging to this company or shared by all of them.
+
+    Each caller raises its own message: only the caller knows whose money it
+    is, and "the wage of X" and "the staffing line Y" send an officer to two
+    different screens.
+    """
+    return bool(env['res.currency.rate'].search_count([
+        ('currency_id', '=', currency.id),
+        ('company_id', 'in', [company.id, False]),
+        ('name', '<=', date),
+    ]))
+
+
 class HrVersion(models.Model):
     _inherit = 'hr.version'
 
@@ -46,12 +66,7 @@ class HrVersion(models.Model):
             return wage
 
         date = date or fields.Date.context_today(self)
-        latest_rate = self.env['res.currency.rate'].search([
-            ('currency_id', '=', currency.id),
-            ('company_id', 'in', [company.id, False]),
-            ('name', '<=', date),
-        ], order='name desc', limit=1)
-        if not latest_rate:
+        if not _l10n_ua_has_rate(self.env, currency, company, date):
             raise UserError(_(
                 'Оклад %(employee)s встановлено в %(currency)s, але курс цієї '
                 'валюти на %(date)s не заданий. Без курсу оклад потрапив би в '

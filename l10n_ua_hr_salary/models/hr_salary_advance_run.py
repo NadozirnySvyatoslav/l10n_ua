@@ -94,7 +94,10 @@ class HrSalaryAdvanceRun(models.Model):
                 version.company_id)._resolve(
                     version.company_id, version.department_id,
                     version.job_id, self.date)
-            wage = staffing.salary or 0.0
+            # The line converts its own money: it names a currency of its own,
+            # and the batch is denominated in the company's.
+            wage = staffing._salary_in_company_currency(
+                self.date) if staffing else 0.0
         return wage
 
     def action_generate_advances(self):

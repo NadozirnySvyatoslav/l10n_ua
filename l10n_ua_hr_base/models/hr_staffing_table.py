@@ -6,6 +6,8 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools import format_date, formatLang
 from odoo.addons.base.models.ir_model import MODULE_UNINSTALL_FLAG
 
+from .hr_version import _l10n_ua_has_rate
+
 
 class HrStaffingTable(models.Model):
     _name = 'hr.staffing.table'
@@ -343,6 +345,42 @@ class HrStaffingTable(models.Model):
                     resolved[key] = line
                 break
         return resolved
+
+    def _salary_in_company_currency(self, date=None):
+        """This line's salary, in the currency of the company that keeps it.
+
+        The staffing table names a currency of its own, and it is not the one
+        a version's wage is denominated in. Payroll reads this figure as a
+        fallback for a version that carries no wage — which is exactly the case
+        where the version's currency says nothing about this money — so putting
+        it through the version's rate turns a position of 20 000 UAH into
+        830 000. The line answers for its own money, on the date it is asked
+        about, because the rate moves.
+        """
+        self.ensure_one()
+        salary = self.salary or 0.0
+        company = self.company_id or self.env.company
+        currency = self.currency_id
+        company_currency = company.currency_id
+        if not salary or not currency or not company_currency \
+                or currency == company_currency:
+            return salary
+
+        date = date or fields.Date.context_today(self)
+        if not _l10n_ua_has_rate(self.env, currency, company, date):
+            raise UserError(self.env._(
+                'The staffing line "%(position)s" states its salary in '
+                '%(currency)s, and no rate for that currency is on file for '
+                '%(date)s. Without one the salary would enter payroll as '
+                'though it were hryvnia. Add the rate to the currency table.',
+                position=self.name or '',
+                currency=currency.name,
+                date=format_date(self.env, date)))
+
+        # round=False for the reason it is false everywhere else here: a rate
+        # squeezed to the kopiyka costs two hryvnia on every thousand.
+        return currency._convert(
+            salary, company_currency, company, date, round=False)
 
     @api.constrains('units')
     def _check_units(self):

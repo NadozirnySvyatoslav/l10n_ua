@@ -105,13 +105,15 @@ class HrSalaryAdvance(models.Model):
                     if not wage and (setting or 'both') in ('fallback', 'both'):
                         # The staffing table is asked about the payment
                         # date too, not read off the version, which answers
-                        # for today. It is kept in the company currency, so
-                        # there is nothing to convert here.
+                        # for today. It converts its own money as well: the
+                        # line names a currency of its own, and the advance is
+                        # denominated in the company's.
                         staffing = self.env['hr.staffing.table'].with_company(
                             version.company_id)._resolve(
                                 version.company_id, version.department_id,
                                 version.job_id, advance.date)
-                        wage = staffing.salary or 0.0
+                        wage = staffing._salary_in_company_currency(
+                            advance.date) if staffing else 0.0
             advance.gross_amount = round(wage * advance.wage_percent / 100, 2)
 
     @api.depends(

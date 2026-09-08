@@ -28,19 +28,26 @@ def migrate(cr, version):
     if not version:
         return
 
+    # Grouped by the same columns the index is built on — ids, not names. Two
+    # departments may legitimately share a name, and grouping by the name would
+    # merge them into one report entry, sending the officer to look for a clash
+    # the index is perfectly happy with. The names are carried along only to
+    # make the message readable.
     cr.execute("""
         SELECT s.company_id,
-               d.name->>'en_US',
-               j.name->>'en_US',
+               s.department_id,
+               s.job_id,
+               min(d.name->>'en_US'),
+               min(j.name->>'en_US'),
                s.date_from,
                array_agg(s.id ORDER BY s.id)
         FROM hr_staffing_table s
         LEFT JOIN hr_department d ON d.id = s.department_id
         LEFT JOIN hr_job j ON j.id = s.job_id
         WHERE s.state = 'approved'
-        GROUP BY s.company_id, d.name->>'en_US', j.name->>'en_US', s.date_from
+        GROUP BY s.company_id, s.department_id, s.job_id, s.date_from
         HAVING count(*) > 1
-        ORDER BY 2, 3
+        ORDER BY 4, 5
     """)
     rows = cr.fetchall()
     if not rows:
@@ -56,7 +63,9 @@ def migrate(cr, version):
         "this is fixed. Correct the dates or archive the surplus lines, then "
         "update the module again.",
         len(rows))
-    for company_id, department, job, date_from, ids in rows:
+    for (company_id, department_id, job_id,
+         department, job, date_from, ids) in rows:
         _logger.warning(
-            "  company %s, %s / %s starting %s: ids %s",
-            company_id, department or '?', job or '?', date_from, list(ids))
+            "  company %s, %s (id %s) / %s (id %s) starting %s: ids %s",
+            company_id, department or '?', department_id,
+            job or '?', job_id, date_from, list(ids))

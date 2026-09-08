@@ -2004,11 +2004,6 @@ msgstr ""
 "датою. Виправте наявний рядок замість того, щоб додавати другий."
 
 #. module: l10n_ua_hr_base
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_staffing_table_search
-msgid "In Force"
-msgstr "Чинні"
-
-#. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__date_end
 msgid "Effective Until"
 msgstr "Діє до"
@@ -2133,3 +2128,15 @@ msgid ""
 msgstr ""
 "Посаду не можна скасувати %(discontinued)s: рядок штатного розпису, який її "
 "описує, починає діяти лише %(start)s."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"The staffing line \"%(position)s\" states its salary in %(currency)s, and no"
+" rate for that currency is on file for %(date)s. Without one the salary "
+"would enter payroll as though it were hryvnia. Add the rate to the currency "
+"table."
+msgstr ""
+"Рядок штатного розпису «%(position)s» задає оклад у %(currency)s, а курс "
+"цієї валюти на %(date)s не внесений. Без курсу оклад потрапив би в "
+"розрахунок як гривневий. Внесіть курс у довідник валют."
