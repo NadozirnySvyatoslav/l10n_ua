@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Employee Transfer',
-    'version': '19.0.1.1.1',
+    'version': '19.0.1.1.2',
     'category': 'Human Resources/Localization',
     'summary': 'Переведення співробітника в іншу організацію (КЗпП ст. 36 п. 5)',
     'description': """

@@ -1,4 +1,10 @@
-"""The headcount report reads the staffing table of its own period.
+"""The headcount report reads the staffing table of its own period, per head.
+
+Two things it has to get right at once. The line has to be the one in force on
+the day being counted, not the one in force today. And what it contributes has
+to be one person's share of the post, not the whole post: `units` says what the
+position is worth, so counting it per head reported a post of two units held by
+two people as four.
 
 `hr.version.staffing_line_id` answers for the version's period, and for the
 ordinary open-ended Ukrainian contract that means today. Reading it here made
@@ -116,3 +122,50 @@ class TestHeadcountStaffingPeriod(TransactionCase):
         version.work_rate = 0.75
         _, fte = self.report._count_employees_on_date(self.last_year)
         self.assertEqual(fte, 0.75)
+
+    def _second_holder(self):
+        """Another person on the same post, with no rate of their own."""
+        colleague = self.env['hr.employee'].create({
+            'name': 'Другий Оператор',
+            'company_id': self.company.id,
+            'department_id': self.department.id,
+            'job_id': self.job.id,
+        })
+        version = colleague.with_context(active_test=False).version_ids[:1]
+        version.write({
+            'contract_date_start': self.long_ago,
+            'contract_date_end': False,
+            'work_rate': 0.0,
+        })
+        return colleague
+
+    def test_a_post_of_two_units_held_by_two_is_one_rate_each(self):
+        """The case the review caught: two units, two people, four FTE."""
+        self.new_line.units = 2.0
+        self._second_holder()
+
+        headcount, fte = self.report._count_employees_on_date(self.today)
+        self.assertEqual(
+            fte, 2.0,
+            'Two people on a post worth two units are one full rate each, '
+            'not two apiece')
+        self.assertEqual(headcount, 2)
+
+    def test_one_unit_shared_by_two_is_half_each(self):
+        """Job sharing: one post, two people."""
+        self.new_line.units = 1.0
+        self._second_holder()
+
+        headcount, fte = self.report._count_employees_on_date(self.today)
+        self.assertEqual(fte, 1.0)
+        self.assertEqual(
+            headcount, 0,
+            'Half a rate each is nobody at a full rate')
+
+    def test_a_guess_never_exceeds_a_full_rate(self):
+        """Two units, one holder. Nothing here says they work double."""
+        self.new_line.units = 2.0
+
+        headcount, fte = self.report._count_employees_on_date(self.today)
+        self.assertEqual(fte, 1.0)
+        self.assertEqual(headcount, 1)

@@ -122,12 +122,43 @@ class HrEmployeeTransferWizard(models.TransientModel):
         for wiz in self:
             wiz.hire_date = (wiz.dismissal_date + timedelta(days=1)) if wiz.dismissal_date else False
 
-    @api.depends('source_employee_id', 'copy_wage')
+    @api.depends('source_employee_id', 'copy_wage',
+                 'target_company_id', 'hire_date')
     def _compute_new_wage(self):
+        """Оклад джерела, виражений у валюті цільової компанії.
+
+        `new_wage` підписаний `currency_id`, тобто валютою цільової компанії,
+        а `wage` версії живе у своїй: `salary_currency_id` для валютного
+        контракту, інакше валюта компанії-джерела. Число, перенесене як є,
+        підписувалось чужою валютою — оклад 1 000 USD ставав 1 000 грн у новій
+        організації, тобто падав у сорок разів, і так само мовчки їхав між
+        компаніями з різними валютами.
+
+        Курс береться на дату прийняття, а не на сьогодні: наказ можуть
+        готувати заздалегідь, а рахуватись переведення має за днем, коли воно
+        відбувається.
+        """
         for wiz in self:
             src_version = wiz.source_employee_id.current_version_id
-            wiz.new_wage = (src_version.wage or 0.0) if (
-                wiz.copy_wage and src_version) else 0.0
+            if not (wiz.copy_wage and src_version):
+                wiz.new_wage = 0.0
+                continue
+
+            date = wiz.hire_date or fields.Date.context_today(wiz)
+            # Спільний хелпер з l10n_ua_hr_base: він і кидає UserError, якщо
+            # курсу немає. Мовчазне число тут гірше за зупинку — воно піде
+            # у новий контракт.
+            amount = src_version._l10n_ua_wage_in_company_currency(date)
+
+            source_currency = (src_version.company_id
+                               or wiz.source_company_id).currency_id
+            target_currency = wiz.target_company_id.currency_id
+            if amount and source_currency and target_currency \
+                    and source_currency != target_currency:
+                amount = source_currency._convert(
+                    amount, target_currency, wiz.target_company_id, date,
+                    round=False)
+            wiz.new_wage = amount
 
     @api.constrains('target_company_id', 'source_company_id')
     def _check_different_company(self):
