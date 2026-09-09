@@ -8,10 +8,30 @@ from .hr_employee import REGISTRATION_ADDRESS_MAP
 _logger = logging.getLogger(__name__)
 
 
+def _l10n_ua_has_rate(env, currency, company, date):
+    """Whether the rate table can answer for `currency` on `date`.
+
+    `_convert` quietly falls back to 1.0 when it finds nothing, which turns a
+    missing rate into a number that looks calculated. Two places have to refuse
+    instead — the wage on a version and the salary on a staffing line — so the
+    lookup they both refuse on lives here: the latest rate on or before the
+    date, belonging to this company or shared by all of them.
+
+    Each caller raises its own message: only the caller knows whose money it
+    is, and "the wage of X" and "the staffing line Y" send an officer to two
+    different screens.
+    """
+    return bool(env['res.currency.rate'].search_count([
+        ('currency_id', '=', currency.id),
+        ('company_id', 'in', [company.id, False]),
+        ('name', '<=', date),
+    ]))
+
+
 class HrVersion(models.Model):
     _inherit = 'hr.version'
 
-    def _l10n_ua_wage_in_company_currency(self, date=None):
+    def _l10n_ua_wage_in_company_currency(self, date=None, wage=None):
         """Оклад у валюті компанії на задану дату.
 
         `wage` зберігається в тій валюті, яку задано у версії, а всі
@@ -29,9 +49,15 @@ class HrVersion(models.Model):
         Дата потрібна, бо курс змінюється: аванс середини місяця, відпустка
         в липні та довідка за минулий рік мають рахуватись кожне за своїм
         курсом, а не за сьогоднішнім.
+
+        `wage` may be passed in, and then the field is not read at all. That
+        matters to whoever has just written it: the field is restricted to
+        `hr.group_hr_manager`, and reading it back would mean asking the ORM
+        for something it is entitled to refuse. Whoever could write it could
+        read it.
         """
         self.ensure_one()
-        wage = self.wage or 0.0
+        wage = (self.wage if wage is None else wage) or 0.0
         currency = getattr(self, 'salary_currency_id', False)
         company = self.company_id or self.env.company
         company_currency = company.currency_id
@@ -40,12 +66,7 @@ class HrVersion(models.Model):
             return wage
 
         date = date or fields.Date.context_today(self)
-        latest_rate = self.env['res.currency.rate'].search([
-            ('currency_id', '=', currency.id),
-            ('company_id', 'in', [company.id, False]),
-            ('name', '<=', date),
-        ], order='name desc', limit=1)
-        if not latest_rate:
+        if not _l10n_ua_has_rate(self.env, currency, company, date):
             raise UserError(_(
                 'Оклад %(employee)s встановлено в %(currency)s, але курс цієї '
                 'валюти на %(date)s не заданий. Без курсу оклад потрапив би в '

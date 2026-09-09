@@ -1112,6 +1112,68 @@ msgid "Staffing Position"
 msgstr "Штатна позиція"
 
 #. module: l10n_ua_hr_contract
+#: model:ir.model.fields,help:l10n_ua_hr_contract.field_hr_employee__staffing_line_id
+#: model:ir.model.fields,help:l10n_ua_hr_contract.field_hr_version__staffing_line_id
+msgid ""
+"Staffing table line matching the department and the job of this version on "
+"the date it is in force. Not filled in by hand: the position is entered "
+"once, in the native Job Position field, and the staffing line follows from "
+"it."
+msgstr ""
+"Рядок штатного розпису, що відповідає підрозділу й посаді цієї версії на "
+"дату її чинності. Не заповнюється вручну: посада вводиться один раз у "
+"штатному полі «Посада», а рядок розпису виводиться з неї."
+
+#. module: l10n_ua_hr_contract
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
+msgid "Staffing Version"
+msgstr "Версія штатного розпису"
+
+#. module: l10n_ua_hr_contract
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
+msgid "Staffing Salary"
+msgstr "Оклад за розписом"
+
+#. module: l10n_ua_hr_contract
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
+msgid "Status:"
+msgstr "Статус:"
+
+#. module: l10n_ua_hr_contract
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
+msgid "Salary Range"
+msgstr "Діапазон"
+
+#. module: l10n_ua_hr_contract
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
+msgid "Outside the staffing table"
+msgstr "Поза штатним розписом"
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/models/hr_version.py:0
+msgid ""
+"The wage set on the version of %(date)s is outside the staffing table range:"
+" the line \"%(position)s\" provides for %(range)s. Please review the "
+"staffing table."
+msgstr ""
+"Оклад, встановлений у версії від %(date)s, виходить за вилку штатного "
+"розпису: рядок «%(position)s» передбачає %(range)s. Перегляньте штатний "
+"розпис."
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/models/hr_version.py:0
+msgid "at least %s"
+msgstr "не менше %s"
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/models/hr_version.py:0
+msgid "at most %s"
+msgstr "не більше %s"
+
+#. module: l10n_ua_hr_contract
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__resource_calendar__ua_schedule_type__standard
 msgid "Standard (5-day week)"
 msgstr "Стандартний (5-денний тиждень)"
@@ -1132,16 +1194,13 @@ msgid ""
 "Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
-"Planned: Future activities."
-"Status based on activities\n"
+"Planned: Future activities.Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
-"Planned: Future activities."
-"Status based on activities\n"
+"Planned: Future activities.Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
-"Planned: Future activities."
-"Status based on activities\n"
+"Planned: Future activities.Status based on activities\n"
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
@@ -1227,7 +1286,8 @@ msgstr "Код причини звільнення повинен бути ун�
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.actions.act_window,help:l10n_ua_hr_contract.action_hr_termination_reason
 msgid "Termination reasons are based on Ukrainian Labor Code articles."
-msgstr "Причини звільнення базуються на статтях Кодексу законів про працю України."
+msgstr ""
+"Причини звільнення базуються на статтях Кодексу законів про працю України."
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_termination_reason__compensation_amount__three_months
@@ -1255,10 +1315,11 @@ msgstr "Загальний оклад"
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.actions.act_window,help:l10n_ua_hr_contract.action_hr_job_combining
 msgid ""
-"Track employees who perform duties of combined positions with surcharges."
-"Track employees who perform duties of combined positions with surcharges."
-"Track employees who perform duties of combined positions with surcharges."
-"Track employees who perform duties of combined positions with surcharges."
+"Track employees who perform duties of combined positions with "
+"surcharges.Track employees who perform duties of combined positions with "
+"surcharges.Track employees who perform duties of combined positions with "
+"surcharges.Track employees who perform duties of combined positions with "
+"surcharges."
 msgstr ""
 
 #. module: l10n_ua_hr_contract
@@ -1375,8 +1436,8 @@ msgstr "напр., п. 1, п. 2"
 
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
-msgid "Випробувальний термін"
-msgstr ""
+msgid "Probation"
+msgstr "Випробувальний термін"
 
 #. module: l10n_ua_hr_contract
 #: model:hr.termination.reason,name:l10n_ua_hr_contract.termination_reason_retirement
@@ -1485,8 +1546,8 @@ msgstr ""
 
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
-msgid "Накази"
-msgstr ""
+msgid "Orders"
+msgstr "Накази"
 
 #. module: l10n_ua_hr_contract
 #: model:hr.termination.reason,name:l10n_ua_hr_contract.termination_reason_incompetence
@@ -1555,13 +1616,8 @@ msgstr ""
 
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
-msgid "Умови праці"
-msgstr ""
-
-#. module: l10n_ua_hr_contract
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
-msgid "Штатний розпис"
-msgstr ""
+msgid "Working Conditions"
+msgstr "Умови праці"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_resource_calendar__ua_code
@@ -1581,8 +1637,8 @@ msgstr "Тип графіка (UA)"
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,help:l10n_ua_hr_contract.field_resource_calendar__ua_schedule_type
 msgid ""
-"Ukrainian classification of the working-time regime. Independent of the core "
-"schedule_type, which only states whether the hours are fixed or flexible."
+"Ukrainian classification of the working-time regime. Independent of the core"
+" schedule_type, which only states whether the hours are fixed or flexible."
 msgstr ""
 "Українська класифікація режиму робочого часу. Не пов'язана зі штатним "
 "schedule_type, який лише вказує, фіксовані години чи гнучкі."
@@ -1596,3 +1652,66 @@ msgstr "Скорочена тривалість робочого часу за �
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.resource_calendar_form_ua
 msgid "Українська локалізація"
 msgstr "Українська локалізація"
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/migrations/19.0.7.0.0/post-migrate.py:0
+msgid ""
+"Staffing table: the version of %(date)s used to point at the line "
+"\"%(line)s\", which disagrees with the card (%(fields)s). The job and the "
+"department on the card were left as they are: they are what orders and the "
+"P-2 card print. Please check that this is what you expect."
+msgstr ""
+"Штатний розпис: версія від %(date)s вказувала на рядок «%(line)s», який не "
+"збігається з карткою (%(fields)s). Посаду й підрозділ у картці залишено без "
+"змін — саме їх друкують накази та картка П-2. Перевірте, чи це очікуваний "
+"стан."
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/migrations/19.0.7.0.0/post-migrate.py:0
+msgid "department"
+msgstr "відділ"
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/migrations/19.0.7.0.0/post-migrate.py:0
+msgid "job"
+msgstr "посада"
+
+#. module: l10n_ua_hr_contract
+#. odoo-python
+#: code:addons/l10n_ua_hr_contract/migrations/19.0.7.0.0/post-migrate.py:0
+msgid ""
+"Staffing table: the line \"%(line)s\" of %(date)s was not carried over to "
+"the card because of a company mismatch on: %(fields)s. The position was left"
+" as it is — fix the staffing table, then set the position by hand."
+msgstr ""
+"Штатний розпис: рядок «%(line)s» від %(date)s не перенесено в картку через "
+"невідповідність компанії: %(fields)s. Позицію залишено як є — виправте "
+"штатний розпис і вкажіть посаду вручну."
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__staffing_line_start
+msgid "Staffing Line Start"
+msgstr "Рядок розпису від"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__staffing_state
+msgid "Staffing Line Status"
+msgstr "Стан рядка розпису"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__staffing_currency_id
+msgid "Staffing Currency"
+msgstr "Валюта розпису"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__staffing_salary_min
+msgid "Staffing Minimum Salary"
+msgstr "Мінімальний оклад за розписом"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__staffing_salary_max
+msgid "Staffing Maximum Salary"
+msgstr "Максимальний оклад за розписом"

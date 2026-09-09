@@ -76,11 +76,15 @@ class HrSalaryAdvance(models.Model):
         store=True, readonly=True,
     )
 
+    # `staffing_line_id.salary` is no longer a dependency: the field is
+    # computed and not stored, so the ORM has no column to walk the path back
+    # through. The fallback in the method body stays; only the moment of
+    # recomputation changes - draft advances are refreshed when the run
+    # regenerates them, and confirmed ones must not change retroactively.
     @api.depends(
         'employee_id', 'wage_percent', 'date',
         'employee_id.current_version_id.wage',
         'employee_id.current_version_id.salary_currency_id',
-        'employee_id.current_version_id.staffing_line_id.salary',
     )
     def _compute_gross_amount(self):
         for advance in self:
@@ -91,10 +95,25 @@ class HrSalaryAdvance(models.Model):
                     # Курс — на дату виплати авансу: аванс середини місяця й
                     # зарплата в кінці рахуються кожне за своїм.
                     wage = version._l10n_ua_wage_in_company_currency(advance.date)
-                    if not wage and version.staffing_line_id:
-                        # Штатний розпис ведеться у валюті компанії, тож
-                        # перераховувати тут нема чого.
-                        wage = version.staffing_line_id.salary or 0.0
+                    # Same gate as the payslip (`_get_effective_wage`). Where
+                    # a company has turned the fallback off, the payslip
+                    # calculates zero; paying an advance from the staffing
+                    # table anyway would leave that payslip deducting an
+                    # advance it never earned.
+                    setting = (advance.company_id
+                               or version.company_id).wage_from_staffing
+                    if not wage and (setting or 'both') in ('fallback', 'both'):
+                        # The staffing table is asked about the payment
+                        # date too, not read off the version, which answers
+                        # for today. It converts its own money as well: the
+                        # line names a currency of its own, and the advance is
+                        # denominated in the company's.
+                        staffing = self.env['hr.staffing.table'].with_company(
+                            version.company_id)._resolve(
+                                version.company_id, version.department_id,
+                                version.job_id, advance.date)
+                        wage = staffing._salary_in_company_currency(
+                            advance.date) if staffing else 0.0
             advance.gross_amount = round(wage * advance.wage_percent / 100, 2)
 
     @api.depends(

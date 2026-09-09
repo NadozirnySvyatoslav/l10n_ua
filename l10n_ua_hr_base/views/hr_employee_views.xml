@@ -98,10 +98,11 @@
                             <field name="job_hazard_class" string="Клас шкідливості"
                                    invisible="job_work_conditions == 'normal'"/>
                         </group>
-                        <group string="Оплата за посадою">
-                            <field name="job_min_salary" string="Мін. ставка"/>
-                            <field name="job_max_salary" string="Макс. оклад"/>
-                        </group>
+                        <!-- The "Position pay" group was removed: the range of
+                             the job catalogue duplicated the staffing table
+                             range, which is now shown on the Work tab and is
+                             the only one the wage check looks at. The fields
+                             themselves stay on hr.job. -->
                     </group>
                     <group>
                         <group string="Стаж роботи">

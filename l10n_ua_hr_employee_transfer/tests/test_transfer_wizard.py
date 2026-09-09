@@ -171,7 +171,11 @@ class TestEmployeeTransfer(TransactionCase):
         self.assertEqual(new_employee.work_email, 'ivan@example.com')
         self.assertEqual(new_employee.private_phone, '+380931112233')
         self.assertEqual(new_employee.private_email, 'ivan.private@example.com')
-        self.assertEqual(new_employee.job_title, 'Інженер')
+        # The job title follows the NEW position instead of being carried over:
+        # copying it would freeze "Інженер" on a card whose job_id — and every
+        # printed order — says "Target Job".
+        self.assertEqual(new_employee.job_id, self.job_b)
+        self.assertEqual(new_employee.job_title, 'Target Job')
 
     def test_documents_not_copied_when_flag_off(self):
         wizard = self._make_wizard(copy_documents=False)

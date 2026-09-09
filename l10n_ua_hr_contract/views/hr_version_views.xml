@@ -26,6 +26,45 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="priority">60</field>
         <field name="arch" type="xml">
+            <!-- The staffing line sits right under the position it is derived
+                 from: the position is entered once, and the line, its salary
+                 and its occupancy are read next to it without switching tabs.
+                 Everything here is readonly - only the position is edited. -->
+            <xpath expr="//field[@name='job_title']" position="after">
+                <field name="staffing_line_id" invisible="1"/>
+                <field name="staffing_currency_id" invisible="1"/>
+                <!-- The empty state is carried by a second label rather than a
+                     span: text of an inline element standing among <field>
+                     siblings is extracted together with its markup, so it
+                     never matches a plain msgid. `string` always does. -->
+                <label for="staffing_line_start" string="Staffing Version"
+                       invisible="not staffing_line_id"/>
+                <label for="staffing_line_start" string="Outside the staffing table"
+                       invisible="staffing_line_id"/>
+                <!-- The row itself is always rendered, empty or not: a visible
+                     <label> claims the label cell of the group, so hiding its
+                     partner would shift every following cell by one and break
+                     the pairing of the fields below. -->
+                <div class="o_row">
+                    <field name="staffing_line_start" readonly="1" class="oe_inline"
+                           invisible="not staffing_line_id"/>
+                    <label for="staffing_state" string="Status:" class="oe_inline"
+                           invisible="not staffing_line_id"/>
+                    <field name="staffing_state" readonly="1" class="oe_inline"
+                           invisible="not staffing_line_id"/>
+                </div>
+                <field name="staffing_salary" string="Staffing Salary" readonly="1"
+                       invisible="not staffing_line_id"/>
+                <label for="staffing_salary_min" string="Salary Range"
+                       invisible="not staffing_salary_min and not staffing_salary_max"/>
+                <div class="o_row"
+                     invisible="not staffing_salary_min and not staffing_salary_max">
+                    <field name="staffing_salary_min" readonly="1" class="oe_inline"/>
+                    <span>-</span>
+                    <field name="staffing_salary_max" readonly="1" class="oe_inline"/>
+                </div>
+                <field name="tariff_grade_id"/>
+            </xpath>
             <!-- Add Ukrainian contract fields after standard contract_type_id -->
             <xpath expr="//field[@name='contract_type_id']" position="after">
                 <field name="contract_type_ua" string="UA Contract Type" placeholder="UA Contract Type"/>
@@ -46,15 +85,20 @@
             <!-- Add consolidated Ukrainian contract page -->
             <xpath expr="//page[@name='hr_settings']" position="before">
                 <page string="UA: Контракт" name="ua_contract" groups="hr.group_hr_user">
+                    <!-- work_schedule_ua_id прибрано (#213): графік роботи
+                         живе у штатному resource_calendar_id на вкладці
+                         «Робоча інформація».
+                         The "Staffing" group moved to the Work tab, next to
+                         the position it is derived from. -->
                     <group>
-                        <!-- work_schedule_ua_id прибрано (#213): графік роботи
-                             живе у штатному resource_calendar_id на вкладці
-                             «Робоча інформація». -->
-                        <group string="Штатний розпис">
-                            <field name="staffing_line_id"/>
-                            <field name="tariff_grade_id"/>
+                        <group string="Orders">
+                            <field name="hire_order_number"/>
+                            <field name="hire_order_date"/>
+                            <field name="termination_order_number"/>
+                            <field name="termination_order_date"/>
+                            <field name="termination_reason_ua_id"/>
                         </group>
-                        <group string="Умови праці">
+                        <group string="Working Conditions">
                             <field name="work_conditions"/>
                             <field name="work_conditions_class" invisible="work_conditions == 'normal'"/>
                             <field name="work_conditions_subclass" invisible="work_conditions == 'normal'"/>
@@ -63,14 +107,7 @@
                         </group>
                     </group>
                     <group>
-                        <group string="Накази">
-                            <field name="hire_order_number"/>
-                            <field name="hire_order_date"/>
-                            <field name="termination_order_number"/>
-                            <field name="termination_order_date"/>
-                            <field name="termination_reason_ua_id"/>
-                        </group>
-                        <group string="Випробувальний термін">
+                        <group string="Probation">
                             <field name="probation_period_days"/>
                             <field name="probation_end_date"/>
                         </group>

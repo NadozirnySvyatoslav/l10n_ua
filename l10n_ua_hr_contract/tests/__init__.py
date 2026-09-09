@@ -10,3 +10,4 @@ from . import test_resource_calendar_multicompany
 from . import test_scheduled_norm
 from . import test_multicompany
 from . import test_work_schedule_removed
+from . import test_staffing_resolution
