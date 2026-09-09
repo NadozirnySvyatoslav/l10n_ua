@@ -208,52 +208,272 @@ class HrStaffingTable(models.Model):
         for record in self:
             record.total_salary_fund = record.units * record.salary
 
-    @api.depends(
-        'department_id', 
-        'job_id', 
-        'state',
-        'job_id.employee_ids',
-        'job_id.employee_ids.department_id',
-        'job_id.employee_ids.active',
-        'job_id.employee_ids.current_version_id'
-    )
+    @api.depends('state', 'company_id', 'department_id', 'job_id',
+                 'date_from', 'date_to')
     def _compute_filled_units(self):
-        for record in self:
-            if record.state == 'approved' and record.department_id and record.job_id:
-                employees = self.env['hr.employee'].search([
-                    ('department_id', '=', record.department_id.id),
-                    ('job_id', '=', record.job_id.id),
-                    ('active', '=', True),
-                ])
-                # Sum work_rate for all employees (0.5 for part-time, 1.0 for full-time)
-                total_rate = 0.0
-                for emp in employees:
-                    version = emp.current_version_id
-                    # `work_rate` додає l10n_ua_hr_contract, який залежить
-                    # від цього модуля, а не навпаки — тож поля може не бути.
-                    if version and 'work_rate' in version._fields and version.work_rate:
-                        total_rate += version.work_rate
-                    else:
-                        total_rate += 1.0  # Default full-time
-                # Суміщення (сумісництво) споживає свою частку штатної одиниці
-                # цієї посади нарівні з основними працівниками (#149).
-                Combining = self.env.get('hr.job.combining')
-                if Combining is not None:
-                    combinings = Combining.search([
-                        ('combined_department_id', '=', record.department_id.id),
-                        ('combined_job_id', '=', record.job_id.id),
-                        ('state', '=', 'active'),
-                    ])
-                    total_rate += sum(
-                        c.combined_rate or 0.0 for c in combinings)
-                record.filled_units = total_rate
-            else:
-                record.filled_units = 0.0
+        """Staff units held during this line's own period, not today.
+
+        A position keeps a history of approved lines, each in force from its
+        own date until the next one starts. Asking every one of them who holds
+        the post *now* gave the 2023 line the occupancy of 2026: the number was
+        right only on the line currently in force, and a staffing table printed
+        for a past period carried somebody else's figures.
+
+        The date a line is measured on mirrors `_reference_date`, which answers
+        the same question from the other end, for a version:
+
+        * a period that has closed is measured on its last day — a fact that
+          does not move any more;
+        * a line in force, or one that has yet to start, is measured on today
+          or on the day it takes effect, whichever comes later.
+
+        No `sudo()` here, and none is needed: the field is stored, so
+        `compute_sudo` defaults to True (`odoo/orm/fields.py`, `_setup_attrs`)
+        and the whole compute already runs elevated. That is also why the
+        domains below state `company_id` by hand — under superuser there is no
+        record rule left to keep companies apart.
+        """
+        countable = self.filtered(
+            lambda line: line.state == 'approved' and line.company_id
+            and line.department_id and line.job_id and line.date_from)
+        (self - countable).filled_units = 0.0
+        if not countable:
+            return
+
+        today = fields.Date.context_today(self)
+        keys = {}
+        for line in countable:
+            date_end = line.date_end
+            ref_date = date_end if date_end and date_end < today \
+                else max(line.date_from, today)
+            keys[line.id] = (line.company_id.id, line.department_id.id,
+                             line.job_id.id, ref_date)
+
+        occupancy = self._occupancy_batch(list(keys.values()))
+        for line in countable:
+            line.filled_units = occupancy.get(keys[line.id], 0.0)
 
     @api.depends('units', 'filled_units')
     def _compute_vacant_units(self):
         for record in self:
             record.vacant_units = max(0.0, record.units - record.filled_units)
+
+    # === Occupancy ===
+    # Who holds a position on a given date. The mirror of the resolution
+    # below: that one asks which line a version falls under, this one which
+    # versions fall under a line. They are not inverses of each other, and
+    # must not be collapsed into one — a version whose period spans two
+    # revisions of the staffing table is paid by exactly one of them, but
+    # occupies both in turn.
+
+    @api.model
+    def _occupancy_batch(self, keys):
+        """Staff units held, per (company, department, job, date).
+
+        Keys carry ids, not recordsets, so they stay hashable — the same shape
+        `_resolve_batch` takes. One pass serves the whole batch: the caller is
+        a computed field read down a list view, where a query per line would
+        be felt at once.
+        """
+        keys = [key for key in keys if all(key)]
+        if not keys:
+            return {}
+        totals = dict.fromkeys(keys, 0.0)
+        for source in (self._occupancy_from_versions,
+                       self._occupancy_from_combinings):
+            for key, rate in source(keys).items():
+                totals[key] += rate
+        return totals
+
+    @api.model
+    def _occupancy_from_versions(self, keys):
+        """Employees holding each position on its date, read from hr.version.
+
+        Never from `hr.employee`: `department_id`, `job_id` and `active` on the
+        card are delegated to the version in force *now*
+        (`hr.employee._inherits`), so they cannot answer for 2023 at all, and
+        `current_version_id` behind them is only refreshed by a daily cron.
+
+        Two queries. The first finds who ever held these positions; the second
+        reads the whole timeline of those people, because which version is in
+        force on a date is only known once the later ones are known too — an
+        employee moved to another post in June must not still be counted on
+        the old one in December.
+        """
+        Version = self.env['hr.version'].with_context(active_test=False)
+        last_date = max(key[3] for key in keys)
+        holders = Version.search([
+            ('employee_id', '!=', False),
+            ('company_id', 'in', list({key[0] for key in keys})),
+            ('department_id', 'in', list({key[1] for key in keys})),
+            ('job_id', 'in', list({key[2] for key in keys})),
+            ('date_version', '<=', last_date),
+        ])
+        if not holders:
+            return {}
+
+        # Only the columns needed. Reading fields off a searched recordset
+        # makes the ORM fetch every stored field of hr.version — over a
+        # hundred of them — for every version of every employee involved.
+        columns = ['employee_id', 'company_id', 'department_id', 'job_id',
+                   'date_version', 'contract_date_start', 'contract_date_end',
+                   'departure_date']
+        if 'work_rate' in Version._fields:
+            # Added by l10n_ua_hr_contract, which depends on this module and
+            # not the other way round, so the column may be absent.
+            columns.append('work_rate')
+        employees = holders.employee_id
+        rows = Version.search_read(
+            [('employee_id', 'in', employees.ids),
+             ('date_version', '<=', last_date)],
+            columns, order='date_version, id')
+        # Safety net for broken data, the same one the headcount report keeps:
+        # an archived employee with no end date anywhere was archived by hand,
+        # bypassing both the dismissal order and core's departure wizard. There
+        # is no telling when they actually left, so they are dropped rather
+        # than left occupying the post for ever.
+        archived = set(self.env['hr.employee'].with_context(
+            active_test=False).search([
+                ('id', 'in', employees.ids), ('active', '=', False)]).ids)
+
+        timelines = defaultdict(list)
+        # A departure is a fact about the person, not about a version: it is
+        # written through the employee card, so it lands on whichever version
+        # was current that day and is empty on all the others. Kept as the
+        # fallback for legacy dismissals that never reached
+        # `contract_date_end`, the same way the headcount report does it.
+        departures = {}
+        for row in rows:
+            employee = row['employee_id'][0]
+            timelines[employee].append(row)
+            departure = row['departure_date']
+            if departure:
+                previous = departures.get(employee)
+                if not previous or departure > previous:
+                    departures[employee] = departure
+
+        wanted = set(keys)
+        totals = defaultdict(float)
+        for ref_date in {key[3] for key in keys}:
+            for employee, timeline in timelines.items():
+                in_force = None
+                for row in timeline:  # ordered by date_version ascending
+                    if row['date_version'] > ref_date:
+                        break
+                    in_force = row
+                if in_force is None:
+                    continue
+                start = in_force['contract_date_start']
+                if start and start > ref_date:
+                    continue
+                end = in_force['contract_date_end'] or departures.get(employee)
+                if end and end < ref_date:
+                    continue
+                if not end and employee in archived:
+                    continue
+                key = (in_force['company_id'] and in_force['company_id'][0],
+                       in_force['department_id'] and in_force['department_id'][0],
+                       in_force['job_id'] and in_force['job_id'][0],
+                       ref_date)
+                if key in wanted:
+                    # `work_rate` defaults to 1.0, so a falsy one is missing
+                    # data rather than an unpaid post.
+                    totals[key] += in_force.get('work_rate') or 1.0
+        return totals
+
+    @api.model
+    def _occupancy_from_combinings(self, keys):
+        """Combined posts consume their share of the unit (#149).
+
+        Dated like everything else here, so a combination that ran in 2023 is
+        counted on the 2023 line and not on today's. One gap stays: cancelling
+        a combination stamps no end date on it, so a cancelled one drops out of
+        every date at once rather than out of the dates after the cancellation.
+        Recording that would change what `action_cancel` writes, which belongs
+        to the module owning the model.
+        """
+        Combining = self.env.get('hr.job.combining')
+        if Combining is None:
+            return {}
+        ref_dates = {key[3] for key in keys}
+        combinings = Combining.search([
+            ('company_id', 'in', list({key[0] for key in keys})),
+            ('combined_department_id', 'in', list({key[1] for key in keys})),
+            ('combined_job_id', 'in', list({key[2] for key in keys})),
+            ('state', '=', 'active'),
+            ('date_from', '<=', max(ref_dates)),
+        ])
+
+        wanted = set(keys)
+        totals = defaultdict(float)
+        for combining in combinings:
+            for ref_date in ref_dates:
+                if combining.date_from > ref_date:
+                    continue
+                if combining.date_to and combining.date_to < ref_date:
+                    continue
+                key = (combining.company_id.id,
+                       combining.combined_department_id.id,
+                       combining.combined_job_id.id, ref_date)
+                if key in wanted:
+                    totals[key] += combining.combined_rate or 0.0
+        return totals
+
+    def _positions(self):
+        """The (company, department, job) triples these lines describe."""
+        return {(line.company_id.id, line.department_id.id, line.job_id.id)
+                for line in self}
+
+    @api.model
+    def _recompute_occupancy(self, positions):
+        """Queue `filled_units` on every line of these positions.
+
+        There is no `@api.depends` path from a staffing line to the versions
+        that occupied it: `hr.job.employee_ids` reaches only the people whose
+        *current* post this is, so a 2023 version belonging to somebody who has
+        since moved on is invisible to the dependency graph. Whoever changes
+        such a version says so here instead.
+
+        `add_to_compute` rather than calling the compute directly. A direct
+        call runs under the writer's own rights and stores what it produces,
+        and this count is made of `contract_date_*`, which core keeps behind
+        hr.group_hr_manager — an HR officer issuing an order would get an
+        AccessError. Going through the ORM gets the `compute_sudo` a stored
+        field is entitled to.
+        """
+        positions = {position for position in positions if all(position)}
+        if not positions:
+            return
+        self.search([
+            ('company_id', 'in', list({position[0] for position in positions})),
+            ('department_id', 'in', list({position[1] for position in positions})),
+            ('job_id', 'in', list({position[2] for position in positions})),
+        ]).filtered(
+            lambda line: (line.company_id.id, line.department_id.id,
+                          line.job_id.id) in positions
+        )._mark_occupancy_dirty()
+
+    def _mark_occupancy_dirty(self):
+        """Queue the occupancy pair on these lines for recomputation.
+
+        Both fields, not `filled_units` alone: `add_to_compute` marks exactly
+        what it is given, and a dependent stored field is only dragged along
+        when its source is *written*. Queueing the first by itself left
+        `vacant_units` to be read straight back from the column, which still
+        held the figure from before.
+
+        `date_end` is dropped from the cache in the same breath. It is not
+        stored, and it depends on the sibling lines of the position rather
+        than on anything of this record's own, so approving a line next to
+        these ones leaves the cached value of the older one still claiming its
+        period is open — and the occupancy would then be measured on today
+        instead of on the day the period actually closed.
+        """
+        if not self:
+            return
+        self.invalidate_recordset(['date_end'])
+        for name in ('filled_units', 'vacant_units'):
+            self.env.add_to_compute(self._fields[name], self)
 
     # === Resolution ===
     # A position is identified by (company, department, job); which line of the
@@ -415,9 +635,18 @@ class HrStaffingTable(models.Model):
                     raise ValidationError('Standard salary cannot exceed maximum salary!')
 
 
+    # Fields whose change moves a period, and therefore the date every line of
+    # the position is measured on: a new approved line ends the one before it,
+    # so its neighbours have to be counted again as well.
+    _PERIOD_FIELDS = frozenset({
+        'state', 'date_from', 'date_to',
+        'company_id', 'department_id', 'job_id',
+    })
+
     @api.model_create_multi
     def create(self, vals_list):
         lines = super().create(vals_list)
+        self._recompute_occupancy(lines._positions())
         lines._warn_retroactive_change()
         lines._warn_discontinued_while_occupied()
         return lines
@@ -435,7 +664,11 @@ class HrStaffingTable(models.Model):
             if record.state == 'approved'
             and record.date_from and record.date_from < today
         } if 'date_from' in vals else ()
+        moves_period = not self._PERIOD_FIELDS.isdisjoint(vals)
+        positions = self._positions() if moves_period else set()
         result = super().write(vals)
+        if moves_period:
+            self._recompute_occupancy(positions | self._positions())
 
         # Only the fields that decide a salary. Staff units and the range do
         # not reach a payslip — warning about them would say something untrue
