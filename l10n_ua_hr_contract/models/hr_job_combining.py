@@ -157,25 +157,26 @@ class HrJobCombining(models.Model):
                     'Частка ставки суміщення має бути в межах (0; 1].')
 
     def _recompute_staffing(self):
-        """Перерахувати заповнення штатних одиниць суміщуваних посад.
+        """Have the staffing table count the combined positions again.
 
-        filled_units штатного розпису шукає працівників динамічно (не через
-        збережений зв'язок), тож зміну стану суміщення треба явно
-        відобразити на відповідних рядках розпису.
+        `filled_units` has no `@api.depends` path to a combination, so a
+        change of state has to be reported here by hand.
+
+        Through `add_to_compute`, not by calling the compute directly. The
+        direct call runs under the rights of whoever is writing and stores
+        what it produces, and the count reads `contract_date_*`, which core
+        keeps behind hr.group_hr_manager: an officer without that group would
+        get an AccessError where everything used to work quietly. Going
+        through the ORM gets the field the `compute_sudo` it is entitled to.
         """
         Staffing = self.env.get('hr.staffing.table')
         if Staffing is None:
             return
-        for record in self:
-            if not (record.combined_department_id and record.combined_job_id):
-                continue
-            lines = Staffing.search([
-                ('department_id', '=', record.combined_department_id.id),
-                ('job_id', '=', record.combined_job_id.id),
-            ])
-            if lines:
-                lines._compute_filled_units()
-                lines._compute_vacant_units()
+        Staffing._recompute_occupancy({
+            (record.company_id.id, record.combined_department_id.id,
+             record.combined_job_id.id)
+            for record in self
+        })
 
     @api.onchange('employee_id')
     def _onchange_employee_id(self):

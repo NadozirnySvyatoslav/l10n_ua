@@ -1057,6 +1057,19 @@ class HrEmployee(models.Model):
         res = super().write(vals)
         if not REGISTRATION_SYNC_TRIGGERS.isdisjoint(vals):
             self._sync_registration_address_from_private()
+        if 'active' in vals:
+            # Archiving somebody who carries no end date on any version takes
+            # them out of the occupancy count (see
+            # `hr.staffing.table._occupancy_from_versions`), and that count is
+            # stored. No `@api.depends` reaches it: the positions concerned are
+            # the ones this person's versions name, including the ones they
+            # have long since left.
+            self.env['hr.staffing.table']._recompute_occupancy({
+                (version.company_id.id, version.department_id.id,
+                 version.job_id.id)
+                for version in self.with_context(
+                    active_test=False).version_ids
+            })
         return res
 
     def _sync_registration_address_from_private(self):

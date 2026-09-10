@@ -112,14 +112,57 @@ class HrVersion(models.Model):
             and version.employee_id.current_version_id == version)
         current.employee_id._sync_registration_address_from_private()
 
+    # Fields that decide whether a version occupies a staffing position, and
+    # on which dates. `work_rate` is declared by l10n_ua_hr_contract, which
+    # depends on this module; naming it here costs nothing when it is absent,
+    # since this is only ever matched against the keys of a write.
+    _STAFFING_OCCUPANCY_FIELDS = frozenset({
+        'company_id', 'department_id', 'job_id', 'employee_id', 'active',
+        'date_version', 'contract_date_start', 'contract_date_end',
+        'departure_date', 'work_rate',
+    })
+
+    def _staffing_positions(self):
+        return {(version.company_id.id, version.department_id.id,
+                 version.job_id.id) for version in self}
+
+    def _touch_staffing_occupancy(self, previous=()):
+        """Have the staffing table count this position again.
+
+        `hr.staffing.table.filled_units` is stored and has no `@api.depends`
+        path back to here: a line of 2023 is occupied by versions of people
+        who may since have moved elsewhere, and no relation on the line leads
+        to them. So the writer says so, for the position as it was and as it
+        now is — moving somebody between two posts empties one and fills the
+        other.
+
+        Nothing is elevated on the way: `company_id`, `department_id` and
+        `job_id` carry no `groups` of their own, and the recount itself runs
+        through `add_to_compute`, which lets the ORM give the stored field the
+        `compute_sudo` it is entitled to.
+        """
+        self.env['hr.staffing.table']._recompute_occupancy(
+            set(previous) | self._staffing_positions())
+
     @api.model_create_multi
     def create(self, vals_list):
         versions = super().create(vals_list)
         versions._sync_ua_registration_address()
+        versions._touch_staffing_occupancy()
         return versions
 
     def write(self, vals):
+        touches_occupancy = not self._STAFFING_OCCUPANCY_FIELDS.isdisjoint(vals)
+        previous = self._staffing_positions() if touches_occupancy else ()
         res = super().write(vals)
         if not REGISTRATION_ADDRESS_MAP.keys().isdisjoint(vals):
             self._sync_ua_registration_address()
+        if touches_occupancy:
+            self._touch_staffing_occupancy(previous)
         return res
+
+    def unlink(self):
+        previous = self._staffing_positions()
+        result = super().unlink()
+        self.env['hr.staffing.table']._recompute_occupancy(previous)
+        return result
