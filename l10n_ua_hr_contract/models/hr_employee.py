@@ -4,31 +4,43 @@ from odoo import models, fields, api
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    # Related fields from current_version_id for form display
+    # UA version fields on the card, in the core pattern: related through
+    # `version_id`, the delegation target (`_inherits = {'hr.version':
+    # 'version_id'}`), never through `current_version_id`.
+    #
+    # `version_id` is a compute with `@api.depends_context('version_id')`:
+    # the versions timeline widget puts the version being looked at into the
+    # context, and the whole card follows it. Pointed at `current_version_id`
+    # instead, these fields kept showing today's version while the native
+    # ones switched — and an edit made in that state was written to today's
+    # version rather than the one on screen.
+    #
+    # The groups are stated even though a related field already borrows them
+    # from its target (`Field._related_groups`), so deleting these declarations
+    # would not have opened the fields up. They are written out because core
+    # asks for it on every version field carrying a group
+    # (`addons/hr/models/hr_employee.py:178`) and because `hr.tests.
+    # TestPayrollFieldsAccess.test_related_fields_on_version` reads them off the
+    # declaration: a group that only exists by inheritance is a group nobody
+    # sees when reading this file. They mirror `hr.version` one for one.
     contract_type_ua = fields.Selection(
-        related='current_version_id.contract_type_ua',
-        readonly=False
-    )
+        related='version_id.contract_type_ua', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     is_main_workplace = fields.Boolean(
-        related='current_version_id.is_main_workplace',
-        readonly=False
-    )
+        related='version_id.is_main_workplace', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     is_part_time = fields.Boolean(
-        related='current_version_id.is_part_time',
-        readonly=False
-    )
+        related='version_id.is_part_time', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     part_time_type = fields.Selection(
-        related='current_version_id.part_time_type',
-        readonly=False
-    )
+        related='version_id.part_time_type', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     work_mode = fields.Selection(
-        related='current_version_id.work_mode',
-        readonly=False
-    )
+        related='version_id.work_mode', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     work_rate = fields.Float(
-        related='current_version_id.work_rate',
-        readonly=False
-    )
+        related='version_id.work_rate', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     # Derived from department_id + job_id, so no longer writable from the card:
     # the position is entered once, in the native "Job Position" field.
     #
@@ -139,72 +151,60 @@ class HrEmployee(models.Model):
         resolved = Staffing._resolve_batch(list(keys.values()))
         for employee in self:
             employee.staffing_line_id = resolved.get(keys[employee.id], False)
-    tariff_grade_id = fields.Many2one(
-        related='current_version_id.tariff_grade_id',
-        readonly=False
-    )
-    work_conditions = fields.Selection(
-        related='current_version_id.work_conditions',
-        readonly=False
-    )
-    work_conditions_class = fields.Integer(
-        related='current_version_id.work_conditions_class',
-        readonly=False
-    )
-    work_conditions_subclass = fields.Integer(
-        related='current_version_id.work_conditions_subclass',
-        readonly=False
-    )
-    additional_vacation_days = fields.Integer(
-        related='current_version_id.additional_vacation_days',
-        readonly=False
-    )
-    diia_city_employee = fields.Boolean(
-        related='current_version_id.diia_city_employee',
-        readonly=False
-    )
-    hire_order_number = fields.Char(
-        related='current_version_id.hire_order_number',
-        readonly=False
-    )
-    hire_order_date = fields.Date(
-        related='current_version_id.hire_order_date',
-        readonly=False
-    )
-    termination_order_number = fields.Char(
-        related='current_version_id.termination_order_number',
-        readonly=False
-    )
-    termination_order_date = fields.Date(
-        related='current_version_id.termination_order_date',
-        readonly=False
-    )
-    termination_reason_ua_id = fields.Many2one(
-        related='current_version_id.termination_reason_ua_id',
-        readonly=False
-    )
-    probation_period_days = fields.Integer(
-        related='current_version_id.probation_period_days',
-        readonly=False
-    )
-    probation_end_date = fields.Date(
-        related='current_version_id.probation_end_date',
-        readonly=False
-    )
 
-    # One2many fields through current version
+    tariff_grade_id = fields.Many2one(
+        related='version_id.tariff_grade_id', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    work_conditions = fields.Selection(
+        related='version_id.work_conditions', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    work_conditions_class = fields.Integer(
+        related='version_id.work_conditions_class', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    work_conditions_subclass = fields.Integer(
+        related='version_id.work_conditions_subclass', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    # No `readonly=False` on this one and on probation_end_date: both are
+    # stored computes on hr.version. Offering them for editing on the card
+    # only invited a value the next recompute would silently drop.
+    additional_vacation_days = fields.Integer(
+        related='version_id.additional_vacation_days', inherited=True,
+        groups="hr.group_hr_user")
+    diia_city_employee = fields.Boolean(
+        related='version_id.diia_city_employee', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    hire_order_number = fields.Char(
+        related='version_id.hire_order_number', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    hire_order_date = fields.Date(
+        related='version_id.hire_order_date', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    termination_order_number = fields.Char(
+        related='version_id.termination_order_number', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    termination_order_date = fields.Date(
+        related='version_id.termination_order_date', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    termination_reason_ua_id = fields.Many2one(
+        related='version_id.termination_reason_ua_id', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    probation_period_days = fields.Integer(
+        related='version_id.probation_period_days', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
+    probation_end_date = fields.Date(
+        related='version_id.probation_end_date', inherited=True,
+        groups="hr.group_hr_user")
+
+    # One2many fields of the version being looked at.
     allowance_ids = fields.One2many(
-        related='current_version_id.allowance_ids',
-        readonly=False
-    )
+        related='version_id.allowance_ids', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     salary_change_ids = fields.One2many(
-        related='current_version_id.salary_change_ids',
-        readonly=False
-    )
+        related='version_id.salary_change_ids', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
     amendment_ids = fields.One2many(
-        related='current_version_id.amendment_ids',
-        readonly=False
-    )
+        related='version_id.amendment_ids', inherited=True,
+        readonly=False, groups="hr.group_hr_user")
 
     job_combining_ids = fields.One2many(
         'hr.job.combining',
