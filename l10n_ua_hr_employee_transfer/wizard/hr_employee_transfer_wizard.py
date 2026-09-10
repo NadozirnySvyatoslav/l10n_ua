@@ -137,6 +137,16 @@ class HrEmployeeTransferWizard(models.TransientModel):
         Курс береться на дату прийняття, а не на сьогодні: наказ можуть
         готувати заздалегідь, а рахуватись переведення має за днем, коли воно
         відбувається.
+
+        Оклад читається так само, як його читає розрахунковий листок: із
+        версії, а за її мовчання — зі штатного розпису. Для української
+        практики це не рідкісний випадок, а звичайний — оклад живе саме в
+        розписі, тож без фолбеку працівник переводився в нову організацію з
+        нулем, і мовчки: майстер показував 0, кадровик підтверджував наказ.
+
+        Ворота `wage_from_staffing` беруться з компанії-джерела: це її
+        політика оплати, і саме її оклад переїжджає. Компанія призначення про
+        нього ще нічого не вирішувала.
         """
         for wiz in self:
             src_version = wiz.source_employee_id.current_version_id
@@ -148,7 +158,8 @@ class HrEmployeeTransferWizard(models.TransientModel):
             # Спільний хелпер з l10n_ua_hr_base: він і кидає UserError, якщо
             # курсу немає. Мовчазне число тут гірше за зупинку — воно піде
             # у новий контракт.
-            amount = src_version._l10n_ua_wage_in_company_currency(date)
+            amount = src_version._l10n_ua_effective_wage(
+                date, company=wiz.source_company_id or src_version.company_id)
 
             source_currency = (src_version.company_id
                                or wiz.source_company_id).currency_id

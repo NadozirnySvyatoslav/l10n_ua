@@ -93,27 +93,17 @@ class HrSalaryAdvance(models.Model):
                 version = advance.employee_id.current_version_id
                 if version:
                     # Курс — на дату виплати авансу: аванс середини місяця й
-                    # зарплата в кінці рахуються кожне за своїм.
-                    wage = version._l10n_ua_wage_in_company_currency(advance.date)
-                    # Same gate as the payslip (`_get_effective_wage`). Where
-                    # a company has turned the fallback off, the payslip
-                    # calculates zero; paying an advance from the staffing
-                    # table anyway would leave that payslip deducting an
-                    # advance it never earned.
-                    setting = (advance.company_id
-                               or version.company_id).wage_from_staffing
-                    if not wage and (setting or 'both') in ('fallback', 'both'):
-                        # The staffing table is asked about the payment
-                        # date too, not read off the version, which answers
-                        # for today. It converts its own money as well: the
-                        # line names a currency of its own, and the advance is
-                        # denominated in the company's.
-                        staffing = self.env['hr.staffing.table'].with_company(
-                            version.company_id)._resolve(
-                                version.company_id, version.department_id,
-                                version.job_id, advance.date)
-                        wage = staffing._salary_in_company_currency(
-                            advance.date) if staffing else 0.0
+                    # зарплата в кінці рахуються кожне за своїм. За тією ж
+                    # датою питається і штатний розпис, коли на версії окладу
+                    # немає.
+                    #
+                    # Ворота `wage_from_staffing` — з компанії авансу. Там, де
+                    # компанія вимкнула фолбек, листок рахує нуль; аванс зі
+                    # штатного розпису лишив би той листок утримувати аванс,
+                    # якого він не нарахував.
+                    wage = version._l10n_ua_effective_wage(
+                        advance.date,
+                        company=advance.company_id or version.company_id)
             advance.gross_amount = round(wage * advance.wage_percent / 100, 2)
 
     @api.depends(

@@ -81,6 +81,51 @@ class HrVersion(models.Model):
         return currency._convert(
             wage, company_currency, company, date, round=False)
 
+    def _l10n_ua_effective_wage(self, date=None, company=None):
+        """Wage in company currency on `date`, with the staffing table behind it.
+
+        The version's own wage first; where it carries none — the usual case
+        in Ukrainian practice, where the salary lives in the staffing table and
+        not on the card — the position is asked instead.
+
+        The table is asked about `date` rather than read off
+        `staffing_line_id`: that field answers which position applies *now*,
+        while an advance, a payslip and a transfer order all ask which one
+        applied *then*.
+
+        `company` is whose policy decides whether the fallback is allowed at
+        all (`wage_from_staffing`), and it is not always the version's own: a
+        transfer between organisations reads the policy of the one the person
+        is leaving, since it is that company's pay that is being carried over.
+        It defaults to the version's company.
+
+        The line converts its own money, and this is why the two sources return
+        by separate routes. `_l10n_ua_wage_in_company_currency` uses the rate
+        of the currency the *version's* wage is denominated in, which says
+        nothing about a staffing line — and the fallback is reached precisely
+        when the version carries no wage, so that currency stands for nothing
+        at all.
+        """
+        self.ensure_one()
+        date = date or fields.Date.context_today(self)
+        wage = self._l10n_ua_wage_in_company_currency(date)
+        if wage:
+            return wage
+
+        company = company or self.company_id or self.env.company
+        if (company.wage_from_staffing or 'both') not in ('fallback', 'both'):
+            return 0.0
+
+        # `with_company`, not `sudo`: the staffing table is read through a rule
+        # on `company_id in company_ids`, that is, on the companies ticked in
+        # the switcher. Without this the wage would depend on what the officer
+        # happens to have selected and read zero for a company left out, where
+        # sudo would quietly answer for one they may not see at all.
+        staffing = self.env['hr.staffing.table'].with_company(
+            self.company_id or company)._resolve(
+                self.company_id, self.department_id, self.job_id, date)
+        return staffing._salary_in_company_currency(date) if staffing else 0.0
+
     @api.constrains('country_id')
     def _check_ua_military_citizenship(self):
         """Mirror of the employee-side check, from where nationality lives.
