@@ -156,6 +156,105 @@ class TestStaffingOccupancy(ContractTestCase):
         self.assertAlmostEqual(line_new.filled_units, 0.5)
         self.assertAlmostEqual(line_old.filled_units, 0.0)
 
+    def _combining(self, line, **kwargs):
+        """An active combination consuming part of `line`'s unit."""
+        employee = self._create_employee()
+        version = self._create_version(
+            employee=employee, date_version=date(2024, 1, 1),
+            contract_date_start=date(2024, 1, 1))
+        vals = {
+            'employee_id': employee.id,
+            'version_id': version.id,
+            'combined_job_id': line.job_id.id,
+            'combined_department_id': line.department_id.id,
+            'combined_rate': 0.5,
+            'date_from': date(2025, 3, 1),
+            'surcharge_type': 'percent',
+            'surcharge_percent': 50,
+            'order_number': 'HOOK-1',
+            'order_date': date(2025, 2, 25),
+        }
+        vals.update(kwargs)
+        combining = self.env['hr.job.combining'].create(vals)
+        combining.action_activate()
+        return combining
+
+    def test_editing_an_active_combination_recounts(self):
+        """The dates and the rate move the answer, so writing them recounts.
+
+        The two buttons used to be the only route into the recount, which left
+        every edit of an active combination invisible to a stored field no
+        `@api.depends` reaches.
+        """
+        line = self._line(date(2020, 1, 1))
+        combining = self._combining(line)
+        self.assertAlmostEqual(line.filled_units, 0.5)
+
+        combining.combined_rate = 0.25
+        self.assertAlmostEqual(line.filled_units, 0.25)
+
+        # Closed before today: the post is free again.
+        combining.date_to = date(2025, 12, 31)
+        self.assertAlmostEqual(line.filled_units, 0.0)
+
+        # Reopened, and starting only next year: not yet held.
+        combining.write({'date_to': False, 'date_from': date(2027, 1, 1)})
+        self.assertAlmostEqual(line.filled_units, 0.0)
+
+    def test_moving_a_combination_frees_the_post_it_left(self):
+        """Both posts are recounted: the one left and the one taken."""
+        third_job = self.env['hr.job'].create({
+            'name': 'Third position', 'company_id': self.company.id,
+            'department_id': self.department.id,
+        })
+        line = self._line(date(2020, 1, 1))
+        other = self._line(date(2020, 1, 1), job_id=third_job.id)
+        combining = self._combining(line)
+        self.assertAlmostEqual(line.filled_units, 0.5)
+        self.assertAlmostEqual(other.filled_units, 0.0)
+
+        combining.combined_job_id = third_job
+        self.assertAlmostEqual(line.filled_units, 0.0)
+        self.assertAlmostEqual(other.filled_units, 0.5)
+
+    def test_deleting_a_combination_recounts(self):
+        line = self._line(date(2020, 1, 1))
+        combining = self._combining(line)
+        self.assertAlmostEqual(line.filled_units, 0.5)
+
+        combining.unlink()
+        self.assertAlmostEqual(line.filled_units, 0.0)
+
+    def test_cancelled_combination_keeps_the_period_it_ran(self):
+        """Cancelling ends the combination; it does not erase it.
+
+        The line of 2020 closed on 2024-12-31, well inside the period the
+        combination ran, so it has to keep counting there after the
+        cancellation.
+        """
+        line_old = self._line(date(2020, 1, 1))
+        line_new = self._line(date(2025, 1, 1))
+        combining = self._combining(line_new, date_from=date(2024, 1, 1))
+        self.assertEqual(line_old.date_end, date(2024, 12, 31))
+        self.assertAlmostEqual(line_old.filled_units, 0.5)
+
+        combining.action_cancel()
+        self.assertEqual(combining.date_to, self.today)
+        # Still held on the day the old line closed...
+        self.assertAlmostEqual(line_old.filled_units, 0.5)
+        # ...and still held today, since the surcharge runs through date_to.
+        self.assertAlmostEqual(line_new.filled_units, 0.5)
+
+    def test_cancelled_before_it_started_never_counted(self):
+        """No end date can be stamped, and none is needed: it never ran."""
+        line = self._line(date(2020, 1, 1))
+        combining = self._combining(line, date_from=date(2027, 1, 1))
+        self.assertAlmostEqual(line.filled_units, 0.0)
+
+        combining.action_cancel()
+        self.assertFalse(combining.date_to)
+        self.assertAlmostEqual(line.filled_units, 0.0)
+
     def test_officer_without_manager_group_reads_the_field(self):
         """The count reads contract_date_*, guarded by hr.group_hr_manager.
 
