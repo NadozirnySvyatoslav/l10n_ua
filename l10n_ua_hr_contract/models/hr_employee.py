@@ -102,7 +102,11 @@ class HrEmployee(models.Model):
         string='Staffing Maximum Salary', compute='_compute_staffing_details',
         currency_field='staffing_currency_id', groups="hr.group_hr_user")
 
+    # `depends_context` again, for the same reason as on the line itself: a
+    # compute inherits nothing from what it depends on, so a field fed by a
+    # context-dependent one has to declare the context key of its own accord.
     @api.depends('staffing_line_id')
+    @api.depends_context('version_id')
     def _compute_staffing_details(self):
         for employee in self:
             line = employee.staffing_line_id
@@ -116,8 +120,9 @@ class HrEmployee(models.Model):
     @api.depends('company_id', 'department_id', 'job_id', 'date_version',
                  'contract_date_start', 'contract_date_end',
                  'version_ids.date_version')
+    @api.depends_context('version_id')
     def _compute_staffing_line_id(self):
-        """Staffing line of this employee's position, as of today.
+        """Staffing line of this employee's position, as of the version shown.
 
         Deliberately not `compute_sudo`. The reference date needs
         `contract_date_start` / `contract_date_end`, which core restricts to
@@ -130,6 +135,16 @@ class HrEmployee(models.Model):
         That buys a property a blanket sudo cannot: whatever the resolution
         returns, the reader is entitled to read. The fields fed from it can
         then be read plainly, with no risk of an access error on a form.
+
+        `depends_context('version_id')` because `date_version`, `job_id`,
+        `department_id` and `contract_date_*` are all delegated to the version
+        and therefore answer differently under the timeline's context. A
+        related field picks that up on its own — `Field.get_depends()` walks
+        the path and collects the context keys of every step — but a compute
+        gets only what its own decorators declare. Without it the cache key
+        is the same in every context, so whichever version was read first in
+        the transaction wins and the panel shows, next to the position, the
+        line and salary of a version that is not the one on screen.
         """
         today = fields.Date.context_today(self)
         Staffing = self.env['hr.staffing.table']
