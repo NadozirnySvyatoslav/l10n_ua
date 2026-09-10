@@ -11,4 +11,5 @@ from . import test_scheduled_norm
 from . import test_multicompany
 from . import test_work_schedule_removed
 from . import test_staffing_resolution
+from . import test_version_context_fields
 from . import test_staffing_occupancy
