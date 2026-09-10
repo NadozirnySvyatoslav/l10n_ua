@@ -7,8 +7,9 @@
 - Валідація combined_rate
 """
 
-from datetime import date
+from datetime import date, timedelta
 
+from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.tests import tagged
 
@@ -101,10 +102,25 @@ class TestCombiningFte(ContractTestCase):
         self.assertAlmostEqual(staffing.vacant_units, 0.5)
 
     def test_cancelling_combining_frees_staffing(self):
+        """Cancelling frees the unit from the next day, not retroactively.
+
+        `action_cancel` stamps `date_to` = today: the surcharge is paid
+        through that day, so the post is held through it too. A cancelled
+        record used to drop out of the count at once — and with it out of
+        every period the combination genuinely ran.
+        """
         staffing = self._staffing_job2(units=1.0)
         jc = self._combining(combined_rate=0.5)
         jc.action_activate()
         jc.action_cancel()
+        today = fields.Date.context_today(jc)
+        self.assertEqual(jc.date_to, today)
+
         staffing.invalidate_recordset(['filled_units', 'vacant_units'])
-        self.assertAlmostEqual(staffing.filled_units, 0.0)
-        self.assertAlmostEqual(staffing.vacant_units, 1.0)
+        self.assertAlmostEqual(staffing.filled_units, 0.5)
+        self.assertAlmostEqual(staffing.vacant_units, 0.5)
+
+        Staffing = self.env['hr.staffing.table']
+        key = (self.company.id, self.department.id, self.job_2.id,
+               today + timedelta(days=1))
+        self.assertAlmostEqual(Staffing._occupancy_batch([key])[key], 0.0)

@@ -376,16 +376,36 @@ class HrVersion(models.Model):
         return versions
 
     def write(self, vals):
-        if 'wage' not in vals:
-            return super().write(vals)
+        # The combinations hanging on this version change hands with it.
+        # `hr.job.combining.company_id` is a stored related on the version, and
+        # the ORM recomputes a related field straight into `_write`: the
+        # combination's own `write` never runs, so nothing would tell the
+        # staffing table that the combined post now belongs to another company.
+        # Read before the write, as everywhere else — the position as it was is
+        # half the answer.
+        #
+        # Elevated only to reach the field: `job_combining_ids` is declared for
+        # hr.group_hr_user, and a recount owes nothing to whoever happens to be
+        # writing. Nothing read here is shown to them.
+        combinings = self.sudo().job_combining_ids \
+            if 'company_id' in vals else self.env['hr.job.combining']
+        previous = combinings._staffing_positions()
+
         # Reading the old wage here is safe by construction: field groups gate
         # reading and writing together, so a caller who got `wage` past write()
         # can read it. Only versions whose wage actually moves deserve a note —
         # saving the same form twice must not post the same warning twice.
-        changed = self.filtered(lambda version: version.wage != vals['wage'])
+        changed = self.filtered(
+            lambda version: version.wage != vals['wage']) \
+            if 'wage' in vals else self.browse()
+
         result = super().write(vals)
-        changed._warn_wage_out_of_staffing_range(
-            dict.fromkeys(changed.ids, vals['wage']))
+
+        if combinings:
+            combinings._recompute_staffing(previous)
+        if 'wage' in vals:
+            changed._warn_wage_out_of_staffing_range(
+                dict.fromkeys(changed.ids, vals['wage']))
         return result
 
     def _warn_wage_out_of_staffing_range(self, wage_by_id):
