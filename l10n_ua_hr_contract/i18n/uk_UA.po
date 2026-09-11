@@ -458,8 +458,14 @@ msgid "Employer Initiative (Art. 40)"
 msgstr "З ініціативи роботодавця (ст. 40)"
 
 #. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__part_time_type__external
-msgid "External Part-time"
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__employment_type_ua
+#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__employment_type_ua
+msgid "Employment Type (UA)"
+msgstr "Тип зайнятості"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__employment_type_ua__external
+msgid "External Secondary Job"
 msgstr "Зовнішнє сумісництво"
 
 #. module: l10n_ua_hr_contract
@@ -489,7 +495,6 @@ msgid "Fixed surcharge amount"
 msgstr "Фіксована сума доплати"
 
 #. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__work_mode__flexible
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__resource_calendar__ua_schedule_type__flexible
 msgid "Flexible Schedule"
 msgstr "Гнучкий графік"
@@ -524,11 +529,6 @@ msgstr "Повне посилання"
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_termination_reason__full_text
 msgid "Full Text for Order"
 msgstr "Повний текст для наказу"
-
-#. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__work_mode__full_time
-msgid "Full-time"
-msgstr "Повна зайнятість"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__contract_type_ua__gig
@@ -606,11 +606,6 @@ msgid "Hours per Week"
 msgstr "Годин на тиждень"
 
 #. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__work_mode__hybrid
-msgid "Hybrid"
-msgstr "Гібридна робота"
-
-#. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_allowance_type__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_document_mixin__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__id
@@ -660,8 +655,8 @@ msgid "Includes Night Work"
 msgstr "Включає нічну роботу"
 
 #. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__part_time_type__internal
-msgid "Internal Part-time"
+#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__employment_type_ua__internal
+msgid "Internal Secondary Job"
 msgstr "Внутрішнє сумісництво"
 
 #. module: l10n_ua_hr_contract
@@ -711,12 +706,6 @@ msgstr "Оновив"
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version_salary_change__write_date
 msgid "Last Updated on"
 msgstr "Оновлено"
-
-#. module: l10n_ua_hr_contract
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__is_main_workplace
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__is_main_workplace
-msgid "Main Workplace"
-msgstr "Основне місце роботи"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_job_combining__message_has_error
@@ -900,23 +889,6 @@ msgid "Paragraph"
 msgstr "Пункт"
 
 #. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__work_mode__part_time
-msgid "Part-time"
-msgstr "Часткова зайнятість"
-
-#. module: l10n_ua_hr_contract
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__part_time_type
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__part_time_type
-msgid "Part-time Type"
-msgstr "Тип часткової зайнятості"
-
-#. module: l10n_ua_hr_contract
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__is_part_time
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__is_part_time
-msgid "Part-time Work"
-msgstr "Робота на неповний день"
-
-#. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version_allowance__percent
 msgid "Percent"
 msgstr "Відсоток"
@@ -978,6 +950,11 @@ msgid "Previous field values before amendment"
 msgstr "Попередні значення полів до зміни"
 
 #. module: l10n_ua_hr_contract
+#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__employment_type_ua__primary
+msgid "Primary Job"
+msgstr "Основне місце роботи"
+
+#. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__probation_end_date
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__probation_end_date
 msgid "Probation End Date"
@@ -1026,11 +1003,6 @@ msgstr "Посилання"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.view_hr_job_combining_form
 msgid "Related Allowance"
 msgstr "Пов'язана надбавка"
-
-#. module: l10n_ua_hr_contract
-#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_version__work_mode__remote
-msgid "Remote Work"
-msgstr "Дистанційна робота"
 
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_version_amendment_view_form
@@ -1411,12 +1383,6 @@ msgstr "Зміна умов праці"
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_allowance_type__category__intensity
 msgid "Work Intensity"
 msgstr "Інтенсивність роботи"
-
-#. module: l10n_ua_hr_contract
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__work_mode
-#: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__work_mode
-msgid "Work Mode"
-msgstr "Режим роботи"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__work_rate

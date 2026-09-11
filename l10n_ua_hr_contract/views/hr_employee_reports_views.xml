@@ -12,7 +12,7 @@
             <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
                    position="before">
                 <field name="contract_type_ua" optional="hide"/>
-                <field name="is_main_workplace" optional="hide"/>
+                <field name="employment_type_ua" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -25,7 +25,7 @@
             <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
                    position="before">
                 <field name="contract_type_ua" optional="hide"/>
-                <field name="is_main_workplace" optional="hide"/>
+                <field name="employment_type_ua" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -38,7 +38,7 @@
             <xpath expr="//field[@name='employee_ids']/list/field[@name='departure_date']"
                    position="before">
                 <field name="contract_type_ua" optional="hide"/>
-                <field name="is_main_workplace" optional="hide"/>
+                <field name="employment_type_ua" optional="hide"/>
             </xpath>
         </field>
     </record>

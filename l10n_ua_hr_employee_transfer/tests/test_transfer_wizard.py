@@ -241,8 +241,8 @@ class TestEmployeeTransfer(TransactionCase):
         })
         if 'contract_type_ua' in version._fields:
             version.contract_type_ua = 'permanent'
-        if 'work_mode' in version._fields:
-            version.work_mode = 'full_time'
+        if 'employment_type_ua' in version._fields:
+            version.employment_type_ua = 'primary'
         self.source_employee.current_version_id = version.id
         return version
 

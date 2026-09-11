@@ -26,17 +26,8 @@ class HrEmployee(models.Model):
     contract_type_ua = fields.Selection(
         related='version_id.contract_type_ua', inherited=True,
         readonly=False, groups="hr.group_hr_user")
-    is_main_workplace = fields.Boolean(
-        related='version_id.is_main_workplace', inherited=True,
-        readonly=False, groups="hr.group_hr_user")
-    is_part_time = fields.Boolean(
-        related='version_id.is_part_time', inherited=True,
-        readonly=False, groups="hr.group_hr_user")
-    part_time_type = fields.Selection(
-        related='version_id.part_time_type', inherited=True,
-        readonly=False, groups="hr.group_hr_user")
-    work_mode = fields.Selection(
-        related='version_id.work_mode', inherited=True,
+    employment_type_ua = fields.Selection(
+        related='version_id.employment_type_ua', inherited=True,
         readonly=False, groups="hr.group_hr_user")
     work_rate = fields.Float(
         related='version_id.work_rate', inherited=True,

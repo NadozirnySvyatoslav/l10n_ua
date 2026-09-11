@@ -48,7 +48,7 @@ class SalaryTestCase(TransactionCase):
             'date_version': date(2024, 1, 15),
             'wage': 25000,
             'contract_type_ua': 'permanent',
-            'work_mode': 'full_time',
+            'employment_type_ua': 'primary',
             'company_id': cls.company.id,
         })
         cls.employee.write({'current_version_id': cls.version.id})
