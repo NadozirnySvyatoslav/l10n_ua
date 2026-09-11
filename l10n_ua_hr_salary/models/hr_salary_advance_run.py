@@ -75,30 +75,16 @@ class HrSalaryAdvanceRun(models.Model):
         if not version:
             return 0.0
         # Валютний оклад — у гривню за курсом на дату виплати; штатний
-        # розпис уже у валюті компанії.
-        wage = version._l10n_ua_wage_in_company_currency(self.date)
-        # Same gate as the payslip (`_get_effective_wage`). A company that has
-        # turned the fallback off gets nothing from the staffing table there,
-        # so taking it here would pay an advance against a payslip that
-        # calculates zero — and then deduct the advance from it, leaving a
-        # negative net.
-        setting = (self.company_id or version.company_id).wage_from_staffing
-        if not wage and (setting or 'both') in ('fallback', 'both'):
-            # The staffing table is asked about the payment date, by the
-            # same rule as the exchange rate. The field on the version answers
-            # for today; this is a question about one date. `with_company`,
-            # not `sudo`: the rule on the staffing table looks at the
-            # companies in the switcher, so without it the amount would depend
-            # on the interface settings of whoever generates the batch.
-            staffing = self.env['hr.staffing.table'].with_company(
-                version.company_id)._resolve(
-                    version.company_id, version.department_id,
-                    version.job_id, self.date)
-            # The line converts its own money: it names a currency of its own,
-            # and the batch is denominated in the company's.
-            wage = staffing._salary_in_company_currency(
-                self.date) if staffing else 0.0
-        return wage
+        # розпис уже у валюті компанії. Дата — саме дата виплати: поле на
+        # версії відповідає за сьогодні, а тут питання про один конкретний
+        # день, так само як і з курсом.
+        #
+        # Ворота `wage_from_staffing` беруться з компанії відомості. Компанія,
+        # що вимкнула фолбек, нічого не отримує зі штатного розпису й у
+        # листку, тож аванс проти нульового листка лише лишив би від'ємне
+        # «на руки» після його ж утримання.
+        return version._l10n_ua_effective_wage(
+            self.date, company=self.company_id or version.company_id)
 
     def action_generate_advances(self):
         """Generate wage advances for all active employees."""
