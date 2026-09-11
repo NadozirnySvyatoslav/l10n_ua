@@ -386,11 +386,17 @@ class HrStaffingTable(models.Model):
         """Combined posts consume their share of the unit (#149).
 
         Dated like everything else here, so a combination that ran in 2023 is
-        counted on the 2023 line and not on today's. One gap stays: cancelling
-        a combination stamps no end date on it, so a cancelled one drops out of
-        every date at once rather than out of the dates after the cancellation.
-        Recording that would change what `action_cancel` writes, which belongs
-        to the module owning the model.
+        counted on the 2023 line and not on today's. A cancelled one therefore
+        counts for the period it actually ran: `action_cancel` stamps the end
+        date, and dropping the whole record on cancellation would empty the
+        history it belongs to.
+
+        A cancellation carrying no end date is the exception, and it is
+        dropped — the same conservative choice as an employee archived with no
+        dates anywhere. There is no telling when such a combination stopped,
+        and the alternative is to have it hold the post for ever. Records
+        cancelled before `action_cancel` began stamping the date fall here,
+        which is where they were already.
         """
         Combining = self.env.get('hr.job.combining')
         if Combining is None:
@@ -400,13 +406,15 @@ class HrStaffingTable(models.Model):
             ('company_id', 'in', list({key[0] for key in keys})),
             ('combined_department_id', 'in', list({key[1] for key in keys})),
             ('combined_job_id', 'in', list({key[2] for key in keys})),
-            ('state', '=', 'active'),
+            ('state', 'in', ('active', 'cancelled')),
             ('date_from', '<=', max(ref_dates)),
         ])
 
         wanted = set(keys)
         totals = defaultdict(float)
         for combining in combinings:
+            if combining.state == 'cancelled' and not combining.date_to:
+                continue
             for ref_date in ref_dates:
                 if combining.date_from > ref_date:
                     continue
