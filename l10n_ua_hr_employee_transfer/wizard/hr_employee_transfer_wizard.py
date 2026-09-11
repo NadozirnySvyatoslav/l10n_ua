@@ -290,7 +290,7 @@ class HrEmployeeTransferWizard(models.TransientModel):
             vals['job_id'] = self.new_job_id.id
         if self.new_department_id and 'department_id' in Version._fields:
             vals['department_id'] = self.new_department_id.id
-        # Carry the employment terms (contract type, employment basis, work
+        # Carry the employment terms (contract type, employment type, work
         # rate) over from the source version when the HR officer asked for it.
         if self.copy_wage and src:
             for fname in ('contract_type_ua', 'employment_type_ua', 'work_rate'):

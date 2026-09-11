@@ -458,6 +458,11 @@ msgid "Employer Initiative (Art. 40)"
 msgstr "З ініціативи роботодавця (ст. 40)"
 
 #. module: l10n_ua_hr_contract
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.report_hr_employee_list_document_contract
+msgid "Employment Type"
+msgstr "Тип зайнятості"
+
+#. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_employee__employment_type_ua
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_version__employment_type_ua
 msgid "Employment Type (UA)"
