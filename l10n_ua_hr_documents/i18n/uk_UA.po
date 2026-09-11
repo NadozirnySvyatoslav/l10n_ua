@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20260103\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-05 19:47+0000\n"
-"PO-Revision-Date: 2026-01-05 19:47+0000\n"
+"POT-Creation-Date: 2026-09-11 00:00+0000\n"
+"PO-Revision-Date: 2026-09-11 00:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -44,6 +44,11 @@ msgstr "<strong>Працівник:</strong>"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
 msgid "<strong>Підрозділ:</strong>"
 msgstr "<strong>Підрозділ:</strong>"
+
+#. module: l10n_ua_hr_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
+msgid "<strong>Підстава:</strong>"
+msgstr "<strong>Підстава:</strong>"
 
 #. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
@@ -87,6 +92,15 @@ msgid "Activity Type Icon"
 msgstr "Іконка типу активності"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__include_vacation_compensation
+msgid ""
+"Add the standard \"виплатити компенсацію за N календарних днів "
+"невикористаної відпустки\" phrase to the dismissal order."
+msgstr ""
+"Додавати до наказу про звільнення стандартну фразу \"виплатити компенсацію "
+"за N календарних днів невикористаної відпустки\"."
+
+#. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_template_wizard_form
 msgid "Apply"
 msgstr "Застосувати"
@@ -106,16 +120,6 @@ msgstr "Вкладення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__message_attachment_count
 msgid "Attachment Count"
 msgstr "Кількість вкладень"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__basic_higher
-msgid "Basic Higher (Bachelor)"
-msgstr "Базова вища (бакалавр)"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__basic_secondary
-msgid "Basic Secondary"
-msgstr "Базова середня"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_family__birth_date
@@ -150,6 +154,20 @@ msgid "Business Trip"
 msgstr "Відрядження"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__unused_vacation_days
+msgid ""
+"Calendar days of unused vacation to compensate on dismissal. Auto-filled "
+"from the vacation balance; editable."
+msgstr ""
+"Календарні дні невикористаної відпустки для компенсації при звільненні. "
+"Заповнюється автоматично із залишку відпусток; можна редагувати."
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__can_create_leave
+msgid "Can Create Time Off"
+msgstr "Можна створити відпустку"
+
+#. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_template_wizard_form
 msgid "Cancel"
@@ -159,6 +177,46 @@ msgstr "Скасувати"
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__state__cancelled
 msgid "Cancelled"
 msgstr "Скасовано"
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Cannot cancel the dismissal of %(employee)s: a new contract for this employee already starts on %(start)s.\n"
+"\n"
+"Reopening the contract this order closed would put the employee under two contracts at once. Correct or delete the later contract first, then cancel this order."
+msgstr ""
+"Не можна скасувати звільнення %(employee)s: для цього працівника вже починається новий контракт з %(start)s.\n"
+"\n"
+"Повернення контракту, який закрив цей наказ, лишило б працівника під двома контрактами одночасно. Спочатку виправте або видаліть пізніший контракт, а тоді скасовуйте наказ."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Cannot start a contract for %(employee)s on %(start)s: the contract of %(other_start)s - %(other_end)s is still running that day.\n"
+"\n"
+"An employee who leaves and is hired again is free from the day after the previous contract ends, so hire them from %(next_day)s.\n"
+"\n"
+"If instead the two contracts are meant to run side by side (concurrent employment next to a job that carries on), create a separate employee record for it: one record holds one contract at a time."
+msgstr ""
+"Не можна відкрити контракт для %(employee)s з %(start)s: цього дня ще діє контракт за період %(other_start)s - %(other_end)s.\n"
+"\n"
+"Звільнений і знову прийнятий працівник вільний з наступного дня після закінчення попереднього контракту, тож приймайте з %(next_day)s.\n"
+"\n"
+"Якщо ж два контракти мають діяти одночасно (сумісництво поряд з роботою, що триває), створіть для цього окрему картку працівника: одна картка тримає один контракт за раз."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Cannot start a contract for %(employee)s on %(start)s: the contract opened on %(other_start)s is still running and carries no end date.\n"
+"\n"
+"Close it first — confirm the dismissal order, or fill in its end date — and hire the employee from the day after. If the two contracts are meant to run side by side (concurrent employment), create a separate employee record for it."
+msgstr ""
+"Не можна відкрити контракт для %(employee)s з %(start)s: контракт, відкритий %(other_start)s, ще діє і не має дати закінчення.\n"
+"\n"
+"Спочатку закрийте його — проведіть наказ про звільнення або вкажіть дату закінчення — і приймайте працівника з наступного дня. Якщо ж два контракти мають діяти одночасно (сумісництво), створіть для цього окрему картку працівника."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_type__category
@@ -171,14 +229,14 @@ msgid "Certificate"
 msgstr "Довідка"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__is_fixed_term
+msgid "Check if this is a fixed-term (строковий) contract"
+msgstr "Позначте, якщо це строковий трудовий договір"
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file_family__relation__child
 msgid "Child"
 msgstr "Дитина"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__citizenship
-msgid "Citizenship"
-msgstr "Громадянство"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_type__code
@@ -192,14 +250,14 @@ msgid "Company"
 msgstr "Компанія"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__complete_higher
-msgid "Complete Higher (Master/Specialist)"
-msgstr "Повна вища (магістр/спеціаліст)"
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__include_vacation_compensation
+msgid "Compensate Unused Vacation"
+msgstr "Компенсувати невикористану відпустку"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__complete_secondary
-msgid "Complete Secondary"
-msgstr "Повна середня"
+#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__secondary
+msgid "Concurrent employment"
+msgstr "За сумісництвом"
 
 #. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
@@ -213,6 +271,26 @@ msgid "Confirmed"
 msgstr "Підтверджено"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__confirmed_by_id
+msgid "Confirmed By"
+msgstr "Підтвердив"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__confirmed_date
+msgid "Confirmed On"
+msgstr "Дата підтвердження"
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Confirming a vacation order grants the leave, which requires the \"Ukraine "
+"HR: Officer\" access rights. Ask an HR officer to confirm this order."
+msgstr ""
+"Підтвердження наказу на відпустку надає відпустку, тому потребує прав "
+"«Ukraine HR: Officer». Попросіть кадровика підтвердити цей наказ."
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__content
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
 msgid "Content"
@@ -222,6 +300,16 @@ msgstr "Зміст"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_template_form
 msgid "Content Template"
 msgstr "Шаблон змісту"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__date_end
+msgid "Contract end date (for fixed-term contracts)"
+msgstr "Дата закінчення договору (для строкових договорів)"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__country_of_birth
+msgid "Country of Birth"
+msgstr "Країна народження"
 
 #. module: l10n_ua_hr_documents
 #: model_terms:ir.actions.act_window,help:l10n_ua_hr_documents.action_hr_personal_file
@@ -273,6 +361,11 @@ msgid "Date To"
 msgstr "Дата до"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__date_start
+msgid "Date when employment begins"
+msgstr "Дата початку роботи"
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__department_id
 msgid "Department"
 msgstr "Підрозділ"
@@ -282,6 +375,11 @@ msgstr "Підрозділ"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.hr_order_type_view_form
 msgid "Description"
 msgstr "Опис"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_personal_file__education_level_id
+msgid "Detailed Ukrainian education level classification"
+msgstr "Детальна українська класифікація рівнів освіти"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file_document__document_type__diploma
@@ -303,6 +401,17 @@ msgid "Dismissal"
 msgstr "Звільнення"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_dismissal
+msgid "Dismissal Date"
+msgstr "Дата звільнення"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__dismissal_reason
+msgid "Dismissal Reason"
+msgstr "Причина звільнення"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template_wizard__display_name
@@ -313,16 +422,6 @@ msgstr "Звільнення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_work_history__display_name
 msgid "Display Name"
 msgstr "Відображуване ім'я"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__marital_status__divorced
-msgid "Divorced"
-msgstr "Розлучений/а"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__doctor
-msgid "Doctor of Sciences"
-msgstr "Доктор наук"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_document__name
@@ -357,7 +456,7 @@ msgid "Education"
 msgstr "Освіта"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__education_level
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__education_level_id
 msgid "Education Level"
 msgstr "Рівень освіти"
 
@@ -367,6 +466,12 @@ msgid "Educational Institution"
 msgstr "Навчальний заклад"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__date_dismissal
+msgid "Effective date of employment termination"
+msgstr "Дата припинення трудових відносин"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model,name:l10n_ua_hr_documents.model_hr_employee
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__employee_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__employee_id
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_search
@@ -374,9 +479,36 @@ msgid "Employee"
 msgstr "Працівник"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_end
+msgid "Employment End Date"
+msgstr "Дата закінчення працевлаштування"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_start
+msgid "Employment Start Date"
+msgstr "Дата початку працевлаштування"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__employment_form
+msgid "Employment Type"
+msgstr "Тип зайнятості"
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_work_history__entry_type
 msgid "Entry Type"
 msgstr "Тип запису"
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid ""
+"Failed to sync hiring order data to the employee record.\n"
+"\n"
+"Details: %s"
+msgstr ""
+"Не вдалось синхронізувати дані наказу з карткою співробітника.\n"
+"\n"
+"Подробиці: %s"
 
 #. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.hr_personal_file_view_form
@@ -397,6 +529,11 @@ msgstr "Члени сім'ї"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__name
 msgid "File Number"
 msgstr "Номер справи"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__is_fixed_term
+msgid "Fixed-term Contract"
+msgstr "Строковий трудовий договір"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__message_follower_ids
@@ -477,6 +614,7 @@ msgid "Hiring"
 msgstr "Прийняття на роботу"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template_wizard__id
@@ -520,9 +658,22 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__incomplete_higher
-msgid "Incomplete Higher"
-msgstr "Неповна вища"
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__previous_departure_date_saved
+msgid ""
+"Internal: True if previous_departure_date holds a backed-up value (needed "
+"because False is a legitimate previous value)."
+msgstr ""
+"Службове: True, якщо previous_departure_date містить збережене значення "
+"(потрібно, бо False — теж коректне попереднє значення)."
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__previous_departure_date
+msgid ""
+"Internal: saves employee.departure_date before this dismissal order was "
+"applied, so cancellation can restore it."
+msgstr ""
+"Службове: зберігає employee.departure_date до застосування цього наказу про "
+"звільнення, щоб скасування могло його відновити."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__message_is_follower
@@ -570,9 +721,45 @@ msgid "Last Updated on"
 msgstr "Оновлено"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__military_status__liable
-msgid "Liable for Military Service"
-msgstr "Військовозобов'язаний"
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_id
+msgid "Leave Record"
+msgstr "Запис відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__holiday_status_id
+msgid "Leave Type"
+msgstr "Тип відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_personal_file__military_status
+msgid ""
+"Legacy field — kept for backward compatibility. Use "
+"military_register_category for the official ПКМУ № 1487 categorization."
+msgstr ""
+"Застаріле поле — залишено для зворотної сумісності. Для офіційної "
+"категоризації за ПКМУ № 1487 використовуйте military_register_category."
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__dismissal_reason
+msgid ""
+"Legal basis for dismissal (e.g., \"за власним бажанням, ст. 38 КЗпП "
+"України\")"
+msgstr ""
+"Правова підстава звільнення (напр., \"за власним бажанням, ст. 38 КЗпП "
+"України\")"
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid "Linked vacation order %s was cancelled. Leave state is unchanged."
+msgstr ""
+"Пов'язаний наказ про відпустку %s скасовано. Стан відпустки не змінено."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid "Linked vacation order was deleted."
+msgstr "Пов'язаний наказ про відпустку видалено."
 
 #. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
@@ -580,14 +767,14 @@ msgid "Load from Template"
 msgstr "Завантажити з шаблону"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__main
+msgid "Main place of work"
+msgstr "За основним місцем роботи"
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__marital_status
 msgid "Marital Status"
 msgstr "Сімейний стан"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__marital_status__married
-msgid "Married"
-msgstr "Одружений/а"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file_document__document_type__medical
@@ -617,7 +804,12 @@ msgid "Military Document"
 msgstr "Військовий документ"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__military_rank
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_personal_file__military_specialty
+msgid "Military Occupational Specialty"
+msgstr "Військово-облікова спеціальність"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__military_rank_id
 msgid "Military Rank"
 msgstr "Військове звання"
 
@@ -628,8 +820,8 @@ msgstr "Військова спеціальність"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__military_status
-msgid "Military Status"
-msgstr "Військовий статус"
+msgid "Military Status (legacy)"
+msgstr "Військовий статус (застаріле)"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__my_activity_date_deadline
@@ -641,6 +833,18 @@ msgstr "Термін моєї активності"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_type__name
 msgid "Name"
 msgstr "Назва"
+
+#. module: l10n_ua_hr_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.hr_employee_view_form_inherit_documents
+msgid "New Order"
+msgstr "Новий наказ"
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
+msgid "New Time Off"
+msgstr "Нова відпустка"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__activity_calendar_event_id
@@ -665,11 +869,6 @@ msgstr "Опис наступної активності"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__activity_type_id
 msgid "Next Activity Type"
 msgstr "Тип наступної активності"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__military_status__not_liable
-msgid "Not Liable"
-msgstr "Невійськовозобов'язаний"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template__notes
@@ -709,6 +908,23 @@ msgstr "Кількість повідомлень, що потребують д�
 #: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_personal_file__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__leave_count
+msgid ""
+"Number of time off records tied to THIS order (0 or 1 — the order and its "
+"leave reference each other). Drives the \"Time Off\" smart button on "
+"vacation orders."
+msgstr ""
+"Кількість відпусток, прив'язаних до ЦЬОГО наказу (0 або 1 — наказ та його "
+"відпустка посилаються одне на одного). Керує смарт-кнопкою «Відпустки» на "
+"наказах про відпустку."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid "Only a vacation order records time off."
+msgstr "Лише наказ на відпустку оформлює відпустку."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template_wizard__order_id
@@ -752,6 +968,11 @@ msgstr "Типи наказів"
 #: model:ir.model.constraint,message:l10n_ua_hr_documents.constraint_hr_order_type_unique_code
 msgid "Order type code must be unique!"
 msgstr "Код типу наказу повинен бути унікальним!"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__orders_count
+msgid "Orders"
+msgstr "Накази"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_work_history__organization
@@ -805,19 +1026,35 @@ msgid "Personal file for this employee already exists!"
 msgstr "Особова справа для цього працівника вже існує!"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__phd
-msgid "PhD"
-msgstr "Кандидат наук"
-
-#. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file_document__document_type__photo
 msgid "Photo"
 msgstr "Фото"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__termination_reason_id
+msgid ""
+"Pick a structured termination reason from the legal catalog. When set, the "
+"dismissal order will use its full_text and render description_html (legal "
+"explanation) in the print template."
+msgstr ""
+"Оберіть структуровану причину звільнення з правового довідника. Якщо її "
+"задано, наказ про звільнення використає її повний текст і виведе правове "
+"обґрунтування (description_html) у друкованому шаблоні."
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_work_history__position
 msgid "Position"
 msgstr "Посада"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__previous_departure_date
+msgid "Previous Departure Date (backup)"
+msgstr "Попередня дата звільнення (резервна копія)"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__previous_departure_date_saved
+msgid "Previous Departure Date Saved"
+msgstr "Попередню дату звільнення збережено"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__qualification
@@ -855,20 +1092,10 @@ msgid "Requires Employee"
 msgstr "Потребує працівника"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__military_status__reservist
-msgid "Reservist"
-msgstr "Резервіст"
-
-#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__activity_user_id
 msgid "Responsible User"
 msgstr "Відповідальний"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__military_status__retired
-msgid "Retired"
-msgstr "У відставці"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__message_has_sms_error
@@ -901,12 +1128,12 @@ msgid "Sick Leave"
 msgstr "Лікарняний"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__marital_status__single
-msgid "Single"
-msgstr "Неодружений/а"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_template_form
+msgid "Source code"
+msgstr "Вихідний код"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__specialty
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__education_specialty
 msgid "Specialty"
 msgstr "Спеціальність"
 
@@ -930,12 +1157,25 @@ msgid ""
 "Today: Activity date is today\n"
 "Planned: Future activities."
 msgstr ""
+"Стан на основі дій\n"
+"Прострочено: термін виконання вже минув\n"
+"Сьогодні: дата дії сьогодні\n"
+"Заплановано: майбутні дії."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__subject
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template__subject
 msgid "Subject"
 msgstr "Тема"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__can_create_leave
+msgid ""
+"Technical: true when the \"New Time Off\" button should be shown — a "
+"vacation order with all its details filled in and no time off linked yet."
+msgstr ""
+"Технічне: істина, коли слід показати кнопку «Нова відпустка» — наказ на "
+"відпустку із заповненими даними, до якого ще не прив'язано відпустку."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template_wizard__template_id
@@ -966,6 +1206,24 @@ msgid "Termination"
 msgstr "Звільнення"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__termination_reason_id
+msgid "Termination Reason (from catalog)"
+msgstr "Причина звільнення (з довідника)"
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+msgid "This order already has a linked time off."
+msgstr "Цей наказ уже має прив'язану відпустку."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_count
+msgid "Time Off"
+msgstr "Відпустки"
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__order_type__transfer
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order_template__order_type__transfer
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order_template_wizard__order_type__transfer
@@ -983,6 +1241,22 @@ msgid "Type of the exception activity on record."
 msgstr "Тип виключної активності в записі."
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__unused_vacation_days
+msgid "Unused Vacation Days"
+msgstr "Дні невикористаної відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__confirmed_by_id
+msgid ""
+"User who confirmed this order in the system — the HR officer recording that "
+"the printed order was signed. Kept as the audit trail of the act the order "
+"performs (e.g. granting a leave)."
+msgstr ""
+"Користувач, який підтвердив цей наказ у системі, — кадровик, що фіксує "
+"підписання друкованого наказу. Зберігається як аудиторський слід дії, яку "
+"виконує наказ (напр., надання відпустки)."
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__order_type__vacation
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order_template__order_type__vacation
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order_template_wizard__order_type__vacation
@@ -993,14 +1267,19 @@ msgid "Vacation"
 msgstr "Відпустка"
 
 #. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_to
+msgid "Vacation End Date"
+msgstr "Дата закінчення відпустки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_from
+msgid "Vacation Start Date"
+msgstr "Дата початку відпустки"
+
+#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file_document__valid_until
 msgid "Valid Until"
 msgstr "Дійсний до"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__education_level__vocational
-msgid "Vocational"
-msgstr "Професійно-технічна"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__website_message_ids
@@ -1015,9 +1294,9 @@ msgid "Website communication history"
 msgstr "Історія комунікації веб-сайту"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_personal_file__marital_status__widowed
-msgid "Widowed"
-msgstr "Вдівець/вдова"
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__confirmed_date
+msgid "When the order was confirmed in the system."
+msgstr "Коли наказ було підтверджено в системі."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__work_history_ids
@@ -1031,225 +1310,81 @@ msgid "Work History Entry"
 msgstr "Запис трудової історії"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__orders_count
-msgid "Orders Count"
-msgstr "Кількість наказів"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
+msgid "Бухгалтерії підприємства виплатити компенсацію за"
+msgstr "Бухгалтерії підприємства виплатити компенсацію за"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_from
-msgid "Vacation Start Date"
-msgstr "Дата початку відпустки"
+#: model:ir.actions.act_window,name:l10n_ua_hr_documents.action_hr_order
+msgid "Кадрові накази"
+msgstr "Кадрові накази"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__vacation_date_to
-msgid "Vacation End Date"
-msgstr "Дата закінчення відпустки"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
+msgid "Керівник"
+msgstr "Керівник"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_id
-msgid "Leave Record"
-msgstr "Запис відпустки"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
+msgid "НАКАЗ"
+msgstr "НАКАЗ"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__holiday_status_id
-msgid "Leave Type"
-msgstr "Тип відпустки"
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_business_trip
+msgid "Наказ про відрядження"
+msgstr "Наказ про відрядження"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_start
-msgid "Employment Start Date"
-msgstr "Дата початку працевлаштування"
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_reprimand
+msgid "Наказ про догану"
+msgstr "Наказ про догану"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_end
-msgid "Employment End Date"
-msgstr "Дата закінчення працевлаштування"
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_termination
+msgid "Наказ про звільнення"
+msgstr "Наказ про звільнення"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__is_fixed_term
-msgid "Fixed-term Contract"
-msgstr "Строковий трудовий договір"
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_wage_change
+msgid "Наказ про зміну окладу"
+msgstr "Наказ про зміну окладу"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__employment_form
-msgid "Employment Type"
-msgstr "Тип зайнятості"
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_vacation
+msgid "Наказ про надання відпустки"
+msgstr "Наказ про надання відпустки"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__main
-msgid "Main place of work"
-msgstr "За основним місцем роботи"
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_transfer
+msgid "Наказ про переведення"
+msgstr "Наказ про переведення"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__secondary
-msgid "Concurrent employment"
-msgstr "За сумісництвом"
-
-
-#. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid ""
-"Cannot cancel the dismissal of %(employee)s: a new contract for this "
-"employee already starts on %(start)s.\n"
-"\n"
-"Reopening the contract this order closed would put the employee under two "
-"contracts at once. Correct or delete the later contract first, then cancel "
-"this order."
-msgstr ""
-"Не можна скасувати звільнення %(employee)s: для цього працівника вже "
-"починається новий контракт з %(start)s.\n"
-"\n"
-"Повернення контракту, який закрив цей наказ, лишило б працівника під двома "
-"контрактами одночасно. Спочатку виправте або видаліть пізніший контракт, а "
-"тоді скасовуйте наказ."
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_bonus
+msgid "Наказ про преміювання"
+msgstr "Наказ про преміювання"
 
 #. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid ""
-"Cannot start a contract for %(employee)s on %(start)s: the contract of "
-"%(other_start)s - %(other_end)s is still running that day.\n"
-"\n"
-"An employee who leaves and is hired again is free from the day after the "
-"previous contract ends, so hire them from %(next_day)s.\n"
-"\n"
-"If instead the two contracts are meant to run side by side (concurrent "
-"employment next to a job that carries on), create a separate employee record "
-"for it: one record holds one contract at a time."
-msgstr ""
-"Не можна відкрити контракт для %(employee)s з %(start)s: цього дня ще діє "
-"контракт за період %(other_start)s - %(other_end)s.\n"
-"\n"
-"Звільнений і знову прийнятий працівник вільний з наступного дня після "
-"закінчення попереднього контракту, тож приймайте з %(next_day)s.\n"
-"\n"
-"Якщо ж два контракти мають діяти одночасно (сумісництво поряд з роботою, що "
-"триває), створіть для цього окрему картку працівника: одна картка тримає "
-"один контракт за раз."
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_hiring
+msgid "Наказ про прийняття на роботу"
+msgstr "Наказ про прийняття на роботу"
 
 #. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid ""
-"Cannot start a contract for %(employee)s on %(start)s: the contract opened "
-"on %(other_start)s is still running and carries no end date.\n"
-"\n"
-"Close it first — confirm the dismissal order, or fill in its end date — and "
-"hire the employee from the day after. If the two contracts are meant to run "
-"side by side (concurrent employment), create a separate employee record for "
-"it."
-msgstr ""
-"Не можна відкрити контракт для %(employee)s з %(start)s: контракт, відкритий "
-"%(other_start)s, ще діє і не має дати закінчення.\n"
-"\n"
-"Спочатку закрийте його — проведіть наказ про звільнення або вкажіть дату "
-"закінчення — і приймайте працівника з наступного дня. Якщо ж два контракти "
-"мають діяти одночасно (сумісництво), створіть для цього окрему картку "
-"працівника."
+#: model:hr.order.type,name:l10n_ua_hr_documents.order_type_combine
+msgid "Наказ про суміщення"
+msgstr "Наказ про суміщення"
 
 #. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid ""
-"Failed to sync hiring order data to the employee record.\n"
-"\n"
-"Details: %s"
-msgstr ""
-"Не вдалось синхронізувати дані наказу з карткою співробітника.\n"
-"\n"
-"Подробиці: %s"
+#: model_terms:ir.actions.act_window,help:l10n_ua_hr_documents.action_hr_order
+msgid "Створіть перший кадровий наказ"
+msgstr "Створіть перший кадровий наказ"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_count
-msgid "Time Off"
-msgstr "Відпустки"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
+msgid "від"
+msgstr "від"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_employee__orders_count
-msgid "Orders"
-msgstr "Накази"
-
-#. module: l10n_ua_hr_documents
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.hr_employee_view_form_inherit_documents
-msgid "New Order"
-msgstr "Новий наказ"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__leave_count
-msgid ""
-"Number of time off records tied to THIS order (0 or 1 — the order "
-"and its leave reference each other). Drives the \"Time Off\" smart "
-"button on vacation orders."
-msgstr ""
-"Кількість відпусток, прив'язаних до ЦЬОГО наказу (0 або 1 — наказ "
-"та його відпустка посилаються одне на одного). Керує смарт-кнопкою "
-"«Відпустки» на наказах про відпустку."
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__confirmed_by_id
-msgid "Confirmed By"
-msgstr "Підтвердив"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__confirmed_by_id
-msgid ""
-"User who confirmed this order in the system — the HR officer "
-"recording that the printed order was signed. Kept as the audit "
-"trail of the act the order performs (e.g. granting a leave)."
-msgstr ""
-"Користувач, який підтвердив цей наказ у системі, — кадровик, що "
-"фіксує підписання друкованого наказу. Зберігається як аудиторський "
-"слід дії, яку виконує наказ (напр., надання відпустки)."
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__confirmed_date
-msgid "Confirmed On"
-msgstr "Дата підтвердження"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__confirmed_date
-msgid "When the order was confirmed in the system."
-msgstr "Коли наказ було підтверджено в системі."
-
-#. module: l10n_ua_hr_documents
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid ""
-"Confirming a vacation order grants the leave, which requires the "
-"\"Ukraine HR: Officer\" access rights. Ask an HR officer to confirm "
-"this order."
-msgstr ""
-"Підтвердження наказу на відпустку надає відпустку, тому потребує "
-"прав «Ukraine HR: Officer». Попросіть кадровика підтвердити цей "
-"наказ."
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__can_create_leave
-msgid "Can Create Time Off"
-msgstr "Можна створити відпустку"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__can_create_leave
-msgid ""
-"Technical: true when the \"New Time Off\" button should be shown — a "
-"vacation order with all its details filled in and no time off "
-"linked yet."
-msgstr ""
-"Технічне: істина, коли слід показати кнопку «Нова відпустка» — "
-"наказ на відпустку із заповненими даними, до якого ще не прив'язано "
-"відпустку."
-
-#. module: l10n_ua_hr_documents
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
-msgid "New Time Off"
-msgstr "Нова відпустка"
-
-#. module: l10n_ua_hr_documents
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid "This order already has a linked time off."
-msgstr "Цей наказ уже має прив'язану відпустку."
-
-#. module: l10n_ua_hr_documents
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid "Only a vacation order records time off."
-msgstr "Лише наказ на відпустку оформлює відпустку."
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
+msgid "календарних днів невикористаної відпустки."
+msgstr "календарних днів невикористаної відпустки."
