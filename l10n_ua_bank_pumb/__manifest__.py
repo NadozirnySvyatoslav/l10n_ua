@@ -30,6 +30,7 @@ Extends l10n_ua_bank_sync with PUMB-specific functionality.
         'views/l10n_ua_bank_pumb_config_views.xml',
     ],
     'demo': [],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'application': False,
     'auto_install': False,
