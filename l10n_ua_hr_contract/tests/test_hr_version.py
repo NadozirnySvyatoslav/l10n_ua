@@ -22,8 +22,7 @@ class TestHrVersion(ContractTestCase):
         """Version should have correct Ukrainian defaults."""
         version = self._create_version()
         self.assertEqual(version.contract_type_ua, 'permanent')
-        self.assertEqual(version.work_mode, 'full_time')
-        self.assertTrue(version.is_main_workplace)
+        self.assertEqual(version.employment_type_ua, 'primary')
         self.assertEqual(version.work_rate, 1.0)
         # Тижнева норма живе у штатному календарі версії, не на версії (#213)
         self.assertEqual(version.scheduled_hours_week, 40.0)
@@ -52,13 +51,32 @@ class TestHrVersion(ContractTestCase):
 
     def test_work_rate_part_time(self):
         """Part-time work rate 0.5 should be valid."""
-        version = self._create_version(
-            work_rate=0.5,
-            is_part_time=True,
-            work_mode='part_time',
-        )
+        version = self._create_version(work_rate=0.5)
         self.assertEqual(version.work_rate, 0.5)
-        self.assertTrue(version.is_part_time)
+
+    def test_employment_type_ua_default(self):
+        """A version is a primary job unless told otherwise."""
+        version = self.env['hr.version'].create({
+            'employee_id': self._create_employee().id,
+            'date_version': date(2025, 6, 1),
+            'company_id': self.company.id,
+        })
+        self.assertEqual(version.employment_type_ua, 'primary')
+
+    def test_employment_type_ua_values(self):
+        """All three kinds of employment should be storable."""
+        for basis in ('primary', 'internal', 'external'):
+            version = self._create_version(employment_type_ua=basis)
+            self.assertEqual(version.employment_type_ua, basis)
+
+    def test_employment_type_ua_on_employee(self):
+        """The card should expose the version field as related."""
+        employee = self._create_employee()
+        version = self._create_version(
+            employee=employee, employment_type_ua='external')
+        employee.write({'current_version_id': version.id})
+        employee.invalidate_recordset()
+        self.assertEqual(employee.employment_type_ua, 'external')
 
     def test_total_wage_no_allowances(self):
         """Total wage with no allowances equals base wage."""
@@ -104,12 +122,12 @@ class TestHrVersion(ContractTestCase):
         version = self._create_version(
             employee=employee,
             contract_type_ua='fixed_term',
-            work_mode='remote',
+            work_rate=0.5,
         )
         employee.write({'current_version_id': version.id})
         employee.invalidate_recordset()
         self.assertEqual(employee.contract_type_ua, 'fixed_term')
-        self.assertEqual(employee.work_mode, 'remote')
+        self.assertEqual(employee.work_rate, 0.5)
 
     def test_termination_reason_reference(self):
         """Termination reason should link to version."""

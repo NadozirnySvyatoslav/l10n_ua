@@ -23,31 +23,27 @@ class HrVersion(models.Model):
        groups="hr.group_hr_user")
 
     # === Workplace Configuration ===
-    is_main_workplace = fields.Boolean(
-        string='Main Workplace',
-        default=True,
-        tracking=True,
-        groups="hr.group_hr_user"
-    )
-    is_part_time = fields.Boolean(
-        string='Part-time Work',
-        tracking=True,
-        groups="hr.group_hr_user"
-    )
-    part_time_type = fields.Selection([
-        ('internal', 'Internal Part-time'),
-        ('external', 'External Part-time'),
-    ], string='Part-time Type', groups="hr.group_hr_user")
-
-    # === Work Mode ===
-    work_mode = fields.Selection([
-        ('full_time', 'Full-time'),
-        ('part_time', 'Part-time'),
-        ('flexible', 'Flexible Schedule'),
-        ('remote', 'Remote Work'),
-        ('hybrid', 'Hybrid'),
-    ], string='Work Mode', default='full_time', tracking=True,
-       groups="hr.group_hr_user")
+    # One field, one question: is this employment the person's primary job or
+    # secondary employment, and if secondary, is it with the same
+    # employer or another one.
+    #
+    # It replaces three flags that could contradict each other: "main
+    # workplace" ticked together with "internal part-time", or a secondary job
+    # whose type stayed invisible because the unrelated part-time checkbox was
+    # off. How much the person works is deliberately not part of it - that is
+    # `work_rate`, which payroll, the timesheet norm and the staffing table all
+    # read; and where the work happens is the native `work_location_id`.
+    #
+    # The `_ua` suffix follows `contract_type_ua`, and it also keeps the name
+    # away from the native `employee_type`, which sits on this very model: two
+    # attributes one letter apart in the middle of the word would read as each
+    # other in a report or a salary rule and be wrong without raising.
+    employment_type_ua = fields.Selection([
+        ('primary', 'Primary Job'),
+        ('internal', 'Internal Secondary Job'),
+        ('external', 'External Secondary Job'),
+    ], string='Employment Type (UA)', default='primary', required=True,
+       tracking=True, groups="hr.group_hr_user")
 
     work_rate = fields.Float(
         string='Work Rate',

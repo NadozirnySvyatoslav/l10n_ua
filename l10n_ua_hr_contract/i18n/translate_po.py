@@ -12,18 +12,16 @@ TRANSLATIONS = {
     "Author Contract": "Авторський договір",
     "Employment Contract (Ukraine)": "Трудовий договір (Україна)",
 
-    # Work Modes
-    "Full-time": "Повна зайнятість",
-    "Part-time": "Часткова зайнятість",
-    "Part-time Work": "Робота на неповний день",
-    "Part-time Type": "Тип часткової зайнятості",
-    "Remote Work": "Дистанційна робота",
-    "Hybrid": "Гібридна робота",
+    # Employment Type (UA)
+    "Employment Type (UA)": "Тип зайнятості",
+    "Primary Job": "Основне місце роботи",
+    "Internal Secondary Job": "Внутрішнє сумісництво",
+    "External Secondary Job": "Зовнішнє сумісництво",
+
+    # Work Schedules
     "Flexible Schedule": "Гнучкий графік",
     "Shift Work": "Змінна робота",
     "Reduced Working Hours": "Скорочений робочий час",
-    "Internal Part-time": "Внутрішнє сумісництво",
-    "External Part-time": "Зовнішнє сумісництво",
 
     # Work Conditions
     "Work Conditions": "Умови праці",
@@ -52,7 +50,6 @@ TRANSLATIONS = {
     "Current UA Contract": "Поточний договір UA",
     "Current running Ukrainian contract": "Поточний діючий український договір",
     "Main Contract": "Основний договір",
-    "Main Workplace": "Основне місце роботи",
 
     # Dates
     "Start Date": "Дата початку",
@@ -283,7 +280,6 @@ TRANSLATIONS = {
     "Employment Type": "Тип зайнятості",
     "Diia.City Employee": "Працівник Дія.Сіті",
     "Employee under Diia.City special tax regime": "Працівник за спеціальним податковим режимом Дія.Сіті",
-    "Work Mode": "Режим роботи",
 
     # Staffing
     "Staffing": "Штатний розпис",

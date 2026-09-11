@@ -9,8 +9,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='contract_type_id']" position="after">
                 <field name="contract_type_ua" optional="show"/>
-                <field name="is_main_workplace" optional="hide"/>
-                <field name="work_mode" optional="hide"/>
+                <field name="employment_type_ua" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='wage']" position="after">
                 <field name="total_allowances" optional="hide"/>
@@ -68,10 +67,7 @@
             <!-- Add Ukrainian contract fields after standard contract_type_id -->
             <xpath expr="//field[@name='contract_type_id']" position="after">
                 <field name="contract_type_ua" string="UA Contract Type" placeholder="UA Contract Type"/>
-                <field name="is_main_workplace"/>
-                <field name="is_part_time"/>
-                <field name="part_time_type" invisible="not is_part_time"/>
-                <field name="work_mode"/>
+                <field name="employment_type_ua"/>
             </xpath>
             <!-- Add after schedule separator -->
             <!-- working_hours_week прибрано (#213): норма тижня тепер

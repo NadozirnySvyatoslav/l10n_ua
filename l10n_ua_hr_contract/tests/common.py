@@ -75,7 +75,7 @@ class ContractTestCase(TransactionCase):
             'date_version': unique_date,
             'wage': 25000,
             'contract_type_ua': 'permanent',
-            'work_mode': 'full_time',
+            'employment_type_ua': 'primary',
             'company_id': self.company.id,
         }
         vals.update(kwargs)

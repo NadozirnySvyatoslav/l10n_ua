@@ -43,7 +43,7 @@ class TestSalaryAdvance(SalaryTestCase):
             'date_version': date(2025, 1, 1),
             'wage': 25000,
             'contract_type_ua': 'gig',
-            'work_mode': 'full_time',
+            'employment_type_ua': 'primary',
             'company_id': cls.company.id,
         })
         cls.employee_gig.write({'current_version_id': cls.version_gig.id})

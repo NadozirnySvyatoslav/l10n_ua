@@ -19,8 +19,8 @@ from .common import ContractTestCase
 # must carry. Kept as a literal list so that adding a field to hr.employee
 # without its group makes the guard test fail rather than pass silently.
 VERSION_RELATED_FIELDS = [
-    'contract_type_ua', 'is_main_workplace', 'is_part_time', 'part_time_type',
-    'work_mode', 'work_rate', 'tariff_grade_id', 'work_conditions',
+    'contract_type_ua', 'employment_type_ua',
+    'work_rate', 'tariff_grade_id', 'work_conditions',
     'work_conditions_class', 'work_conditions_subclass',
     'additional_vacation_days', 'diia_city_employee', 'hire_order_number',
     'hire_order_date', 'termination_order_number', 'termination_order_date',
