@@ -1,0 +1,500 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_bank_pumb
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-11 09:49+0000\n"
+"PO-Revision-Date: 2026-09-11 09:49+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Account %(iban)s is not among the consent accounts: %(list)s"
+msgstr "Рахунку %(iban)s немає серед рахунків згоди: %(list)s"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_account_iban
+msgid "Account IBAN"
+msgstr "IBAN рахунку"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_account_resource_id
+msgid "Account Resource ID"
+msgstr "ID рахунку в API"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_account_resource_id
+msgid ""
+"Account identifier in PUMB Open Banking, received after the consent is "
+"confirmed."
+msgstr "Ідентифікатор рахунку в Open Banking ПУМБ; отримується після підтвердження згоди."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_authorisation_id
+msgid "Authorisation ID"
+msgstr "ID авторизації"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_psu_message
+msgid "Bank Message"
+msgstr "Повідомлення банку"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model,name:l10n_ua_bank_pumb.model_l10n_ua_bank_sync_config
+msgid "Bank Sync Configuration"
+msgstr "Налаштування синхронізації банку"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Cannot read the certificate or private key: %s"
+msgstr "Не вдалося прочитати сертифікат або приватний ключ: %s"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_cert_filename
+msgid "Certificate File Name"
+msgstr "Назва файлу сертифіката"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Certificate and key are valid. Now press \"Create Consent\"."
+msgstr "Сертифікат і ключ коректні. Тепер натисніть «Створити згоду»."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_cert_file
+msgid "Client Certificate"
+msgstr "Сертифікат клієнта"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sca_status__psuidentified
+msgid "Client Identified"
+msgstr "Клієнта ідентифіковано"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_psu_id
+msgid "Client identifier in PUMB: account IBAN or PUMB Online login."
+msgstr "Ідентифікатор клієнта в ПУМБ: IBAN рахунку або логін ПУМБ Online."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid ""
+"Confirm the consent in the PUMB Online app, then press \"Refresh Consent\"."
+msgstr "Підтвердіть згоду в застосунку ПУМБ Online, потім натисніть «Оновити згоду»."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_sca_status
+msgid "Confirmation Status"
+msgstr "Статус підтвердження"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sandbox_consent_state__valid
+msgid "Confirmed"
+msgstr "Підтверджено"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Connection to PUMB failed: %s"
+msgstr "Помилка з'єднання з ПУМБ: %s"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_consent_id
+msgid "Consent ID"
+msgstr "ID згоди"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_consent_status
+msgid "Consent Status"
+msgstr "Статус згоди"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_consent_valid_to
+msgid "Consent Valid To"
+msgstr "Згода дійсна до"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_consent_days
+msgid "Consent Validity (days)"
+msgstr "Строк дії згоди (днів)"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Consent created"
+msgstr "Згоду створено"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Consent revoked."
+msgstr "Згоду відкликано."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Consent status: %(status)s, valid to %(date)s."
+msgstr "Статус згоди: %(status)s, дійсна до %(date)s."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_corporate_id
+msgid "Corporate IBAN"
+msgstr "IBAN юрособи"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "Create Consent"
+msgstr "Створити згоду"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__expired
+msgid "Expired"
+msgstr "Прострочена"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sca_status__failed
+msgid "Failed"
+msgstr "Помилка"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Fill in Account IBAN or set a bank account on the journal."
+msgstr "Заповніть IBAN рахунку або вкажіть банківський рахунок у журналі."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Fill in PSU ID (account IBAN or PUMB Online login)."
+msgstr "Заповніть PSU ID (IBAN рахунку або логін ПУМБ Online)."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sca_status__finalised
+msgid "Finalised"
+msgstr "Завершено"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_psu_id_type__iban
+msgid "IBAN"
+msgstr "IBAN"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_account_iban
+msgid ""
+"IBAN of the account to import. Defaults to the bank account of the journal."
+msgstr "IBAN рахунку для імпорту. За замовчуванням — банківський рахунок журналу."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_key_password
+msgid "Key Password"
+msgstr "Пароль ключа"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_psu_id_type__login
+msgid "Login"
+msgstr "Логін"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_frequency_per_day
+msgid ""
+"Maximum number of account accesses per day without the client (1-4). Every "
+"statement page and every accounts request counts."
+msgstr "Максимальна кількість звернень до рахунку на добу без участі клієнта (1-4). Рахується кожна сторінка виписки та кожен запит списку рахунків."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "No PUMB consent yet: press \"Create Consent\"."
+msgstr "Згоди ПУМБ ще немає: натисніть «Створити згоду»."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_psu_id
+msgid "PSU ID"
+msgstr "PSU ID"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_psu_id_type
+msgid "PSU ID Type"
+msgstr "Тип PSU ID"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__provider__pumb
+msgid "PUMB (Open Banking)"
+msgstr "ПУМБ (Open Banking)"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "PUMB API allows maximum %d days per request."
+msgstr "API ПУМБ дозволяє максимум %d днів на запит."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "PUMB API error %(status)s: %(text)s"
+msgstr "Помилка API ПУМБ %(status)s: %(text)s"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "PUMB Client"
+msgstr "Клієнт ПУМБ"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "PUMB Consent"
+msgstr "Згода ПУМБ"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_environment
+msgid "PUMB Environment"
+msgstr "Середовище ПУМБ"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "PUMB Open Banking"
+msgstr "Open Banking ПУМБ"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "PUMB Open Banking does not support account currency %s."
+msgstr "Open Banking ПУМБ не підтримує валюту рахунку %s."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "PUMB consent"
+msgstr "Згода ПУМБ"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "PUMB consent expired on %s. Create a new consent."
+msgstr "Згода ПУМБ закінчилась %s. Створіть нову згоду."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid ""
+"PUMB consent is not confirmed (status: %s). Confirm it in PUMB Online and "
+"press \"Refresh Consent\"."
+msgstr "Згоду ПУМБ не підтверджено (статус: %s). Підтвердіть її в ПУМБ Online і натисніть «Оновити згоду»."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid ""
+"PUMB consent is not valid (%s). Create a new consent and confirm it in PUMB "
+"Online."
+msgstr "Згода ПУМБ недійсна (%s). Створіть нову згоду та підтвердіть її в ПУМБ Online."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "PUMB did not return a consent ID."
+msgstr "ПУМБ не повернув ID згоди."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid ""
+"PUMB request limit exceeded (up to %d requests per day per consent). Try "
+"again tomorrow."
+msgstr "Перевищено ліміт запитів ПУМБ (до %d запитів на добу за згодою). Спробуйте завтра."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__partiallyauthorised
+msgid "Partially Authorised"
+msgstr "Частково підтверджено"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_key_password
+msgid "Password of an encrypted private key or of a PKCS#12 bundle."
+msgstr "Пароль зашифрованого приватного ключа або контейнера PKCS#12."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_key_file
+msgid "Private Key"
+msgstr "Приватний ключ"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_key_filename
+msgid "Private Key File Name"
+msgstr "Назва файлу ключа"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_key_file
+msgid ""
+"Private key of the certificate (PEM/DER). Not needed for PKCS#12 or when the"
+" PEM certificate file includes the key."
+msgstr "Приватний ключ сертифіката (PEM/DER). Не потрібен для PKCS#12 або коли ключ уже є у PEM-файлі сертифіката."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_environment__production
+msgid "Production"
+msgstr "Робоче"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__provider
+msgid "Provider"
+msgstr "Провайдер"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_cert_file
+msgid ""
+"QWAC certificate for mTLS: PEM/DER, or a PKCS#12 bundle (.p12/.pfx) that "
+"already contains the private key."
+msgstr "Сертифікат QWAC для mTLS: PEM/DER або контейнер PKCS#12 (.p12/.pfx), що вже містить приватний ключ."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sca_status__received
+msgid "Received"
+msgstr "Отримано"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__received
+msgid "Received (awaiting confirmation)"
+msgstr "Отримано (очікує підтвердження)"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "Refresh Consent"
+msgstr "Оновити згоду"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__rejected
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sandbox_consent_state__rejected
+msgid "Rejected"
+msgstr "Відхилено"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__replacedbytpp
+msgid "Replaced"
+msgstr "Замінено"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_frequency_per_day
+msgid "Requests per Day"
+msgstr "Запитів на добу"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_corporate_id
+msgid ""
+"Required for legal entities: IBAN of the corporate client (PSU-Corporate-"
+"ID)."
+msgstr "Обов'язково для юросіб: IBAN корпоративного клієнта (PSU-Corporate-ID)."
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "Revoke Consent"
+msgstr "Відкликати згоду"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid ""
+"Revoke the PUMB consent? Statements will not sync until a new consent is "
+"confirmed."
+msgstr "Відкликати згоду ПУМБ? Виписки не синхронізуватимуться, доки не буде підтверджено нову згоду."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__revokedbypsu
+msgid "Revoked by Client"
+msgstr "Відкликано клієнтом"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_environment__sandbox
+msgid "Sandbox"
+msgstr "Тестове (sandbox)"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,field_description:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_sandbox_consent_state
+msgid "Sandbox Result"
+msgstr "Результат у sandbox"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_sandbox_consent_state
+msgid ""
+"Sandbox only: consent state the test bank sets instead of waiting for "
+"confirmation in PUMB Online."
+msgstr "Лише для sandbox: статус, який тестовий банк встановить згоді замість очікування підтвердження в ПУМБ Online."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_environment
+msgid ""
+"Sandbox works with PUMB test key pairs and test IBANs; production requires a"
+" QWAC certificate of a registered TPP."
+msgstr "Sandbox працює з тестовими ключами та тестовими IBAN ПУМБ; для робочого середовища потрібен сертифікат QWAC зареєстрованого TPP."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_sca_status__started
+msgid "Started"
+msgstr "Розпочато"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Success"
+msgstr "Успіх"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__terminatedbytpp
+msgid "Terminated"
+msgstr "Припинено"
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "Test Connection"
+msgstr "Перевірити підключення"
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "The PKCS#12 file has no certificate or private key."
+msgstr "У файлі PKCS#12 немає сертифіката або приватного ключа."
+
+#. module: l10n_ua_bank_pumb
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_pumb.l10n_ua_bank_sync_config_view_form_pumb
+msgid "UA000000000000000000000000000"
+msgstr "UA000000000000000000000000000"
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields,help:l10n_ua_bank_pumb.field_l10n_ua_bank_sync_config__pumb_consent_days
+msgid "Up to 90 days, after that the client must confirm a new consent."
+msgstr "До 90 днів, після чого клієнт має підтвердити нову згоду."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Upload the PUMB client certificate (QWAC)."
+msgstr "Завантажте сертифікат клієнта ПУМБ (QWAC)."
+
+#. module: l10n_ua_bank_pumb
+#. odoo-python
+#: code:addons/l10n_ua_bank_pumb/models/l10n_ua_bank_pumb_config.py:0
+msgid "Upload the private key of the certificate."
+msgstr "Завантажте приватний ключ сертифіката."
+
+#. module: l10n_ua_bank_pumb
+#: model:ir.model.fields.selection,name:l10n_ua_bank_pumb.selection__l10n_ua_bank_sync_config__pumb_consent_status__valid
+msgid "Valid"
+msgstr "Дійсна"
