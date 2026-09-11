@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Extend base config form with PUMB fields -->
+    <record id="l10n_ua_bank_sync_config_view_form_pumb" model="ir.ui.view">
+        <field name="name">l10n_ua.bank.sync.config.form.pumb</field>
+        <field name="model">l10n_ua.bank.sync.config</field>
+        <field name="inherit_id" ref="l10n_ua_bank_sync.l10n_ua_bank_sync_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_sync_now']" position="before">
+                <button name="action_test_connection" string="Test Connection" type="object"
+                        invisible="provider != 'pumb'"/>
+                <button name="action_pumb_create_consent" string="Create Consent" type="object"
+                        class="btn-secondary"
+                        invisible="provider != 'pumb'"/>
+                <button name="action_pumb_refresh_consent" string="Refresh Consent" type="object"
+                        invisible="provider != 'pumb' or not pumb_consent_id"/>
+                <button name="action_pumb_revoke_consent" string="Revoke Consent" type="object"
+                        confirm="Revoke the PUMB consent? Statements will not sync until a new consent is confirmed."
+                        invisible="provider != 'pumb' or not pumb_consent_id"/>
+            </xpath>
+            <xpath expr="//group[@name='account_group']" position="after">
+                <group string="PUMB Open Banking" name="pumb_connection_group"
+                       invisible="provider != 'pumb'">
+                    <field name="pumb_environment"/>
+                    <field name="pumb_cert_file" filename="pumb_cert_filename"/>
+                    <field name="pumb_cert_filename" invisible="1"/>
+                    <field name="pumb_key_file" filename="pumb_key_filename"/>
+                    <field name="pumb_key_filename" invisible="1"/>
+                    <field name="pumb_key_password" password="True"/>
+                </group>
+                <group string="PUMB Client" name="pumb_psu_group"
+                       invisible="provider != 'pumb'">
+                    <field name="pumb_psu_id_type"/>
+                    <field name="pumb_psu_id" placeholder="UA000000000000000000000000000"/>
+                    <field name="pumb_corporate_id" placeholder="UA000000000000000000000000000"/>
+                    <field name="pumb_account_iban" placeholder="UA000000000000000000000000000"/>
+                    <field name="pumb_consent_days"/>
+                    <field name="pumb_frequency_per_day"/>
+                    <field name="pumb_sandbox_consent_state"
+                           invisible="pumb_environment != 'sandbox'"/>
+                </group>
+                <group string="PUMB Consent" name="pumb_consent_group"
+                       invisible="provider != 'pumb' or not pumb_consent_id">
+                    <field name="pumb_consent_status" widget="badge"
+                           decoration-success="pumb_consent_status == 'valid'"
+                           decoration-warning="pumb_consent_status in ('received', 'partiallyAuthorised')"
+                           decoration-danger="pumb_consent_status in ('rejected', 'expired', 'revokedByPsu', 'terminatedByTpp', 'replacedByTpp')"/>
+                    <field name="pumb_consent_valid_to"/>
+                    <field name="pumb_sca_status"/>
+                    <field name="pumb_psu_message"/>
+                    <field name="pumb_consent_id"/>
+                    <field name="pumb_account_resource_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
