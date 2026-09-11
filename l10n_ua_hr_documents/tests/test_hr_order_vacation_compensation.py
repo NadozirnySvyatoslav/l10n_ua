@@ -1,5 +1,6 @@
 """Tests for the unused-vacation compensation phrase on dismissal orders — issue #125."""
 
+import re
 from datetime import date
 from unittest import SkipTest
 from odoo.tests import TransactionCase, tagged
@@ -112,6 +113,49 @@ class TestVacationCompensation(TransactionCase):
             'l10n_ua_hr_documents.report_hr_order', order.ids)[0]
         text = html.decode() if isinstance(html, bytes) else html
         self.assertNotIn('виплатити компенсацію', text)
+
+    def _apply_dismissal_template(self, order):
+        """Run the "Load Template" flow the user goes through on the form."""
+        template = self.env.ref(
+            'l10n_ua_hr_documents.order_template_dismissal')
+        wizard = self.env['hr.order.template.wizard'].create({
+            'order_id': order.id,
+            'order_type': order.order_type,
+            'template_id': template.id,
+        })
+        wizard.action_apply_template()
+        return order.content or ''
+
+    def test_phrase_rendered_in_loaded_template(self):
+        """Loading the dismissal template writes the compensation sentence,
+        with the days substituted, right under the "Підстава" line."""
+        self._balance(2026, 7)
+        order = self._dismissal(date(2026, 5, 20))
+        content = self._apply_dismissal_template(order)
+        text = ' '.join(re.sub(r'<[^>]+>', ' ', content).split())
+        self.assertIn(
+            'Бухгалтерії підприємства виплатити компенсацію за 7 '
+            'календарних днів невикористаної відпустки.', text)
+        self.assertLess(
+            text.index('Підстава'),
+            text.index('Бухгалтерії підприємства виплатити компенсацію'),
+            'The compensation line must follow the "Підстава" line.')
+
+    def test_phrase_absent_from_loaded_template_when_disabled(self):
+        """No compensation sentence in the loaded template when the flag is off."""
+        self._balance(2026, 7)
+        order = self._dismissal(date(2026, 5, 20),
+                                include_vacation_compensation=False)
+        content = self._apply_dismissal_template(order)
+        self.assertNotIn('виплатити компенсацію', content)
+
+    def test_phrase_absent_from_loaded_template_without_days(self):
+        """Nothing to compensate — no sentence, even with the flag on. Same
+        rule as the printed report."""
+        order = self._dismissal(date(2026, 5, 20), unused_vacation_days=0)
+        content = self._apply_dismissal_template(order)
+        self.assertEqual(order.unused_vacation_days, 0)
+        self.assertNotIn('виплатити компенсацію', content)
 
     def test_non_dismissal_has_no_days(self):
         """A non-dismissal order never computes compensation days."""
