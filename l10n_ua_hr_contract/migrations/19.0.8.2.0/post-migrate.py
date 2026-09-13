@@ -5,6 +5,46 @@ between them — whether this employment is the person's primary job or
 secondary employment — and could contradict each other while doing it. They
 are replaced by a single Selection, and their values are carried over here.
 
+Only a deliberate secondary employment is carried over; everything else stays
+on the column default, `primary`. That asymmetry is not caution for its own
+sake — `is_main_workplace = FALSE` is not evidence of anything:
+
+    19.0.2.0.0/pre-migrate.py created the column with
+    `ALTER TABLE hr_version ADD COLUMN is_main_workplace BOOLEAN DEFAULT FALSE`,
+    so every row that existed at that upgrade was stamped FALSE. Its
+    post-migrate then set the real value on employees who had an *open*
+    `hr_contract_ua`, and only on their current version. Everyone else — past
+    versions, employees without a UA contract, employees whose contract was
+    closed — kept the FALSE nobody chose. And because the column was created
+    by SQL rather than by the ORM, the field's `default=True` never reached
+    those rows either.
+
+Reading FALSE as secondary employment would therefore turn whole payroll
+histories into external secondary jobs. So the two signals that are actually
+deliberate decide instead:
+
+  1. `part_time_type` was NULL by default and is only ever filled in by hand
+     (or from a hand-filled UA contract) — it is taken at face value, even
+     where `is_main_workplace` is TRUE, because TRUE is what every new version
+     gets for free from the field default while nobody picks "Internal
+     secondary job" by accident.
+  2. `is_part_time = TRUE` together with a cleared main-workplace flag is the
+     recipe the HR manual gave for a secondary job whose type was never
+     chosen — the old form hid `part_time_type` until that checkbox was
+     ticked. Read as external, the common case, and the ids are logged.
+
+Everything else is left primary, and the count is logged so it can be
+reviewed. To see what this will do before upgrading, run on a copy:
+
+    SELECT count(*) FILTER (WHERE part_time_type IN ('internal','external')) AS explicit,
+           count(*) FILTER (WHERE part_time_type IS NULL
+                              AND is_part_time IS TRUE
+                              AND is_main_workplace IS NOT TRUE)            AS guessed,
+           count(*) FILTER (WHERE part_time_type IS NULL
+                              AND is_part_time IS NOT TRUE
+                              AND is_main_workplace IS NOT TRUE)            AS left_primary
+      FROM hr_version;
+
 This runs in post-migrate, not pre-migrate: the new column already exists by
 now, while the three old ones are still there. Odoo drops the columns of
 fields a module no longer declares only at the very end of the upgrade, once
@@ -33,7 +73,8 @@ def migrate(cr, version):
     if not version:
         return
 
-    missing = [name for name in ('is_main_workplace', 'part_time_type')
+    missing = [name for name in
+               ('is_main_workplace', 'is_part_time', 'part_time_type')
                if not _column_exists(cr, 'hr_version', name)]
     if missing:
         _logger.info(
@@ -43,53 +84,70 @@ def migrate(cr, version):
 
     # Every row already reads 'primary': Odoo fills a newly added required
     # column with the field's default before adding the NOT NULL constraint.
-    # Only the secondary employments need correcting.
+    # Only a deliberate secondary employment is moved off it.
     cr.execute("""
         UPDATE hr_version
-           SET employment_type_ua = CASE
-                   WHEN part_time_type IN ('internal', 'external')
-                       THEN part_time_type
-                   ELSE 'external'
-               END
-         WHERE is_main_workplace IS NOT TRUE
+           SET employment_type_ua = part_time_type
+         WHERE part_time_type IN ('internal', 'external')
     """)
-    moved = cr.rowcount
+    explicit = cr.rowcount
 
-    # A secondary employment whose type was never filled in. It could not be:
-    # the old form only showed the type once the unrelated "part-time work"
-    # checkbox was ticked. External is the common case and the safe guess —
-    # internal secondary employment is registered by an order the HR officer
-    # cannot forget — but the rows are named so the guess can be reviewed.
+    # Stated as a secondary job and as a main workplace at once. The explicit
+    # type wins: a main-workplace flag is what every version gets by default,
+    # whereas the type is only ever there because somebody picked it.
+    cr.execute("""
+        SELECT count(*) FROM hr_version
+         WHERE part_time_type IN ('internal', 'external')
+           AND is_main_workplace IS TRUE
+    """)
+    contradictory = cr.fetchone()[0]
+    if contradictory:
+        _logger.warning(
+            "l10n_ua_hr_contract %s: %s versions carried a secondary "
+            "employment type while also flagged as a main workplace; the "
+            "explicit type was kept", VERSION, contradictory)
+
+    # Part-time and not a main workplace, but the type was never chosen — the
+    # old form only revealed it once the part-time box was ticked. External is
+    # the common case; the ids are named so the guess can be reviewed.
     cr.execute("""
         SELECT id FROM hr_version
-         WHERE is_main_workplace IS NOT TRUE
-           AND (part_time_type IS NULL
-                OR part_time_type NOT IN ('internal', 'external'))
+         WHERE part_time_type IS NULL
+           AND is_part_time IS TRUE
+           AND is_main_workplace IS NOT TRUE
     """)
     guessed = [row[0] for row in cr.fetchall()]
     if guessed:
+        cr.execute("""
+            UPDATE hr_version
+               SET employment_type_ua = 'external'
+             WHERE id IN %s
+        """, (tuple(guessed),))
         _logger.warning(
-            "l10n_ua_hr_contract %s: %s versions were not a main workplace but "
-            "carried no secondary employment type; read as external (ids: %s)",
-            VERSION, len(guessed), guessed[:50])
+            "l10n_ua_hr_contract %s: %s part-time versions were not a main "
+            "workplace but carried no secondary employment type; read as "
+            "external (ids: %s)", VERSION, len(guessed), guessed[:50])
 
-    # The mirror image: a main workplace that also carried a secondary
-    # employment type. One of the two statements was wrong, and the main
-    # workplace flag is the one the HR officer actually maintained, so it wins
-    # and the type is dropped. Named for the same reason.
+    # Left primary despite a cleared main-workplace flag. Expected on any
+    # database that went through 19.0.2.0.0, which stamped the whole table
+    # FALSE — see the module docstring. Counted, not listed: on such a
+    # database this is most of the history.
     cr.execute("""
-        SELECT id FROM hr_version
-         WHERE is_main_workplace IS TRUE
-           AND part_time_type IN ('internal', 'external')
+        SELECT count(*) FROM hr_version
+         WHERE part_time_type IS NULL
+           AND is_part_time IS NOT TRUE
+           AND is_main_workplace IS NOT TRUE
     """)
-    contradictory = [row[0] for row in cr.fetchall()]
-    if contradictory:
-        _logger.warning(
-            "l10n_ua_hr_contract %s: %s versions were flagged as a main "
-            "workplace and as secondary employment at the same time; read as "
-            "primary, the secondary type was dropped (ids: %s)",
-            VERSION, len(contradictory), contradictory[:50])
+    left_primary = cr.fetchone()[0]
+    if left_primary:
+        _logger.info(
+            "l10n_ua_hr_contract %s: %s versions had no main-workplace flag "
+            "and no other sign of secondary employment; read as a primary "
+            "job, because that flag was stamped FALSE on every existing row "
+            "by 19.0.2.0.0 and carries no information on its own", VERSION,
+            left_primary)
 
     _logger.info(
-        "l10n_ua_hr_contract %s: %s versions carried over to secondary "
-        "employment, the rest read as a primary job", VERSION, moved)
+        "l10n_ua_hr_contract %s: %s versions carried over from an explicit "
+        "secondary employment type, %s more read as external, the rest read "
+        "as a primary job", VERSION, explicit, len(guessed))
