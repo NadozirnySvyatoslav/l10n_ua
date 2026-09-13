@@ -3,7 +3,7 @@
 from psycopg2 import IntegrityError
 
 from odoo.tests import tagged
-from odoo.tools import mute_logger
+from odoo.tools import SQL, mute_logger
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.base.models.ir_model import MODULE_UNINSTALL_FLAG
 from datetime import date
@@ -182,6 +182,64 @@ class TestHrStaffingTable(TestHrUaBase):
             self._create_staffing_record(
                 state='approved', date_from=date(2025, 1, 1))
             self.env.flush_all()
+
+    def _drop_start_date_index(self):
+        """Leave the table without the guarantee, the way a failed upgrade
+        leaves it: the index is what the database refuses the second line
+        with, and the point of the checks below is what happens without it."""
+        Staffing = self.env['hr.staffing.table']
+        index = Staffing._one_approved_line_per_start_date.full_name(Staffing)
+        self.env.cr.execute(
+            SQL('DROP INDEX IF EXISTS %s', SQL.identifier(index)))
+        return index
+
+    def _approve_behind_the_orm(self, line):
+        """Approve without passing the constraint — the state a database that
+        upgraded without the index is already in."""
+        self.env.cr.execute(SQL(
+            "UPDATE hr_staffing_table SET state = 'approved' WHERE id = %s",
+            line.id))
+        line.invalidate_recordset(['state'])
+
+    def test_same_start_date_is_refused_without_the_index(self):
+        """The index is the guarantee, and an upgrade can end without it. The
+        Python constraint is what keeps the conflict from growing meanwhile."""
+        self._drop_start_date_index()
+        self._create_staffing_record(
+            state='approved', date_from=date(2025, 1, 1))
+        second = self._create_staffing_record(date_from=date(2025, 1, 1))
+
+        with self.assertRaises(ValidationError):
+            second.action_approve()
+
+    def test_a_missing_guarantee_is_reported_on_the_lines(self):
+        """Nobody reads odoo.schema: the conflicting lines say it themselves."""
+        self._drop_start_date_index()
+        first = self._create_staffing_record(
+            state='approved', date_from=date(2025, 1, 1))
+        second = self._create_staffing_record(date_from=date(2025, 1, 1))
+        self._approve_behind_the_orm(second)
+
+        with mute_logger(
+                'odoo.addons.l10n_ua_hr_base.models.hr_staffing_table'):
+            self.env['hr.staffing.table']._report_duplicate_start_dates()
+
+        for line in first | second:
+            self.assertTrue(
+                any('Several approved staffing lines' in (message.body or '')
+                    for message in line.message_ids),
+                'the conflict should be in the chatter of every line in it')
+
+    def test_nothing_is_reported_while_the_guarantee_holds(self):
+        """The report is for a broken database — a healthy one stays quiet,
+        or the message stops being read."""
+        line = self._create_staffing_record(
+            state='approved', date_from=date(2025, 1, 1))
+        before = len(line.message_ids)
+
+        self.env['hr.staffing.table']._report_duplicate_start_dates()
+
+        self.assertEqual(len(line.message_ids), before)
 
     def test_an_approved_line_cannot_be_archived(self):
         """Archiving the line in force would silently restore the previous

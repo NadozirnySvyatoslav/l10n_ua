@@ -2140,3 +2140,29 @@ msgstr ""
 "Рядок штатного розпису «%(position)s» задає оклад у %(currency)s, а курс "
 "цієї валюти на %(date)s не внесений. Без курсу оклад потрапив би в "
 "розрахунок як гривневий. Внесіть курс у довідник валют."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"This position already has an approved staffing line starting on %(date)s. "
+"Two of them leave the salary payroll reads undefined — correct the "
+"existing line instead of adding a second one."
+msgstr ""
+"Ця позиція вже має затверджений рядок штатного розпису, що починається "
+"%(date)s. Два таких рядки роблять оклад, який читає розрахунок зарплати, "
+"невизначеним — виправте наявний рядок замість того, щоб додавати другий."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"Several approved staffing lines of this position start on %(date)s (lines "
+"%(ids)s). Payroll reads whichever of them the database happens to return "
+"first, so the salary this position pays is undefined, and a recalculated "
+"payslip may not repeat what was paid. Correct the start dates, or set all "
+"but one back to draft."
+msgstr ""
+"Кілька затверджених рядків штатного розпису цієї позиції починаються "
+"%(date)s (рядки %(ids)s). Розрахунок зарплати бере той із них, який база "
+"поверне першим, тож оклад цієї позиції невизначений, і перерахований "
+"розрахунковий листок може не повторити вже виплаченого. Виправте дати "
+"початку або поверніть усі рядки, крім одного, у чернетку."
