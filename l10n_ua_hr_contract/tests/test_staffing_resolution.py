@@ -8,6 +8,7 @@ the date the version is in force. Covered here:
 - the salary range warns instead of blocking
 - the wage suggestion fires from a change of position
 - the panel on the card follows the position inside the form, before saving
+- the panel follows the version the timeline puts in the context
 - resolution is batched: one lookup for a whole recordset
 
 Note on the fixtures: creating an hr.employee already creates a version dated
@@ -172,6 +173,60 @@ class TestStaffingResolution(ContractTestCase):
 
             self.assertEqual(form.staffing_line_id, line)
             self.assertEqual(form.staffing_salary, line.salary)
+
+    def test_panel_follows_the_version_in_the_context(self):
+        """The panel belongs to the version on screen, not to today's.
+
+        The timeline widget reloads the card with `version_id` in the context.
+        The panel is a compute, and a compute is cached per record without
+        regard to the context unless it says otherwise — so before
+        `depends_context('version_id')` both reads below answered with
+        whichever version happened to be read first.
+        """
+        old_line = self._line(
+            date_from=date(2024, 1, 1), date_to=date(2025, 5, 31),
+            salary=18000.0)
+        new_line = self._line(date_from=date(2025, 6, 1), salary=30000.0)
+
+        employee = self._employee()
+        old_version = self._version(employee, date(2024, 6, 1))
+        self._version(employee, date(2025, 6, 1))
+
+        # Read the current one first, so a context-blind cache would be primed
+        # with the wrong answer for the assertion that follows.
+        self.assertEqual(employee.staffing_line_id, new_line)
+        self.assertEqual(employee.staffing_salary, new_line.salary)
+
+        in_context = employee.with_context(version_id=old_version.id)
+        self.assertEqual(in_context.staffing_line_id, old_line)
+        self.assertEqual(in_context.staffing_salary, old_line.salary)
+        self.assertEqual(in_context.staffing_line_start, old_line.date_from)
+
+        # And back again: the current context must not have been overwritten
+        # by the historical read either.
+        self.assertEqual(employee.staffing_line_id, new_line)
+        self.assertEqual(employee.staffing_salary, new_line.salary)
+
+    def test_panel_in_context_matches_that_version(self):
+        """The card under a version context and that version itself agree."""
+        self._line(date_from=date(2024, 1, 1), date_to=date(2025, 5, 31),
+                   salary=18000.0)
+        self._line(date_from=date(2025, 6, 1), salary=30000.0)
+
+        employee = self._employee()
+        old_version = self._version(employee, date(2024, 6, 1))
+        self._version(employee, date(2025, 6, 1))
+
+        # Read the card plainly first: the two must still agree afterwards,
+        # which is what a cache blind to the context would break.
+        self.assertTrue(employee.staffing_line_id)
+
+        in_context = employee.with_context(version_id=old_version.id)
+        self.assertTrue(old_version.staffing_line_id)
+        self.assertEqual(in_context.staffing_line_id,
+                         old_version.staffing_line_id)
+        self.assertEqual(in_context.staffing_salary,
+                         old_version.staffing_line_id.salary)
 
     def test_card_and_version_agree(self):
         """Both read the same rule, so they cannot answer differently."""
