@@ -1,12 +1,16 @@
+import logging
 from collections import defaultdict
 from datetime import timedelta
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import format_date, formatLang
+from odoo.tools.sql import index_definition
 from odoo.addons.base.models.ir_model import MODULE_UNINSTALL_FLAG
 
 from .hr_version import _l10n_ua_has_rate
+
+_logger = logging.getLogger(__name__)
 
 
 class HrStaffingTable(models.Model):
@@ -97,6 +101,107 @@ class HrStaffingTable(models.Model):
         'This position already has an approved staffing line starting on that '
         'date. Correct the existing line instead of adding a second one.',
     )
+
+    # Nothing stops a database from running without that index. Odoo applies it
+    # through `Registry.post_constraint`, which catches the failure, sends it to
+    # the `odoo.schema` logger, and queues a retry that fails on the same rows;
+    # the module then loads and the upgrade reports success. The guarantee the
+    # whole resolution rests on can therefore be absent, with the conflicting
+    # rows still in place, and the only trace of it in a log nobody reads.
+    #
+    # `init` below says it where it will be seen, on every update. The Python
+    # constraint further down keeps a third line from joining the two while
+    # nobody has fixed them.
+
+    def init(self):
+        super().init()
+        # Deferred: this writes to the chatter, and the post-init queue runs
+        # once every model of the module has been through `_auto_init`.
+        self.pool.post_init(self._report_duplicate_start_dates_safely)
+
+    def _report_duplicate_start_dates_safely(self):
+        """The report runs inside `load_modules`, and anything raised there
+        takes the whole database down with it — every module, for every user,
+        over a message about a staffing line. It is a diagnostic: it may fail
+        to be produced, it may not decide whether the database comes up. The
+        traceback goes to the log, where the schema errors it is about already
+        are."""
+        try:
+            # In a savepoint, the way `Registry.post_constraint` runs the index
+            # it is reporting on: a database error left uncaught would poison
+            # the transaction the rest of the loading still has to write in.
+            with self.env.cr.savepoint():
+                self._report_duplicate_start_dates()
+        except Exception:  # noqa: BLE001 - a report may not break the upgrade
+            _logger.exception(
+                "could not check whether two approved staffing lines of a "
+                "position start on the same day; the resolution by date is "
+                "unverified on this database")
+
+    def _report_duplicate_start_dates(self):
+        """Say out loud that the one-line-per-start-date guarantee is missing.
+
+        Two approved lines of a position sharing a start date is the single
+        thing the resolution cannot survive: `_resolve_batch` orders by
+        `date_from desc` and takes the first, and a tie is broken by whatever
+        the query plan returns that day. The same data then pays one salary
+        today and another after a recalculation, with nothing to explain it.
+
+        Those rows are also the reason the index is missing — its creation
+        failed on exactly them — so the report goes by the data rather than by
+        the index, and it names the lines an officer has to open. It repeats on
+        every update: it is meant to stop when the rows are corrected, not when
+        somebody has read it once.
+        """
+        index_name = self._one_approved_line_per_start_date.full_name(self)
+        duplicates = self._read_group(
+            [('state', '=', 'approved')],
+            # `:day` is what `_read_group` demands of a date field, and on a
+            # Date column `date_trunc('day', ...)` is the column itself — the
+            # grouping stays the one the index is built on.
+            ['company_id', 'department_id', 'job_id', 'date_from:day'],
+            ['id:recordset'],
+            having=[('__count', '>', 1)],
+        )
+        if not duplicates:
+            if not index_definition(self.env.cr, index_name)[0]:
+                # No conflicting row to blame, so the data is not what stopped
+                # it: the creation failed on its own (a lock it could not take,
+                # an index dropped by hand). Nothing is wrong yet, and nothing
+                # stands in the way of it going wrong.
+                _logger.warning(
+                    "the unique index %s is not in the database: nothing "
+                    "prevents two approved staffing lines of a position from "
+                    "starting on the same day, and the line payroll reads "
+                    "would then be undefined. The odoo.schema log says why "
+                    "its creation did not go through.", index_name)
+            return
+
+        _logger.error(
+            "%s position(s) hold several approved staffing lines starting on "
+            "the same day, so the unique index %s could not be created. Which "
+            "line an employee resolves to — and the salary a recalculated "
+            "payslip carries — stays undefined until this is corrected: %s",
+            len(duplicates), index_name,
+            "; ".join(
+                "%s / %s from %s: ids %s" % (
+                    department.display_name, job.display_name,
+                    date_from, lines.ids)
+                for _company, department, job, date_from, lines in duplicates))
+
+        for _company, _department, _job, date_from, lines in duplicates:
+            # Every line of the group gets the same note: whichever one the
+            # officer opens, it names the others.
+            body = self.env._(
+                'Several approved staffing lines of this position start on '
+                '%(date)s (lines %(ids)s). Payroll reads whichever of them the '
+                'database happens to return first, so the salary this position '
+                'pays is undefined, and a recalculated payslip may not repeat '
+                'what was paid. Correct the start dates, or set all but one '
+                'back to draft.',
+                date=format_date(self.env, date_from),
+                ids=', '.join(str(line_id) for line_id in lines.ids))
+            lines._message_log_batch({line_id: body for line_id in lines.ids})
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
@@ -621,6 +726,51 @@ class HrStaffingTable(models.Model):
                     '%(start)s.',
                     discontinued=format_date(self.env, record.date_to),
                     start=format_date(self.env, record.date_from)))
+
+    @api.constrains('state', 'company_id', 'department_id', 'job_id',
+                    'date_from')
+    def _check_one_approved_line_per_start_date(self):
+        """The rule of `_one_approved_line_per_start_date`, in Python.
+
+        The index states it better — it holds against two officers approving at
+        the same moment, which no Python check can. But it is also the one
+        guarantee that can be missing without anybody noticing, and a database
+        that came up without it would take a third conflicting line as readily
+        as it took the second. Where the index is in place this never fires:
+        the write reaches the database first and is refused there.
+        """
+        approved = self.filtered(
+            lambda line: line.state == 'approved' and line.date_from)
+        if not approved:
+            return
+
+        def position_start(line):
+            return (line.company_id.id, line.department_id.id,
+                    line.job_id.id, line.date_from)
+
+        taken = defaultdict(list)
+        # One query for the batch: a migration or an import approves lines by
+        # the hundred, and this runs on every one of them.
+        for line in self.search([
+            ('id', 'not in', approved.ids),
+            ('state', '=', 'approved'),
+            ('company_id', 'in', approved.company_id.ids),
+            ('department_id', 'in', approved.department_id.ids),
+            ('job_id', 'in', approved.job_id.ids),
+            ('date_from', 'in', approved.mapped('date_from')),
+        ]):
+            taken[position_start(line)].append(line)
+
+        for line in approved:
+            key = position_start(line)
+            if taken[key]:
+                raise ValidationError(self.env._(
+                    'This position already has an approved staffing line '
+                    'starting on %(date)s. Two of them leave the salary '
+                    'payroll reads undefined — correct the existing line '
+                    'instead of adding a second one.',
+                    date=format_date(self.env, line.date_from)))
+            taken[key].append(line)
 
     @api.constrains('salary', 'salary_min', 'salary_max')
     def _check_salary_range(self):

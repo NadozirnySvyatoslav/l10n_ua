@@ -5,8 +5,9 @@ context. The UA fields used to be related through `current_version_id`, so they
 kept showing today's version while the native ones switched — and an edit made
 in that state landed on today's version instead of the one on screen.
 
-Covers reading, writing and the one2many case, plus a guard that the groups on
-the card still mirror the ones on hr.version.
+Covers reading and writing, the one2many case in both directions (adding and
+editing a line through the card), plus a guard that the groups on the card
+still mirror the ones on hr.version.
 """
 
 from datetime import date
@@ -103,6 +104,56 @@ class TestVersionContextFields(ContractTestCase):
             self.employee.with_context(
                 version_id=self.old_version.id).allowance_ids,
             old_allowance)
+
+    def test_one2many_write_in_version_context_hits_that_version(self):
+        """Надбавка, додана з картки в контексті версії, лягає саме в неї."""
+        self.employee.with_context(version_id=self.old_version.id).write({
+            'allowance_ids': [(0, 0, {
+                'allowance_type_id': self.allowance_seniority.id,
+                'calculation_method': 'fixed',
+                'amount': 500.0,
+            })],
+        })
+
+        self.assertEqual(len(self.old_version.allowance_ids), 1)
+        self.assertEqual(self.old_version.allowance_ids.amount, 500.0)
+        self.assertFalse(self.current_version.allowance_ids)
+
+    def test_one2many_edit_in_version_context_hits_that_version(self):
+        """Правка наявної надбавки в контексті версії не чіпає поточну."""
+        old_allowance = self.env['hr.version.allowance'].create({
+            'version_id': self.old_version.id,
+            'allowance_type_id': self.allowance_seniority.id,
+            'calculation_method': 'fixed',
+            'amount': 500.0,
+        })
+        current_allowance = self.env['hr.version.allowance'].create({
+            'version_id': self.current_version.id,
+            'allowance_type_id': self.allowance_seniority.id,
+            'calculation_method': 'fixed',
+            'amount': 700.0,
+        })
+        self.employee.invalidate_recordset()
+
+        self.employee.with_context(version_id=self.old_version.id).write({
+            'allowance_ids': [(1, old_allowance.id, {'amount': 900.0})],
+        })
+
+        self.assertEqual(old_allowance.amount, 900.0)
+        self.assertEqual(current_allowance.amount, 700.0)
+
+    def test_one2many_write_without_context_hits_current_version(self):
+        """Без контексту надбавка з картки лягає в сьогоднішню версію."""
+        self.employee.write({
+            'allowance_ids': [(0, 0, {
+                'allowance_type_id': self.allowance_hazard.id,
+                'calculation_method': 'fixed',
+                'amount': 700.0,
+            })],
+        })
+
+        self.assertEqual(len(self.current_version.allowance_ids), 1)
+        self.assertFalse(self.old_version.allowance_ids)
 
     def test_fields_mirror_version_groups(self):
         """Права на UA-полях картки збігаються з правами на версії."""
