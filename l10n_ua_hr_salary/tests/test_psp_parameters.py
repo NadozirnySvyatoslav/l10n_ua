@@ -8,6 +8,7 @@ Tests cover:
 
 from datetime import date
 from odoo.tests import tagged
+from odoo.tools import float_round
 from .common import SalaryTestCase
 
 
@@ -37,8 +38,8 @@ class TestPspParameters(SalaryTestCase):
         self.assertAlmostEqual(self.psp_params.psp_200, expected, places=2)
 
     def test_income_limit_computed(self):
-        """Income limit = subsistence_minimum * 1.4 * 10."""
-        expected = self.psp_params.subsistence_minimum * 1.4 * 10
+        """Граничний дохід для ПСП = ПМ × 1,4, округлений до найближчих 10 грн (п. 169.4.1 ПКУ)."""
+        expected = float_round(self.psp_params.subsistence_minimum * 1.4, precision_rounding=10)
         self.assertAlmostEqual(self.psp_params.income_limit, expected, places=2)
 
     def test_max_esv_base_computed(self):
