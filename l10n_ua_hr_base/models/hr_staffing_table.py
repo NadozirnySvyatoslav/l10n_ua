@@ -265,12 +265,31 @@ class HrStaffingTable(models.Model):
         # happens to have ticked would go quiet exactly where nobody is looking.
         staffing = self.sudo()
 
+        # Who holds a post today is read from the version timeline, the same
+        # way `_occupancy_from_versions` reads it, and never from
+        # `current_version_id`: that field is refreshed by a daily cron, so
+        # right after a transfer it still names the post the employee left —
+        # and this report is a statement about today. The same rule also drops
+        # the people who no longer stand anywhere: a contract that has ended, a
+        # departure, an employee archived by hand. Counting them would put
+        # "2 employee(s) still stand here" in the chatter of a line whose own
+        # `filled_units` says nobody does.
+        Version = staffing.env['hr.version'].with_context(active_test=False)
+        rows = Version.search_read(
+            [('employee_id', '!=', False), ('date_version', '<=', today)],
+            self._IN_FORCE_COLUMNS, order='date_version, id')
+        archived = set(staffing.env['hr.employee'].with_context(
+            active_test=False).search([('active', '=', False)]).ids)
+        timelines, departures = self._version_timelines(rows)
+        in_force = self._versions_in_force(
+            timelines, departures, today, archived)
+
         # Mirrors `hr.version._l10n_ua_effective_wage`, which is the thing that
         # will return the zero: its own wage first, the table only where there
         # is none, and only where the company allows it. A version that never
         # reaches the fallback cannot be hurt by a position that stopped.
-        versions = staffing.env['hr.employee'].search(
-            []).current_version_id.filtered(
+        versions = Version.browse(
+            row['id'] for row in in_force.values()).filtered(
             lambda version: (
                 not version.wage
                 and version.department_id and version.job_id
@@ -632,6 +651,14 @@ class HrStaffingTable(models.Model):
                 totals[key] += rate
         return totals
 
+    # The columns `_version_timelines` and `_versions_in_force` read. Both
+    # callers pass rows from `search_read`, not a recordset: reading a field
+    # off a searched hr.version fetches every stored field it has — over a
+    # hundred — for every version of every employee involved.
+    _IN_FORCE_COLUMNS = ['employee_id', 'company_id', 'department_id', 'job_id',
+                         'date_version', 'contract_date_start',
+                         'contract_date_end', 'departure_date']
+
     @api.model
     def _occupancy_from_versions(self, keys):
         """Employees holding each position on its date, read from hr.version.
@@ -662,9 +689,7 @@ class HrStaffingTable(models.Model):
         # Only the columns needed. Reading fields off a searched recordset
         # makes the ORM fetch every stored field of hr.version — over a
         # hundred of them — for every version of every employee involved.
-        columns = ['employee_id', 'company_id', 'department_id', 'job_id',
-                   'date_version', 'contract_date_start', 'contract_date_end',
-                   'departure_date']
+        columns = list(self._IN_FORCE_COLUMNS)
         if 'work_rate' in Version._fields:
             # Added by l10n_ua_hr_contract, which depends on this module and
             # not the other way round, so the column may be absent.
@@ -683,6 +708,33 @@ class HrStaffingTable(models.Model):
             active_test=False).search([
                 ('id', 'in', employees.ids), ('active', '=', False)]).ids)
 
+        timelines, departures = self._version_timelines(rows)
+
+        wanted = set(keys)
+        totals = defaultdict(float)
+        # Built once, asked per date: the timelines do not change between
+        # dates, and rebuilding them for each would walk every version again.
+        for ref_date in {key[3] for key in keys}:
+            for in_force in self._versions_in_force(
+                    timelines, departures, ref_date, archived).values():
+                key = (in_force['company_id'] and in_force['company_id'][0],
+                       in_force['department_id'] and in_force['department_id'][0],
+                       in_force['job_id'] and in_force['job_id'][0],
+                       ref_date)
+                if key in wanted:
+                    # `work_rate` defaults to 1.0, so a falsy one is missing
+                    # data rather than an unpaid post.
+                    totals[key] += in_force.get('work_rate') or 1.0
+        return totals
+
+    @api.model
+    def _version_timelines(self, rows):
+        """Group `search_read` rows by employee, keeping their order.
+
+        :param rows: version rows ordered by `date_version`, carrying at least
+            `_IN_FORCE_COLUMNS`.
+        :return: ({employee id: their rows}, {employee id: departure date}).
+        """
         timelines = defaultdict(list)
         # A departure is a fact about the person, not about a version: it is
         # written through the employee card, so it lands on whichever version
@@ -698,35 +750,41 @@ class HrStaffingTable(models.Model):
                 previous = departures.get(employee)
                 if not previous or departure > previous:
                     departures[employee] = departure
+        return timelines, departures
 
-        wanted = set(keys)
-        totals = defaultdict(float)
-        for ref_date in {key[3] for key in keys}:
-            for employee, timeline in timelines.items():
-                in_force = None
-                for row in timeline:  # ordered by date_version ascending
-                    if row['date_version'] > ref_date:
-                        break
-                    in_force = row
-                if in_force is None:
-                    continue
-                start = in_force['contract_date_start']
-                if start and start > ref_date:
-                    continue
-                end = in_force['contract_date_end'] or departures.get(employee)
-                if end and end < ref_date:
-                    continue
-                if not end and employee in archived:
-                    continue
-                key = (in_force['company_id'] and in_force['company_id'][0],
-                       in_force['department_id'] and in_force['department_id'][0],
-                       in_force['job_id'] and in_force['job_id'][0],
-                       ref_date)
-                if key in wanted:
-                    # `work_rate` defaults to 1.0, so a falsy one is missing
-                    # data rather than an unpaid post.
-                    totals[key] += in_force.get('work_rate') or 1.0
-        return totals
+    @api.model
+    def _versions_in_force(self, timelines, departures, ref_date, archived=()):
+        """Which version of each employee holds a post on `ref_date`.
+
+        The one statement of that rule in this module: occupancy counts the
+        posts it returns, and `_report_stopped_positions` names the people on
+        them. Two readings of "who works here today" would drift, and a report
+        that contradicts the `filled_units` of the very line it writes on is
+        worse than no report.
+
+        :param archived: employees archived with no end date anywhere;
+            they are dropped rather than left holding the post for ever.
+        :return: {employee id: the row in force, if any}.
+        """
+        in_force_rows = {}
+        for employee, timeline in timelines.items():
+            in_force = None
+            for row in timeline:  # ordered by date_version ascending
+                if row['date_version'] > ref_date:
+                    break
+                in_force = row
+            if in_force is None:
+                continue
+            start = in_force['contract_date_start']
+            if start and start > ref_date:
+                continue
+            end = in_force['contract_date_end'] or departures.get(employee)
+            if end and end < ref_date:
+                continue
+            if not end and employee in archived:
+                continue
+            in_force_rows[employee] = in_force
+        return in_force_rows
 
     @api.model
     def _occupancy_from_combinings(self, keys):

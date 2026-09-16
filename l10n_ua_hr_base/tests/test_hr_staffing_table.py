@@ -376,6 +376,75 @@ class TestHrStaffingTable(TestHrUaBase):
 
         self.assertEqual(self._messages_on(line), before)
 
+    def test_an_employee_whose_contract_ended_is_not_counted(self):
+        """A finished fixed-term contract means the post is empty.
+
+        `filled_units` of the very same line counts nobody once the contract
+        has ended, and a note saying "1 employee(s) still stand on this
+        position" over a line that says zero is read as noise, which is how a
+        report stops being read at all.
+        """
+        employee = self._create_employee()
+        # Both dates: a version may not carry an end without a start.
+        employee.current_version_id.write({
+            'contract_date_start': date.today() - relativedelta(years=1),
+            'contract_date_end': date.today() - relativedelta(months=2),
+        })
+        line = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(months=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertEqual(self._messages_on(line), before)
+
+    def test_a_transfer_is_seen_before_the_daily_cron_catches_up(self):
+        """The report speaks about today, so it reads the version timeline.
+
+        `hr.employee.current_version_id` is refreshed by a daily cron, so a
+        version that comes into force today is only picked up hours later —
+        until then the field still names the post the employee has left. A
+        report built on it would write on the line of a position nobody stands
+        on any more.
+        """
+        # The post being left is the older version — one version per employee
+        # per day, and that is also how a transfer really looks.
+        employee = self._create_employee(
+            date_version=date.today() - relativedelta(years=1))
+        stale = employee.current_version_id
+        elsewhere = self.env['hr.job'].create({
+            'name': 'Other Position',
+            'company_id': self.company.id,
+            'department_id': self.department.id,
+        })
+        self.env['hr.version'].create({
+            'employee_id': employee.id,
+            'date_version': date.today(),
+            'department_id': self.department.id,
+            'job_id': elsewhere.id,
+        })
+        # What the cron has not done yet: creating the version recomputed the
+        # field, and the state this is about is the one between the two. The
+        # flush first, or the recomputation would land on top of this.
+        self.env.flush_all()
+        self.env.cr.execute(
+            'UPDATE hr_employee SET current_version_id = %s WHERE id = %s',
+            (stale.id, employee.id))
+        employee.invalidate_recordset(['current_version_id'])
+        line = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(months=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertEqual(
+            self._messages_on(line), before,
+            'the employee moved off this position today')
+
     def test_an_approved_line_cannot_be_archived(self):
         """Archiving the line in force would silently restore the previous
         salary: the resolution only looks at approved lines."""
