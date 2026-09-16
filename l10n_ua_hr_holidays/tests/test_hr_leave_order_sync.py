@@ -410,6 +410,131 @@ class TestHrLeaveOrderSync(common.TransactionCase):
                          "Refusing the leave must not change the order state.")
         self.assertEqual(leave.order_id, order, "The link must survive.")
 
+    def test_this_module_owns_both_ends_of_the_link(self):
+        """leave_id and its companions are declared here, not in
+        l10n_ua_hr_documents — that module must install without hr_holidays,
+        and it is the one this module depends on."""
+        Order = self.env['hr.order']
+        for name in ('leave_id', 'holiday_status_id', 'leave_count',
+                     'can_create_leave'):
+            self.assertIn('l10n_ua_hr_holidays',
+                          Order._fields[name]._modules,
+                          '%s must be declared by l10n_ua_hr_holidays' % name)
+            self.assertNotIn('l10n_ua_hr_documents',
+                             Order._fields[name]._modules,
+                             '%s must not be declared by l10n_ua_hr_documents'
+                             % name)
+
+    def test_is_locked_follows_the_linked_leave(self):
+        """A linked time off locks the data both documents share; the form
+        binds its readonly attributes to is_locked, which is false as long as
+        the order stands alone."""
+        order = self._make_vacation_order(date(2029, 2, 1), date(2029, 2, 5))
+        self.assertFalse(order.is_locked)
+
+        self._create_leave_via_button(order)
+
+        order.invalidate_recordset(['is_locked'])
+        self.assertTrue(order.is_locked)
+
+    def test_new_time_off_refused_on_a_non_vacation_order(self):
+        """Only a vacation order records time off."""
+        from odoo.exceptions import UserError
+        order = self.env['hr.order'].create({
+            'order_type': 'bonus',
+            'employee_id': self.employee.id,
+            'date': date(2029, 2, 1),
+            'subject': 'Bonus',
+        })
+        self.assertFalse(order.can_create_leave)
+        with self.assertRaises(UserError):
+            order.action_create_leave()
+
+    def test_smart_button_opens_the_leave_of_this_order(self):
+        """The Time Off smart button counts and opens the order's own leave."""
+        order = self._make_vacation_order(date(2029, 4, 1), date(2029, 4, 5))
+        self.assertEqual(order.leave_count, 0)
+
+        leave = self._create_leave_via_button(order)
+
+        order.invalidate_recordset(['leave_count'])
+        self.assertEqual(order.leave_count, 1)
+        action = order.action_view_leaves()
+        self.assertEqual(action['res_model'], 'hr.leave')
+        self.assertEqual(action['view_mode'], 'form')
+        self.assertEqual(action['res_id'], leave.id)
+
+    def test_create_does_not_leak_its_sync_context(self):
+        """create() links the order and its leave under _sync_order_leave and
+        leave_skip_state_check, and each of those switches off a safeguard.
+        A recordset carries its context wherever it goes, so they must not
+        follow the new order out of create(): a caller writing through the
+        returned records would skip the date sync below and bypass the
+        leave's state check."""
+        order = self._make_vacation_order(date(2029, 1, 8), date(2029, 1, 12))
+        for key in ('_sync_order_leave', 'leave_skip_state_check'):
+            self.assertNotIn(key, order.env.context)
+
+    def test_order_dates_flow_into_an_editable_leave(self):
+        """Editing the order dates pushes them onto a leave still open for
+        changes — the mirror of test_manual_order_date_sync."""
+        order = self._make_vacation_order(date(2029, 5, 1), date(2029, 5, 5))
+        leave = self._create_leave_via_button(order)
+        self.assertIn(leave.state, ('draft', 'confirm'))
+
+        order.write({
+            'vacation_date_from': date(2029, 5, 4),
+            'vacation_date_to': date(2029, 5, 8),
+        })
+
+        # hr.leave.write turns a written date_from/date_to into the request
+        # dates, which is what the leave form shows and what the order reads
+        # back — and unlike date_from they carry no time of day.
+        leave.invalidate_recordset(['request_date_from', 'request_date_to'])
+        self.assertEqual(leave.request_date_from, date(2029, 5, 4))
+        self.assertEqual(leave.request_date_to, date(2029, 5, 8))
+
+    def test_order_dates_do_not_touch_a_leave_past_editing(self):
+        """An approved leave is never silently rewritten: the order keeps the
+        new dates, the leave keeps its own."""
+        order = self._make_vacation_order(date(2029, 5, 20), date(2029, 5, 24))
+        leave = self._create_leave_via_button(order)
+        leave._action_validate()
+        self.assertEqual(leave.state, 'validate')
+
+        order.write({'vacation_date_from': date(2029, 5, 21)})
+
+        leave.invalidate_recordset(['request_date_from'])
+        self.assertEqual(leave.request_date_from, date(2029, 5, 20))
+
+    def test_cancelling_the_order_notifies_the_leave(self):
+        """Cancelling a vacation order leaves the time off alone but says so
+        in its chatter."""
+        order = self._make_vacation_order(date(2029, 6, 1), date(2029, 6, 5))
+        leave = self._create_leave_via_button(order)
+        state_before = leave.state
+        messages_before = len(leave.message_ids)
+
+        order.action_cancel()
+
+        self.assertEqual(order.state, 'cancelled')
+        self.assertEqual(leave.state, state_before)
+        self.assertGreater(len(leave.message_ids), messages_before,
+                           'The leave must be told its order was cancelled.')
+
+    def test_deleting_the_order_notifies_the_leave(self):
+        """Deleting the order clears the link and posts on the leave."""
+        order = self._make_vacation_order(date(2029, 7, 1), date(2029, 7, 5))
+        leave = self._create_leave_via_button(order)
+        messages_before = len(leave.message_ids)
+
+        order.unlink()
+
+        self.assertTrue(leave.exists(), 'The leave must survive its order.')
+        self.assertFalse(leave.order_id)
+        self.assertGreater(len(leave.message_ids), messages_before,
+                           'The leave must be told its order was deleted.')
+
     def test_cascade_delete(self):
         """Unlinking a draft leave also unlinks its draft order."""
         leave = self._make_leave(date(2027, 11, 1), date(2027, 11, 5))
