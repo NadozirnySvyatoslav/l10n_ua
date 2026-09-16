@@ -11,3 +11,4 @@ from . import test_multicompany
 from . import test_military_tcc
 from . import test_military_citizenship
 from . import test_wage_currency
+from . import test_staffing_currency

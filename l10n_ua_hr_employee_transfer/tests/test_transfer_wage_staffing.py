@@ -64,10 +64,10 @@ class TestTransferWageFromStaffing(TransactionCase):
             'job_id': self.job_a.id,
             'units': 1.0,
             'salary': salary,
-            # Stated, not left to the default: `currency_id` defaults to the
-            # currency of the company in the switcher, which is not the one
-            # the line belongs to. The staffing table means the money of its
-            # own company here.
+            # Stated rather than left to the field: `currency_id` follows
+            # the company of the line now, not the one in the switcher.
+            # Saying it here keeps the test about the wage instead of about
+            # what the currency defaults to.
             'currency_id': self.company_a.currency_id.id,
             'date_from': date_from,
             'state': 'approved',

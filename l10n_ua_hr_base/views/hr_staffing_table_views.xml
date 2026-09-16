@@ -65,7 +65,16 @@
                                 <span class="oe_inline"> - </span>
                                 <field name="salary_max" class="oe_inline" placeholder="Max"/>
                             </div>
-                            <field name="currency_id" invisible="1"/>
+                            <field name="currency_id" groups="base.group_multi_currency"
+                                   options="{'no_create': True}"/>
+                            <!-- The salary fields above take their symbol from
+                                 this one. Hidden by the group alone it would be
+                                 absent from the record altogether, and they
+                                 would fall back to the currency of the company
+                                 in the switcher — the very mistake this field
+                                 now exists to prevent. -->
+                            <field name="currency_id" invisible="1"
+                                   groups="!base.group_multi_currency"/>
                             <field name="total_salary_fund"/>
                         </group>
                         <group string="Validity">

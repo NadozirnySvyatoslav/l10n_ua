@@ -2166,3 +2166,116 @@ msgstr ""
 "поверне першим, тож оклад цієї позиції невизначений, і перерахований "
 "розрахунковий листок може не повторити вже виплаченого. Виправте дати "
 "початку або поверніть усі рядки, крім одного, у чернетку."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_staffing_table__currency_id
+msgid ""
+"The currency the salary on this line is stated in. It follows the "
+"company of the line; set it by hand only for a position genuinely "
+"priced in another currency."
+msgstr ""
+"Валюта, у якій задано оклад цього рядка. Береться від компанії рядка; "
+"змінюйте вручну лише для посади, оклад якої справді визначено в іншій "
+"валюті."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid "Salary in another currency"
+msgstr "Оклад в іншій валюті"
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"This line states its salary in %(currency)s, while %(company)s keeps "
+"its accounts in %(company_currency)s. Payroll converts the figure at "
+"the rate of the period it calculates, so what is entered here is not "
+"what is paid. Leave it only if the position is genuinely priced in "
+"%(currency)s."
+msgstr ""
+"Цей рядок задає оклад у %(currency)s, тоді як %(company)s веде облік у "
+"%(company_currency)s. Розрахунок зарплати перерахує суму за курсом "
+"періоду, який обчислює, тож введене тут — не те, що буде виплачено. "
+"Лишайте так, лише якщо оклад посади справді визначено в %(currency)s."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"This staffing line states its salary in %(currency)s, while %(company)s "
+"keeps its accounts in %(company_currency)s, and no rate for "
+"%(currency)s is on file at all. Payroll cannot convert the figure: the "
+"position would either stop every payslip that reaches it or enter the "
+"calculation as though the number were %(company_currency)s. Set the "
+"currency of the company, or add the rate to the currency table first."
+msgstr ""
+"Цей рядок штатного розпису задає оклад у %(currency)s, тоді як "
+"%(company)s веде облік у %(company_currency)s, а курсу %(currency)s "
+"немає в довіднику взагалі. Розрахунок зарплати не може перерахувати "
+"суму: посада або зупинятиме кожен розрахунковий листок, який її "
+"зачепить, або потрапить у розрахунок так, ніби число задано в "
+"%(company_currency)s. Задайте валюту компанії або спершу внесіть курс у "
+"довідник валют."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"The salary on this line is stated in %(currency)s, not in "
+"%(company_currency)s, the currency of %(company)s. Payroll converts it "
+"at the rate of the period it calculates. If the position is not priced "
+"in %(currency)s, correct the currency here — the figure enters payslips "
+"as it stands."
+msgstr ""
+"Оклад цього рядка задано в %(currency)s, а не в %(company_currency)s — "
+"валюті %(company)s. Розрахунок зарплати перераховує його за курсом "
+"періоду, який обчислює. Якщо оклад посади не визначено в %(currency)s, "
+"виправте валюту тут: число потрапляє в розрахункові листки як є."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"The salary on this line was stated in %(old)s, the currency of "
+"whichever company was selected when it was created, while the line "
+"belongs to %(company)s and its salary was entered, read and printed as "
+"%(new)s. No rate for %(old)s was ever on file, so nothing could convert "
+"the figure and every payslip that reached this position stopped. The "
+"currency now says what the number always meant."
+msgstr ""
+"Оклад цього рядка був заданий у %(old)s — валюті тієї компанії, яка "
+"була вибрана під час створення, — тоді як рядок належить %(company)s, а "
+"його оклад вносили, читали й друкували як %(new)s. Курсу %(old)s у "
+"довіднику не було ніколи, тож перерахувати суму не міг ніхто, і кожен "
+"розрахунковий листок, який діставався цієї посади, зупинявся. Тепер "
+"валюта говорить те, що число означало завжди."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"The salary on this line is stated in %(currency)s, not in "
+"%(company_currency)s, the currency of %(company)s. Until now the "
+"currency was filled in from the company selected at the time of "
+"writing, not from the line, so this may never have been intended — and "
+"payroll converts the figure at the rate of the period it calculates, "
+"which is not what an officer entering a hryvnia salary expects. A rate "
+"is on file, so the number has been reaching payslips multiplied by it. "
+"Check it: if the position is not priced in %(currency)s, correct the "
+"currency here."
+msgstr ""
+"Оклад цього рядка задано в %(currency)s, а не в %(company_currency)s — "
+"валюті %(company)s. Досі валюта підставлялася від компанії, вибраної на "
+"момент внесення, а не від самого рядка, тож наміру могло й не бути, — а "
+"розрахунок зарплати перераховує суму за курсом періоду, який обчислює, "
+"чого кадровик, що вносив гривневий оклад, не чекає. Курс у довіднику є, "
+"тож число потрапляло в листки помноженим на нього. Перевірте: якщо "
+"оклад посади не визначено в %(currency)s, виправте валюту тут."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+msgid ""
+"The salary on this line named no currency at all, so everything that "
+"read it — payroll, the printed staffing table — took the figure for "
+"%(new)s, the currency of %(company)s. The currency now says what the "
+"number always meant."
+msgstr ""
+"Оклад цього рядка не називав жодної валюти, тож усе, що його читало, — "
+"розрахунок зарплати, друкований штатний розпис — брало число за "
+"%(new)s, валюту %(company)s. Тепер валюта говорить те, що число "
+"означало завжди."

@@ -116,8 +116,19 @@ class TestStaffingCurrency(SalaryTestCase):
             run._get_employee_wage(self.employee), 20000.0, places=2)
 
     def test_a_line_without_a_rate_refuses_to_guess(self):
-        """`_convert` answers 1.0 when it finds nothing; that is not an answer."""
+        """`_convert` answers 1.0 when it finds nothing; that is not an answer.
+
+        The line is a legitimate one: a rate for the currency is on file,
+        which is as much as the staffing table asks before accepting it — a
+        rate list that begins after the line does is ordinary, and prices the
+        position correctly once payroll gets there. This payslip is earlier
+        than the list, so for June there is still nothing to convert by.
+        """
         gbp = self.env.ref('base.GBP')
+        self.env['res.currency.rate'].create({
+            'name': '2027-01-01', 'currency_id': gbp.id,
+            'company_id': self.company.id, 'inverse_company_rate': 50.0,
+        })
         self.version.write({'wage': 0.0, 'salary_currency_id': False})
         self._line(500.0, gbp)
 

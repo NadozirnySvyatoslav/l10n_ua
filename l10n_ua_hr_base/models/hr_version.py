@@ -8,7 +8,7 @@ from .hr_employee import REGISTRATION_ADDRESS_MAP
 _logger = logging.getLogger(__name__)
 
 
-def _l10n_ua_has_rate(env, currency, company, date):
+def _l10n_ua_has_rate(env, currency, company, date=None):
     """Whether the rate table can answer for `currency` on `date`.
 
     `_convert` quietly falls back to 1.0 when it finds nothing, which turns a
@@ -17,15 +17,24 @@ def _l10n_ua_has_rate(env, currency, company, date):
     lookup they both refuse on lives here: the latest rate on or before the
     date, belonging to this company or shared by all of them.
 
+    Without a date the question is the weaker one a guard asks long before the
+    money is due: whether this company knows the currency at all. A staffing
+    line is written months or years before the payslip that reads it, and a
+    rate list that only starts after the line does is ordinary — refusing on
+    that would reject a position payroll will price correctly. A currency with
+    no rate anywhere is a different matter: nothing about it converts, ever.
+
     Each caller raises its own message: only the caller knows whose money it
     is, and "the wage of X" and "the staffing line Y" send an officer to two
     different screens.
     """
-    return bool(env['res.currency.rate'].search_count([
+    domain = [
         ('currency_id', '=', currency.id),
         ('company_id', 'in', [company.id, False]),
-        ('name', '<=', date),
-    ]))
+    ]
+    if date:
+        domain.append(('name', '<=', date))
+    return bool(env['res.currency.rate'].search_count(domain))
 
 
 class HrVersion(models.Model):

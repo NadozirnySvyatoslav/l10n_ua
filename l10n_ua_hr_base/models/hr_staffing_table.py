@@ -46,8 +46,11 @@ class HrStaffingTable(models.Model):
         string='Maximum Salary', currency_field='currency_id',
         help='Maximum salary for this position (salary range)')
     currency_id = fields.Many2one(
-        'res.currency', string='Currency',
-        default=lambda self: self.env.company.currency_id)
+        'res.currency', string='Currency', tracking=True,
+        compute='_compute_currency_id', store=True, readonly=False,
+        help='The currency the salary on this line is stated in. It follows '
+             'the company of the line; set it by hand only for a position '
+             'genuinely priced in another currency.')
     total_salary_fund = fields.Monetary(
         string='Total Salary Fund', currency_field='currency_id',
         compute='_compute_total_salary_fund', store=True)
@@ -211,6 +214,57 @@ class HrStaffingTable(models.Model):
         if self.job_id and self.job_id.company_id \
                 and self.job_id.company_id != self.company_id:
             self.job_id = False
+
+    @api.onchange('currency_id')
+    def _onchange_currency_id(self):
+        """Say it while the officer is still on the form.
+
+        A position priced in another currency is possible on purpose, so this
+        warns and refuses nothing. But the trouble with this field is that it
+        is quiet: the salary above is a number, and nothing on the screen tells
+        20 000 hryvnia apart from 20 000 of something worth forty times more.
+        """
+        company_currency = self.company_id.currency_id
+        if not self.currency_id or not company_currency \
+                or self.currency_id == company_currency:
+            return
+        return {'warning': {
+            'title': self.env._('Salary in another currency'),
+            'message': self.env._(
+                'This line states its salary in %(currency)s, while '
+                '%(company)s keeps its accounts in %(company_currency)s. '
+                'Payroll converts the figure at the rate of the period it '
+                'calculates, so what is entered here is not what is paid. '
+                'Leave it only if the position is genuinely priced in '
+                '%(currency)s.',
+                currency=self.currency_id.name,
+                company=self.company_id.display_name,
+                company_currency=company_currency.name),
+        }}
+
+    @api.depends('company_id')
+    def _compute_currency_id(self):
+        """The money of the company that keeps the line, not of the switcher.
+
+        A default reads `self.env.company` — the company ticked in the
+        switcher, which has nothing to do with the one this line is written
+        for. A line for company A, entered while the officer was looking at
+        company B, silently took B's currency, and the field is not on the form
+        for most of them to see. What happened to the number afterwards
+        depended on the rate table: either it was multiplied by the rate on its
+        way into payroll, or payroll refused to calculate at all — months
+        later, on a payslip, over a line nobody was looking at.
+
+        `readonly=False`: a position genuinely priced in another currency is
+        what `_salary_in_company_currency` exists for, and stays possible. The
+        company remains the source of the default, so moving a line to another
+        company re-states its salary in that company's money — the figure keeps
+        its number and changes its meaning, which is why the field is tracked
+        and why the change lands in the chatter.
+        """
+        for record in self:
+            record.currency_id = (
+                record.company_id.currency_id or record.currency_id)
 
     @api.depends('department_id', 'job_id')
     def _compute_name(self):
@@ -793,6 +847,42 @@ class HrStaffingTable(models.Model):
                     raise ValidationError('Standard salary cannot exceed maximum salary!')
 
 
+    @api.constrains('currency_id', 'company_id', 'salary')
+    def _check_currency_is_convertible(self):
+        """A currency the rate table has never heard of.
+
+        The line is not refused for naming another currency — that is a rare
+        but legitimate thing to do, and `_salary_in_company_currency` exists
+        for it. It is refused when nothing can ever convert the figure: the
+        first payslip to reach this position would stop with a message about
+        currency rates that names no staffing line, months after the line was
+        written and far from the screen the mistake was made on.
+
+        Any rate at all is enough — see `_l10n_ua_has_rate`. A rate list that
+        begins after the line does is ordinary, and prices the line correctly
+        by the time payroll gets there.
+        """
+        for record in self:
+            currency = record.currency_id
+            company = record.company_id
+            if not record.salary or not currency or not company:
+                continue
+            if currency == company.currency_id:
+                continue
+            if _l10n_ua_has_rate(self.env, currency, company):
+                continue
+            raise ValidationError(self.env._(
+                'This staffing line states its salary in %(currency)s, while '
+                '%(company)s keeps its accounts in %(company_currency)s, and '
+                'no rate for %(currency)s is on file at all. Payroll cannot '
+                'convert the figure: the position would either stop every '
+                'payslip that reaches it or enter the calculation as though '
+                'the number were %(company_currency)s. Set the currency of '
+                'the company, or add the rate to the currency table first.',
+                currency=currency.name,
+                company=company.display_name,
+                company_currency=company.currency_id.name or ''))
+
     # Fields whose change moves a period, and therefore the date every line of
     # the position is measured on: a new approved line ends the one before it,
     # so its neighbours have to be counted again as well.
@@ -807,6 +897,7 @@ class HrStaffingTable(models.Model):
         self._recompute_occupancy(lines._positions())
         lines._warn_retroactive_change()
         lines._warn_discontinued_while_occupied()
+        lines._warn_foreign_currency()
         return lines
 
     def write(self, vals):
@@ -842,6 +933,8 @@ class HrStaffingTable(models.Model):
             self._warn_retroactive_change(was_in_force)
         if vals.keys() & {'state', 'date_to'}:
             self._warn_discontinued_while_occupied()
+        if vals.keys() & {'currency_id', 'company_id'}:
+            self._warn_foreign_currency()
         return result
 
     def unlink(self):
@@ -938,6 +1031,40 @@ class HrStaffingTable(models.Model):
                     'nothing at all.',
                     date=format_date(self.env, record.date_from),
                 ))
+
+    def _warn_foreign_currency(self):
+        """Note in the chatter when a line's money is not the company's.
+
+        The form warns about this too, and the form is not where most of these
+        lines come from: an import, a data file and a `create()` from code all
+        go straight past an onchange. This is the trace an officer works back
+        from when a salary turns up multiplied by the rate — on the line
+        itself, where the currency was set, rather than on the payslip that
+        found it.
+
+        Silent during an install or upgrade, like the other notes here: a
+        migration writing lines in bulk is not somebody making a decision
+        today.
+        """
+        if not self.env.registry.ready:
+            return
+
+        for record in self:
+            company_currency = record.company_id.currency_id
+            if not record.currency_id or not company_currency:
+                continue
+            if record.currency_id == company_currency:
+                continue
+            record._message_log(body=self.env._(
+                'The salary on this line is stated in %(currency)s, not in '
+                '%(company_currency)s, the currency of %(company)s. Payroll '
+                'converts it at the rate of the period it calculates. If the '
+                'position is not priced in %(currency)s, correct the currency '
+                'here — the figure enters payslips as it stands.',
+                currency=record.currency_id.name,
+                company_currency=company_currency.name,
+                company=record.company_id.display_name,
+            ))
 
     def action_approve(self):
         self.write({'state': 'approved'})
