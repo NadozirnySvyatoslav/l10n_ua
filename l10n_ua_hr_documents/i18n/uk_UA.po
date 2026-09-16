@@ -1334,3 +1334,17 @@ msgstr "від"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
 msgid "календарних днів невикористаної відпустки."
 msgstr "календарних днів невикористаної відпустки."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+msgid ""
+"This order was linked to time off #%(leave)s%(detail)s. The link itself is "
+"not kept: it now lives in Ukraine - HR Holidays, which is not installed "
+"here, so the field holding it is removed with this update. The note stays, "
+"so the time off this order was issued for can still be found."
+msgstr ""
+"Цей наказ був пов'язаний із відпусткою №%(leave)s%(detail)s. Сам зв'язок не "
+"зберігається: він тепер живе в модулі «Україна — Кадрові відпустки», якого "
+"тут не встановлено, тож поле, що його тримало, це оновлення прибирає. "
+"Нотатка лишається, щоб відпустку, заради якої видано наказ, можна було "
+"знайти."
