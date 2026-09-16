@@ -3,7 +3,7 @@
 from psycopg2 import IntegrityError
 
 from odoo.tests import tagged
-from odoo.tools import SQL, mute_logger
+from odoo.tools import SQL, format_date, mute_logger
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.base.models.ir_model import MODULE_UNINSTALL_FLAG
 from datetime import date
@@ -240,6 +240,141 @@ class TestHrStaffingTable(TestHrUaBase):
         self.env['hr.staffing.table']._report_duplicate_start_dates()
 
         self.assertEqual(len(line.message_ids), before)
+
+    REPORT_LOGGER = 'odoo.addons.l10n_ua_hr_base.models.hr_staffing_table'
+
+    def _run_stopped_report(self):
+        """Run the report and hand back the environment it wrote in.
+
+        English on purpose: the note goes out in the language of whoever reads
+        it, and these tests are about what it says, not which language it says
+        it in. The environment comes back so that a date can be compared the
+        way the note formatted it.
+        """
+        reporter = self.env['hr.staffing.table'].with_context(lang='en_US')
+        with mute_logger(self.REPORT_LOGGER):
+            reporter._report_stopped_positions()
+        return reporter.env
+
+    def _messages_on(self, line):
+        line.invalidate_recordset(['message_ids'])
+        return len(line.message_ids)
+
+    def _latest_body(self, line):
+        line.invalidate_recordset(['message_ids'])
+        return line.message_ids[0].body or ''
+
+    def test_a_position_that_stopped_paying_is_reported_on_the_line(self):
+        """The newest approved line closed by a past date stops the position,
+        and the employee on it has nothing left to be paid from."""
+        self._create_employee()
+        line = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(months=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertGreater(
+            self._messages_on(line), before,
+            'the line that ends the position should say so in its chatter')
+        self.assertIn('1 employee(s)', self._latest_body(line))
+
+    def test_a_discontinued_position_nobody_stands_on_is_not_reported(self):
+        """A position that was abolished and left empty is a correct state, and
+        it stays correct on every later update. Saying otherwise here would
+        mean saying it for ever."""
+        line = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(months=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertEqual(self._messages_on(line), before)
+
+    def test_an_employee_with_a_wage_of_their_own_is_not_exposed(self):
+        """The position is only somebody's salary where the version has none:
+        `_l10n_ua_effective_wage` never reaches the table otherwise."""
+        employee = self._create_employee()
+        employee.current_version_id.wage = 12000.0
+        line = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(months=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertEqual(self._messages_on(line), before)
+
+    def test_a_position_in_force_is_not_reported(self):
+        """The report is for a position that pays nothing — a healthy one stays
+        quiet, or the message stops being read."""
+        self._create_employee()
+        line = self._create_staffing_record(
+            state='approved', date_from=date.today() - relativedelta(years=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertEqual(self._messages_on(line), before)
+
+    def test_a_handover_end_date_is_not_reported(self):
+        """The habit the change of meaning turned into a trap, done in a way
+        that leaves no hole: a line closed the day before the next one starts
+        changes nothing, and a report that fires on the common case stops being
+        read before it reaches the rare one."""
+        self._create_employee()
+        closed = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(years=1, days=1))
+        following = self._create_staffing_record(
+            state='approved', date_from=date.today() - relativedelta(years=1))
+        before = self._messages_on(closed), self._messages_on(following)
+
+        self._run_stopped_report()
+
+        self.assertEqual(
+            (self._messages_on(closed), self._messages_on(following)), before)
+
+    def test_a_position_that_resumes_later_names_the_day_it_does(self):
+        """Today inside a hole: the position comes back, and the day it comes
+        back is what the end date has to be compared against."""
+        self._create_employee()
+        closed = self._create_staffing_record(
+            state='approved',
+            date_from=date.today() - relativedelta(years=2),
+            date_to=date.today() - relativedelta(months=1))
+        resumes_on = date.today() + relativedelta(months=1)
+        following = self._create_staffing_record(
+            state='approved', date_from=resumes_on)
+        before = self._messages_on(following)
+
+        english = self._run_stopped_report()
+
+        self.assertIn(
+            format_date(english, resumes_on),
+            self._latest_body(closed),
+            'the note should name the day the position resumes')
+        self.assertEqual(
+            self._messages_on(following), before,
+            'the line that brings the position back is not at fault')
+
+    def test_a_position_missing_from_the_table_is_left_alone(self):
+        """Nothing was discontinued there: no end date caused it, and it is not
+        this report's business to say the staffing table is incomplete."""
+        self._create_employee()
+        line = self._create_staffing_record(
+            state='approved', date_from=date.today() + relativedelta(months=1))
+        before = self._messages_on(line)
+
+        self._run_stopped_report()
+
+        self.assertEqual(self._messages_on(line), before)
 
     def test_an_approved_line_cannot_be_archived(self):
         """Archiving the line in force would silently restore the previous
