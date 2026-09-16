@@ -223,7 +223,7 @@ class TestPayslipPSPIntegration(TestPayslip):
     def test_psp_amount_for_multi_child_family(self):
         """Сім'я з 2+ дітей → ПСП × N і вищий income_limit (ПК 169.4.1 «в»)."""
         # Drive PSP amounts via subsistence_minimum (compute-stored values)
-        # subsistence=3000 → psp_standard=1500, income_limit=42000
+        # subsistence=3000 → psp_standard=1500, income_limit=4200 (× 3 дітей = 12600)
         self.psp_params.write({'subsistence_minimum': 3000})
         # 3 children
         for i in range(3):

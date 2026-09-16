@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.tools import float_round
 
 
 class HrPspParameters(models.Model):
@@ -133,8 +134,12 @@ class HrPspParameters(models.Model):
 
     @api.depends('subsistence_minimum')
     def _compute_income_limit(self):
+        # п. 169.4.1 ПКУ: ПМ для працездатних на 1 січня × 1,4, округлений до
+        # найближчих 10 грн (2025 — 4240, 2026 — 4660). Раніше тут стояло
+        # «× 1,4 × 10», і ПСП надавалась при доході до ~42 тис. грн (#329).
         for rec in self:
-            rec.income_limit = rec.subsistence_minimum * 1.4 * 10
+            rec.income_limit = float_round(
+                rec.subsistence_minimum * 1.4, precision_rounding=10)
 
     @api.depends('min_wage')
     def _compute_max_esv_base(self):
