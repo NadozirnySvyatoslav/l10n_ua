@@ -164,11 +164,6 @@ msgstr ""
 "Заповнюється автоматично із залишку відпусток; можна редагувати."
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__can_create_leave
-msgid "Can Create Time Off"
-msgstr "Можна створити відпустку"
-
-#. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_template_wizard_form
 msgid "Cancel"
@@ -722,16 +717,6 @@ msgid "Last Updated on"
 msgstr "Оновлено"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_id
-msgid "Leave Record"
-msgstr "Запис відпустки"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__holiday_status_id
-msgid "Leave Type"
-msgstr "Тип відпустки"
-
-#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_personal_file__military_status
 msgid ""
 "Legacy field — kept for backward compatibility. Use "
@@ -750,22 +735,14 @@ msgstr ""
 "України\")"
 
 #. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid "Linked vacation order %s was cancelled. Leave state is unchanged."
-msgstr ""
-"Пов'язаний наказ про відпустку %s скасовано. Стан відпустки не змінено."
-
-#. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid "Linked vacation order was deleted."
-msgstr "Пов'язаний наказ про відпустку видалено."
-
-#. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
 msgid "Load from Template"
 msgstr "Завантажити з шаблону"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__is_locked
+msgid "Locked by a Linked Document"
+msgstr "Заблоковано пов'язаним документом"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__employment_form__main
@@ -841,13 +818,6 @@ msgid "New Order"
 msgstr "Новий наказ"
 
 #. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form
-msgid "New Time Off"
-msgstr "Нова відпустка"
-
-#. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__activity_calendar_event_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_personal_file__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
@@ -909,23 +879,6 @@ msgstr "Кількість повідомлень, що потребують д�
 #: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_personal_file__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Кількість повідомлень з помилкою доставки"
-
-#. module: l10n_ua_hr_documents
-#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__leave_count
-msgid ""
-"Number of time off records tied to THIS order (0 or 1 — the order and its "
-"leave reference each other). Drives the \"Time Off\" smart button on "
-"vacation orders."
-msgstr ""
-"Кількість відпусток, прив'язаних до ЦЬОГО наказу (0 або 1 — наказ та його "
-"відпустка посилаються одне на одного). Керує смарт-кнопкою «Відпустки» на "
-"наказах про відпустку."
-
-#. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid "Only a vacation order records time off."
-msgstr "Лише наказ на відпустку оформлює відпустку."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template_wizard__order_id
@@ -1170,13 +1123,18 @@ msgid "Subject"
 msgstr "Тема"
 
 #. module: l10n_ua_hr_documents
-#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__can_create_leave
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__is_locked
 msgid ""
-"Technical: true when the \"New Time Off\" button should be shown — a "
-"vacation order with all its details filled in and no time off linked yet."
+"Technical: true when another document already holds the same data as this "
+"order, so the fields the two must agree on are locked here. Nothing locks an "
+"order on its own; a module that links orders to another record (Ukraine - HR "
+"Holidays ties a vacation order to its time off) redefines the computation."
 msgstr ""
-"Технічне: істина, коли слід показати кнопку «Нова відпустка» — наказ на "
-"відпустку із заповненими даними, до якого ще не прив'язано відпустку."
+"Технічне: істина, коли інший документ уже містить ті самі дані, що й цей "
+"наказ, тому поля, які мають збігатися в обох, тут заблоковані. Сам по "
+"собі наказ нічим не заблокований; модуль, який пов'язує накази з іншим "
+"записом («Україна - Кадри: Відпустки» пов'язує наказ на відпустку з самою "
+"відпусткою), перевизначає обчислення."
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order_template_wizard__template_id
@@ -1210,19 +1168,6 @@ msgstr "Звільнення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__termination_reason_id
 msgid "Termination Reason (from catalog)"
 msgstr "Причина звільнення (з довідника)"
-
-#. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-msgid "This order already has a linked time off."
-msgstr "Цей наказ уже має прив'язану відпустку."
-
-#. module: l10n_ua_hr_documents
-#. odoo-python
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
-#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__leave_count
-msgid "Time Off"
-msgstr "Відпустки"
 
 #. module: l10n_ua_hr_documents
 #: model:ir.model.fields.selection,name:l10n_ua_hr_documents.selection__hr_order__order_type__transfer
@@ -1389,3 +1334,17 @@ msgstr "від"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.report_hr_order_document
 msgid "календарних днів невикористаної відпустки."
 msgstr "календарних днів невикористаної відпустки."
+
+#. module: l10n_ua_hr_documents
+#. odoo-python
+msgid ""
+"This order was linked to time off #%(leave)s%(detail)s. The link itself is "
+"not kept: it now lives in Ukraine - HR Holidays, which is not installed "
+"here, so the field holding it is removed with this update. The note stays, "
+"so the time off this order was issued for can still be found."
+msgstr ""
+"Цей наказ був пов'язаний із відпусткою №%(leave)s%(detail)s. Сам зв'язок не "
+"зберігається: він тепер живе в модулі «Україна — Кадрові відпустки», якого "
+"тут не встановлено, тож поле, що його тримало, це оновлення прибирає. "
+"Нотатка лишається, щоб відпустку, заради якої видано наказ, можна було "
+"знайти."
