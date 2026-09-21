@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_bank_payment_user,l10n_ua.bank.payment.user,model_l10n_ua_bank_payment,account.group_account_user,1,1,1,1
-access_l10n_ua_bank_payment_line_user,l10n_ua.bank.payment.line.user,model_l10n_ua_bank_payment_line,account.group_account_user,1,1,1,1

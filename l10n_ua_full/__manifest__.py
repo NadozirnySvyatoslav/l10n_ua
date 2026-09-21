@@ -52,7 +52,7 @@ PRRO (Cash Registers)
 ---------------------
 * Checkbox integration
     """,
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localizations',
     'author': 'Many2one',
     'website': 'https://many2one.online',

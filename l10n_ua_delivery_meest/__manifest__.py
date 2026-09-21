@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Meest Delivery',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Inventory/Delivery',
     'summary': 'Meest delivery integration',
     'description': """

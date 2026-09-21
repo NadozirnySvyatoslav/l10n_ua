@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin Clinical',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Клінічна картка пацієнта: прийоми, діагнози, МКХ-10',
     'description': """
@@ -25,7 +25,7 @@ Medecin Clinical
         'l10n_ua_medecin_patient',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/l10n_ua_medecin_icd10_data.xml',
         'views/l10n_ua_medecin_icd10_views.xml',

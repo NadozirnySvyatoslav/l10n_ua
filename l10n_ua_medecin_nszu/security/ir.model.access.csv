@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_package_user,access.package.user,model_l10n_ua_medecin_nszu_package,l10n_ua_medecin_base.group_ua_medecin_user,1,0,0,0
-access_package_manager,access.package.manager,model_l10n_ua_medecin_nszu_package,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1
-access_contract_user,access.contract.user,model_l10n_ua_medecin_nszu_contract,l10n_ua_medecin_base.group_ua_medecin_user,1,1,1,0
-access_contract_manager,access.contract.manager,model_l10n_ua_medecin_nszu_contract,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1
-access_contract_line_user,access.contract.line.user,model_l10n_ua_medecin_nszu_contract_line,l10n_ua_medecin_base.group_ua_medecin_user,1,1,1,1
-access_contract_line_manager,access.contract.line.manager,model_l10n_ua_medecin_nszu_contract_line,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Education ЄДЕБО XML Import',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Education',
     'summary': 'Підтримка XML-формату обміну з ЄДЕБО (МОН)',
     'description': """

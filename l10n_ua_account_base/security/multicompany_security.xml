@@ -8,58 +8,58 @@
              ALL companies, including non-UA ones. Standard Odoo pattern
              (see l10n_ua_account_vat security). -->
 
-        <record id="l10n_ua_journal_order_company_rule" model="ir.rule">
+        <record id="l10n_ua_journal_order_company_rule" model="ir.access">
             <field name="name">Журнал-ордер: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_journal_order"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_account_card_company_rule" model="ir.rule">
+        <record id="l10n_ua_account_card_company_rule" model="ir.access">
             <field name="name">Картка рахунку: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_account_card"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-<record id="l10n_ua_account_analysis_company_rule" model="ir.rule">
+<record id="l10n_ua_account_analysis_company_rule" model="ir.access">
             <field name="name">Аналіз рахунку: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_account_analysis"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-<record id="l10n_ua_general_ledger_company_rule" model="ir.rule">
+<record id="l10n_ua_general_ledger_company_rule" model="ir.access">
             <field name="name">Головна книга: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_general_ledger"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-<record id="l10n_ua_chess_sheet_company_rule" model="ir.rule">
+<record id="l10n_ua_chess_sheet_company_rule" model="ir.access">
             <field name="name">Шахматка: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_chess_sheet"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_osv_company_rule" model="ir.rule">
+        <record id="l10n_ua_osv_company_rule" model="ir.access">
             <field name="name">Оборотно-сальдова відомість: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_osv"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

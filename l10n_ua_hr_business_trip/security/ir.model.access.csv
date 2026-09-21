@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_business_trip_report_hr_user,l10n_ua.business.trip.report.hr.user,model_l10n_ua_business_trip_report,l10n_ua_hr_base.group_hr_ua_user,1,1,1,0
-access_business_trip_report_account_user,l10n_ua.business.trip.report.account.user,model_l10n_ua_business_trip_report,account.group_account_user,1,1,1,0
-access_business_trip_report_hr_manager,l10n_ua.business.trip.report.hr.manager,model_l10n_ua_business_trip_report,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Salary',
-    'version': '19.0.1.4.4',
+    'version': '20.0.1.4.4',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian salary calculation',
     'description': """
@@ -36,7 +36,7 @@ to avoid naming conflicts with existing modules on Odoo Apps.
         'l10n_ua_hr_contract',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'data/hr_accrual_type_data.xml',

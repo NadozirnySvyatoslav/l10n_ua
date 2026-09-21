@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_bonus_type_user,hr.bonus.type.user,model_hr_bonus_type,hr.group_hr_user,1,0,0,0
-access_hr_bonus_type_officer,hr.bonus.type.officer,model_hr_bonus_type,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
-access_hr_bonus_type_manager,hr.bonus.type.manager,model_hr_bonus_type,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
-access_hr_bonus_user,hr.bonus.user,model_hr_bonus,hr.group_hr_user,1,0,0,0
-access_hr_bonus_officer,hr.bonus.officer,model_hr_bonus,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
-access_hr_bonus_manager,hr.bonus.manager,model_hr_bonus,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

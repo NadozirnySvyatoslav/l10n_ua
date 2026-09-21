@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Bank Currency Sync',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Sync currency rates from NBU, PrivatBank, Monobank',
     'description': """
@@ -27,7 +27,7 @@ Features:
         'l10n_ua_bank_sync',  # For Bank UA menu integration
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/res_currency_rate_provider_data.xml',
         'data/ir_cron_data.xml',
         'views/res_currency_rate_provider_views.xml',

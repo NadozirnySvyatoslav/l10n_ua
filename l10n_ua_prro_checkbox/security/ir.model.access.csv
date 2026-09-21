@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_prro_checkbox_config_manager,l10n_ua.prro.checkbox.config.manager,model_l10n_ua_prro_checkbox_config,point_of_sale.group_pos_manager,1,1,1,1

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Documents',
-    'version': '19.0.1.1.1',
+    'version': '20.0.1.1.1',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR document templates and orders',
     'description': """
@@ -30,7 +30,7 @@ Requires l10n_ua_hr_base module.
         'mail',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'security/hr_order_security.xml',
         'data/ir_sequence_data.xml',

@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_hr_salary_account_config_user,hr.salary.account.config.user,model_hr_salary_account_config,hr.group_hr_user,r,
+access_hr_salary_account_config_manager,hr.salary.account.config.manager,model_hr_salary_account_config,l10n_ua_hr_base.group_hr_ua_manager,crud,

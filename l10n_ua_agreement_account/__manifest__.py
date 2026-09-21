@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Agreements Accounting (Взаєморозрахунки за договорами)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Взаєморозрахунки у розрізі договорів: договір у рахунках, '
                'платежах та акті звірки',

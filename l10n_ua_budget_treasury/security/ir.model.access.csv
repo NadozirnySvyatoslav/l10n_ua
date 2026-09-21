@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_treasury_organ_user,access.l10n_ua.treasury.organ.user,model_l10n_ua_treasury_organ,l10n_ua_budget_base.group_ua_budget_user,1,0,0,0
-access_l10n_ua_treasury_organ_manager,access.l10n_ua.treasury.organ.manager,model_l10n_ua_treasury_organ,l10n_ua_budget_base.group_ua_budget_manager,1,1,1,1
-access_l10n_ua_treasury_statement_import,access.l10n_ua.treasury.statement.import,model_l10n_ua_treasury_statement_import,l10n_ua_budget_base.group_ua_budget_user,1,1,1,1

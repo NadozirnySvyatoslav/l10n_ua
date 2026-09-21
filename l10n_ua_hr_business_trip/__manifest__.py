@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Business Trip Report (Звіт про відрядження)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Localization',
     'summary': 'Звіт про відрядження: добові за нормами, проїзд/проживання, '
                'друкована форма, зв’язок з наказом та авансовим звітом',
@@ -27,7 +27,7 @@ Ukraine Business Trip Report
         'l10n_ua_accounting',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/ir_sequence_data.xml',
         'views/res_company_views.xml',
         'views/business_trip_report_views.xml',

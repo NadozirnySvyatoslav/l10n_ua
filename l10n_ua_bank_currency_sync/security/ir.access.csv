@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_res_currency_rate_provider_user,res.currency.rate.provider.user,model_res_currency_rate_provider,account.group_account_user,r,
+access_res_currency_rate_provider_manager,res.currency.rate.provider.manager,model_res_currency_rate_provider,account.group_account_manager,crud,
+access_currency_sync_wizard_user,l10n_ua.currency.sync.wizard.user,model_l10n_ua_currency_sync_wizard,account.group_account_user,crud,

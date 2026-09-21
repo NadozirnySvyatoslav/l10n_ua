@@ -1,0 +1,9 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_prro_config_user,l10n_ua.prro.config.user,model_l10n_ua_prro_config,point_of_sale.group_pos_user,r,
+access_l10n_ua_prro_config_manager,l10n_ua.prro.config.manager,model_l10n_ua_prro_config,point_of_sale.group_pos_manager,crud,
+access_l10n_ua_prro_shift_user,l10n_ua.prro.shift.user,model_l10n_ua_prro_shift,point_of_sale.group_pos_user,cru,
+access_l10n_ua_prro_shift_manager,l10n_ua.prro.shift.manager,model_l10n_ua_prro_shift,point_of_sale.group_pos_manager,crud,
+access_l10n_ua_prro_receipt_user,l10n_ua.prro.receipt.user,model_l10n_ua_prro_receipt,point_of_sale.group_pos_user,cru,
+access_l10n_ua_prro_receipt_manager,l10n_ua.prro.receipt.manager,model_l10n_ua_prro_receipt,point_of_sale.group_pos_manager,crud,
+access_l10n_ua_prro_receipt_line_user,l10n_ua.prro.receipt.line.user,model_l10n_ua_prro_receipt_line,point_of_sale.group_pos_user,cru,
+access_l10n_ua_prro_receipt_line_manager,l10n_ua.prro.receipt.line.manager,model_l10n_ua_prro_receipt_line,point_of_sale.group_pos_manager,crud,

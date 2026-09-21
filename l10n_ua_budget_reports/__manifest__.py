@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Reports',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Друковані форми кошторису, звіти 2д/4-1д, меморіальні ордери',
     'description': """
@@ -27,7 +27,7 @@ Ukraine Budget Reports
         'l10n_ua_budget_estimate',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'reports/budget_estimate_report.xml',
         'reports/budget_form_2d_report.xml',
         'reports/budget_multi_form_report.xml',

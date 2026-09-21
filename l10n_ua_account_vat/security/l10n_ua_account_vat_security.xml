@@ -7,40 +7,40 @@
              without these rules the records were visible across ALL companies,
              including non-UA ones. Standard Odoo pattern (see hr_order rule). -->
 
-        <record id="l10n_ua_tax_invoice_company_rule" model="ir.rule">
+        <record id="l10n_ua_tax_invoice_company_rule" model="ir.access">
             <field name="name">Податкова накладна: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_tax_invoice"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_vat_register_company_rule" model="ir.rule">
+        <record id="l10n_ua_vat_register_company_rule" model="ir.access">
             <field name="name">Реєстр ПДВ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_vat_register"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_vat_declaration_company_rule" model="ir.rule">
+        <record id="l10n_ua_vat_declaration_company_rule" model="ir.access">
             <field name="name">Декларація з ПДВ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_vat_declaration"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_vat_erpn_limit_company_rule" model="ir.rule">
+        <record id="l10n_ua_vat_erpn_limit_company_rule" model="ir.access">
             <field name="name">Ліміт ЄРПН: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_vat_erpn_limit"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Education Base',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Education',
     'summary': 'Облік освітніх закладів: типи установ, контингент, навчальні групи',
     'description': """
@@ -35,7 +35,7 @@ Ukraine Education Base
     ],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/l10n_ua_education_academic_year_data.xml',
         'views/res_company_views.xml',

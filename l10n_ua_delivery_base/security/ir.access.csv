@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_delivery_warehouse_user,l10n_ua.delivery.warehouse.user,model_l10n_ua_delivery_warehouse,stock.group_stock_user,r,
+access_l10n_ua_delivery_warehouse_manager,l10n_ua.delivery.warehouse.manager,model_l10n_ua_delivery_warehouse,stock.group_stock_manager,crud,

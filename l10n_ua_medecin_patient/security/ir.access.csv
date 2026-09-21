@@ -1,0 +1,5 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_patient_user,access.patient.user,model_l10n_ua_medecin_patient,l10n_ua_medecin_base.group_ua_medecin_user,cru,
+access_patient_manager,access.patient.manager,model_l10n_ua_medecin_patient,l10n_ua_medecin_base.group_ua_medecin_manager,crud,
+access_declaration_user,access.declaration.user,model_l10n_ua_medecin_declaration,l10n_ua_medecin_base.group_ua_medecin_user,cru,
+access_declaration_manager,access.declaration.manager,model_l10n_ua_medecin_declaration,l10n_ua_medecin_base.group_ua_medecin_manager,crud,

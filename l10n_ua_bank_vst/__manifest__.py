@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - VST Bank (iBank 2 UA) Integration',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'summary': 'Імпорт виписок VST Bank (Банк Восток) з файлу iBank 2 UA (CSV)',
     'category': 'Accounting/Localizations',
     'author': 'Svyatoslav Nadozirny',
@@ -9,7 +9,7 @@
         'l10n_ua_bank_sync',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/l10n_ua_bank_vst_config_views.xml',
     ],
     'installable': True,

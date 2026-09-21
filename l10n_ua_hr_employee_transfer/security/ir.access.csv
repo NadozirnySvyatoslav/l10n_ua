@@ -1,0 +1,2 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_hr_employee_transfer_wizard_hr_manager,hr.employee.transfer.wizard hr_manager,model_hr_employee_transfer_wizard,hr.group_hr_manager,crud,

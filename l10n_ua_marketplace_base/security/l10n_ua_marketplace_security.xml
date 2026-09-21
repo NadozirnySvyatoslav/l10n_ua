@@ -34,44 +34,4 @@
     </record>
 
 </data>
-<data noupdate="1">
-
-    <!-- Record Rules -->
-
-    <!-- Backend: Users see only active backends of their company -->
-    <record id="marketplace_backend_rule_user" model="ir.rule">
-        <field name="name">Marketplace Backend: User sees company backends</field>
-        <field name="model_id" ref="model_marketplace_backend"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-        <field name="groups" eval="[(4, ref('group_marketplace_user'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="False"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
-    </record>
-
-    <record id="marketplace_backend_rule_manager" model="ir.rule">
-        <field name="name">Marketplace Backend: Manager full access to company</field>
-        <field name="model_id" ref="model_marketplace_backend"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-        <field name="groups" eval="[(4, ref('group_marketplace_manager'))]"/>
-    </record>
-
-    <!-- Orders: Multi-company rule -->
-    <record id="marketplace_order_rule_company" model="ir.rule">
-        <field name="name">Marketplace Order: Multi-company</field>
-        <field name="model_id" ref="model_marketplace_order"/>
-        <field name="domain_force">[('backend_id.company_id', 'in', company_ids)]</field>
-        <field name="groups" eval="[(4, ref('group_marketplace_user'))]"/>
-    </record>
-
-    <!-- Pricelist: Multi-company rule -->
-    <record id="marketplace_pricelist_rule_company" model="ir.rule">
-        <field name="name">Marketplace Pricelist: Multi-company</field>
-        <field name="model_id" ref="model_marketplace_pricelist"/>
-        <field name="domain_force">[('backend_id.company_id', 'in', company_ids)]</field>
-        <field name="groups" eval="[(4, ref('group_marketplace_user'))]"/>
-    </record>
-
-</data>
 </odoo>

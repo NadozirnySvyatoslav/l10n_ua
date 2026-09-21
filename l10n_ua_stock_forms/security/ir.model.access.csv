@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_material_report_wizard_user,l10n_ua.material.report.wizard.user,model_l10n_ua_material_report_wizard,stock.group_stock_user,1,1,1,1
-access_l10n_ua_material_report_line_user,l10n_ua.material.report.line.user,model_l10n_ua_material_report_line,stock.group_stock_user,1,1,1,1

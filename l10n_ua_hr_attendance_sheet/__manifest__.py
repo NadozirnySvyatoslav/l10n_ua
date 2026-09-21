@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Attendance Sheet',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian attendance sheet (Табель обліку робочого часу)',
     'description': """
@@ -28,7 +28,7 @@ Requires l10n_ua_hr_base module.
         'l10n_ua_hr_holidays',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/hr_timesheet_code_data.xml',
         'views/hr_timesheet_views.xml',

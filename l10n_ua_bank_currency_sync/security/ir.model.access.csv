@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_res_currency_rate_provider_user,res.currency.rate.provider.user,model_res_currency_rate_provider,account.group_account_user,1,0,0,0
-access_res_currency_rate_provider_manager,res.currency.rate.provider.manager,model_res_currency_rate_provider,account.group_account_manager,1,1,1,1
-access_currency_sync_wizard_user,l10n_ua.currency.sync.wizard.user,model_l10n_ua_currency_sync_wizard,account.group_account_user,1,1,1,1

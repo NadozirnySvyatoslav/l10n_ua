@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - PRRO Base',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian PRRO (fiscal registrar) base module',
     'description': """
@@ -25,7 +25,7 @@ Requires l10n_ua_account_base module.
         'point_of_sale',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/pos_payment_method_data.xml',
         'views/l10n_ua_prro_config_views.xml',

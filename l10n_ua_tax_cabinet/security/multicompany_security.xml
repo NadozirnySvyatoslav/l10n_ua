@@ -7,31 +7,31 @@
              so records leaked across ALL companies, including non-UA ones.
              Standard Odoo pattern (see l10n_ua_account_vat). -->
 
-        <record id="l10n_ua_tax_cabinet_config_company_rule" model="ir.rule">
+        <record id="l10n_ua_tax_cabinet_config_company_rule" model="ir.access">
             <field name="name">Конфігурація Електронного кабінету: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_tax_cabinet_config"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_company_kved_company_rule" model="ir.rule">
+        <record id="l10n_ua_company_kved_company_rule" model="ir.access">
             <field name="name">КВЕД компанії: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_company_kved"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_tax_request_company_rule" model="ir.rule">
+        <record id="l10n_ua_tax_request_company_rule" model="ir.access">
             <field name="name">Інформаційний запит до ДПС: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_tax_request"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

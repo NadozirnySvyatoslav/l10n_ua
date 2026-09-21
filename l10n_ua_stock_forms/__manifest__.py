@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Stock Reports',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Inventory/Localization',
     'summary': 'Ukrainian warehouse forms: the material report',
     'description': """
@@ -26,7 +26,7 @@ charge has not, so the form is still what Ukrainian accountants ask for.
         'stock',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/material_report_security.xml',
         'report/material_report.xml',
         # The screen first, then the dialog it opens: the period form is

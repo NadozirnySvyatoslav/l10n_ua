@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR FSS Settlements',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'summary': 'Взаєморозрахунки з ФСС: звірка, сальдо, відшкодування лікарняних',
     'category': 'Human Resources/Payroll',
     'author': 'Svyatoslav Nadozirny',
@@ -10,7 +10,7 @@
         'account',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/ir_sequence_data.xml',
         'views/hr_fss_settlement_views.xml',
     ],

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin (Усе для закладів охорони здоров\'я)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Umbrella: повний стек для медичних закладів України',
     'description': """

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget (Усе для бюджетних установ)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Umbrella: встановлює увесь стек для бюджетних установ',
     'description': """

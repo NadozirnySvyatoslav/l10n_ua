@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_certificate_type_user,hr.certificate.type.user,model_hr_certificate_type,hr.group_hr_user,1,0,0,0
-access_hr_certificate_type_manager,hr.certificate.type.manager,model_hr_certificate_type,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
-access_hr_certificate_user,hr.certificate.user,model_hr_certificate,hr.group_hr_user,1,0,0,0
-access_hr_certificate_officer,hr.certificate.officer,model_hr_certificate,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
-access_hr_certificate_manager,hr.certificate.manager,model_hr_certificate,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

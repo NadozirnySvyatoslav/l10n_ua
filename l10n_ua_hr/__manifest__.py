@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Complete',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Localization',
     'summary': 'Complete Ukrainian HR localization package',
     'description': """

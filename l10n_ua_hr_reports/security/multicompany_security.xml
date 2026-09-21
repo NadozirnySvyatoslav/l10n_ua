@@ -7,40 +7,40 @@
              ir.rule, so records leaked across ALL companies. Standard Odoo
              pattern (see l10n_ua_account_vat pilot). -->
 
-        <record id="hr_report_1df_company_rule" model="ir.rule">
+        <record id="hr_report_1df_company_rule" model="ir.access">
             <field name="name">Звіт 1ДФ: multi-company</field>
             <field name="model_id" ref="model_hr_report_1df"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="hr_report_headcount_company_rule" model="ir.rule">
+        <record id="hr_report_headcount_company_rule" model="ir.access">
             <field name="name">Звіт про чисельність: multi-company</field>
             <field name="model_id" ref="model_hr_report_headcount"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="hr_report_d5_company_rule" model="ir.rule">
+        <record id="hr_report_d5_company_rule" model="ir.access">
             <field name="name">Звіт Д5: multi-company</field>
             <field name="model_id" ref="model_hr_report_d5"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="hr_report_wage_fund_company_rule" model="ir.rule">
+        <record id="hr_report_wage_fund_company_rule" model="ir.access">
             <field name="name">Звіт по фонду оплати праці: multi-company</field>
             <field name="model_id" ref="model_hr_report_wage_fund"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

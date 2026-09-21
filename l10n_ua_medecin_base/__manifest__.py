@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin Base',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Базис для українських закладів охорони здоров\'я',
     'description': """
@@ -34,7 +34,7 @@ Ukraine Medecin Base
     ],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/l10n_ua_medecin_specialty_data.xml',
         'views/res_company_views.xml',
         'views/l10n_ua_medecin_specialty_views.xml',

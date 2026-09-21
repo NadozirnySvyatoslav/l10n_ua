@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '19.0.7.1.0',
+    'version': '20.0.7.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
@@ -67,7 +67,7 @@ Dependencies:
     ],
     'data': [
         # Security
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         # Data
         'data/period_closing_data.xml',

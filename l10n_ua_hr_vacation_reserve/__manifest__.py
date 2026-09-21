@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Vacation Reserve',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Localization',
     'summary': 'Резерв відпусток: автоматичне нарахування проводок (П(С)БО 26)',
     'description': """
@@ -28,7 +28,7 @@ Requires l10n_ua_hr_holidays, l10n_ua_hr_salary, and account modules.
         'l10n_ua_hr_salary',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'data/ir_cron_data.xml',

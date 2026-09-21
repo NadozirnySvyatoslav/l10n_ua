@@ -57,7 +57,9 @@
                 <field name="edrpou"/>
                 <field name="ipn"/>
             </field>
-            <filter name="type_company" position="after">
+            <!-- Odoo 20 dropped the company/person filters from the core
+                 search view; anchor on the VAT filter instead. -->
+            <filter name="filter_vat_set" position="after">
                 <filter name="vat_payer" string="VAT Payers" domain="[('is_vat_payer', '=', True)]"/>
             </filter>
         </field>

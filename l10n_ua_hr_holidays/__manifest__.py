@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Holidays',
-    'version': '19.0.1.0.8',
+    'version': '20.0.1.0.8',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian holidays and sick leave management',
     'description': """
@@ -31,7 +31,7 @@ Requires l10n_ua_hr_base module.
         'l10n_ua_hr_documents',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'security/hr_vacation_balance_security.xml',
         'security/hr_leave_officer_security.xml',

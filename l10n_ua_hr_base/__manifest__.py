@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Base',
-    'version': '19.0.1.7.0',
+    'version': '20.0.1.7.0',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR localization base module',
     'description': """
@@ -33,7 +33,7 @@ This module is required for all other l10n_ua_hr_* modules.
     ],
     'data': [
         'security/hr_ua_security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/hr_education_level_data.xml',
         'data/hr_military_rank_data.xml',

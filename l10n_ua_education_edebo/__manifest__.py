@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Education ЄДЕБО Integration',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Education',
     'summary': 'Імпорт/експорт контингенту з ЄДЕБО (Єдина державна електронна база освіти)',
     'description': """
@@ -32,7 +32,7 @@ Ukraine Education ЄДЕБО Integration
         'l10n_ua_education_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'wizard/l10n_ua_edebo_import_views.xml',
         'wizard/l10n_ua_edebo_export_views.xml',
         'views/menu_views.xml',

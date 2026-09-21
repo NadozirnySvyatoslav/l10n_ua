@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Supplier Prices SFTP Fetcher',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Purchases/Localization',
     'summary': 'SFTP fetcher для імпорту прайсів постачальників',
     'description': """

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Treasury DBF Import',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Імпорт виписок ДКСУ у форматі DBase III/IV',
     'description': """

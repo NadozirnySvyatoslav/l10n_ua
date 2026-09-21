@@ -1,9 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_fop_group_user,l10n_ua.fop.group.user,model_l10n_ua_fop_group,account.group_account_user,1,0,0,0
-access_l10n_ua_fop_group_manager,l10n_ua.fop.group.manager,model_l10n_ua_fop_group,account.group_account_manager,1,1,1,1
-access_l10n_ua_fop_income_book_user,l10n_ua.fop.income.book.user,model_l10n_ua_fop_income_book,account.group_account_user,1,1,1,0
-access_l10n_ua_fop_income_book_manager,l10n_ua.fop.income.book.manager,model_l10n_ua_fop_income_book,account.group_account_manager,1,1,1,1
-access_l10n_ua_fop_income_book_line_user,l10n_ua.fop.income.book.line.user,model_l10n_ua_fop_income_book_line,account.group_account_user,1,1,1,0
-access_l10n_ua_fop_income_book_line_manager,l10n_ua.fop.income.book.line.manager,model_l10n_ua_fop_income_book_line,account.group_account_manager,1,1,1,1
-access_l10n_ua_fop_declaration_user,l10n_ua.fop.declaration.user,model_l10n_ua_fop_declaration,account.group_account_user,1,1,1,0
-access_l10n_ua_fop_declaration_manager,l10n_ua.fop.declaration.manager,model_l10n_ua_fop_declaration,account.group_account_manager,1,1,1,1

@@ -1,9 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_kvkv_user,access.l10n_ua.kvkv.user,model_l10n_ua_kvkv,group_ua_budget_user,1,0,0,0
-access_l10n_ua_kvkv_manager,access.l10n_ua.kvkv.manager,model_l10n_ua_kvkv,group_ua_budget_manager,1,1,1,1
-access_l10n_ua_kekv_user,access.l10n_ua.kekv.user,model_l10n_ua_kekv,group_ua_budget_user,1,0,0,0
-access_l10n_ua_kekv_manager,access.l10n_ua.kekv.manager,model_l10n_ua_kekv,group_ua_budget_manager,1,1,1,1
-access_l10n_ua_kfk_user,access.l10n_ua.kfk.user,model_l10n_ua_kfk,group_ua_budget_user,1,0,0,0
-access_l10n_ua_kfk_manager,access.l10n_ua.kfk.manager,model_l10n_ua_kfk,group_ua_budget_manager,1,1,1,1
-access_l10n_ua_kpkvk_user,access.l10n_ua.kpkvk.user,model_l10n_ua_kpkvk,group_ua_budget_user,1,0,0,0
-access_l10n_ua_kpkvk_manager,access.l10n_ua.kpkvk.manager,model_l10n_ua_kpkvk,group_ua_budget_manager,1,1,1,1

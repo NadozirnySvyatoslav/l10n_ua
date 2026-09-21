@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Certificates',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources/Localization',
     'summary': 'Standard HR certificates and references for Ukrainian companies',
     'description': """
@@ -34,7 +34,7 @@ Requires l10n_ua_hr_base module.
         'l10n_ua_hr_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'data/hr_certificate_type_data.xml',

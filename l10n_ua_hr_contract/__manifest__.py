@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Contracts',
-    'version': '19.0.8.2.0',
+    'version': '20.0.8.2.0',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR contracts localization (extends hr.version)',
     'description': """
@@ -33,7 +33,7 @@ Requires l10n_ua_hr_base module.
         'resource',   # explicit: we now inherit resource.calendar
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'data/hr_allowance_type_data.xml',

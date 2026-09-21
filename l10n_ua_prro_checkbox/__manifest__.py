@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - PRRO Checkbox',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Checkbox PRRO integration',
     'description': """
@@ -25,7 +25,7 @@ Requires l10n_ua_prro_base module.
         'l10n_ua_prro_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/l10n_ua_prro_checkbox_config_views.xml',
         'views/menu_views.xml',
     ],

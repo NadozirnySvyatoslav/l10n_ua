@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Company Registration Data',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'EDRPOU, KATOTTG, tax office and other statutory company details',
     'description': """

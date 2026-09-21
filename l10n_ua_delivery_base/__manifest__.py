@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Delivery Base',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Inventory/Delivery',
     'summary': 'Ukrainian delivery carriers base module',
     'description': """
@@ -24,7 +24,7 @@ Requires l10n_ua_account_base module.
         'l10n_ua_account_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/delivery_carrier_views.xml',
         'views/l10n_ua_delivery_warehouse_views.xml',
         'views/menu_views.xml',

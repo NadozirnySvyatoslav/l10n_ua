@@ -5,43 +5,34 @@
         <!-- Ukraine HR officers manage vacations end to end: they prepare the
              vacation order, confirm it once the printed order is signed, and
              that act grants the leave. Core only lets a plain user see their
-             OWN time off (hr_leave_rule_employee), so without these rules an
+             OWN time off (hr_leave_rule_employee), so without these accesses an
              HR officer could not even read the leave their own order grants —
              the code had to fall back on elevated access everywhere.
 
-             Record rules of different groups are ORed, so these widen access
+             Permissions of different groups are ORed, so these widen access
              for HR officers without loosening anything for other users. Scope
              is the officer's allowed companies; unlink is deliberately NOT
              granted — a leave is cancelled or refused, not deleted. -->
 
-        <record id="hr_leave_rule_ua_officer_read" model="ir.rule">
+        <record id="hr_leave_rule_ua_officer_read" model="ir.access">
             <field name="name">Time Off: Ukraine HR Officer read</field>
             <field name="model_id" ref="hr_holidays.model_hr_leave"/>
-            <field name="groups"
-                   eval="[(4, ref('l10n_ua_hr_base.group_hr_ua_officer'))]"/>
-            <field name="domain_force">
+            <field name="group_id" ref="l10n_ua_hr_base.group_hr_ua_officer"/>
+            <field name="operation">r</field>
+            <field name="domain">
                 [('employee_id.company_id', 'in', company_ids)]
             </field>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
         </record>
 
-        <record id="hr_leave_rule_ua_officer_update" model="ir.rule">
+        <record id="hr_leave_rule_ua_officer_update" model="ir.access">
             <field name="name">Time Off: Ukraine HR Officer create/write</field>
             <field name="model_id" ref="hr_holidays.model_hr_leave"/>
-            <field name="groups"
-                   eval="[(4, ref('l10n_ua_hr_base.group_hr_ua_officer'))]"/>
-            <field name="domain_force">
+            <field name="group_id" ref="l10n_ua_hr_base.group_hr_ua_officer"/>
+            <field name="operation">cu</field>
+            <field name="domain">
                 [('employee_id.company_id', 'in', company_ids)]
             </field>
-            <field name="perm_read" eval="False"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="False"/>
         </record>
 
     </data>
 </odoo>
-

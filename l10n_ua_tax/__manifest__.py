@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Tax',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian tax documents and reporting',
     'description': """
@@ -32,7 +32,7 @@ Requires l10n_ua_account_base module.
         'l10n_ua_account_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/account_tax_data.xml',
         'data/l10n_ua_budget_code_data.xml',

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Base (Public Sector)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Foundation for Ukrainian public-sector accounting: budget classifications and fund accounting',
     'description': """
@@ -36,7 +36,7 @@ Regulatory basis: Бюджетний кодекс України, Наказ М�
     ],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/l10n_ua.kvkv.csv',
         'data/l10n_ua.kfk.csv',
         'data/l10n_ua.kekv.csv',

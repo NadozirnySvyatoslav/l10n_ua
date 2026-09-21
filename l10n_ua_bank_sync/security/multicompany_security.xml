@@ -10,22 +10,22 @@
              stored-related on job (config_id.company_id). Standard Odoo
              pattern (see VAT rule). -->
 
-        <record id="l10n_ua_bank_sync_config_company_rule" model="ir.rule">
+        <record id="l10n_ua_bank_sync_config_company_rule" model="ir.access">
             <field name="name">Конфігурація банк-синку: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_bank_sync_config"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_bank_sync_job_company_rule" model="ir.rule">
+        <record id="l10n_ua_bank_sync_job_company_rule" model="ir.access">
             <field name="name">Завдання синхронізації: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_bank_sync_job"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

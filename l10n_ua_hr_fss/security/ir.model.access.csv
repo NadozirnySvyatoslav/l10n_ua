@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_fss_settlement_user,hr.fss.settlement.user,model_hr_fss_settlement,hr.group_hr_user,1,0,0,0
-access_hr_fss_settlement_officer,hr.fss.settlement.officer,model_hr_fss_settlement,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
-access_hr_fss_settlement_manager,hr.fss.settlement.manager,model_hr_fss_settlement,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

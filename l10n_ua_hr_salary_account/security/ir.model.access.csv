@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_hr_salary_account_config_user,hr.salary.account.config.user,model_hr_salary_account_config,hr.group_hr_user,1,0,0,0
-access_hr_salary_account_config_manager,hr.salary.account.config.manager,model_hr_salary_account_config,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

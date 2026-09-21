@@ -1,0 +1,2 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_tax_document_wizard_activity_user,l10n_ua.tax.document.wizard.activity.user,model_l10n_ua_tax_document_wizard_activity,base.group_user,crud,

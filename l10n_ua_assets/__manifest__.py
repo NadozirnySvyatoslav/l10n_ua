@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Fixed Assets',
-    'version': '19.0.3.1.0',
+    'version': '20.0.3.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian fixed assets: depreciation, OZ-6, acts, MNMA, revaluation, modernization, inventory',
     'description': """
@@ -37,7 +37,7 @@ Requires l10n_ua_account_base and l10n_ua_doc_reports modules.
     ],
     'data': [
         # Security
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         # Data
         'data/l10n_ua_asset_group_data.xml',

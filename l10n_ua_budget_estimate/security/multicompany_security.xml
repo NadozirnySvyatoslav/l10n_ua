@@ -7,22 +7,22 @@
              компанії. Рядок кошторису має stored related company_id — теж
              гейтуємо, бо доступний напряму. -->
 
-        <record id="l10n_ua_budget_estimate_company_rule" model="ir.rule">
+        <record id="l10n_ua_budget_estimate_company_rule" model="ir.access">
             <field name="name">Кошторис: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_budget_estimate"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_budget_estimate_line_company_rule" model="ir.rule">
+        <record id="l10n_ua_budget_estimate_line_company_rule" model="ir.access">
             <field name="name">Рядок кошторису: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_budget_estimate_line"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

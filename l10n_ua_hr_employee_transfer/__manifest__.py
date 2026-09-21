@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Employee Transfer',
-    'version': '19.0.1.2.0',
+    'version': '20.0.1.2.0',
     'category': 'Human Resources/Localization',
     'summary': 'Переведення співробітника в іншу організацію (КЗпП ст. 36 п. 5)',
     'description': """
@@ -41,7 +41,7 @@ Wizard для переведення співробітника з однієї 
         'l10n_ua_hr_documents',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'wizard/hr_employee_transfer_wizard_views.xml',
         'views/hr_employee_views.xml',
     ],

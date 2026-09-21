@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account VAT',
-    'version': '19.0.5.1.0',
+    'version': '20.0.5.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian VAT: tax invoices, registers, declaration',
     'description': """
@@ -30,7 +30,7 @@ Requires l10n_ua_tax module.
         'l10n_ua_tax_cabinet',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/l10n_ua_account_vat_security.xml',
         'data/ir_sequence_data.xml',
         'report/tax_invoice_report.xml',

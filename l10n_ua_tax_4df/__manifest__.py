@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - 4DF Unified Tax Report',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': '4ДФ — об\'єднана квартальна звітність ПДФО/ВЗ/ЄСВ '
                '(заміна 1ДФ + Д5 з 01.01.2021)',
@@ -34,7 +34,7 @@ a filing for submission through M.E.Doc / FREDO / Tax Cabinet.
         'l10n_ua_tax_cabinet',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/l10n_ua_tax_4df_views.xml',
         'views/menu_views.xml',
     ],

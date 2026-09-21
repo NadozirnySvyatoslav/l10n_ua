@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Estimate (Кошториси)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Кошториси бюджетних установ: план асигнувань і контроль виконання',
     'description': """
@@ -34,7 +34,7 @@ Ukraine Budget Estimate
         'l10n_ua_budget_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'views/l10n_ua_budget_estimate_views.xml',

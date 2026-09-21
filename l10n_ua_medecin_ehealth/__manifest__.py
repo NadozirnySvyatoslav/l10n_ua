@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin eHealth API',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Інтеграція з ЦК eHealth (МОЗ): декларації, eRx, eReferral',
     'description': """
@@ -37,7 +37,7 @@ endpoints, формати тіл запитів і автентифікація 
         'l10n_ua_medecin_patient',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/l10n_ua_ehealth_request_log_views.xml',
         'views/res_config_settings_views.xml',
         'views/l10n_ua_medecin_declaration_views.xml',

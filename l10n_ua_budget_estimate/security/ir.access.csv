@@ -1,0 +1,5 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_budget_estimate_user,access.l10n_ua.budget.estimate.user,model_l10n_ua_budget_estimate,l10n_ua_budget_base.group_ua_budget_user,r,
+access_l10n_ua_budget_estimate_manager,access.l10n_ua.budget.estimate.manager,model_l10n_ua_budget_estimate,l10n_ua_budget_base.group_ua_budget_manager,crud,
+access_l10n_ua_budget_estimate_line_user,access.l10n_ua.budget.estimate.line.user,model_l10n_ua_budget_estimate_line,l10n_ua_budget_base.group_ua_budget_user,r,
+access_l10n_ua_budget_estimate_line_manager,access.l10n_ua.budget.estimate.line.manager,model_l10n_ua_budget_estimate_line,l10n_ua_budget_base.group_ua_budget_manager,crud,

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Supplier Prices XML Parser',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Purchases/Localization',
     'summary': 'XML парсер для імпорту прайсів постачальників',
     'description': """

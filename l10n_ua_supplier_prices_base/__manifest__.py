@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Supplier Prices Base',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Purchases/Localization',
     'summary': 'Базовий модуль для імпорту прайс-листів постачальників',
     'description': """
@@ -33,7 +33,7 @@
     ],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/ir_cron_data.xml',
         'data/ir_sequence_data.xml',
         'views/l10n_ua_supplier_price_mapping_views.xml',

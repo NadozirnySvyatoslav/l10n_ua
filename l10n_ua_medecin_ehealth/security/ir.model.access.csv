@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ehealth_log_user,access.ehealth.log.user,model_l10n_ua_ehealth_request_log,l10n_ua_medecin_base.group_ua_medecin_user,1,0,0,0
-access_ehealth_log_mgr,access.ehealth.log.mgr,model_l10n_ua_ehealth_request_log,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1

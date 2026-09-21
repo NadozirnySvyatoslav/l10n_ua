@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - NBU QR Payment Links',
-    'version': '19.0.2.0.0',
+    'version': '20.0.2.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Платіжні QR-коди за стандартом НБУ',
     'description': """
@@ -14,7 +14,7 @@ Monobank Acquiring винесено в окремий модуль l10n_ua_mono_
     'license': 'LGPL-3',
     'depends': ['l10n_ua_account_base', 'sale'],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/nbu_qr_data.xml',
         'views/res_config_settings_views.xml',
         'views/sale_order_views.xml',

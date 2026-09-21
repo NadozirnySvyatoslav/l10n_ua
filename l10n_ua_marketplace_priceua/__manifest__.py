@@ -16,7 +16,7 @@ Features:
 Note: Price.ua is a feed-only integration (no API for orders/stock sync).
 The feed URL can be submitted to Price.ua merchant portal.
     """,
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Sales/Sales',
     'author': 'NDEV',
     'website': 'https://ndev.online',

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Marketplace Base',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Sales/Sales',
     'summary': 'Ukrainian marketplace integrations base module',
     'description': """
@@ -38,7 +38,7 @@ Supported marketplaces (via specific modules):
     'data': [
         # Security
         'security/l10n_ua_marketplace_security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         # Data
         'data/ir_sequence_data.xml',
         'data/ir_cron_data.xml',

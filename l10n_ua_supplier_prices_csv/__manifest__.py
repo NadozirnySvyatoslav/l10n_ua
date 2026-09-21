@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Supplier Prices CSV Parser',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Purchases/Localization',
     'summary': 'CSV парсер для імпорту прайсів постачальників',
     'description': """

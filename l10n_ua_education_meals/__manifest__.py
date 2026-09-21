@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Education Meals',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Education',
     'summary': 'Облік дитячого харчування для ЗДО і ШНЗ',
     'description': """
@@ -25,7 +25,7 @@ Education Meals
         'l10n_ua_education_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/l10n_ua_meal_recipe_views.xml',
         'views/l10n_ua_meal_menu_views.xml',
         'views/l10n_ua_meal_attendance_views.xml',

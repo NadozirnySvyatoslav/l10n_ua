@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_business_trip_report_hr_user,l10n_ua.business.trip.report.hr.user,model_l10n_ua_business_trip_report,l10n_ua_hr_base.group_hr_ua_user,cru,
+access_business_trip_report_account_user,l10n_ua.business.trip.report.account.user,model_l10n_ua_business_trip_report,account.group_account_user,cru,
+access_business_trip_report_hr_manager,l10n_ua.business.trip.report.hr.manager,model_l10n_ua_business_trip_report,l10n_ua_hr_base.group_hr_ua_manager,crud,

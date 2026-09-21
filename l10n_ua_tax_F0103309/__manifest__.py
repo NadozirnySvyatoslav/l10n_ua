@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Single Tax Declaration (F0103309)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Single Tax Declaration form F0103309 for FOP',
     'description': """
@@ -26,7 +26,7 @@ Requires l10n_ua_tax_cabinet module.
         'l10n_ua_tax_cabinet',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'wizard/l10n_ua_tax_F0103309_wizard_views.xml',
     ],
     'demo': [],

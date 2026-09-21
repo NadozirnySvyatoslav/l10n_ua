@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin Patient',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Пацієнти медичних закладів та декларації з лікарем (ПМД)',
     'description': """
@@ -29,7 +29,7 @@ Ukraine Medecin Patient
         'l10n_ua_medecin_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'data/ir_cron_data.xml',

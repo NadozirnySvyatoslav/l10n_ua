@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Tax Cabinet Integration',
-    'version': '19.0.2.0.0',
+    'version': '20.0.2.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Integration with cabinet.tax.gov.ua for document sync',
     'description': """
@@ -36,7 +36,7 @@ Extends l10n_ua.tax.document with cabinet-specific fields and actions.
         'l10n_ua_sign',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'wizard/l10n_ua_tax_cabinet_sync_wizard_views.xml',
         'wizard/l10n_ua_tax_document_wizard_views.xml',

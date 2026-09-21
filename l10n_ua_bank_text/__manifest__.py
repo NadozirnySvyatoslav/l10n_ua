@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Generic Text Bank Statement (BUH-1 / ІБІС)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'summary': 'Конфігурований імпорт текстової виписки клієнт-банку (BUH-1, ІБІС, CSV)',
     'category': 'Accounting/Localizations',
     'author': 'Svyatoslav Nadozirny',

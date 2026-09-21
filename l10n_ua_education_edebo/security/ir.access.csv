@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_edebo_import,access.l10n_ua.edebo.import,model_l10n_ua_edebo_import,l10n_ua_education_base.group_ua_education_manager,crud,
+access_l10n_ua_edebo_export,access.l10n_ua.edebo.export,model_l10n_ua_edebo_export,l10n_ua_education_base.group_ua_education_user,crud,

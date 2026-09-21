@@ -7,13 +7,13 @@
              so records leaked across ALL companies, including non-UA ones.
              Standard Odoo pattern (see l10n_ua_account_vat). -->
 
-        <record id="l10n_ua_tax_document_company_rule" model="ir.rule">
+        <record id="l10n_ua_tax_document_company_rule" model="ir.access">
             <field name="name">Податковий документ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_tax_document"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

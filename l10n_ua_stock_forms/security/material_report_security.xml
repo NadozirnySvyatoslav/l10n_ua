@@ -12,16 +12,18 @@
          The rules are global on purpose (no groups): global rules intersect,
          so no other module can widen them by adding a group rule of its own.
     -->
-    <record id="rule_material_report_wizard_own" model="ir.rule">
+    <record id="rule_material_report_wizard_own" model="ir.access">
         <field name="name">Material report: own reports only</field>
         <field name="model_id" ref="model_l10n_ua_material_report_wizard"/>
-        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="domain">[('create_uid', '=', user.id)]</field>
+        <field name="operation">crud</field>
     </record>
 
-    <record id="rule_material_report_line_own" model="ir.rule">
+    <record id="rule_material_report_line_own" model="ir.access">
         <field name="name">Material report lines: own reports only</field>
         <field name="model_id" ref="model_l10n_ua_material_report_line"/>
-        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="domain">[('create_uid', '=', user.id)]</field>
+        <field name="operation">crud</field>
     </record>
 
     <!-- The report is a document of one company: it is filed for one store,
@@ -39,16 +41,18 @@
          Global rules again, and they intersect with the ones above: a report is
          visible when it is both yours and of a company you have selected.
     -->
-    <record id="rule_material_report_wizard_company" model="ir.rule">
+    <record id="rule_material_report_wizard_company" model="ir.access">
         <field name="name">Material report: multi-company</field>
         <field name="model_id" ref="model_l10n_ua_material_report_wizard"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+        <field name="operation">crud</field>
     </record>
 
-    <record id="rule_material_report_line_company" model="ir.rule">
+    <record id="rule_material_report_line_company" model="ir.access">
         <field name="name">Material report lines: multi-company</field>
         <field name="model_id" ref="model_l10n_ua_material_report_line"/>
-        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+        <field name="operation">crud</field>
     </record>
 
 </odoo>

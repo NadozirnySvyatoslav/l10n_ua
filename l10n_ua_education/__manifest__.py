@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Education (Усе для закладів освіти)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Human Resources/Education',
     'summary': 'Umbrella: повний стек для українських освітніх установ',
     'description': """

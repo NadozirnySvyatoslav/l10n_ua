@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget КПКВК Bulk Import',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Імпорт довідника КПКВК з CSV/DBF Казначейства',
     'description': """
@@ -28,7 +28,7 @@ Wizard для масового завантаження довідника пр�
         'l10n_ua_budget_base',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'wizard/l10n_ua_kpkvk_import_views.xml',
         'views/menu_views.xml',
     ],

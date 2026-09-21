@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account Base Localization',
-    'version': '19.0.1.3.0',
+    'version': '20.0.1.3.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian localization base module with accounting',
     'description': """
@@ -38,7 +38,7 @@ This module is required for all other l10n_ua_* modules.
     ],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/res_country_state_data.xml',
         'data/l10n_ua_koatuu_data.xml',

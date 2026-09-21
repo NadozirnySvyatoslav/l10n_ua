@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Chart Template (Наказ 1203)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'План рахунків бухобліку в державному секторі (Наказ Мінфіну № 1203)',
     'description': """

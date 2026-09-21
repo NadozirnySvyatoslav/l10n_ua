@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Reports',
-    'version': '19.0.1.0.1',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR regulatory reports',
     'description': """
@@ -28,7 +28,7 @@ Requires l10n_ua_hr_salary module.
         'l10n_ua_tax_cabinet',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'views/hr_report_1df_views.xml',
         'views/hr_report_d5_views.xml',

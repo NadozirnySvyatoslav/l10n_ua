@@ -7,33 +7,33 @@
              without these rules the records were visible across ALL companies,
              including non-UA ones. Standard Odoo pattern (see l10n_ua_account_vat). -->
 
-        <record id="l10n_ua_prro_config_company_rule" model="ir.rule">
+        <record id="l10n_ua_prro_config_company_rule" model="ir.access">
             <field name="name">ПРРО конфіг: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_prro_config"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
         <!-- Shift has no own company_id — scope via config_id.company_id. -->
-        <record id="l10n_ua_prro_shift_company_rule" model="ir.rule">
+        <record id="l10n_ua_prro_shift_company_rule" model="ir.access">
             <field name="name">ПРРО зміна: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_prro_shift"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 [('config_id.company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
         <!-- Receipt has no own company_id — scope via shift_id.config_id.company_id. -->
-        <record id="l10n_ua_prro_receipt_company_rule" model="ir.rule">
+        <record id="l10n_ua_prro_receipt_company_rule" model="ir.access">
             <field name="name">ПРРО чек: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_prro_receipt"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 [('shift_id.config_id.company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

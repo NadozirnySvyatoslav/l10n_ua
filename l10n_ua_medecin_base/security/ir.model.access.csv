@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_medecin_specialty_user,access.l10n_ua.medecin.specialty.user,model_l10n_ua_medecin_specialty,group_ua_medecin_user,1,0,0,0
-access_l10n_ua_medecin_specialty_manager,access.l10n_ua.medecin.specialty.manager,model_l10n_ua_medecin_specialty,group_ua_medecin_manager,1,1,1,1

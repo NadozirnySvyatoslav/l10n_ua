@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Bank Sync Base',
-    'version': '19.0.1.1.0',
+    'version': '20.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian bank synchronization base module',
     'description': """
@@ -29,7 +29,7 @@ from this module and implement bank-specific API calls.
         'mail',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/res_bank_data.xml',
         'data/ir_cron_data.xml',

@@ -7,22 +7,22 @@
              so records leaked across ALL companies. Standard Odoo pattern
              (see l10n_ua_account_vat pilot). -->
 
-        <record id="hr_certificate_company_rule" model="ir.rule">
+        <record id="hr_certificate_company_rule" model="ir.access">
             <field name="name">Довідка: multi-company</field>
             <field name="model_id" ref="model_hr_certificate"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="hr_certificate_type_company_rule" model="ir.rule">
+        <record id="hr_certificate_type_company_rule" model="ir.access">
             <field name="name">Тип довідки: multi-company</field>
             <field name="model_id" ref="model_hr_certificate_type"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

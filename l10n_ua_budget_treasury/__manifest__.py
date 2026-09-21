@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Treasury (Казначейство)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Інтеграція з Державною казначейською службою: реєстраційні рахунки, контроль ліміту, виписки',
     'description': """
@@ -34,7 +34,7 @@ Ukraine Budget Treasury
         'l10n_ua_budget_estimate',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/l10n_ua.treasury.organ.csv',
         'views/l10n_ua_treasury_organ_views.xml',
         'views/account_journal_views.xml',

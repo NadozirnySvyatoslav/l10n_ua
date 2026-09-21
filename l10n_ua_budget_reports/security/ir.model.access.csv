@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_l10n_ua_budget_form_2d_wizard,access.l10n_ua.budget.form_2d.wizard,model_l10n_ua_budget_form_2d_wizard,l10n_ua_budget_base.group_ua_budget_user,1,1,1,1
-access_l10n_ua_budget_multi_form_wizard,access.l10n_ua.budget.multi_form.wizard,model_l10n_ua_budget_multi_form_wizard,l10n_ua_budget_base.group_ua_budget_user,1,1,1,1
-access_l10n_ua_budget_memorial_order_wizard,access.l10n_ua.budget.memorial_order.wizard,model_l10n_ua_budget_memorial_order_wizard,l10n_ua_budget_base.group_ua_budget_user,1,1,1,1

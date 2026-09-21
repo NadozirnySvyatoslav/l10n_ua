@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - FOP (Single Tax)',
-    'version': '19.0.3.1.0',
+    'version': '20.0.3.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Єдиний податок для ФОП: книга доходів, декларація, ЄСВ',
     'description': """
@@ -32,7 +32,7 @@ Ukraine FOP Module (Єдиний податок ФОП)
         'l10n_ua_tax_cabinet',
     ],
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'security/multicompany_security.xml',
         'data/l10n_ua_fop_group_data.xml',
         'views/l10n_ua_fop_income_book_views.xml',

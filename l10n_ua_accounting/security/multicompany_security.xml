@@ -8,85 +8,85 @@
              Each global rule scopes records to the user's allowed companies.
              Standard Odoo pattern (see l10n_ua_account_vat pilot). -->
 
-        <record id="l10n_ua_advance_report_company_rule" model="ir.rule">
+        <record id="l10n_ua_advance_report_company_rule" model="ir.access">
             <field name="name">Авансовий звіт: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_advance_report"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_period_closing_company_rule" model="ir.rule">
+        <record id="l10n_ua_period_closing_company_rule" model="ir.access">
             <field name="name">Закриття періоду: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_period_closing"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_currency_revaluation_company_rule" model="ir.rule">
+        <record id="l10n_ua_currency_revaluation_company_rule" model="ir.access">
             <field name="name">Переоцінка валюти: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_currency_revaluation"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_service_act_company_rule" model="ir.rule">
+        <record id="l10n_ua_service_act_company_rule" model="ir.access">
             <field name="name">Акт наданих послуг: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_service_act"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_tax_period_company_rule" model="ir.rule">
+        <record id="l10n_ua_tax_period_company_rule" model="ir.access">
             <field name="name">Податковий період: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_tax_period"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_aging_report_company_rule" model="ir.rule">
+        <record id="l10n_ua_aging_report_company_rule" model="ir.access">
             <field name="name">Звіт про заборгованість: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_aging_report"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_balance_report_company_rule" model="ir.rule">
+        <record id="l10n_ua_balance_report_company_rule" model="ir.access">
             <field name="name">Баланс: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_balance_report"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_pnl_report_company_rule" model="ir.rule">
+        <record id="l10n_ua_pnl_report_company_rule" model="ir.access">
             <field name="name">Звіт про фінансові результати: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_pnl_report"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_cashflow_report_company_rule" model="ir.rule">
+        <record id="l10n_ua_cashflow_report_company_rule" model="ir.access">
             <field name="name">Звіт про рух грошових коштів: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_cashflow_report"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

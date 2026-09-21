@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Product Codes',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Inventory/Localization',
     'summary': 'UKTZED and DKPP codes on products, shared by the UA modules',
     'description': """

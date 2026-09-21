@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - PrivatBank Integration',
-    'version': '19.0.1.2.0',
+    'version': '20.0.1.2.0',
     'category': 'Accounting/Localization',
     'summary': 'PrivatBank API + file statement import (XLS/XLSX/CSV/MultiCash)',
     'description': """

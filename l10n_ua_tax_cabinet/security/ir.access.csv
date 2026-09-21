@@ -1,0 +1,10 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_tax_cabinet_config_user,l10n_ua.tax.cabinet.config.user,model_l10n_ua_tax_cabinet_config,base.group_user,r,
+access_l10n_ua_tax_cabinet_config_manager,l10n_ua.tax.cabinet.config.manager,model_l10n_ua_tax_cabinet_config,account.group_account_manager,crud,
+access_l10n_ua_tax_cabinet_sync_wizard_user,l10n_ua.tax.cabinet.sync.wizard.user,model_l10n_ua_tax_cabinet_sync_wizard,base.group_user,crud,
+access_l10n_ua_tax_cabinet_sync_wizard_file_user,l10n_ua.tax.cabinet.sync.wizard.file.user,model_l10n_ua_tax_cabinet_sync_wizard_file,base.group_user,crud,
+access_l10n_ua_tax_document_wizard_user,l10n_ua.tax.document.wizard.user,model_l10n_ua_tax_document_wizard,base.group_user,crud,
+access_l10n_ua_company_kved_user,l10n_ua.company.kved.user,model_l10n_ua_company_kved,base.group_user,r,
+access_l10n_ua_company_kved_manager,l10n_ua.company.kved.manager,model_l10n_ua_company_kved,account.group_account_manager,crud,
+access_l10n_ua_tax_request_user,l10n_ua.tax.request.user,model_l10n_ua_tax_request,base.group_user,r,
+access_l10n_ua_tax_request_manager,l10n_ua.tax.request.manager,model_l10n_ua_tax_request,account.group_account_manager,crud,

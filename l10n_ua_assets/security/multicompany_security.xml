@@ -8,49 +8,49 @@
              ones). These global rules scope each document to the user's allowed
              companies. Standard Odoo pattern (see l10n_ua_account_vat rules). -->
 
-        <record id="l10n_ua_asset_company_rule" model="ir.rule">
+        <record id="l10n_ua_asset_company_rule" model="ir.access">
             <field name="name">Основний засіб: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_asset"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_asset_inventory_company_rule" model="ir.rule">
+        <record id="l10n_ua_asset_inventory_company_rule" model="ir.access">
             <field name="name">Інвентаризація ОЗ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_asset_inventory"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_asset_modernization_company_rule" model="ir.rule">
+        <record id="l10n_ua_asset_modernization_company_rule" model="ir.access">
             <field name="name">Модернізація ОЗ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_asset_modernization"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_asset_revaluation_company_rule" model="ir.rule">
+        <record id="l10n_ua_asset_revaluation_company_rule" model="ir.access">
             <field name="name">Переоцінка ОЗ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_asset_revaluation"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_mnma_company_rule" model="ir.rule">
+        <record id="l10n_ua_mnma_company_rule" model="ir.access">
             <field name="name">МНМА: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_mnma"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>

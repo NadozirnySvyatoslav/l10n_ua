@@ -11,31 +11,31 @@
              three models (direct on academic.year & contingent.member; related
              store=True on group), so a plain company_id domain is correct. -->
 
-        <record id="l10n_ua_education_academic_year_company_rule" model="ir.rule">
+        <record id="l10n_ua_education_academic_year_company_rule" model="ir.access">
             <field name="name">Навчальний рік: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_education_academic_year"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_education_group_company_rule" model="ir.rule">
+        <record id="l10n_ua_education_group_company_rule" model="ir.access">
             <field name="name">Навчальна група: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_education_group"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
-        <record id="l10n_ua_education_contingent_member_company_rule" model="ir.rule">
+        <record id="l10n_ua_education_contingent_member_company_rule" model="ir.access">
             <field name="name">Член контингенту: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_education_contingent_member"/>
-            <field name="global" eval="True"/>
-            <field name="domain_force">
+            <field name="domain">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
             </field>
+            <field name="operation">crud</field>
         </record>
 
     </data>
