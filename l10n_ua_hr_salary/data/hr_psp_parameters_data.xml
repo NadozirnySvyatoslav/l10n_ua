@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Розміри — за законами про Держбюджет: № 3460-IX (2024), № 4059-IX (2025),
-         № 4695-IX від 03.12.2025 (2026). Записи під noupdate: виправлення значень
-         для наявних баз робить міграція 19.0.1.4.4 (#329). -->
-    <data noupdate="1">
+    <!-- Statutory values: State Budget Laws No. 3460-IX (2024), No. 4059-IX (2025),
+         No. 4695-IX of 03.12.2025 (2026).
+         A reference that belongs to no company. Every company gets its own
+         hr.psp.parameters records created from it (see the function at the end
+         of the file and res.company.create) and manages them independently.
+         Not under noupdate: nobody edits the reference itself, so a corrected
+         value here reaches it on update. Companies' records are not touched;
+         a new period added here is created for every company on update. -->
+    <data>
 
-        <record id="psp_params_2024_01" model="hr.psp.parameters">
+        <record id="psp_template_2024_01" model="hr.psp.parameters.template">
             <field name="year">2024</field>
             <field name="date_from">2024-01-01</field>
             <field name="date_to">2024-03-31</field>
@@ -17,7 +22,7 @@
             <field name="esv_rate">22</field>
         </record>
 
-        <record id="psp_params_2024_04" model="hr.psp.parameters">
+        <record id="psp_template_2024_04" model="hr.psp.parameters.template">
             <field name="year">2024</field>
             <field name="date_from">2024-04-01</field>
             <field name="date_to">2024-12-31</field>
@@ -30,7 +35,7 @@
         </record>
 
         <!-- 2025: мінзарплата й прожитковий мінімум без змін увесь рік. -->
-        <record id="psp_params_2025_01" model="hr.psp.parameters">
+        <record id="psp_template_2025_01" model="hr.psp.parameters.template">
             <field name="year">2025</field>
             <field name="date_from">2025-01-01</field>
             <field name="date_to">2025-12-31</field>
@@ -42,7 +47,7 @@
             <field name="esv_rate">22</field>
         </record>
 
-        <record id="psp_params_2026_01" model="hr.psp.parameters">
+        <record id="psp_template_2026_01" model="hr.psp.parameters.template">
             <field name="year">2026</field>
             <field name="date_from">2026-01-01</field>
             <field name="subsistence_minimum">3328</field>
@@ -54,4 +59,6 @@
         </record>
 
     </data>
+
+    <function model="hr.psp.parameters" name="_seed_company_parameters"/>
 </odoo>

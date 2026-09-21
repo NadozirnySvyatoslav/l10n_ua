@@ -116,6 +116,7 @@ class HrPspParameters(models.Model):
     company_id = fields.Many2one(
         'res.company',
         string='Company',
+        required=True,
         default=lambda self: self.env.company
     )
     
@@ -153,20 +154,54 @@ class HrPspParameters(models.Model):
 
     @api.model
     def get_parameters(self, date=None, company_id=None):
-        """Get PSP parameters for given date and company"""
+        """Get PSP parameters for given date and company.
+
+        Every company keeps its own set of records (each may have its own
+        administrator), so only records of that company are considered.
+        Payslip code must pass the payslip's company explicitly: the default
+        (the company active in the session switcher) is only meant for calls
+        made outside a payslip. The lookup runs as superuser so the result
+        does not depend on which companies are enabled in the switcher of
+        whoever triggers the computation.
+        """
         if date is None:
             date = fields.Date.today()
         if company_id is None:
             company_id = self.env.company.id
-        
-        params = self.search([
+
+        return self.sudo().search([
             ('date_from', '<=', date),
             '|', ('date_to', '>=', date), ('date_to', '=', False),
-            '|', ('company_id', '=', company_id), ('company_id', '=', False),
+            ('company_id', '=', company_id),
             ('active', '=', True),
         ], order='date_from desc', limit=1)
-        
-        return params or self.browse()
+
+    @api.model
+    def _seed_company_parameters(self, companies=None):
+        """Create each company's records from the statutory reference.
+
+        All companies are treated alike: records are built from
+        `hr.psp.parameters.template` (loaded from the module data), never
+        copied from another company. A company without any parameters gets
+        every period; otherwise only periods newer than its latest record are
+        added. Existing records are never touched, and a period the company's
+        administrator deleted is not brought back.
+        """
+        Params = self.sudo().with_context(active_test=False)
+        if companies is None:
+            companies = self.env['res.company'].sudo().with_context(
+                active_test=False).search([])
+        templates = self.env['hr.psp.parameters.template'].sudo().search([])
+        latest = dict(Params._read_group(
+            [('company_id', 'in', companies.ids)],
+            ['company_id'], ['date_from:max']))
+        vals_list = [
+            template._company_values(company)
+            for company in companies
+            for template in templates
+            if not latest.get(company) or template.date_from > latest[company]
+        ]
+        return Params.create(vals_list)
 
     _unique_year_date_from_company_id = models.Constraint(
         'unique(year, date_from, company_id)',

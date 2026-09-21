@@ -46,8 +46,11 @@
                         <group>
                             <field name="date_from"/>
                             <field name="date_to"/>
-                            <field name="payslip_run_id"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="payslip_run_id"
+                                   domain="[('company_id', '=', company_id)]"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   domain="[('id', 'in', allowed_company_ids)]"
+                                   options="{'no_create': True}"/>
                             <field name="salary_currency_id" invisible="1"/>
                             <field name="salary_rate"
                                    invisible="salary_currency_id == currency_id"/>
