@@ -72,7 +72,6 @@ Binary-поля тепер тримають сирі байти в обгорт�
 | `resource.calendar.schedule_type` | `calendar_type`: `fully_fixed`→`fixed`, `flexible`→`undefined` |
 | `resource.calendar.attendance.name` | прибрано |
 | `pos.payment.method.is_cash_count` | обов'язкове `type` (`cash`/`bank`/`pay_later`) |
-| `res.users.groups_id` | `group_ids` |
 
 ### Якорі xpath, що зникли з виглядів ядра
 
