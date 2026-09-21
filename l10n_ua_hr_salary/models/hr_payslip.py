@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools import format_date
 from dateutil.relativedelta import relativedelta
 import calendar
 import logging
@@ -12,6 +13,7 @@ class HrPayslip(models.Model):
     _description = 'Payslip'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date_to desc, employee_id'
+    _check_company_auto = True
 
     name = fields.Char(
         string='Reference',
@@ -23,7 +25,8 @@ class HrPayslip(models.Model):
         'hr.employee',
         string='Employee',
         required=True,
-        tracking=True
+        tracking=True,
+        check_company=True,
     )
     version_id = fields.Many2one(
         'hr.version',
@@ -77,7 +80,8 @@ class HrPayslip(models.Model):
 
     payslip_run_id = fields.Many2one(
         'hr.payslip.run',
-        string='Payslip Batch'
+        string='Payslip Batch',
+        check_company=True,
     )
     
     date_from = fields.Date(
@@ -372,10 +376,12 @@ class HrPayslip(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        """Clear employee if from a different company (preserve shared employees)."""
+        """Clear employee and batch if from a different company (preserve shared employees)."""
         if self.employee_id and self.employee_id.company_id \
                 and self.employee_id.company_id != self.company_id:
             self.employee_id = False
+        if self.payslip_run_id and self.payslip_run_id.company_id != self.company_id:
+            self.payslip_run_id = False
 
     @api.depends('gross_salary', 'psp_type', 'employee_id.dependents_count',
                  'employee_id.is_single_parent')
@@ -390,7 +396,8 @@ class HrPayslip(models.Model):
         Single parent gets double base PSP × dependents_count (covers «двойна ПСП»).
         """
         for payslip in self:
-            params = self.env['hr.psp.parameters'].get_parameters(payslip.date_to)
+            params = self.env['hr.psp.parameters'].get_parameters(
+                payslip.date_to, payslip.company_id.id)
             if not params:
                 payslip.psp_eligible = False
                 payslip.psp_amount = 0.0
@@ -465,7 +472,8 @@ class HrPayslip(models.Model):
             # Натуральний коефіцієнт (п. 164.5 ПКУ) для гросс-апу негрошового
             # доходу: К = 100 / (100 − ставка ПДФО). Дохід у натуральній формі
             # приводиться до "брутто" перед оподаткуванням ПДФО/ВЗ (#153).
-            params = self.env['hr.psp.parameters'].get_parameters(payslip.date_to)
+            params = self.env['hr.psp.parameters'].get_parameters(
+                payslip.date_to, payslip.company_id.id)
             natural_coef = 100.0 / (100.0 - pdfo_rate) if pdfo_rate < 100 else 1.0
             mil_natural = (params.natural_coef_for_military
                            if params else True)
@@ -500,10 +508,14 @@ class HrPayslip(models.Model):
                 payslip.esv_base = 0.0
                 payslip.esv_amount = 0.0
             else:
-                min_esv_base = params.min_wage if params else 8000
-                max_esv_base = params.max_esv_base if params else 120000
-
-                payslip.esv_base = min(max(esv_taxable, min_esv_base), max_esv_base)
+                if params:
+                    payslip.esv_base = min(
+                        max(esv_taxable, params.min_wage), params.max_esv_base)
+                else:
+                    # No parameters for the period, so no statutory floor or
+                    # ceiling to apply. Such a payslip can be neither computed
+                    # nor verified: see _check_psp_parameters_known.
+                    payslip.esv_base = esv_taxable
                 payslip.esv_amount = round(payslip.esv_base * esv_rate / 100, 2)
             
             # Other deductions (excluding taxes)
@@ -643,6 +655,22 @@ class HrPayslip(models.Model):
                     1.0, comp_cur, slip.company_id, slip.date_to, round=False)
             else:
                 slip.salary_rate = 1.0
+
+    def _check_psp_parameters_known(self, params):
+        """Refuse to compute a payslip without payroll parameters.
+
+        Without them the sheet used to fall back to constants hardcoded years
+        ago (minimum wage, ESV base limits, minimum hourly wage) and looked
+        perfectly normal, so nobody noticed the stale numbers.
+        """
+        self.ensure_one()
+        if not params:
+            raise UserError(_(
+                'No payroll parameters are defined for company "%(company)s" '
+                'on %(date)s. Add them in Payroll → Configuration → PSP Parameters '
+                'before computing payslips.',
+                company=self.company_id.display_name,
+                date=format_date(self.env, self.date_to)))
 
     def _check_salary_rate_known(self):
         """Не рахувати валютний оклад, поки курс невідомий.
@@ -793,7 +821,9 @@ class HrPayslip(models.Model):
         version = self.version_id
 
         salary_type = self.env['hr.accrual.type'].search([('code', '=', 'SALARY')], limit=1)
-        params = self.env['hr.psp.parameters'].get_parameters(self.date_to)
+        params = self.env['hr.psp.parameters'].get_parameters(
+            self.date_to, self.company_id.id)
+        self._check_psp_parameters_known(params)
 
         # Форма оплати праці: відрядна замінює окладну/тарифну (#143).
         is_piece = getattr(version, 'salary_form', 'time') == 'piece'
@@ -810,7 +840,7 @@ class HrPayslip(models.Model):
             if version.tariff_grade_id:
 
                 if self.worked_hours > 0:                                   # Guard clause
-                    min_hourly_wage = params.min_hourly_wage if params else 52.0
+                    min_hourly_wage = params.min_hourly_wage
                     tariff = version.tariff_grade_id
                     coef = tariff.coefficient or 1.0
 
@@ -1032,7 +1062,7 @@ class HrPayslip(models.Model):
         Не нижче законодавчої мінімальної годинної ставки.
         """
         self.ensure_one()
-        min_hourly = (params.min_hourly_wage if params else 0.0) or 0.0
+        min_hourly = params.min_hourly_wage or 0.0
         tariff = getattr(version, 'tariff_grade_id', False)
         if tariff:
             coef = tariff.coefficient or 1.0
@@ -1067,9 +1097,9 @@ class HrPayslip(models.Model):
             return
         Accrual = self.env['hr.payslip.accrual']
         AccrualType = self.env['hr.accrual.type']
-        night_rate = (params.night_surcharge_rate if params else 20.0) or 0.0
-        ot_mult = (params.overtime_multiplier if params else 2.0) or 0.0
-        hol_mult = (params.holiday_multiplier if params else 2.0) or 0.0
+        night_rate = params.night_surcharge_rate or 0.0
+        ot_mult = params.overtime_multiplier or 0.0
+        hol_mult = params.holiday_multiplier or 0.0
 
         surcharges = [
             ('NIGHT', self.night_hours, hourly * night_rate / 100.0,
@@ -1125,8 +1155,10 @@ class HrPayslip(models.Model):
         cap_percent = max(exec_docs.mapped('max_deduction_percent') or [50.0])
         max_total = net_after_tax * cap_percent / 100
         allocated = 0.0
-        params = self.env['hr.psp.parameters'].get_parameters(self.date_to)
-        min_wage = params.min_wage if params else 8000
+        params = self.env['hr.psp.parameters'].get_parameters(
+            self.date_to, self.company_id.id)
+        self._check_psp_parameters_known(params)
+        min_wage = params.min_wage
 
         for doc in exec_docs:
             if doc.calculation_method == 'percent':
@@ -1201,6 +1233,10 @@ class HrPayslip(models.Model):
 
 
     def action_payslip_verify(self):
+        for payslip in self:
+            payslip._check_psp_parameters_known(
+                self.env['hr.psp.parameters'].get_parameters(
+                    payslip.date_to, payslip.company_id.id))
         self.write({'state': 'verify'})
 
     def action_payslip_done(self):

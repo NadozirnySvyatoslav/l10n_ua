@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
@@ -30,3 +30,9 @@ class ResCompany(models.Model):
         default='Заробітна плата',
         help='Найменування виду нарахування (iFOBS FLOWTYPE / iBank 2 UA '
              'ONFLOW_TYPE) з довідника банку.')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        companies = super().create(vals_list)
+        self.env['hr.psp.parameters']._seed_company_parameters(companies)
+        return companies

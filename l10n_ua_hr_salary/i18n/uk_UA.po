@@ -578,6 +578,7 @@ msgstr "Дата"
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_bank_export__date_from
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_run__date_start
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__date_from
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__date_from
 msgid "Date From"
 msgstr "Дата з"
 
@@ -587,6 +588,7 @@ msgstr "Дата з"
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_bank_export__date_to
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_run__date_end
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__date_to
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__date_to
 msgid "Date To"
 msgstr "Дата по"
 
@@ -787,6 +789,7 @@ msgstr "База ЄСВ"
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip__esv_rate
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__esv_rate
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__esv_rate
 msgid "ESV Rate (%)"
 msgstr "Ставка ЄСВ (%)"
 
@@ -1226,16 +1229,19 @@ msgstr "База військового збору"
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip__military_tax_rate
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__military_tax_rate
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__military_tax_rate
 msgid "Military Tax Rate (%)"
 msgstr "Ставка військового збору (%)"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__min_hourly_wage
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__min_hourly_wage
 msgid "Minimum Hourly Wage"
 msgstr "Мінімальна погодинна ставка"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__min_wage
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__min_wage
 msgid "Minimum Wage"
 msgstr "Мінімальна зарплата"
 
@@ -1334,6 +1340,18 @@ msgstr "Нічні години"
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__night_surcharge_rate
 msgid "Night Surcharge (%)"
 msgstr "Доплата за нічні (%)"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"No payroll parameters are defined for company \"%(company)s\" on %(date)s. "
+"Add them in Payroll → Configuration → PSP Parameters before computing "
+"payslips."
+msgstr ""
+"Для компанії «%(company)s» на %(date)s не задано параметрів розрахунку. "
+"Додайте їх у Зарплата → Налаштування → Параметри ПСП, перш ніж рахувати "
+"розрахункові листи."
 
 #. module: l10n_ua_hr_salary
 #. odoo-python
@@ -1474,6 +1492,7 @@ msgstr "База ПДФО"
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip__pdfo_rate
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__pdfo_rate
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__pdfo_rate
 msgid "PDFO Rate (%)"
 msgstr "Ставка ПДФО (%)"
 
@@ -1976,7 +1995,18 @@ msgstr ""
 "Заплановано: Майбутні активності."
 
 #. module: l10n_ua_hr_salary
+#: model:ir.model,name:l10n_ua_hr_salary.model_hr_psp_parameters_template
+msgid "Statutory PSP Parameters"
+msgstr "Законодавчі параметри ПСП"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.constraint,message:l10n_ua_hr_salary.constraint_hr_psp_parameters_template_unique_date_from
+msgid "Statutory parameters for this period already exist!"
+msgstr "Законодавчі параметри для цього періоду вже існують!"
+
+#. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__subsistence_minimum
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__subsistence_minimum
 msgid "Subsistence Minimum"
 msgstr "Прожитковий мінімум"
 
@@ -2205,6 +2235,7 @@ msgstr "XML"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__year
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__year
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary.hr_cpi_index_view_search
 msgid "Year"
 msgstr "Рік"

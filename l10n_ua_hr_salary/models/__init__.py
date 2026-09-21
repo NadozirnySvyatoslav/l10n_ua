@@ -1,5 +1,6 @@
 from . import res_company
 from . import hr_psp_parameters
+from . import hr_psp_parameters_template
 from . import hr_cpi_index
 from . import hr_version
 from . import hr_seniority_scale

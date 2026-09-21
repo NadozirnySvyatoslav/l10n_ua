@@ -17,6 +17,7 @@ access_hr_deduction_type_user,hr.deduction.type.user,model_hr_deduction_type,hr.
 access_hr_deduction_type_manager,hr.deduction.type.manager,model_hr_deduction_type,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
 access_hr_psp_parameters_user,hr.psp.parameters.user,model_hr_psp_parameters,hr.group_hr_user,1,0,0,0
 access_hr_psp_parameters_manager,hr.psp.parameters.manager,model_hr_psp_parameters,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_psp_parameters_template_user,hr.psp.parameters.template.user,model_hr_psp_parameters_template,hr.group_hr_user,1,0,0,0
 access_hr_cpi_index_user,hr.cpi.index.user,model_hr_cpi_index,hr.group_hr_user,1,0,0,0
 access_hr_cpi_index_manager,hr.cpi.index.manager,model_hr_cpi_index,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
 access_hr_payslip_retro_user,hr.payslip.retro.user,model_hr_payslip_retro,hr.group_hr_user,1,0,0,0

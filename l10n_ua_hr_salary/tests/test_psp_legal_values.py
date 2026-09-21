@@ -55,5 +55,4 @@ class TestPspLegalValues(TransactionCase):
         self.assertEqual(self._params(date(2026, 6, 1)).max_esv_base, 15 * 8647)
 
     def test_no_fictitious_april_2025_increase(self):
-        self.assertFalse(self.env.ref(
-            'l10n_ua_hr_salary.psp_params_2025_04', raise_if_not_found=False))
+        self.assertEqual(self._params(date(2025, 6, 1)).date_from, date(2025, 1, 1))
