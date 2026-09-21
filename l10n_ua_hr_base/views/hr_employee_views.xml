@@ -38,7 +38,7 @@
                  share one heading and one layout.
                  The address rows collapse once the checkbox is ticked; the
                  checkbox itself stays and spells out where they went. -->
-            <xpath expr="//group[@name='hr_location_group']/div[@class='o_address_format']" position="after">
+            <xpath expr="//group[@name='hr_location_group']/div[hasclass('o_address_format')]" position="after">
                 <field name="registration_same_as_actual"/>
                 <label for="registration_street" string="Registration Address" invisible="registration_same_as_actual"/>
                 <div class="o_address_format" invisible="registration_same_as_actual">
@@ -210,7 +210,8 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='job_id']" position="after">
+            <!-- Odoo 20 shows job_title, not job_id, in the employee list. -->
+            <xpath expr="//field[@name='job_title']" position="after">
                 <field name="job_kp_code" string="Код КП" optional="show"/>
                 <field name="rnokpp" optional="hide"/>
             </xpath>
@@ -223,7 +224,9 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='my_team']" position="after">
+            <!-- Odoo 20 dropped the my_team filter; anchor on Archived,
+                 which every version of the search view carries. -->
+            <xpath expr="//filter[@name='inactive']" position="before">
                 <separator/>
                 <filter string="Призовники" name="military_conscripts" domain="[('military_register_category', '=', 'conscript')]"/>
                 <filter string="Військовозобов'язані" name="military_liable" domain="[('military_register_category', '=', 'liable')]"/>

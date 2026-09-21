@@ -7,7 +7,7 @@
         <field name="model">hr.version</field>
         <field name="inherit_id" ref="hr.hr_version_list_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='contract_type_id']" position="after">
+            <xpath expr="//field[@name='employee_type_id']" position="after">
                 <field name="contract_type_ua" optional="show"/>
                 <field name="employment_type_ua" optional="hide"/>
             </xpath>
@@ -64,16 +64,16 @@
                 </div>
                 <field name="tariff_grade_id"/>
             </xpath>
-            <!-- Add Ukrainian contract fields after standard contract_type_id -->
-            <xpath expr="//field[@name='contract_type_id']" position="after">
+            <!-- Add Ukrainian contract fields after standard employee_type_id -->
+            <xpath expr="//field[@name='employee_type_id']" position="after">
                 <field name="contract_type_ua" string="UA Contract Type" placeholder="UA Contract Type"/>
                 <field name="employment_type_ua"/>
             </xpath>
-            <!-- Add after schedule separator -->
+            <!-- Odoo 20 turned the schedule separator into a group. -->
             <!-- working_hours_week прибрано (#213): норма тижня тепер
                  читається зі штатних «Робочих годин», і два сусідні контроли
                  з однаковим змістом лише заплутували кадровика. -->
-            <xpath expr="//separator[@name='schedule']" position="before">
+            <xpath expr="//group[@name='schedule']" position="inside">
                 <field name="work_rate"/>
                 <field name="scheduled_hours_week"/>
                 <field name="scheduled_hours_day"/>

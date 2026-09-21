@@ -6,7 +6,6 @@
         <field name="model">l10n_ua.business.trip.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_business_trip.report_business_trip_document</field>
-        <field name="report_file">l10n_ua_hr_business_trip.report_business_trip_document</field>
         <field name="print_report_name">'Звіт_про_відрядження_%s' % (object.name)</field>
         <field name="binding_model_id" ref="model_l10n_ua_business_trip_report"/>
         <field name="binding_type">report</field>

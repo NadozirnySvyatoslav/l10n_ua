@@ -110,8 +110,13 @@ class HrEmployee(models.Model):
     registration_zip = fields.Char(string='Registration ZIP')
 
     # === Education ===
-    # Use Odoo core fields: study_school (institution), study_field (specialty), certificate (level)
-    # education_institution - REMOVED, use study_school from core
+    # Odoo 20 dropped hr.employee.study_school from core (only study_field and
+    # certificate remain). The institution is a named column of form P-2 and of
+    # the personal file, so the field is declared here instead.
+    study_school = fields.Char(
+        string='School', groups='hr.group_hr_user', tracking=True)
+    # Use core fields study_field (specialty) and certificate (level)
+    # education_institution - REMOVED, use study_school
     # education_specialty - REMOVED, use study_field from core
     # Keep education_level_id as Many2one for more detailed Ukrainian education levels
     education_level_id = fields.Many2one('hr.education.level', string='Education Level (UA)',

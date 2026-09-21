@@ -6,7 +6,6 @@
         <field name="model">hr.leave</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_holidays.report_vacation_order</field>
-        <field name="report_file">l10n_ua_hr_holidays.report_vacation_order</field>
         <field name="print_report_name">'Наказ_відпустка_%s_%s' % (object.employee_id.name, object.date_from)</field>
         <field name="binding_model_id" ref="hr_holidays.model_hr_leave"/>
         <field name="binding_type">report</field>

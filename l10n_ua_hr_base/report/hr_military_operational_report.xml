@@ -9,7 +9,6 @@
         <field name="model">hr.employee.military.operational.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_base.report_hr_military_operational</field>
-        <field name="report_file">l10n_ua_hr_base.report_hr_military_operational</field>
         <field name="print_report_name">'Відомість_оперативного_обліку_%s' % (object.date_to.strftime('%Y%m%d') if object.date_to else time.strftime('%Y%m%d'))</field>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>

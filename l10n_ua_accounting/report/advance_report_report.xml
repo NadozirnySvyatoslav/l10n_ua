@@ -7,7 +7,6 @@
         <field name="model">l10n_ua.advance.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_advance_report_document</field>
-        <field name="report_file">l10n_ua_accounting.report_advance_report_document</field>
         <field name="print_report_name">'АЗ_%s_%s' % (object.name, object.employee_id.name)</field>
         <field name="binding_model_id" ref="model_l10n_ua_advance_report"/>
         <field name="binding_type">report</field>

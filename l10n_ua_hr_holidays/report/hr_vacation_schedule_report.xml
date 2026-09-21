@@ -20,7 +20,6 @@
         <field name="model">hr.vacation.schedule</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_holidays.report_hr_vacation_schedule</field>
-        <field name="report_file">l10n_ua_hr_holidays.report_hr_vacation_schedule</field>
         <field name="print_report_name">'Графік_відпусток_%s' % (object.year)</field>
         <field name="binding_model_id" ref="model_hr_vacation_schedule"/>
         <field name="binding_type">report</field>

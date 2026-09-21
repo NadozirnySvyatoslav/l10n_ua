@@ -7,7 +7,6 @@
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_payment_link.report_payment_qr_sale</field>
-        <field name="report_file">l10n_ua_payment_link.report_payment_qr_sale</field>
         <field name="print_report_name">'QR_оплата_%s' % (object.name)</field>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
@@ -19,7 +18,6 @@
         <field name="model">account.move</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_payment_link.report_payment_qr_invoice</field>
-        <field name="report_file">l10n_ua_payment_link.report_payment_qr_invoice</field>
         <field name="print_report_name">'QR_оплата_%s' % (object.name)</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>

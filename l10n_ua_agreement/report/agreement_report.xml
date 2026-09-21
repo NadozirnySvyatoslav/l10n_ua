@@ -5,7 +5,6 @@
         <field name="model">agreement</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_agreement.report_agreement_document</field>
-        <field name="report_file">l10n_ua_agreement.report_agreement_document</field>
         <field name="binding_model_id" ref="agreement.model_agreement"/>
         <field name="binding_type">report</field>
     </record>
@@ -15,7 +14,6 @@
         <field name="model">agreement</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_agreement.report_agreement_act</field>
-        <field name="report_file">l10n_ua_agreement.report_agreement_act</field>
         <field name="binding_model_id" ref="agreement.model_agreement"/>
         <field name="binding_type">report</field>
     </record>

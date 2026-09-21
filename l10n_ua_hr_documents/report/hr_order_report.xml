@@ -6,7 +6,6 @@
         <field name="model">hr.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_documents.report_hr_order</field>
-        <field name="report_file">l10n_ua_hr_documents.report_hr_order</field>
         <field name="print_report_name">'Наказ_%s_%s' % (object.name, object.date)</field>
         <field name="binding_model_id" ref="model_hr_order"/>
         <field name="binding_type">report</field>

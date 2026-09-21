@@ -14,7 +14,7 @@
 
              Shift cycles (2/2, 24h/3days, 3/3) and summarized accounting do
              not fit a weekly grid - they carry the native
-             schedule_type='flexible', which stops the core from recomputing
+             calendar_type='undefined', which stops the core from recomputing
              hours_per_week/hours_per_day, so the norm comes from our explicit
              values. Scheduling the shifts themselves is a separate task
              (hr.production.calendar).
@@ -34,12 +34,11 @@
             <field name="name">Стандартний 5-денний (40 год/тиждень)</field>
             <field name="ua_code">STD40</field>
             <field name="ua_schedule_type">standard</field>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)] + [
-                (0, 0, {'name': 'Ранок', 'dayofweek': str(d), 'day_period': 'morning',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'morning',
                         'hour_from': 9.0, 'hour_to': 13.0}) for d in range(5)
             ] + [
-                (0, 0, {'name': 'Друга половина дня', 'dayofweek': str(d), 'day_period': 'afternoon',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'afternoon',
                         'hour_from': 14.0, 'hour_to': 18.0}) for d in range(5)
             ]"/>
         </record>
@@ -51,12 +50,11 @@
             <field name="ua_code">STD36</field>
             <field name="ua_schedule_type">standard</field>
             <field name="ua_reduced_hours" eval="True"/>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)] + [
-                (0, 0, {'name': 'Ранок', 'dayofweek': str(d), 'day_period': 'morning',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'morning',
                         'hour_from': 9.0, 'hour_to': 13.0}) for d in range(5)
             ] + [
-                (0, 0, {'name': 'Друга половина дня', 'dayofweek': str(d), 'day_period': 'afternoon',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'afternoon',
                         'hour_from': 14.0, 'hour_to': 17.2}) for d in range(5)
             ]"/>
         </record>
@@ -68,9 +66,8 @@
             <field name="ua_code">STD24</field>
             <field name="ua_schedule_type">standard</field>
             <field name="ua_reduced_hours" eval="True"/>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)] + [
-                (0, 0, {'name': 'Робочий день', 'dayofweek': str(d), 'day_period': 'morning',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'morning',
                         'hour_from': 9.0, 'hour_to': 13.8}) for d in range(5)
             ]"/>
         </record>
@@ -81,9 +78,8 @@
             <field name="name">Неповний робочий день (0.5 ставки)</field>
             <field name="ua_code">PART20</field>
             <field name="ua_schedule_type">standard</field>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)] + [
-                (0, 0, {'name': 'Робочий день', 'dayofweek': str(d), 'day_period': 'morning',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'morning',
                         'hour_from': 9.0, 'hour_to': 13.0}) for d in range(5)
             ]"/>
         </record>
@@ -94,9 +90,8 @@
             <field name="name">6-денний робочий тиждень</field>
             <field name="ua_code">STD6D</field>
             <field name="ua_schedule_type">standard</field>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)] + [
-                (0, 0, {'name': 'Робочий день', 'dayofweek': str(d), 'day_period': 'morning',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'morning',
                         'hour_from': 9.0, 'hour_to': 15.6667}) for d in range(6)
             ]"/>
         </record>
@@ -107,12 +102,11 @@
             <field name="name">Гнучкий графік</field>
             <field name="ua_code">FLEX</field>
             <field name="ua_schedule_type">flexible</field>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)] + [
-                (0, 0, {'name': 'Ранок', 'dayofweek': str(d), 'day_period': 'morning',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'morning',
                         'hour_from': 9.0, 'hour_to': 13.0}) for d in range(5)
             ] + [
-                (0, 0, {'name': 'Друга половина дня', 'dayofweek': str(d), 'day_period': 'afternoon',
+                (0, 0, {'dayofweek': str(d), 'day_period': 'afternoon',
                         'hour_from': 14.0, 'hour_to': 18.0}) for d in range(5)
             ]"/>
         </record>
@@ -125,8 +119,7 @@
             <field name="name">Змінний 2/2 (12 год)</field>
             <field name="ua_code">SHIFT2X2</field>
             <field name="ua_schedule_type">shift</field>
-            <field name="schedule_type">flexible</field>
-            <field name="tz">Europe/Kiev</field>
+            <field name="calendar_type">undefined</field>
             <field name="attendance_ids" eval="[(5, 0, 0)]"/>
             <field name="hours_per_week">42</field>
             <field name="hours_per_day">12</field>
@@ -138,9 +131,8 @@
             <field name="name">Змінний доба/три</field>
             <field name="ua_code">SHIFT1X3</field>
             <field name="ua_schedule_type">shift</field>
-            <field name="schedule_type">flexible</field>
+            <field name="calendar_type">undefined</field>
             <field name="ua_is_night_work" eval="True"/>
-            <field name="tz">Europe/Kiev</field>
             <field name="attendance_ids" eval="[(5, 0, 0)]"/>
             <field name="hours_per_week">42</field>
             <field name="hours_per_day">24</field>
@@ -152,8 +144,7 @@
             <field name="name">Змінний 3/3 (8 год)</field>
             <field name="ua_code">SHIFT3X3</field>
             <field name="ua_schedule_type">shift</field>
-            <field name="schedule_type">flexible</field>
-            <field name="tz">Europe/Kiev</field>
+            <field name="calendar_type">undefined</field>
             <field name="attendance_ids" eval="[(5, 0, 0)]"/>
             <field name="hours_per_week">28</field>
             <field name="hours_per_day">8</field>
@@ -165,8 +156,7 @@
             <field name="name">Підсумований облік (місяць)</field>
             <field name="ua_code">SUMM</field>
             <field name="ua_schedule_type">summarized</field>
-            <field name="schedule_type">flexible</field>
-            <field name="tz">Europe/Kiev</field>
+            <field name="calendar_type">undefined</field>
             <field name="attendance_ids" eval="[(5, 0, 0)]"/>
             <field name="hours_per_week">40</field>
             <field name="hours_per_day">8</field>

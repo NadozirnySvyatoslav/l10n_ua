@@ -10,7 +10,6 @@
         <field name="model">l10n_ua.asset.inventory</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_assets.report_asset_inv1_document</field>
-        <field name="report_file">l10n_ua_assets.report_asset_inv1_document</field>
         <field name="print_report_name">'Інв-1_%s' % (object.name or '')</field>
         <field name="binding_model_id" ref="model_l10n_ua_asset_inventory"/>
         <field name="binding_type">report</field>
@@ -205,7 +204,6 @@
         <field name="model">l10n_ua.asset.inventory</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_assets.report_asset_inv3_document</field>
-        <field name="report_file">l10n_ua_assets.report_asset_inv3_document</field>
         <field name="print_report_name">'Інв-3_%s' % (object.name or '')</field>
         <field name="binding_model_id" ref="model_l10n_ua_asset_inventory"/>
         <field name="binding_type">report</field>

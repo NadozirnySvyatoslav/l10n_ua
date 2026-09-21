@@ -7,7 +7,6 @@
         <field name="model">l10n_ua.inventory.act.wizard</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_inventory_act</field>
-        <field name="report_file">l10n_ua_accounting.report_inventory_act</field>
         <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
         <field name="binding_type">report</field>
     </record>

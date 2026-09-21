@@ -11,7 +11,6 @@
         <field name="model">hr.employee.military.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_base.report_hr_employee_military_form5</field>
-        <field name="report_file">l10n_ua_hr_base.report_hr_employee_military_form5</field>
         <field name="print_report_name">'Списки_ВО_%s' % (object.date.strftime('%Y%m%d') if object.date else time.strftime('%Y%m%d'))</field>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>

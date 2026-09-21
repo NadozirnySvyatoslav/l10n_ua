@@ -7,7 +7,6 @@
         <field name="model">l10n_ua.cash.book.wizard</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_cash_book_document</field>
-        <field name="report_file">l10n_ua_accounting.report_cash_book_document</field>
         <field name="print_report_name">'Касова_книга_%s-%s' % (object.date_from, object.date_to)</field>
         <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
     </record>

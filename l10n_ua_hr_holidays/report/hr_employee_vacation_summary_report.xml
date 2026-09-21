@@ -6,7 +6,6 @@
         <field name="model">hr.employee.vacation.summary.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_hr_holidays.report_hr_employee_vacation_summary</field>
-        <field name="report_file">l10n_ua_hr_holidays.report_hr_employee_vacation_summary</field>
         <field name="print_report_name">'Підсумок_відпусток_%s' % (object.report_date and object.report_date.strftime('%d.%m.%Y') or '')</field>
         <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>

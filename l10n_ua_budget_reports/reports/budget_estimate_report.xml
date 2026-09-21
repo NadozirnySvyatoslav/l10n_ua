@@ -6,7 +6,6 @@
         <field name="model">l10n_ua.budget.estimate</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_budget_reports.budget_estimate_template</field>
-        <field name="report_file">l10n_ua_budget_reports.budget_estimate_template</field>
         <field name="binding_model_id" ref="l10n_ua_budget_estimate.model_l10n_ua_budget_estimate"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="base.paperformat_euro"/>

@@ -39,7 +39,6 @@
         <field name="binding_model_id" eval="False"/>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_stock_forms.report_material_report</field>
-        <field name="report_file">l10n_ua_stock_forms.report_material_report</field>
         <field name="paperformat_id" ref="paperformat_ua_stock_report"/>
         <!-- The field is translatable, so the file is named in the reader's
              own language: this expression is the source term and the PO files

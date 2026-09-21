@@ -13,7 +13,6 @@
         <field name="model">account.payment</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_pko_document</field>
-        <field name="report_file">l10n_ua_accounting.report_pko_document</field>
         <field name="print_report_name">'ПКО-%s' % (object.ua_cash_order_number or object.name)</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>
@@ -26,7 +25,6 @@
         <field name="model">account.payment</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_vko_document</field>
-        <field name="report_file">l10n_ua_accounting.report_vko_document</field>
         <field name="print_report_name">'ВКО-%s' % (object.ua_cash_order_number or object.name)</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>
@@ -39,7 +37,6 @@
         <field name="model">account.payment</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_payment_order_document</field>
-        <field name="report_file">l10n_ua_accounting.report_payment_order_document</field>
         <field name="print_report_name">'ПД-%s' % (object.ua_payment_order_number or object.name)</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>
