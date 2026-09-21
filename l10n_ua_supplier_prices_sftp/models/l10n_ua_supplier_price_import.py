@@ -97,7 +97,7 @@ class L10nUaSupplierPriceImport(models.Model):
 
         filename = os.path.basename(remote_path) or 'sftp_download'
         self.write({
-            'raw_file': base64.b64encode(content),
+            'raw_file': base64.b64encode(content).decode(),
             'raw_filename': filename,
         })
 

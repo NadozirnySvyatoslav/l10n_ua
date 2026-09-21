@@ -141,7 +141,7 @@ class L10nUaTaxDocumentWizard(models.TransientModel):
 
         # Update the document
         self.document_id.write({
-            'file_xml': base64.b64encode(xml_content.encode('windows-1251')),
+            'file_xml': base64.b64encode(xml_content.encode('windows-1251')).decode(),
             'file_xml_name': filename,
             'year': self.year,
             'period': self.period,

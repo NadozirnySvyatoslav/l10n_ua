@@ -177,7 +177,7 @@ class TestStatementImport(TransactionCase):
         )
         wizard = self.env['l10n_ua.treasury.statement.import'].create({
             'journal_id': journal.id,
-            'file': base64.b64encode(csv_content.encode('utf-8')),
+            'file': base64.b64encode(csv_content.encode('utf-8')).decode(),
             'filename': 'demo.csv',
             'file_format': 'csv',
             'encoding': 'utf-8',
@@ -199,7 +199,7 @@ class TestStatementImport(TransactionCase):
         bad_content = "wrong,headers\n2025-01-10,whatever\n"
         wizard = self.env['l10n_ua.treasury.statement.import'].create({
             'journal_id': journal.id,
-            'file': base64.b64encode(bad_content.encode('utf-8')),
+            'file': base64.b64encode(bad_content.encode('utf-8')).decode(),
             'filename': 'bad.csv', 'file_format': 'csv',
         })
         with self.assertRaises(UserError):

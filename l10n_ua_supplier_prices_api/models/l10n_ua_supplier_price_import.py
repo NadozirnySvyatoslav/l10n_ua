@@ -74,7 +74,7 @@ class L10nUaSupplierPriceImport(models.Model):
             filename = self._extract_filename(response, url)
 
         self.write({
-            'raw_file': base64.b64encode(content),
+            'raw_file': base64.b64encode(content).decode(),
             'raw_filename': filename,
         })
 

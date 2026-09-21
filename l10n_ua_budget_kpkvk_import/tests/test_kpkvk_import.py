@@ -17,7 +17,7 @@ class TestKpkvkImport(TransactionCase):
         wizard = self.env['l10n_ua.kpkvk.import'].create({
             'year': 2027,
             'file_format': 'csv',
-            'file': base64.b64encode(CSV_CONTENT),
+            'file': base64.b64encode(CSV_CONTENT).decode(),
             'filename': 'kpkvk.csv',
         })
         wizard.action_import()
@@ -31,7 +31,7 @@ class TestKpkvkImport(TransactionCase):
         wiz1 = self.env['l10n_ua.kpkvk.import'].create({
             'year': 2028,
             'file_format': 'csv',
-            'file': base64.b64encode(CSV_CONTENT),
+            'file': base64.b64encode(CSV_CONTENT).decode(),
             'filename': 'kpkvk.csv',
         })
         wiz1.action_import()
@@ -39,7 +39,7 @@ class TestKpkvkImport(TransactionCase):
         wiz2 = self.env['l10n_ua.kpkvk.import'].create({
             'year': 2028,
             'file_format': 'csv',
-            'file': base64.b64encode(CSV_CONTENT),
+            'file': base64.b64encode(CSV_CONTENT).decode(),
             'filename': 'kpkvk.csv',
             'overwrite': False,
         })
@@ -49,13 +49,13 @@ class TestKpkvkImport(TransactionCase):
     def test_csv_overwrite(self):
         wiz1 = self.env['l10n_ua.kpkvk.import'].create({
             'year': 2029, 'file_format': 'csv',
-            'file': base64.b64encode(CSV_CONTENT),
+            'file': base64.b64encode(CSV_CONTENT).decode(),
         })
         wiz1.action_import()
         new_content = b"code,name\n2201500,Updated Name\n"
         wiz2 = self.env['l10n_ua.kpkvk.import'].create({
             'year': 2029, 'file_format': 'csv',
-            'file': base64.b64encode(new_content),
+            'file': base64.b64encode(new_content).decode(),
             'overwrite': True,
         })
         wiz2.action_import()
@@ -65,7 +65,7 @@ class TestKpkvkImport(TransactionCase):
     def test_bad_csv_raises(self):
         wizard = self.env['l10n_ua.kpkvk.import'].create({
             'year': 2030, 'file_format': 'csv',
-            'file': base64.b64encode(b"wrong,headers\n"),
+            'file': base64.b64encode(b"wrong,headers\n").decode(),
         })
         with self.assertRaises(UserError):
             wizard.action_import()

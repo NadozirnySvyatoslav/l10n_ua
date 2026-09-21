@@ -129,7 +129,7 @@ class L10nUaTaxDocument(models.Model):
     def _inverse_file_xml_content(self):
         for record in self:
             if record.file_xml_content:
-                record.file_xml = base64.b64encode(record.file_xml_content.encode('utf-8'))
+                record.file_xml = base64.b64encode(record.file_xml_content.encode('utf-8')).decode()
             else:
                 record.file_xml = False
 

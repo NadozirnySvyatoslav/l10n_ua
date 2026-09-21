@@ -4,52 +4,52 @@
 
         <record id="pos_payment_method_internet_acquiring" model="pos.payment.method">
             <field name="name">Інтернет еквайринг</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_mono" model="pos.payment.method">
             <field name="name">Платіж через інтегратора mono</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_novapay" model="pos.payment.method">
             <field name="name">Платіж через інтегратора NovaPay</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_rozetkapay" model="pos.payment.method">
             <field name="name">Платіж через інтегратора RozetkaPay</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_liqpay" model="pos.payment.method">
             <field name="name">Платіж через інтегратора LiqPay</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_easypay" model="pos.payment.method">
             <field name="name">Платіж через інтегратора EasyPay</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_wayforpay" model="pos.payment.method">
             <field name="name">Платіж через інтегратора WayForPay</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_gift_certificate" model="pos.payment.method">
             <field name="name">Подарунковий сертифікат</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_talon" model="pos.payment.method">
             <field name="name">Талон</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
         <record id="pos_payment_method_zheton" model="pos.payment.method">
             <field name="name">Жетон</field>
-            <field name="is_cash_count" eval="False"/>
+            <field name="type">bank</field>
         </record>
 
     </data>

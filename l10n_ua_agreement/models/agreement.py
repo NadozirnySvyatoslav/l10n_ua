@@ -155,7 +155,7 @@ class Agreement(models.Model):
         )
         request = self.env['sign.oca.request'].create({
             'name': _('Договір %s') % (self.code or self.name),
-            'data': base64.b64encode(pdf_content),
+            'data': base64.b64encode(pdf_content).decode(),
             'filename': '%s.pdf' % (self.code or 'agreement'),
             'record_ref': '%s,%s' % (self._name, self.id),
         })

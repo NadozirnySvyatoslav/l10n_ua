@@ -68,7 +68,7 @@ class TestTextImport(TransactionCase):
         self.assertIn('Постачальник', payload['text'])
 
     def test_generic_wizard_creates_statement(self):
-        data = base64.b64encode(SAMPLE.encode('cp1251'))
+        data = base64.b64encode(SAMPLE.encode('cp1251')).decode()
         wiz = self.env['l10n_ua.bank.statement.import'].create({
             'config_id': self.config.id, 'statement_file': data,
             'file_name': 'buh1.txt'})

@@ -205,7 +205,7 @@ class HrReportD5(models.Model):
         if self.state == 'draft':
             raise UserError(_('Спочатку згенеруйте звіт (кнопка «Generate»).'))
         xml = self._render_d1_xml(self._d1_vals())
-        self.xml_file = base64.b64encode(xml.encode('windows-1251'))
+        self.xml_file = base64.b64encode(xml.encode('windows-1251')).decode()
         self.xml_filename = 'J0510210_%s_%02d.xml' % (self.year, int(self.month))
         self.message_post(body=_('Сформовано XML Додатка 1 (ЄСВ): %s') % self.xml_filename)
         return True

@@ -18,7 +18,7 @@ from odoo.tests import TransactionCase, tagged
 CONFIG_MODULE = 'odoo.addons.l10n_ua_tax_cabinet.models.l10n_ua_tax_cabinet_config'
 CONFIG_CLASS = CONFIG_MODULE + '.L10nUaTaxCabinetConfig'
 AUTH = 'AUTH-SIGNATURE=='
-XML = base64.b64encode(b'<?xml version="1.0" encoding="UTF-8"?><DECLAR/>')
+XML = base64.b64encode(b'<?xml version="1.0" encoding="UTF-8"?><DECLAR/>').decode()
 
 
 def _json_response(payload, status=200):

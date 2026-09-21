@@ -38,7 +38,7 @@ class TestXmlParser(TransactionCase):
             content = content.encode(encoding)
         imp = self.env['l10n_ua.supplier.price.import'].create({
             'source_id': source.id,
-            'raw_file': base64.b64encode(content),
+            'raw_file': base64.b64encode(content).decode(),
             'raw_filename': 'p.xml',
         })
         imp._set_state('fetching')

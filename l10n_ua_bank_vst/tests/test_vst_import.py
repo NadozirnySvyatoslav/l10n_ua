@@ -84,7 +84,7 @@ class TestVstImport(TransactionCase):
 
     def test_generic_import_wizard_creates_statement(self):
         # Узагальнений файловий майстер + VST _file_to_payload → native-виписка.
-        data = base64.b64encode(SAMPLE_CSV.encode('cp1251'))
+        data = base64.b64encode(SAMPLE_CSV.encode('cp1251')).decode()
         wiz = self.env['l10n_ua.bank.statement.import'].create({
             'config_id': self.config.id,
             'statement_file': data,

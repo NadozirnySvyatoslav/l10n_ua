@@ -146,7 +146,7 @@ class L10nUaPnlReport(models.Model):
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',
-            'datas': base64.b64encode(output.read()),
+            'datas': base64.b64encode(output.read()).decode(),
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         })
         return {

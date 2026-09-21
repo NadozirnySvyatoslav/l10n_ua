@@ -330,7 +330,7 @@ class L10nUaTax4DF(models.Model):
             if rec.state == 'draft':
                 raise UserError(_('Спочатку згенеруйте звіт з payslips.'))
             xml = self._render_d4_xml(rec._d4_vals())
-            rec.xml_file = base64.b64encode(xml.encode('windows-1251'))
+            rec.xml_file = base64.b64encode(xml.encode('windows-1251')).decode()
             prefix = 'F0510410' if rec._d4_prefix() == 'F05' else 'J0510410'
             rec.xml_filename = '%s_%s_Q%s.xml' % (prefix, rec.year, rec.quarter)
         return True

@@ -486,5 +486,5 @@ class L10nUaFopDeclaration(models.Model):
         self.xml_filename = (
             f"{vals['taxpayer_tin']}_{self.year}_{period_month}_F0103309.xml"
         )
-        self.xml_file = base64.b64encode(xml.encode('windows-1251'))
+        self.xml_file = base64.b64encode(xml.encode('windows-1251')).decode()
         return True

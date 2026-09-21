@@ -26,7 +26,7 @@ class TestEdebo(TransactionCase):
         )
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(csv_content.encode('utf-8')),
+            'file': base64.b64encode(csv_content.encode('utf-8')).decode(),
             'filename': 'edebo.csv',
             'file_format': 'csv',
             'dry_run': True,
@@ -42,7 +42,7 @@ class TestEdebo(TransactionCase):
         )
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(csv_content.encode('utf-8')),
+            'file': base64.b64encode(csv_content.encode('utf-8')).decode(),
             'filename': 'edebo.csv',
             'file_format': 'csv',
             'dry_run': False,
@@ -59,7 +59,7 @@ class TestEdebo(TransactionCase):
     def test_bad_csv_raises(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(b"wrong,headers\nfoo,bar\n"),
+            'file': base64.b64encode(b"wrong,headers\nfoo,bar\n").decode(),
             'filename': 'bad.csv',
             'file_format': 'csv',
         })
@@ -69,7 +69,7 @@ class TestEdebo(TransactionCase):
     def test_custom_format_requires_plugin(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(b"any content"),
+            'file': base64.b64encode(b"any content").decode(),
             'filename': 'x.xml',
             'file_format': 'custom',
         })

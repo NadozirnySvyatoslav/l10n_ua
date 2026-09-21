@@ -116,7 +116,7 @@ class L10nUaBankPayment(models.Model):
         self._check_ready()
         content = self._render_xml()
         self.write({
-            'file_data': base64.b64encode(content),
+            'file_data': base64.b64encode(content).decode(),
             'file_name': 'payment_%s.xml' % (self.name or 'order').replace(
                 '/', '_'),
             'state': 'generated',

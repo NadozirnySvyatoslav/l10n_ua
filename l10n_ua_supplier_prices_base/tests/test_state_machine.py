@@ -48,7 +48,7 @@ class TestStateMachine(TransactionCase):
         payload = {'items': [{'code': 'X', 'price': '10'}]}
         imp = self.env['l10n_ua.supplier.price.import'].create({
             'source_id': self.source.id,
-            'raw_file': base64.b64encode(json.dumps(payload).encode()),
+            'raw_file': base64.b64encode(json.dumps(payload).encode()).decode(),
             'raw_filename': 'p.json',
         })
         imp.action_fetch()    # manual: requires raw_file (already set)

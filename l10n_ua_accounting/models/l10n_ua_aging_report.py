@@ -315,7 +315,7 @@ class L10nUaAgingReport(models.Model):
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',
-            'datas': base64.b64encode(output.read()),
+            'datas': base64.b64encode(output.read()).decode(),
             'res_model': self._name,
             'res_id': self.id,
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

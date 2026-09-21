@@ -68,7 +68,7 @@ class TestXlsxParser(TransactionCase):
     def _make_import(self, source, content_bytes, filename='test.xlsx'):
         imp = self.env['l10n_ua.supplier.price.import'].create({
             'source_id': source.id,
-            'raw_file': base64.b64encode(content_bytes),
+            'raw_file': base64.b64encode(content_bytes).decode(),
             'raw_filename': filename,
         })
         imp._set_state('fetching')

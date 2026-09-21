@@ -101,7 +101,7 @@ class HrIfobsEmployeeExport(models.TransientModel):
 
         rows = [self._employee_row(emp) for emp in self.employee_ids]
         content = build_dbf(IFOBS_EMP_FIELDS, rows)
-        self.file_data = base64.b64encode(content)
+        self.file_data = base64.b64encode(content).decode()
         self.file_name = 'ifobs_employees.dbf'
         self.state = 'done'
         return {

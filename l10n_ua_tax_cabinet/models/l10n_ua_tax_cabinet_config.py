@@ -149,7 +149,7 @@ class L10nUaTaxCabinetConfig(models.Model):
                 self.env['ir.attachment'].create({
                     'name': 'DPS_EK_C_NEW.cer',
                     'type': 'binary',
-                    'datas': base64.b64encode(cert_data),
+                    'datas': base64.b64encode(cert_data).decode(),
                     'res_model': 'l10n_ua.tax.cabinet.config',
                     'res_id': self.id,
                 })
@@ -296,7 +296,7 @@ class L10nUaTaxCabinetConfig(models.Model):
             _logger.warning("Failed to download PDF: %s", response.status_code)
             return None
 
-        return base64.b64encode(response.content)
+        return base64.b64encode(response.content).decode()
 
     def _api_download_document_xml(self, year, doc_id, doc_type='reg_doc', *, auth_signature):
         """
@@ -324,7 +324,7 @@ class L10nUaTaxCabinetConfig(models.Model):
             _logger.warning("Failed to download XML: %s", response.status_code)
             return None
 
-        return base64.b64encode(response.content)
+        return base64.b64encode(response.content).decode()
 
     def _api_submit_document_presigned(self, signed_content, filename, auth_signature):
         """Релей уже підписаного документа (клієнтське КЕП-підписування, #146).

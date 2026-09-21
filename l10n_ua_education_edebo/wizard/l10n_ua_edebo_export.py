@@ -69,7 +69,7 @@ class L10nUaEdeboExport(models.TransientModel):
 
         content = buf.getvalue().encode('utf-8')
         self.write({
-            'file': base64.b64encode(content),
+            'file': base64.b64encode(content).decode(),
             'filename': f"edebo_export_{self.academic_year_id.name.replace('/', '_')}.csv",
         })
         return {

@@ -72,8 +72,8 @@ class TestPumb(TransactionCase):
             'journal_id': cls.journal.id,
             'pumb_environment': 'sandbox',
             'pumb_psu_id': OWN_IBAN,
-            'pumb_cert_file': base64.b64encode(cls.cert_pem),
-            'pumb_key_file': base64.b64encode(cls.key_pem),
+            'pumb_cert_file': base64.b64encode(cls.cert_pem).decode(),
+            'pumb_key_file': base64.b64encode(cls.key_pem).decode(),
         })
 
     def _set_valid_consent(self):
@@ -97,7 +97,7 @@ class TestPumb(TransactionCase):
         encrypted = self.key.private_bytes(
             serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
             serialization.BestAvailableEncryption(b'secret'))
-        self.config.write({'pumb_key_file': base64.b64encode(encrypted),
+        self.config.write({'pumb_key_file': base64.b64encode(encrypted).decode(),
                            'pumb_key_password': 'secret'})
         _cert, key = self.config._pumb_pem_material()
         self.assertNotIn(b'ENCRYPTED', key)
@@ -109,7 +109,7 @@ class TestPumb(TransactionCase):
         bundle = pkcs12.serialize_key_and_certificates(
             b'tpp', self.key, self.cert, None,
             serialization.BestAvailableEncryption(b'p12'))
-        self.config.write({'pumb_cert_file': base64.b64encode(bundle),
+        self.config.write({'pumb_cert_file': base64.b64encode(bundle).decode(),
                            'pumb_key_file': False, 'pumb_key_password': 'p12'})
         cert, key = self.config._pumb_pem_material()
         self.assertEqual(cert, self.cert_pem)

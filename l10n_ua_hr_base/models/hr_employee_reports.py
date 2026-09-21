@@ -382,7 +382,7 @@ class HrEmployeeMilitaryReport(models.Model):
                     emp._military_notice_label(),
                 ])
         content = buf.getvalue().encode('cp1251', 'replace')
-        self.export_data = base64.b64encode(content)
+        self.export_data = base64.b64encode(content).decode()
         self.export_filename = 'vijskovyj_oblik_%s.csv' % (
             self.date.strftime('%Y_%m_%d') if self.date else 'list')
         return True
@@ -530,7 +530,7 @@ class HrMilitaryNotification(models.Model):
             self.event_date.strftime('%d.%m.%Y') if self.event_date else '',
         ])
         content = buf.getvalue().encode('cp1251', 'replace')
-        self.export_data = base64.b64encode(content)
+        self.export_data = base64.b64encode(content).decode()
         self.export_filename = 'tcc_notification_%s.csv' % (self.name or '').replace(
             '/', '_')
 

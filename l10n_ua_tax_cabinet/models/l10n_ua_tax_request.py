@@ -61,7 +61,7 @@ class L10nUaTaxRequest(models.Model):
     def action_generate_xml(self):
         for rec in self:
             xml = rec._render_request_xml(rec._request_vals())
-            rec.xml_file = base64.b64encode(xml.encode('windows-1251'))
+            rec.xml_file = base64.b64encode(xml.encode('windows-1251')).decode()
             form = REQUEST_FORMS[rec.request_type]
             edrpou = re.sub(r'\D', '', rec._request_edrpou(rec.company_id))
             rec.xml_filename = '%s%s%s_%s_%s.xml' % (

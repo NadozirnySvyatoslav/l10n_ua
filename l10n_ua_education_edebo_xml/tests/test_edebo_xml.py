@@ -57,7 +57,7 @@ class TestEdeboXml(TransactionCase):
     def test_xml_import_basic(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(SAMPLE_XML),
+            'file': base64.b64encode(SAMPLE_XML).decode(),
             'filename': 'edebo.xml',
             'file_format': 'custom',
             'dry_run': True,
@@ -68,7 +68,7 @@ class TestEdeboXml(TransactionCase):
     def test_xml_alternative_tag_names(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(ALT_XML),
+            'file': base64.b64encode(ALT_XML).decode(),
             'filename': 'alt.xml',
             'file_format': 'custom',
             'dry_run': True,
@@ -79,7 +79,7 @@ class TestEdeboXml(TransactionCase):
     def test_xml_real_import_creates_members(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(SAMPLE_XML),
+            'file': base64.b64encode(SAMPLE_XML).decode(),
             'filename': 'edebo.xml',
             'file_format': 'custom',
             'dry_run': False,
@@ -95,7 +95,7 @@ class TestEdeboXml(TransactionCase):
     def test_invalid_xml_raises(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(b'not xml at all'),
+            'file': base64.b64encode(b'not xml at all').decode(),
             'filename': 'bad.xml',
             'file_format': 'custom',
         })
@@ -105,7 +105,7 @@ class TestEdeboXml(TransactionCase):
     def test_empty_xml_raises(self):
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
-            'file': base64.b64encode(b'<root></root>'),
+            'file': base64.b64encode(b'<root></root>').decode(),
             'filename': 'empty.xml',
             'file_format': 'custom',
         })

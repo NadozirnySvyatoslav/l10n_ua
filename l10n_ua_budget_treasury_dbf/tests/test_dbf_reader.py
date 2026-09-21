@@ -119,7 +119,7 @@ class TestDbfWizardIntegration(TransactionCase):
         })
         # The wizard decodes the file using `encoding` and then re-encodes in
         # `_parse_custom`. Pass the raw bytes through latin-1 round-trip.
-        b64 = base64.b64encode(dbf)
+        b64 = base64.b64encode(dbf).decode()
         wizard = self.env['l10n_ua.treasury.statement.import'].create({
             'journal_id': journal.id,
             'file': b64,

@@ -363,7 +363,7 @@ class L10nUaTaxInvoice(models.Model):
         xml = self._build_xml()
         xml_bytes = xml.encode('windows-1251')
         self.write({
-            'file_xml': base64.b64encode(xml_bytes),
+            'file_xml': base64.b64encode(xml_bytes).decode(),
             'file_xml_name': self._generate_xml_filename(),
         })
 

@@ -22,7 +22,7 @@ class Website(models.Model):
         vals = {'name': 'many2one'}
         try:
             with file_open('l10n_ua_landing/static/src/img/logo.png', 'rb') as f:
-                vals['logo'] = base64.b64encode(f.read())
+                vals['logo'] = base64.b64encode(f.read()).decode()
         except OSError:
             _logger.warning('l10n_ua_landing: logo.png не знайдено, лишаємо дефолтний логотип')
         websites.write(vals)

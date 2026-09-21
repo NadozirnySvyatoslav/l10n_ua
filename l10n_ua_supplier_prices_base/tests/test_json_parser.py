@@ -44,7 +44,7 @@ class TestJsonParser(TransactionCase):
         })
 
     def _make_import(self, payload):
-        raw_b64 = base64.b64encode(json.dumps(payload).encode('utf-8'))
+        raw_b64 = base64.b64encode(json.dumps(payload).encode('utf-8')).decode()
         imp = self.env['l10n_ua.supplier.price.import'].create({
             'source_id': self.source.id,
             'raw_file': raw_b64,
@@ -131,7 +131,7 @@ class TestJsonParser(TransactionCase):
             {'sku': 'A', 'cost': '10'},
             {'sku': 'B', 'cost': '20'},
         ]}}
-        raw_b64 = base64.b64encode(json.dumps(payload).encode('utf-8'))
+        raw_b64 = base64.b64encode(json.dumps(payload).encode('utf-8')).decode()
         imp = self.env['l10n_ua.supplier.price.import'].create({
             'source_id': source.id,
             'raw_file': raw_b64,
@@ -145,7 +145,7 @@ class TestJsonParser(TransactionCase):
     def test_parse_invalid_json(self):
         imp = self.env['l10n_ua.supplier.price.import'].create({
             'source_id': self.source.id,
-            'raw_file': base64.b64encode(b'{invalid json'),
+            'raw_file': base64.b64encode(b'{invalid json').decode(),
         })
         imp._set_state('fetching')
         imp._set_state('fetched')

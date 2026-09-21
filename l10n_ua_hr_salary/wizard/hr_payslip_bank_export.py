@@ -282,7 +282,7 @@ class HrPayslipBankExport(models.TransientModel):
                 'Для формату iFOBS вкажіть транзитний рахунок зарплатного '
                 'проєкту.'))
         content = getattr(self, renderer)(rows)
-        self.file_data = base64.b64encode(content)
+        self.file_data = base64.b64encode(content).decode()
         self.file_name = 'salary_%s_%s.%s' % (
             self.file_format, self._period_label().replace('.', '_') or 'export',
             ext)
