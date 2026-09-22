@@ -169,10 +169,10 @@ class TestStaffingCurrencyMigration(TestHrUaBase):
                 {'name': 'ZZZ', 'symbol': 'Z'})
 
         path = os.path.join(
-            os.path.dirname(__file__), '..', 'migrations', '19.0.1.7.0',
+            os.path.dirname(__file__), '..', 'migrations', '20.0.1.7.0',
             'post-migration.py')
         spec = importlib.util.spec_from_file_location(
-            'l10n_ua_hr_base_19_1_7_0_post', path)
+            'l10n_ua_hr_base_20_1_7_0_post', path)
         cls.script = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.script)
 

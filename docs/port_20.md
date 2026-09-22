@@ -23,8 +23,22 @@ cd ~/Projects/odoo-20
 
 ## Стан
 
-62 з 83 модулів встановлюються на чистій БД. Лишається 21 — усі через
-три зміни ядра, описані нижче.
+62 з 83 модулів встановлюються на чистій БД, **тести зелені: 0 failed,
+0 error(s) of 1144 tests**. Лишається 21 модуль — усі через три зміни
+ядра, описані нижче.
+
+Прогін тестів:
+
+```bash
+cd ~/Projects/odoo-20
+./venv/bin/python ./odoo-bin -c odoo-ua.conf -d odoo20_ua \
+  -u <список модулів> --stop-after-init --test-enable \
+  --test-tags /l10n_ua_account_base,/l10n_ua_...
+```
+
+Тестовій базі потрібен план рахунків (частина тестів шукає рахунки за
+`account_type`): `env['account.chart.template'].try_loading('generic_coa',
+company=company, install_demo=False)`.
 
 ## Зміни ядра Odoo 20, які вже відпрацьовані
 
@@ -59,7 +73,8 @@ Binary-поля тепер тримають сирі байти в обгорт�
 * base64-**рядок** (`.decode()`) — сумісність із RPC, використано у порті.
 
 Читання поля повертає `BinaryValue`: замість `base64.b64decode(rec.field)`
-треба `rec.field.content` (або `bytes(rec.field)`).
+треба `rec.field.content` (або `bytes(rec.field)`), а щоб віддати вміст
+у base64 — `rec.field.to_base64()`.
 
 ### Прибрані поля й моделі
 
@@ -68,10 +83,34 @@ Binary-поля тепер тримають сирі байти в обгорт�
 | `ir.actions.report.report_file` | прибрано |
 | `hr.employee.study_school` | прибрано, оголошуємо самі в `l10n_ua_hr_base` |
 | `hr.job.contract_type_id`, `hr.contract.type` | `employee_type_id`, `hr.employee.type` |
+| `hr.leave.holiday_status_id`, `hr.leave.type` | `work_entry_type_id`, `hr.work.entry.type` |
+| `hr.version.contract_date_start` (group) | `hr.group_hr_manager` → `hr.group_hr_user` |
 | `resource.calendar.tz` | прибрано (часовий пояс з компанії/ресурсу) |
 | `resource.calendar.schedule_type` | `calendar_type`: `fully_fixed`→`fixed`, `flexible`→`undefined` |
+| `resource.calendar.two_weeks_calendar`, `attendance.week_type` | `calendar_type='variable'` + recurrency |
 | `resource.calendar.attendance.name` | прибрано |
+| `resource.calendar.leave_ids` | `copy=False` — копіювати свята явно |
 | `pos.payment.method.is_cash_count` | обов'язкове `type` (`cash`/`bank`/`pay_later`) |
+| `res.company.company_registry`, `res.partner.company_registry` | прибрано — у нас `edrpou` |
+| `res.partner.company_type` | прибрано (лишився обчислюваний `is_company`) |
+| `res.partner.bank.acc_number` | `account_number` — **зберігається з пробілами**, сирий IBAN у `sanitized_account_number` |
+| `res.partner.bank.bank_id`, `res.bank` | прибрано (МФО беремо з IBAN, назву — з `bank_name`) |
+| `stock.move.product_uom` | `uom_id` (на sale/account лініях лишається `product_uom_id`) |
+| `ir.config_parameter.get_param/set_param` | `get_str/get_bool/get_int/get_float` і `set_*` |
+| `mail.message.tracking_value_ids`, `mail.tracking.value` | у окремому модулі `mail_tracking` |
+
+### Тихі зміни поведінки
+
+* **`Char` більше не обрізає значення до `size`** — задовге значення тепер
+  падає в Postgres (`StringDataRightTruncation`) замість того, щоб мовчки
+  вкоротитись і дійти до `@api.constrains`.
+* **Копія дописує « (copy)»** до будь-якого `Char` із назвою `name`
+  (`mark_as_copy`), тож `record.copy()` треба передавати `name` явно, якщо
+  назва має лишитись тією самою.
+* **`.new()` на абстрактній моделі заборонено** (`assert not self._abstract`)
+  — для тестів домішки годиться `browse(1)`.
+* **IBAN зберігається відформатованим** (`UA21 3223 …`), тому все, що йде у
+  файл для банку, має брати `sanitized_account_number` або чистити пробіли.
 
 ### Якорі xpath, що зникли з виглядів ядра
 
@@ -126,12 +165,18 @@ Binary-поля тепер тримають сирі байти в обгорт�
 
 Блокує: `l10n_ua_agreement`, `l10n_ua_agreement_account`.
 
+## Міграції
+
+Каталоги `migrations/19.0.*` перейменовані на `20.0.*`: версії модулів тепер
+`20.0.x`, і скрипт у каталозі зі старим номером просто не спрацював би при
+оновленні. Скрипти мають бути ідемпотентними — база, що вже пройшла
+відповідну міграцію на гілці 19.0, пройде її ще раз.
+
 ## Ще не перевірено
 
-* тести (`--test-enable`) — жодного модуля ще не ганяли;
-* читання Binary-полів (`base64.b64decode(rec.field)`) — 44 місця, з них
-  частина декодує рядки з JSON і чіпати їх не можна;
-* каталоги `migrations/19.0.*` — на гілці 20.0 вони спрацюють при
-  оновленні зі старої версії і звертаються до вже прибраних полів;
 * `telegram_bot_m2o` — не в переліку l10n_ua, security ще на
-  `ir.model.access.csv`.
+  `ir.model.access.csv`;
+* `l10n_ua_bank_sync.res_partner_bank._check_iban_ua` віддає валідатору
+  відформатований IBAN — переписати разом із довідником МФО;
+* нічого з переліку «Що лишається» не перевірено в браузері — тести
+  покривають лише серверну частину.

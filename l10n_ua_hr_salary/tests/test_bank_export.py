@@ -168,7 +168,10 @@ class TestBankExport(SalaryTestCase):
         root = etree.fromstring(wiz.file_data.content)
         payments = root.findall('Payment')
         self.assertEqual(len(payments), 1)
-        self.assertEqual(payments[0].findtext('Account'), expected.account_number)
+        # Odoo 20 stores the IBAN pretty-printed in account_number; the raw
+        # 29 characters that go into the bank file live in sanitized_*.
+        self.assertEqual(payments[0].findtext('Account'),
+                         expected.sanitized_account_number)
 
     def test_iban_written_without_spaces(self):
         """A grouped IBAN reaches the bank file as 29 contiguous characters."""
