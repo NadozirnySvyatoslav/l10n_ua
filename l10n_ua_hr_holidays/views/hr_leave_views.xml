@@ -24,7 +24,7 @@
                  and dates; the employee comes from the order too) must stay
                  identical on both documents, so it is locked here. The
                  description and the attachments stay editable. -->
-            <xpath expr="//field[@name='holiday_status_id']" position="attributes">
+            <xpath expr="//field[@name='work_entry_type_id']" position="attributes">
                 <attribute name="readonly">state in ['cancel', 'refuse', 'validate', 'validate1'] or order_id</attribute>
                 <!-- no_open: opening the leave type from here navigates away
                      and comes back with a fresh, unsaved record — which loses
@@ -126,15 +126,9 @@
                 <attribute name="options">{'no_open': True}</attribute>
                 <attribute name="readonly">state in ['cancel', 'refuse', 'validate', 'validate1'] or order_id</attribute>
             </xpath>
-            <xpath expr="//field[@name='company_id']" position="attributes">
-                <attribute name="options">{'no_open': True}</attribute>
-                <attribute name="readonly">bool(order_id)</attribute>
-            </xpath>
-            <!-- department_id is already readonly in core; a readonly m2o is
-                 still a link, so it only needs no_open. -->
-            <xpath expr="//field[@name='department_id']" position="attributes">
-                <attribute name="options">{'no_open': True}</attribute>
-            </xpath>
+            <!-- company_id і department_id Odoo 20 прибрало з форми
+                 відпустки (лишилися лише в списку), тож налаштовувати
+                 їхні атрибути більше нема де. -->
         </field>
     </record>
 

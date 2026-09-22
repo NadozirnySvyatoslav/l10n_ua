@@ -2,12 +2,13 @@ from odoo.tests.common import TransactionCase
 
 
 class TestHrLeaveType(TransactionCase):
-    """Tests for hr.leave.type Ukrainian extensions"""
+    """Tests for hr.work.entry.type Ukrainian extensions"""
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_WORK_ENTR_1',
             'name': 'Test Annual Leave',
             'ua_leave_category': 'annual_basic',
             'annual_days': 24,
@@ -36,7 +37,8 @@ class TestHrLeaveType(TransactionCase):
 
     def test_leave_type_defaults(self):
         """Test default values for leave type"""
-        leave_type = self.env['hr.leave.type'].create({
+        leave_type = self.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_WORK_ENTR_2',
             'name': 'Test Default Leave',
         })
         self.assertTrue(leave_type.is_calendar_days)
@@ -54,7 +56,9 @@ class TestHrLeaveType(TransactionCase):
             'social', 'unpaid', 'maternity', 'childcare', 'sick', 'other'
         ]
         for category in categories:
-            leave_type = self.env['hr.leave.type'].create({
+            leave_type = self.env['hr.work.entry.type'].create({
+                # `code` is unique per country since Odoo 20.
+                'code': f'UA_T_CAT_{category.upper()}',
                 'name': f'Test {category}',
                 'ua_leave_category': category,
             })
@@ -64,39 +68,37 @@ class TestHrLeaveType(TransactionCase):
         """Test all payment sources can be set"""
         sources = ['employer', 'fss', 'mixed']
         for source in sources:
-            leave_type = self.env['hr.leave.type'].create({
+            leave_type = self.env['hr.work.entry.type'].create({
+                'code': f'UA_T_SRC_{source.upper()}',
                 'name': f'Test {source}',
                 'payment_source': source,
             })
             self.assertEqual(leave_type.payment_source, source)
 
-    def test_default_leave_type_single_no_conflict(self):
-        """Setting a default with no existing default via checkbox."""
-        company = self.env.company
-        lt = self.env['hr.leave.type'].create({
-            'name': 'Default A', 'company_id': company.id})
-        lt.write({'ua_is_default': True})
-        self.assertTrue(lt.ua_is_default)
+    def test_company_default_leave_type(self):
+        """Типовий вид відпустки тепер належить компанії, а не виду.
 
-    def test_default_leave_type_conflict_auto_resolves(self):
-        """Setting a second default automatically clears the previous one."""
-        company = self.env.company
-        lt_a = self.env['hr.leave.type'].create({
-            'name': 'Default A', 'company_id': company.id})
-        lt_b = self.env['hr.leave.type'].create({
-            'name': 'Default B', 'company_id': company.id})
-        lt_a.write({'ua_is_default': True})
-        self.assertTrue(lt_a.ua_is_default)
-        # Setting lt_b as default automatically clears lt_a
-        lt_b.write({'ua_is_default': True})
-        self.assertTrue(lt_b.ua_is_default)
-        self.assertFalse(lt_a.ua_is_default)
+        hr.work.entry.type у Odoo 20 прив'язана до країни, тож прапорець
+        на ній означав би «типовий для всіх компаній країни». Поле на
+        res.company і унікальне саме по собі, і не зачіпає сусідів.
+        """
+        company_a = self.env.company
+        company_b = self.env['res.company'].create({'name': 'ТЕСТ Друга'})
+        lt_a = self.env['hr.work.entry.type'].create({
+            'name': 'Default A', 'code': 'UA_TEST_DEF_A'})
+        lt_b = self.env['hr.work.entry.type'].create({
+            'name': 'Default B', 'code': 'UA_TEST_DEF_B'})
 
-    def test_default_leave_type_unset(self):
-        """Unsetting a default via checkbox."""
-        company = self.env.company
-        lt = self.env['hr.leave.type'].create({
-            'name': 'Default A', 'company_id': company.id})
-        lt.write({'ua_is_default': True})
-        lt.write({'ua_is_default': False})
-        self.assertFalse(lt.ua_is_default)
+        company_a.l10n_ua_default_leave_type_id = lt_a
+        company_b.l10n_ua_default_leave_type_id = lt_b
+        self.assertEqual(company_a.l10n_ua_default_leave_type_id, lt_a)
+        self.assertEqual(company_b.l10n_ua_default_leave_type_id, lt_b,
+                         'вибір однієї компанії не змінює вибір іншої')
+
+        # Нове значення просто замінює попереднє — знімати прапорці
+        # з інших видів більше не треба.
+        company_a.l10n_ua_default_leave_type_id = lt_b
+        self.assertEqual(company_a.l10n_ua_default_leave_type_id, lt_b)
+
+        company_a.l10n_ua_default_leave_type_id = False
+        self.assertFalse(company_a.l10n_ua_default_leave_type_id)

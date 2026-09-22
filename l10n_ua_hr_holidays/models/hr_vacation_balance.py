@@ -22,7 +22,7 @@ class HrVacationBalance(models.Model):
         check_company=True
     )
     leave_type_id = fields.Many2one(
-        'hr.leave.type',
+        'hr.work.entry.type',
         string='Leave Type',
         required=True,
         domain="[('ua_leave_category', '!=', False)]"
@@ -276,7 +276,7 @@ class HrVacationBalance(models.Model):
         lt_id = res.get('leave_type_id') or ctx.get('default_leave_type_id')
         if emp_id and lt_id and not res.get('period_start'):
             employee = self.env['hr.employee'].browse(emp_id)
-            leave_type = self.env['hr.leave.type'].browse(lt_id)
+            leave_type = self.env['hr.work.entry.type'].browse(lt_id)
             ref_year = ctx.get('default_period_year') or fields.Date.today().year
             start, end, index = self._get_period_for(
                 employee, leave_type, self._ref_date_for_year(ref_year))
@@ -293,16 +293,14 @@ class HrVacationBalance(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        # Only clear a now-incompatible employee/type on a genuine company
+        # Only clear a now-incompatible employee on a genuine company
         # switch — never wipe values prefilled from the leave form.
+        # The leave type itself is country-scoped since Odoo 20, so it can
+        # no longer be incompatible with the company.
         if (self.employee_id and self.employee_id.company_id
                 and self.company_id
                 and self.employee_id.company_id != self.company_id):
             self.employee_id = False
-        if (self.leave_type_id and self.leave_type_id.company_id
-                and self.company_id
-                and self.leave_type_id.company_id != self.company_id):
-            self.leave_type_id = False
 
     @api.onchange('employee_id', 'leave_type_id')
     def _onchange_period_defaults(self):
@@ -374,7 +372,7 @@ class HrVacationBalance(models.Model):
         self.ensure_one()
         return [
             ('employee_id', '=', self.employee_id.id),
-            ('holiday_status_id', '=', self.leave_type_id.id),
+            ('work_entry_type_id', '=', self.leave_type_id.id),
             '|', ('vacation_balance_id', '=', self.id),
                  '&', ('vacation_balance_id', '=', False),
                       '&', ('request_date_from', '>=', self.period_start),
@@ -478,7 +476,7 @@ class HrVacationBalance(models.Model):
         if leave_types is None:
             # Types whose unused days roll forward AND that the user opted in
             # to auto-calculate balances for.
-            leave_types = self.env['hr.leave.type'].search([
+            leave_types = self.env['hr.work.entry.type'].search([
                 ('is_transferable', '=', True),
                 ('annual_days', '>', 0),
                 ('ua_auto_calc_balance', '=', True),
@@ -486,17 +484,11 @@ class HrVacationBalance(models.Model):
 
         created = self.browse()
         for leave_type in leave_types:
-            lt_company = leave_type.company_id
             for employee in employees:
-                # Skip cross-company pairings. In multi-company mode each
-                # company has its own annual_basic leave type; without this
-                # guard an employee would get a balance for every company's
-                # type — same employee and period, different leave_type_id —
-                # which the unique constraint allows and shows up as a
-                # duplicate for the same period. A company-less (shared) leave
-                # type still matches any employee.
-                if lt_company and employee.company_id != lt_company:
-                    continue
+                # No cross-company guard any more: Odoo 20 scopes
+                # hr.work.entry.type by country, not by company, so every
+                # company shares one annual_basic type and an employee can
+                # only ever get one balance per type and period.
                 created |= self._generate_period_chain(
                     employee, leave_type, up_to_date)
         # Refresh the rollups for EVERY period of the processed types back to
@@ -530,7 +522,7 @@ class HrVacationBalance(models.Model):
         for balance in self:
             leaves = Leave.search([
                 ('employee_id', '=', balance.employee_id.id),
-                ('holiday_status_id', '=', balance.leave_type_id.id),
+                ('work_entry_type_id', '=', balance.leave_type_id.id),
                 ('vacation_balance_id', '=', False),
                 ('request_date_from', '>=', balance.period_start),
                 ('request_date_from', '<=', balance.period_end),
@@ -582,7 +574,7 @@ class HrVacationBalance(models.Model):
         for balance in self:
             leaves = self.env['hr.leave'].search([
                 ('employee_id', '=', balance.employee_id.id),
-                ('holiday_status_id', '=', balance.leave_type_id.id),
+                ('work_entry_type_id', '=', balance.leave_type_id.id),
                 '|', ('vacation_balance_id', '=', balance.id),
                      '&', ('vacation_balance_id', '=', False),
                           '&', ('request_date_from', '>=', balance.period_start),
@@ -602,7 +594,7 @@ class HrVacationBalance(models.Model):
             if vals.get('period_start') and vals.get('period_end'):
                 continue
             employee = self.env['hr.employee'].browse(vals.get('employee_id'))
-            leave_type = self.env['hr.leave.type'].browse(vals.get('leave_type_id'))
+            leave_type = self.env['hr.work.entry.type'].browse(vals.get('leave_type_id'))
             year = vals.get('year') or fields.Date.today().year
             ref_date = self._ref_date_for_year(year)
             # A reference date earlier in the year than the hire anniversary

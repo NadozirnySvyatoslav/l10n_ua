@@ -23,9 +23,10 @@ cd ~/Projects/odoo-20
 
 ## Стан
 
-62 з 83 модулів встановлюються на чистій БД, **тести зелені: 0 failed,
-0 error(s) of 1144 tests**. Лишається 21 модуль — усі через три зміни
-ядра, описані нижче.
+**81 з 83 модулів встановлюються на чистій БД, тести зелені: 0 failed,
+0 error(s) of 1600 tests.** Лишаються `l10n_ua_agreement` і
+`l10n_ua_agreement_account` — чекають на гілку 20.0 в OCA
+(`agreement`, `contract`, `sign_oca`).
 
 Прогін тестів:
 
@@ -84,6 +85,9 @@ Binary-поля тепер тримають сирі байти в обгорт�
 | `hr.employee.study_school` | прибрано, оголошуємо самі в `l10n_ua_hr_base` |
 | `hr.job.contract_type_id`, `hr.contract.type` | `employee_type_id`, `hr.employee.type` |
 | `hr.leave.holiday_status_id`, `hr.leave.type` | `work_entry_type_id`, `hr.work.entry.type` |
+| `hr.leave.type.time_type` | `hr.work.entry.type.count_as` (`working_time`/`absence`) |
+| `account.payment.state`: `posted`/`in_process`/`sent` | `paid`/`reconciled` |
+| `t-esc`, `t-raw` у QWeb | `t-out` (директиви `esc`/`raw` прибрані, мовчки нічого не виводять) |
 | `hr.version.contract_date_start` (group) | `hr.group_hr_manager` → `hr.group_hr_user` |
 | `resource.calendar.tz` | прибрано (часовий пояс з компанії/ресурсу) |
 | `resource.calendar.schedule_type` | `calendar_type`: `fully_fixed`→`fixed`, `flexible`→`undefined` |
@@ -111,6 +115,22 @@ Binary-поля тепер тримають сирі байти в обгорт�
   — для тестів домішки годиться `browse(1)`.
 * **IBAN зберігається відформатованим** (`UA21 3223 …`), тому все, що йде у
   файл для банку, має брати `sanitized_account_number` або чистити пробіли.
+* **`t-esc` мовчки нічого не виводить**: директиви немає в
+  `ir_qweb._directives_eval_order`, тож друкована форма рендериться з
+  порожніми клітинками й жодної помилки. Скрізь `t-out`.
+* **Курс валюти діє з наступного дня**: `res.currency._get_rates` шукає
+  `('name', '<', date)` замість `<=` (Odoo 19), тобто курс НБУ за 30.06
+  застосується лише 01.07. Для сум, прив'язаних до дати документа,
+  використовуйте `res.currency._l10n_ua_convert` з `l10n_ua_company_base`.
+* **Selection не приймає `''`** — порожнє значення тепер тільки `False`.
+* **`Char(size=N)`** більше не обрізає — задовге значення падає в Postgres.
+* **Відпустку, створену Time Off Officer'ом, Odoo 20 одразу затверджує**
+  (`hr_holidays._process_auto_approve_activities`), а затверджену вже не
+  дає правити за датами. Раніше авто-затвердження було тільки для
+  `leave_validation_type='no_validation'`.
+* **Рахунок типу `asset_cash`** при створенні родить банківський журнал,
+  а два журнали однієї компанії стикаються поштовим аліасом; при
+  завантаженні плану рахунків це вимикає контекст `chart_template_load`.
 
 ### Якорі xpath, що зникли з виглядів ядра
 
@@ -125,40 +145,39 @@ Binary-поля тепер тримають сирі байти в обгорт�
 `hasclass()` замість `@class='...'` — ядро дописує класи (`o_hr_address`),
 і точне порівняння перестає збігатися.
 
-## Що лишається
+## Дві великі заміни моделей
 
-### 1. `hr.leave.type` → `hr.work.entry.type`
+### `hr.leave.type` → `hr.work.entry.type`
 
 Модель типів відпусток злита з типами робочого часу. Наслідки:
 
-* `hr.leave.holiday_status_id` → `work_entry_type_id`;
+* `hr.leave.holiday_status_id` → `work_entry_type_id`, ключ контексту
+  `default_holiday_status_id` → `default_work_entry_type_id`;
 * нова модель **не має `company_id`** — вона прив'язана до `country_id`.
-  Наш `ua_is_default` («показувати за замовчуванням») був у розрізі
-  компанії — потрібне рішення: чи переносити його на `res.company`
-  окремим Many2one, чи робити один типовий на країну;
-* `code` обов'язковий і унікальний у межах країни — нашим 15 типам
-  відпусток треба роздати коди;
-* `count_as` (`working_time`/`absence`) — для відпусток `absence`.
+  Тому:
+  * `ua_is_default` («показувати за замовчуванням») переїхав на
+    компанію — `res.company.l10n_ua_default_leave_type_id`. Один Many2one
+    замість прапорця з ручним зняттям конфліктів: унікальність тепер
+    випливає з самого поля, і вибір однієї компанії не чіпає сусідів;
+  * кнопки «Імпортувати види відпусток» на компанії більше немає —
+    15 видів приходять із даними модуля на всі компанії країни;
+  * у генераторі балансів зник обхід «чужих» пар «працівник — вид»;
+* `code` обов'язковий і унікальний у межах країни — наші види дістали
+  `UA_VAC_*`/`UA_SICK` плюс тризначний `display_code`;
+* `time_type` → `count_as` (`working_time`/`absence`).
 
-Блокує: `l10n_ua_hr_holidays`, `l10n_ua_hr_documents`, `l10n_ua_hr_fss`,
-`l10n_ua_hr_attendance_sheet`, `l10n_ua_hr_vacation_reserve`,
-`l10n_ua_hr_employee_transfer`, `l10n_ua_hr`, `l10n_ua_full`.
-
-### 2. Прибрано `res.bank`
+### Прибрано `res.bank` → `l10n_ua.bank`
 
 Реквізити банку переїхали в денормалізовані поля `res.partner.bank`
-(`bank_name`, `bank_bic`, адреса). Наш довідник МФО (`l10n_ua_bank_sync`,
-`res.bank.ua_mfo` + сидовані банки) лишився без моделі-носія.
+(`bank_name`, `bank_bic`, адреса), а `bank_id` зник зовсім.
 
-Потрібне рішення: власна модель довідника МФО (наприклад `l10n_ua.bank`)
-з резолвингом `МФО → назва банку` в `res.partner.bank`.
+Довідник МФО тепер наш: модель `l10n_ua.bank` у `l10n_ua_account_base`
+(меню «Ukraine → Directories → Banks (MFO)»), а `res.partner.bank` дістав
+обчислювані `l10n_ua_mfo` (МФО з IBAN, позиції 5-10) і `l10n_ua_bank_id`
+(пошук по МФО, ручний вибір не затирається) та `l10n_ua_bank_name` для
+друкованих форм.
 
-Блокує: увесь банківський стек (`bank_sync`, `bank_privat`, `bank_mono`,
-`bank_pumb`, `bank_vst`, `bank_text`, `bank_payment`, `bank_openbanking`,
-`bank_currency_sync`), а також `l10n_ua_accounting`,
-`l10n_ua_hr_business_trip`, `l10n_ua_full`.
-
-### 3. OCA-залежності `l10n_ua_agreement`
+### Лишається: OCA-залежності `l10n_ua_agreement`
 
 `agreement`, `contract`, `sign_oca` ще не мають гілки 20.0. Модуль
 чекає на них (або на заміну ядровим функціоналом).
@@ -176,7 +195,8 @@ Binary-поля тепер тримають сирі байти в обгорт�
 
 * `telegram_bot_m2o` — не в переліку l10n_ua, security ще на
   `ir.model.access.csv`;
-* `l10n_ua_bank_sync.res_partner_bank._check_iban_ua` віддає валідатору
-  відформатований IBAN — переписати разом із довідником МФО;
-* нічого з переліку «Що лишається» не перевірено в браузері — тести
-  покривають лише серверну частину.
+* нічого не перевірено в браузері — тести покривають лише серверну
+  частину, а `t-esc` показав, що саме такі поламки тести не ловлять,
+  якщо не рендерити звіт;
+* `l10n_ua.bank` має лише 10 банків; повний довідник МФО веде НБУ —
+  потрібен імпорт.

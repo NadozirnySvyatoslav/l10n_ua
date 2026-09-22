@@ -4,21 +4,23 @@ from odoo.tests.common import TransactionCase
 
 
 class TestPeriodType(TransactionCase):
-    """PR 1: period_type on hr.leave.type + _get_work_year_for_date on hr.employee."""
+    """PR 1: period_type on hr.work.entry.type + _get_work_year_for_date on hr.employee."""
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.Employee = cls.env['hr.employee']
-        cls.LeaveType = cls.env['hr.leave.type']
+        cls.LeaveType = cls.env['hr.work.entry.type']
 
     def test_period_type_default_is_calendar(self):
-        leave_type = self.LeaveType.create({'name': 'Ad-hoc leave'})
+        leave_type = self.LeaveType.create(
+            {'name': 'Ad-hoc leave', 'code': 'UA_T_PERIOD_1'})
         self.assertEqual(leave_type.period_type, 'calendar')
 
     def test_period_type_explicit_work(self):
         leave_type = self.LeaveType.create({
             'name': 'Work-year leave',
+            'code': 'UA_T_PERIOD_2',
             'period_type': 'work',
         })
         self.assertEqual(leave_type.period_type, 'work')

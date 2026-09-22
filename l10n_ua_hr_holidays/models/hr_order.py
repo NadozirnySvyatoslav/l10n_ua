@@ -4,9 +4,10 @@ from odoo import models, fields, api
 class HrOrder(models.Model):
     """Vacation-order behaviour that needs the leave types this module adds.
 
-    hr.order lives in l10n_ua_hr_documents, which cannot reach ua_is_default
-    or hr.sick.leave — the dependency runs the other way — so the
-    default-type preselection and the sick-leave link are contributed here.
+    hr.order lives in l10n_ua_hr_documents, which cannot reach
+    res.company.l10n_ua_default_leave_type_id or hr.sick.leave — the
+    dependency runs the other way — so the default-type preselection and
+    the sick-leave link are contributed here.
     """
     _inherit = 'hr.order'
 
@@ -41,13 +42,9 @@ class HrOrder(models.Model):
         """Preselect the company's default vacation type as soon as the order
         becomes a vacation order, the same default the leave form applies.
         An explicit choice is never overwritten."""
-        if self.order_type != 'vacation' or self.holiday_status_id:
+        if self.order_type != 'vacation' or self.work_entry_type_id:
             return
         company = self.company_id or self.env.company
-        default_lt = self.env['hr.leave.type'].search([
-            ('ua_is_default', '=', True),
-            ('company_id', '=', company.id),
-        ], limit=1)
-        if default_lt:
-            self.holiday_status_id = default_lt
+        if company.l10n_ua_default_leave_type_id:
+            self.work_entry_type_id = company.l10n_ua_default_leave_type_id
 

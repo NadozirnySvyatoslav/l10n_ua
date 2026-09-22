@@ -15,9 +15,10 @@ class TestHrLeaveOrderSync(common.TransactionCase):
             'name': 'Test Employee',
         })
 
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_LEAVE_ORD_1',
             'name': 'Annual Basic Leave',
-            'time_type': 'leave',
+            'count_as': 'absence',
             'requires_allocation': 'yes',
             'is_paid': True,
         })
@@ -26,7 +27,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         cls.allocation = cls.env['hr.leave.allocation'].create({
             'name': 'Test Leave Allocation',
             'employee_id': cls.employee.id,
-            'holiday_status_id': cls.leave_type.id,
+            'work_entry_type_id': cls.leave_type.id,
             'number_of_days': 100,
         })
         cls.allocation.action_approve()
@@ -34,12 +35,19 @@ class TestHrLeaveOrderSync(common.TransactionCase):
             cls.allocation.action_validate()
 
     def _make_leave(self, day_from, day_to):
-        return self.env['hr.leave'].create({
+        leave = self.env['hr.leave'].create({
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.leave_type.id,
             'request_date_from': day_from,
             'request_date_to': day_to,
         })
+        # Odoo 20 auto-approves a leave created by a Time Off Officer
+        # (hr_holidays._process_auto_approve_activities), and the tests run
+        # as admin. These cases are about a leave still being edited, so put
+        # it back to "To Approve".
+        if leave.state == 'validate':
+            leave.sudo().state = 'confirm'
+        return leave
 
     def _create_order_via_button(self, leave):
         """Simulate the 'Create Order' button: it returns an action opening a
@@ -61,7 +69,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         vals = {
             'order_type': 'vacation',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.leave_type.id,
             'vacation_date_from': day_from,
             'vacation_date_to': day_to,
             'date': day_from,
@@ -76,7 +84,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         ctx = order.action_create_leave()['context']
         return self.env['hr.leave'].create({
             'employee_id': ctx['default_employee_id'],
-            'holiday_status_id': ctx['default_holiday_status_id'],
+            'work_entry_type_id': ctx['default_work_entry_type_id'],
             'request_date_from': ctx['default_request_date_from'],
             'request_date_to': ctx['default_request_date_to'],
             'order_id': ctx['default_order_id'],
@@ -103,7 +111,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         self.assertEqual(action['view_mode'], 'form')
         ctx = action['context']
         self.assertEqual(ctx['default_employee_id'], self.employee.id)
-        self.assertEqual(ctx['default_holiday_status_id'], self.leave_type.id)
+        self.assertEqual(ctx['default_work_entry_type_id'], self.leave_type.id)
         self.assertEqual(ctx['default_request_date_from'], date(2027, 8, 1))
         self.assertEqual(ctx['default_request_date_to'], date(2027, 8, 5))
         self.assertEqual(ctx['default_order_id'], order.id)
@@ -130,7 +138,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         # Save WITHOUT order_id, as a form that lost the default would.
         leave = self.env['hr.leave'].with_context(**ctx).create({
             'employee_id': ctx['default_employee_id'],
-            'holiday_status_id': ctx['default_holiday_status_id'],
+            'work_entry_type_id': ctx['default_work_entry_type_id'],
             'request_date_from': ctx['default_request_date_from'],
             'request_date_to': ctx['default_request_date_to'],
         })
@@ -364,7 +372,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         order = self.env['hr.order'].create({
             'order_type': 'vacation',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.leave_type.id,
             'vacation_date_from': date(2028, 4, 1),
             'vacation_date_to': date(2028, 4, 5),
             'date': date(2028, 4, 1),

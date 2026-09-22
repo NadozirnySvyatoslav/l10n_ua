@@ -293,12 +293,14 @@ class HrSickLeave(models.Model):
         return 0.0
 
     def _sick_leave_type(self):
-        """The company's sick leave type, or an empty recordset."""
+        """The sick leave type, or an empty recordset.
+
+        Odoo 20 scopes hr.work.entry.type by country, so there is one UA
+        sick leave type for every company of the database.
+        """
         self.ensure_one()
-        return self.env['hr.leave.type'].search([
+        return self.env['hr.work.entry.type'].search([
             ('ua_leave_category', '=', 'sick'),
-            '|', ('company_id', '=', (self.company_id or self.env.company).id),
-            ('company_id', '=', False),
         ], limit=1)
 
     def action_create_leave(self):
@@ -328,7 +330,7 @@ class HrSickLeave(models.Model):
             'target': 'current',
             'context': {
                 'default_employee_id': self.employee_id.id,
-                'default_holiday_status_id': leave_type.id,
+                'default_work_entry_type_id': leave_type.id,
                 'default_request_date_from': self.date_from,
                 'default_request_date_to': self.date_to,
                 'default_name': _('Sick Leave %s', self.name),

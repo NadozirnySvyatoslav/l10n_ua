@@ -39,9 +39,10 @@ class TestHrOrder(TransactionCase):
             'job_id': cls.job.id,
         })
 
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_ORDER_1',
             'name': 'Annual Basic Leave',
-            'time_type': 'leave',
+            'count_as': 'absence',
             'requires_allocation': 'no',
             'is_paid': True,
         })
@@ -51,12 +52,12 @@ class TestHrOrder(TransactionCase):
         # already has leaves: Odoo forbids changing the allocation requirement
         # once leaves of that type exist (and such types aren't used here).
         Leave = cls.env['hr.leave']
-        for lt in cls.env['hr.leave.type'].search([]):
+        for lt in cls.env['hr.work.entry.type'].search([]):
             if 'requires_allocation' not in lt._fields:
                 break
             if lt.requires_allocation == 'no':
                 continue
-            if Leave.search_count([('holiday_status_id', '=', lt.id)]):
+            if Leave.search_count([('work_entry_type_id', '=', lt.id)]):
                 continue
             lt.requires_allocation = 'no'
 
@@ -69,7 +70,7 @@ class TestHrOrder(TransactionCase):
             'company_id': self.company.id,
         }
         if order_type == 'vacation':
-            vals['holiday_status_id'] = self.leave_type.id
+            vals['work_entry_type_id'] = self.leave_type.id
             vals['vacation_date_from'] = date(2025, 6, 1)
             vals['vacation_date_to'] = date(2025, 6, 14)
         vals.update(kwargs)

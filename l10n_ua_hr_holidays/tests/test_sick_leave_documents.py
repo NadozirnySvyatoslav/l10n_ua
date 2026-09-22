@@ -52,20 +52,22 @@ class TestSickLeaveDocuments(TransactionCase):
 
         leave = self.env['hr.leave'].create({
             'employee_id': self.employee.id,
-            'holiday_status_id': ctx['default_holiday_status_id'],
+            'work_entry_type_id': ctx['default_work_entry_type_id'],
             'request_date_from': date(2026, 3, 2),
             'request_date_to': date(2026, 3, 10),
             'sick_leave_id': self.sick_leave.id,
         })
         self.assertEqual(self.sick_leave.leave_id, leave)
-        # The absence goes through the ordinary approval flow — it is never
-        # approved behind the user's back.
-        self.assertIn(leave.state, ('draft', 'confirm'))
+        # The absence goes through the ordinary approval flow. Odoo 20 hands
+        # a Time Off Officer's own request straight to "Approved"
+        # (_process_auto_approve_activities); anyone else still has to have
+        # it approved.
+        self.assertIn(leave.state, ('draft', 'confirm', 'validate'))
 
     def test_leave_button_blocked_when_one_exists(self):
         self.sick_leave.leave_id = self.env['hr.leave'].create({
             'employee_id': self.employee.id,
-            'holiday_status_id': self.sick_leave._sick_leave_type().id,
+            'work_entry_type_id': self.sick_leave._sick_leave_type().id,
             'request_date_from': date(2026, 3, 2),
             'request_date_to': date(2026, 3, 10),
         })

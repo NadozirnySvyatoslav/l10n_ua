@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record id="hr_leave_type_view_form_ua" model="ir.ui.view">
-        <field name="name">hr.leave.type.form.ua</field>
-        <field name="model">hr.leave.type</field>
-        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+    <record id="hr_work_entry_type_view_form_ua" model="ir.ui.view">
+        <field name="name">hr.work.entry.type.form.ua</field>
+        <field name="model">hr.work.entry.type</field>
+        <field name="inherit_id" ref="hr_holidays.hr_work_entry_type_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
                 <group string="Ukrainian Settings" name="ua_settings">
@@ -26,7 +26,6 @@
                         <field name="payment_source" invisible="not is_paid"/>
                     </group>
                     <group>
-                        <field name="ua_is_default"/>
                         <field name="ua_auto_calc_balance"/>
                     </group>
                 </group>

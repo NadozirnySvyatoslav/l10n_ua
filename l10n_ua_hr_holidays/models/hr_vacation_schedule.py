@@ -75,7 +75,7 @@ class HrVacationSchedule(models.Model):
             leaves = self.env['hr.leave'].search([
                 ('employee_id', '=', employee.id),
                 ('state', 'not in', ('cancel', 'refuse')),
-                ('holiday_status_id.ua_leave_category', '!=', False),
+                ('work_entry_type_id.ua_leave_category', '!=', False),
                 ('request_date_from', '>=', year_start),
                 ('request_date_from', '<=', year_end),
             ], order='request_date_from')
@@ -85,7 +85,7 @@ class HrVacationSchedule(models.Model):
                     'employee_id': employee.id,
                     'department_id': employee.department_id.id,
                     'leave_id': leave.id,
-                    'leave_type_id': leave.holiday_status_id.id,
+                    'leave_type_id': leave.work_entry_type_id.id,
                     'vacation_balance_id': leave.vacation_balance_id.id,
                     'planned_days': leave.calendar_days,
                 })
@@ -217,7 +217,7 @@ class HrVacationScheduleLine(models.Model):
              'the schedule year.',
     )
     leave_type_id = fields.Many2one(
-        'hr.leave.type',
+        'hr.work.entry.type',
         string='Leave Type',
         help='Annual leave type this scheduled line plans for.',
     )

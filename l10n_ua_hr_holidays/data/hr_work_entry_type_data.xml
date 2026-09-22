@@ -2,7 +2,11 @@
 <odoo>
     <data noupdate="1">
         
-        <record id="leave_type_annual_basic" model="hr.leave.type">
+        <record id="leave_type_annual_basic" model="hr.work.entry.type">
+            <field name="code">UA_VAC_BASIC</field>
+            <field name="display_code">ВІД</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Щорічна основна відпустка</field>
             <field name="ua_leave_category">annual_basic</field>
             <field name="annual_days">24</field>
@@ -20,7 +24,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_annual_additional" model="hr.leave.type">
+        <record id="leave_type_annual_additional" model="hr.work.entry.type">
+            <field name="code">UA_VAC_ADD</field>
+            <field name="display_code">ДОД</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Щорічна додаткова відпустка</field>
             <field name="ua_leave_category">annual_additional</field>
             <field name="annual_days">7</field>
@@ -34,7 +42,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_educational" model="hr.leave.type">
+        <record id="leave_type_educational" model="hr.work.entry.type">
+            <field name="code">UA_VAC_STUDY</field>
+            <field name="display_code">НАВ</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Навчальна відпустка</field>
             <field name="ua_leave_category">educational</field>
             <field name="is_calendar_days">True</field>
@@ -47,7 +59,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_creative" model="hr.leave.type">
+        <record id="leave_type_creative" model="hr.work.entry.type">
+            <field name="code">UA_VAC_CREATIVE</field>
+            <field name="display_code">ТВО</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Творча відпустка</field>
             <field name="ua_leave_category">creative</field>
             <field name="is_calendar_days">True</field>
@@ -60,7 +76,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_social_children" model="hr.leave.type">
+        <record id="leave_type_social_children" model="hr.work.entry.type">
+            <field name="code">UA_VAC_CHILDREN</field>
+            <field name="display_code">СОЦ</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Соціальна відпустка (на дітей)</field>
             <field name="ua_leave_category">social_children</field>
             <field name="annual_days">10</field>
@@ -74,7 +94,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_unpaid" model="hr.leave.type">
+        <record id="leave_type_unpaid" model="hr.work.entry.type">
+            <field name="code">UA_VAC_UNPAID</field>
+            <field name="display_code">БЗ</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Відпустка без збереження зарплати</field>
             <field name="ua_leave_category">unpaid</field>
             <field name="is_calendar_days">True</field>
@@ -86,7 +110,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_unpaid_family" model="hr.leave.type">
+        <record id="leave_type_unpaid_family" model="hr.work.entry.type">
+            <field name="code">UA_VAC_UNPAID_FAM</field>
+            <field name="display_code">БЗС</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Відпустка без збереження зарплати (сімейні обставини)</field>
             <field name="ua_leave_category">unpaid</field>
             <field name="annual_days">15</field>
@@ -99,7 +127,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_maternity" model="hr.leave.type">
+        <record id="leave_type_maternity" model="hr.work.entry.type">
+            <field name="code">UA_VAC_MATERNITY</field>
+            <field name="display_code">ВП</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Відпустка у зв'язку з вагітністю та пологами</field>
             <field name="ua_leave_category">maternity</field>
             <field name="annual_days">126</field>
@@ -113,7 +145,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_childcare" model="hr.leave.type">
+        <record id="leave_type_childcare" model="hr.work.entry.type">
+            <field name="code">UA_VAC_CHILDCARE</field>
+            <field name="display_code">ДД3</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Відпустка для догляду за дитиною до 3 років</field>
             <field name="ua_leave_category">childcare</field>
             <field name="is_calendar_days">True</field>
@@ -125,7 +161,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
-        <record id="leave_type_sick" model="hr.leave.type">
+        <record id="leave_type_sick" model="hr.work.entry.type">
+            <field name="code">UA_SICK</field>
+            <field name="display_code">ЛІК</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Лікарняний</field>
             <field name="ua_leave_category">sick</field>
             <field name="is_calendar_days">True</field>
@@ -140,7 +180,11 @@
 
         <!-- Additional leave types according to Ukrainian law -->
 
-        <record id="leave_type_additional_hazard" model="hr.leave.type">
+        <record id="leave_type_additional_hazard" model="hr.work.entry.type">
+            <field name="code">UA_VAC_HAZARD</field>
+            <field name="display_code">ШКУ</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Додаткова за шкідливі умови праці</field>
             <field name="ua_leave_category">annual_hazardous</field>
             <field name="annual_days">35</field>
@@ -155,7 +199,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
 
-        <record id="leave_type_additional_irregular" model="hr.leave.type">
+        <record id="leave_type_additional_irregular" model="hr.work.entry.type">
+            <field name="code">UA_VAC_IRREGULAR</field>
+            <field name="display_code">НРД</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Додаткова за ненормований робочий день</field>
             <field name="ua_leave_category">annual_irregular</field>
             <field name="annual_days">7</field>
@@ -170,7 +218,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
 
-        <record id="leave_type_additional_special_work" model="hr.leave.type">
+        <record id="leave_type_additional_special_work" model="hr.work.entry.type">
+            <field name="code">UA_VAC_SPECIAL</field>
+            <field name="display_code">ОХП</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Додаткова за особливий характер праці</field>
             <field name="ua_leave_category">annual_special</field>
             <field name="annual_days">7</field>
@@ -185,7 +237,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
 
-        <record id="leave_type_chornobyl" model="hr.leave.type">
+        <record id="leave_type_chornobyl" model="hr.work.entry.type">
+            <field name="code">UA_VAC_CHORNOBYL</field>
+            <field name="display_code">ЧОР</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Додаткова чорнобильцям</field>
             <field name="ua_leave_category">chornobyl</field>
             <field name="annual_days">16</field>
@@ -199,7 +255,11 @@
             <field name="requires_allocation" eval="False"/>
         </record>
 
-        <record id="leave_type_veteran" model="hr.leave.type">
+        <record id="leave_type_veteran" model="hr.work.entry.type">
+            <field name="code">UA_VAC_VETERAN</field>
+            <field name="display_code">ВЕТ</field>
+            <field name="country_id" ref="base.ua"/>
+            <field name="count_as">absence</field>
             <field name="name">Додаткова ветеранам війни</field>
             <field name="ua_leave_category">veteran</field>
             <field name="annual_days">14</field>

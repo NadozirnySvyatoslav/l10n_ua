@@ -1,213 +1,27 @@
-from odoo import models, fields, api, _
+from odoo import fields, models
 
 
 class ResCompany(models.Model):
+    """Типовий вид відпустки компанії.
+
+    До Odoo 20 ознака «показувати за замовчуванням» жила на самому виді
+    відпустки (`hr.leave.type.ua_is_default`), а щоб два види однієї
+    компанії не сперечалися, запис при збереженні знімав прапорець із
+    решти. Odoo 20 злило `hr.leave.type` у `hr.work.entry.type`, а та
+    модель прив'язана до країни (`country_id`), а не до компанії —
+    прапорець на ній означав би «типовий для всіх компаній країни»
+    і мовчки перемикав би вибір сусідам.
+
+    Тому вибір переїхав туди, де він насправді належить: до компанії.
+    Один Many2one замість прапорця з ручним зняттям конфліктів —
+    унікальність тепер випливає з самого поля.
+    """
     _inherit = 'res.company'
 
-    ua_leave_types_imported = fields.Boolean(
-        string='UA Leave Types Imported',
-        default=False,
-        help='Indicates if Ukrainian leave types have been imported for this company'
+    l10n_ua_default_leave_type_id = fields.Many2one(
+        'hr.work.entry.type',
+        string='Default Time Off Type',
+        domain="[('time_off_selectable', '=', True)]",
+        help='Вид відпустки, який підставляється у нову заявку та у наказ '
+             'на відпустку. Явний вибір користувача не перезаписується.',
     )
-
-    def action_import_ua_leave_types(self):
-        """Import Ukrainian leave types for the company"""
-        self.ensure_one()
-        
-        leave_type_data = [
-            {
-                'name': 'Щорічна основна відпустка',
-                'ua_leave_category': 'annual_basic',
-                'annual_days': 24,
-                'is_calendar_days': True,
-                'is_transferable': True,
-                'ua_auto_calc_balance': True,
-                'requires_experience': True,
-                'min_experience_months': 6,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'min_continuous_days': 14,
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Щорічна додаткова відпустка',
-                'ua_leave_category': 'annual_additional',
-                'annual_days': 7,
-                'is_calendar_days': True,
-                'is_transferable': True,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Навчальна відпустка',
-                'ua_leave_category': 'educational',
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Творча відпустка',
-                'ua_leave_category': 'creative',
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Соціальна відпустка (на дітей)',
-                'ua_leave_category': 'social',
-                'annual_days': 10,
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Відпустка без збереження зарплати',
-                'ua_leave_category': 'unpaid',
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': False,
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Відпустка без збереження зарплати (сімейні обставини)',
-                'ua_leave_category': 'unpaid',
-                'annual_days': 15,
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': False,
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Відпустка у зв\'язку з вагітністю та пологами',
-                'ua_leave_category': 'maternity',
-                'annual_days': 126,
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'fss',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Відпустка для догляду за дитиною до 3 років',
-                'ua_leave_category': 'childcare',
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': False,
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Лікарняний',
-                'ua_leave_category': 'sick',
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'mixed',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Додаткова за шкідливі умови праці',
-                'ua_leave_category': 'annual_additional',
-                'annual_days': 35,
-                'is_calendar_days': True,
-                'is_transferable': True,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Додаткова за ненормований робочий день',
-                'ua_leave_category': 'annual_additional',
-                'annual_days': 7,
-                'is_calendar_days': True,
-                'is_transferable': True,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Додаткова за особливий характер праці',
-                'ua_leave_category': 'annual_additional',
-                'annual_days': 35,
-                'is_calendar_days': True,
-                'is_transferable': True,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Додаткова чорнобильцям',
-                'ua_leave_category': 'social',
-                'annual_days': 16,
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-            {
-                'name': 'Додаткова ветеранам війни',
-                'ua_leave_category': 'social',
-                'annual_days': 14,
-                'is_calendar_days': True,
-                'is_transferable': False,
-                'is_paid': True,
-                'payment_source': 'employer',
-                'request_unit': 'day',
-                'leave_validation_type': 'hr',
-            },
-        ]
-
-        LeaveType = self.env['hr.leave.type'].sudo()
-        created_count = 0
-        
-        for data in leave_type_data:
-            existing = LeaveType.search([
-                ('name', '=', data['name']),
-                ('company_id', '=', self.id),
-            ], limit=1)
-            
-            if not existing:
-                data['company_id'] = self.id
-                # UA leave entitlement is tracked via hr.vacation.balance,
-                # not core allocations — don't demand an allocation record.
-                data.setdefault('requires_allocation', False)
-                LeaveType.create(data)
-                created_count += 1
-
-        self.sudo().ua_leave_types_imported = True
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('UA Leave Types Imported'),
-                # Named placeholders so translators may reorder them freely;
-                # positional %d/%s would swap the values and raise on reorder.
-                'message': _(
-                    '%(count)d leave types have been created for %(company)s',
-                    count=created_count, company=self.name),
-                'type': 'success',
-                'sticky': False,
-            }
-        }

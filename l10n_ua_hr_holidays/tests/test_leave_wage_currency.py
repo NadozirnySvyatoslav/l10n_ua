@@ -39,13 +39,13 @@ class TestLeaveWageCurrency(TransactionCase):
         if cls.has_salary_currency:
             version.salary_currency_id = cls.usd
 
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_LEAVE_WAGE_C_1',
             'name': 'Щорічна основна (валютний тест)',
             'ua_leave_category': 'annual_basic',
             'is_calendar_days': True,
             'annual_days': 24,
             'is_paid': True,
-            'company_id': cls.company.id,
             'requires_allocation': False,
         })
 
@@ -59,7 +59,7 @@ class TestLeaveWageCurrency(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Відпустка',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type.id,
+            'work_entry_type_id': self.leave_type.id,
             'date_from': datetime(2026, 6, 15, 8, 0, 0),
             'date_to': datetime(2026, 6, 21, 17, 0, 0),
         })

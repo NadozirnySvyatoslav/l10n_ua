@@ -38,12 +38,19 @@ class TestVacationPeriodBalance(TransactionCase):
         vals = {
             'name': 'Test leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': leave_type.id,
+            'work_entry_type_id': leave_type.id,
             'request_date_from': date_from,
             'request_date_to': date_to,
         }
         vals.update(extra)
-        return self.env['hr.leave'].create(vals)
+        leave = self.env['hr.leave'].create(vals)
+        # Odoo 20 auto-approves a leave created by a Time Off Officer
+        # (hr_holidays._process_auto_approve_activities), and the tests run
+        # as admin. Put it back to "To Approve" so the fixture describes a
+        # freshly requested leave, the way it did on 19.
+        if leave.state == 'validate':
+            leave.sudo().state = 'confirm'
+        return leave
 
     # ------------------------------------------------------------------
     # Balance period derivation
@@ -665,30 +672,36 @@ class TestVacationPeriodBalance(TransactionCase):
             ('leave_type_id', '=', self.annual_type.id),
         ]))
 
-    def test_generate_skips_cross_company_leave_types(self):
-        """generate_balances must not pair an employee with another company's
-        leave type (multi-company: one annual_basic per company would create
-        a duplicate balance for the same employee and period)."""
+    def test_generate_uses_one_country_wide_leave_type(self):
+        """Один вид відпустки обслуговує всі компанії країни.
+
+        До Odoo 20 кожна компанія мала власний annual_basic, і генератор
+        балансів мусив пропускати чужі пари «працівник — вид», інакше той
+        самий період з'являвся двічі. У Odoo 20 hr.work.entry.type
+        прив'язана до країни, тож вид один на всіх, а дубль неможливий
+        за побудовою.
+        """
         Balance = self.env['hr.vacation.balance']
-        company_b = self.env['res.company'].create({'name': 'Company B'})
-        lt_b = self.env['hr.leave.type'].create({
-            'name': 'Annual B',
+        self.env['res.company'].create({'name': 'Company B'})
+        lt = self.env['hr.work.entry.type'].create({
+            'code': 'UA_T_VACATION_PER_1',
+            'name': 'Annual country-wide',
             'ua_leave_category': 'annual_basic',
             'period_type': 'work',
             'annual_days': 24,
             'is_transferable': True,
             'ua_auto_calc_balance': True,
-            'company_id': company_b.id,
             'requires_allocation': False,
         })
-        # self.employee is not in company B, so no balance may be created for
-        # it under company B's leave type.
-        Balance.generate_balances(
-            year=date.today().year, leave_types=lt_b)
-        self.assertFalse(Balance.search([
+        Balance.generate_balances(year=date.today().year, leave_types=lt)
+        balances = Balance.search([
             ('employee_id', '=', self.employee.id),
-            ('leave_type_id', '=', lt_b.id),
-        ]))
+            ('leave_type_id', '=', lt.id),
+        ])
+        self.assertTrue(balances, 'працівник має отримати періоди')
+        self.assertEqual(len(balances.mapped('period_index')),
+                         len(set(balances.mapped('period_index'))),
+                         'жоден період не продубльовано')
 
     def test_generate_creates_no_overlapping_duplicates(self):
         """The backfill must not create a canonical period on top of an
@@ -802,8 +815,13 @@ class TestVacationPeriodBalance(TransactionCase):
     # Per-type transfer rules: carry-over cap + non-blocking warning
     # ------------------------------------------------------------------
 
+    _work_type_seq = 0
+
     def _work_type(self, **overrides):
+        # `code` is required and unique per country since Odoo 20.
+        type(self)._work_type_seq += 1
         vals = {
+            'code': 'UA_T_TRANSFER_%d' % self._work_type_seq,
             'name': 'Transfer Rule Type',
             'ua_leave_category': 'other',
             'period_type': 'work',
@@ -812,7 +830,7 @@ class TestVacationPeriodBalance(TransactionCase):
             'requires_allocation': False,
         }
         vals.update(overrides)
-        return self.env['hr.leave.type'].create(vals)
+        return self.env['hr.work.entry.type'].create(vals)
 
     def _wy1_with_unused(self, leave_type):
         """A first work-year period (index 1) with 24 unused days."""

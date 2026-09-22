@@ -161,13 +161,13 @@ class HrOrder(models.Model):
              'linked yet.'
     )
 
-    @api.depends('order_type', 'leave_id', 'employee_id', 'holiday_status_id',
+    @api.depends('order_type', 'leave_id', 'employee_id', 'work_entry_type_id',
                  'vacation_date_from', 'vacation_date_to')
     def _compute_can_create_leave(self):
         for order in self:
             order.can_create_leave = bool(
                 order.order_type == 'vacation' and not order.leave_id
-                and order.employee_id and order.holiday_status_id
+                and order.employee_id and order.work_entry_type_id
                 and order.vacation_date_from and order.vacation_date_to)
 
     def action_create_leave(self):
@@ -188,7 +188,7 @@ class HrOrder(models.Model):
             'target': 'current',
             'context': {
                 'default_employee_id': self.employee_id.id,
-                'default_holiday_status_id': self.holiday_status_id.id,
+                'default_work_entry_type_id': self.work_entry_type_id.id,
                 'default_request_date_from': self.vacation_date_from,
                 'default_request_date_to': self.vacation_date_to,
                 'default_order_id': self.id,
@@ -236,10 +236,10 @@ class HrOrder(models.Model):
         return action
 
     # Related field — eliminates duplication 
-    holiday_status_id = fields.Many2one(
-        'hr.leave.type',
+    work_entry_type_id = fields.Many2one(
+        'hr.work.entry.type',
         string='Leave Type',
-        related='leave_id.holiday_status_id',
+        related='leave_id.work_entry_type_id',
         store=True,
         readonly=False,   # writable for orders being created standalone before leave is linked
         precompute=True,
@@ -343,7 +343,7 @@ class HrOrder(models.Model):
 
         # Add _sync_order_leave context to prevent duplicate orders on inverse
         # related fields write. leave_skip_state_check lets the order write to
-        # its own linked leave (e.g. the related holiday_status_id inverse)
+        # its own linked leave (e.g. the related work_entry_type_id inverse)
         # without hr_holidays raising "modification not allowed in the current
         # state" when the leave is past draft/confirm.
         orders = super(HrOrder, self.with_context(

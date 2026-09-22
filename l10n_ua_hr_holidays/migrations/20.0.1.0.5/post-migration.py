@@ -9,7 +9,7 @@ def migrate(cr, version):
     rows are created by an action rather than XML.
     """
     cr.execute("""
-        UPDATE hr_leave_type
+        UPDATE hr_work_entry_type
            SET ua_auto_calc_balance = true
          WHERE ua_leave_category = 'annual_basic'
     """)

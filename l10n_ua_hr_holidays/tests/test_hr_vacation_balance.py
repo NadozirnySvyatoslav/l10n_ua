@@ -16,13 +16,13 @@ class TestHrVacationBalance(TransactionCase):
             'company_id': cls.company.id,
         })
         
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_VACATION__1',
             'name': 'Annual Leave Balance Test',
             'ua_leave_category': 'annual_basic',
             'is_calendar_days': True,
             'annual_days': 24,
             'is_paid': True,
-            'company_id': cls.company.id,
             'requires_allocation': False,
         })
 

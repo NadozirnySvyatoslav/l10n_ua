@@ -410,7 +410,7 @@
         </table>
 
 	<p style="margin: 15px 0 5px 0;"><strong>Вид відпустки:</strong> 
-    	    <t t-out="order.holiday_status_id.name if order.holiday_status_id else 'щорічна основна відпустка'"/>
+    	    <t t-out="order.work_entry_type_id.name if order.work_entry_type_id else 'щорічна основна відпустка'"/>
 	</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">

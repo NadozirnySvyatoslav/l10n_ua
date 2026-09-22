@@ -25,7 +25,7 @@ def migrate(cr, version):
     #    noupdate=1 and the ORM forbids flipping requires_allocation once
     #    leaves of the type exist, so plain SQL is the only clean path.
     cr.execute("""
-        UPDATE hr_leave_type
+        UPDATE hr_work_entry_type
            SET requires_allocation = false
          WHERE ua_leave_category IS NOT NULL
            AND requires_allocation = true
@@ -50,7 +50,7 @@ def migrate(cr, version):
            SET vacation_balance_id = vb.id
           FROM hr_vacation_balance vb
          WHERE vb.employee_id = l.employee_id
-           AND vb.leave_type_id = l.holiday_status_id
+           AND vb.leave_type_id = l.work_entry_type_id
            AND l.vacation_balance_id IS NULL
            AND l.vacation_year IS NOT NULL
            AND l.vacation_year != 0
@@ -65,7 +65,7 @@ def migrate(cr, version):
            SET vacation_balance_id = vb.id
           FROM hr_vacation_balance vb
          WHERE vb.employee_id = l.employee_id
-           AND vb.leave_type_id = l.holiday_status_id
+           AND vb.leave_type_id = l.work_entry_type_id
            AND l.vacation_balance_id IS NULL
            AND l.request_date_from IS NOT NULL
            AND l.request_date_from BETWEEN vb.period_start AND vb.period_end

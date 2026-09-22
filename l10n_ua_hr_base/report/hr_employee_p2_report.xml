@@ -332,7 +332,7 @@
 		    <t t-foreach="leaves" t-as="leave">
     		        <tr>
         		    <td style="border: 1px solid #000; padding: 3px;">
-            			<t t-out="leave.holiday_status_id.name or ''"/>
+            			<t t-out="leave.work_entry_type_id.name or ''"/>
         		    </td>
         		    <td style="border: 1px solid #000; padding: 3px;">
             			<t t-if="'vacation_balance_id' in leave._fields and leave.vacation_balance_id">

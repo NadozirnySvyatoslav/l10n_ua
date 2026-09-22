@@ -26,12 +26,19 @@ class TestVacationScheduleReport(TransactionCase):
         vals = {
             'name': 'Test leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': leave_type.id,
+            'work_entry_type_id': leave_type.id,
             'request_date_from': date_from,
             'request_date_to': date_to,
         }
         vals.update(extra)
-        return self.env['hr.leave'].create(vals)
+        leave = self.env['hr.leave'].create(vals)
+        # Odoo 20 auto-approves a leave created by a Time Off Officer
+        # (hr_holidays._process_auto_approve_activities), and the tests run
+        # as admin. Put it back to "To Approve" so the fixture describes a
+        # freshly requested leave, the way it did on 19.
+        if leave.state == 'validate':
+            leave.sudo().state = 'confirm'
+        return leave
 
     def _new_schedule(self, year, company=None):
         """Create a vacation schedule for (year, company), first removing any
@@ -237,7 +244,7 @@ class TestVacationScheduleReport(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Chornobyl leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': chornobyl.id,
+            'work_entry_type_id': chornobyl.id,
             'request_date_from': date(2025, 4, 1),
             'request_date_to': date(2025, 4, 4),
         })
@@ -275,7 +282,7 @@ class TestVacationScheduleReport(TransactionCase):
         self.env['hr.leave'].create({
             'name': 'Chornobyl 2026',
             'employee_id': emp.id,
-            'holiday_status_id': chornobyl.id,
+            'work_entry_type_id': chornobyl.id,
             'request_date_from': date(2026, 4, 1),
             'request_date_to': date(2026, 4, 4),
         }).action_approve()

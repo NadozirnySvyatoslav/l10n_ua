@@ -171,7 +171,8 @@ class TestVacationCompensationBalance(VacationCompensationCommon):
         # Non-transferable keeps each year's days inside their own period,
         # which is what the year-scoping test below is about; carry-over is
         # covered separately by test_transferable_type_carries_previous_years.
-        cls.leave_type = cls.env['hr.leave.type'].create({
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_ORDER_VAC_1',
             'name': 'Annual Basic (compensation test)',
             'is_transferable': False,
         })
@@ -209,7 +210,8 @@ class TestVacationCompensationBalance(VacationCompensationCommon):
         still holds: the older balance is not counted twice, its remainder
         reaches the total through carried_over.
         """
-        leave_type = self.env['hr.leave.type'].create({
+        leave_type = self.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_ORDER_VAC_2',
             'name': 'Annual Basic transferable (compensation test)',
             'is_transferable': True,
         })

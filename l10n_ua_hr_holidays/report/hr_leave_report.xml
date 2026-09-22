@@ -44,7 +44,7 @@
                     <t t-if="leave.employee_id.department_id">
                         <t t-out="leave.employee_id.department_id.name"/>,
                     </t>
-                    <strong><t t-out="leave.holiday_status_id.name"/></strong>
+                    <strong><t t-out="leave.work_entry_type_id.name"/></strong>
                     тривалістю <strong><t t-out="leave.calendar_days"/></strong> календарних днів
                     з <strong><t t-out="leave.date_from.strftime('%d.%m.%Y')"/></strong>
                     по <strong><t t-out="leave.date_to.strftime('%d.%m.%Y')"/></strong>.
@@ -61,7 +61,7 @@
                     </p>
                 </t>
                 
-                <t t-if="leave.holiday_status_id.is_paid and leave.vacation_pay_amount">
+                <t t-if="leave.work_entry_type_id.is_paid and leave.vacation_pay_amount">
                     <p style="text-indent: 30px;">
                         Відпускні: <t t-out="'{:,.2f}'.format(leave.vacation_pay_amount)"/> грн
                     </p>

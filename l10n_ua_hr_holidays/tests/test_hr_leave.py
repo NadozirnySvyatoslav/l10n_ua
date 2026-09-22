@@ -16,22 +16,22 @@ class TestHrLeave(TransactionCase):
             'company_id': cls.company.id,
         })
 
-        cls.leave_type_calendar = cls.env['hr.leave.type'].create({
+        cls.leave_type_calendar = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_LEAVE_1',
             'name': 'Annual Leave (Calendar) Test',
             'ua_leave_category': 'annual_basic',
             'is_calendar_days': True,
             'annual_days': 24,
             'is_paid': True,
-            'company_id': cls.company.id,
             'requires_allocation': False,
         })
 
-        cls.leave_type_working = cls.env['hr.leave.type'].create({
+        cls.leave_type_working = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_HR_LEAVE_2',
             'name': 'Other Leave (Working) Test',
             'ua_leave_category': 'other',
             'is_calendar_days': False,
             'is_paid': False,
-            'company_id': cls.company.id,
             'requires_allocation': False,
         })
 
@@ -40,7 +40,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
         })
@@ -51,7 +51,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'request_date_from': date(2026, 1, 15),
             'request_date_to':   date(2026, 1, 21),
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
@@ -65,7 +65,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
         })
@@ -76,7 +76,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
             'average_daily_salary': 500.0,
@@ -88,7 +88,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_working.id,
+            'work_entry_type_id': self.leave_type_working.id,
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
             'average_daily_salary': 500.0,
@@ -110,7 +110,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'request_date_from': date(2028, 1, 15),
             'request_date_to': date(2028, 1, 21),
             'date_from': datetime(2028, 1, 15, 8, 0, 0),
@@ -126,7 +126,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
             'order_number': 'ORD-001',
@@ -140,7 +140,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             # vacation_year follows request_date_from (the driver field), so
             # set it explicitly rather than relying on date_from back-derivation.
             'request_date_from': date(2026, 1, 15),
@@ -148,6 +148,10 @@ class TestHrLeave(TransactionCase):
             'vacation_year': 2025,  # ignored — the field is computed
         })
         self.assertEqual(leave.vacation_year, 2026)
+        # Odoo 20 auto-approves what a Time Off Officer creates, and an
+        # approved leave refuses date changes — put it back to "To Approve".
+        if leave.state == 'validate':
+            leave.sudo().state = 'confirm'
         # Moving the dates re-derives the year automatically.
         leave.write({
             'request_date_from': date(2027, 3, 1),
@@ -158,16 +162,16 @@ class TestHrLeave(TransactionCase):
 
     def test_default_leave_type_preselected(self):
         """When creating a leave without specifying type, default is preselected."""
-        # Set leave_type_calendar as default
-        self.leave_type_calendar.write({'ua_is_default': True})
-        # Create leave without specifying holiday_status_id
+        # Set leave_type_calendar as the company default
+        self.env.company.l10n_ua_default_leave_type_id = self.leave_type_calendar
+        # Create leave without specifying work_entry_type_id
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
             'date_from': datetime(2026, 1, 15, 8, 0, 0),
             'date_to': datetime(2026, 1, 21, 17, 0, 0),
         })
-        self.assertEqual(leave.holiday_status_id, self.leave_type_calendar)
+        self.assertEqual(leave.work_entry_type_id, self.leave_type_calendar)
 
     def test_vacation_period_auto_selected(self):
         """When creating a leave, the period its first day falls into is
@@ -185,7 +189,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'request_date_from': date(2026, 6, 15),
             'request_date_to': date(2026, 6, 21),
             'date_from': datetime(2026, 6, 15, 8, 0, 0),
@@ -200,7 +204,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'request_date_from': date(2029, 6, 15),
             'request_date_to': date(2029, 6, 21),
             'date_from': datetime(2029, 6, 15, 8, 0, 0),
@@ -233,7 +237,7 @@ class TestHrLeave(TransactionCase):
         leave = self.env['hr.leave'].create({
             'name': 'Test Leave',
             'employee_id': self.employee.id,
-            'holiday_status_id': self.leave_type_calendar.id,
+            'work_entry_type_id': self.leave_type_calendar.id,
             'request_date_from': date(today.year, 6, 15),
             'request_date_to': date(today.year, 6, 21),
             'date_from': datetime(today.year, 6, 15, 8, 0, 0),
@@ -241,6 +245,10 @@ class TestHrLeave(TransactionCase):
         })
         # Defaults to the current period on create.
         self.assertEqual(leave.vacation_balance_id, balance)
+        # Odoo 20 auto-approves what a Time Off Officer creates, and an
+        # approved leave refuses date changes — put it back to "To Approve".
+        if leave.state == 'validate':
+            leave.sudo().state = 'confirm'
         # Moving to 2030 leaves the chosen period untouched.
         leave.write({
             'request_date_from': date(2030, 6, 15),

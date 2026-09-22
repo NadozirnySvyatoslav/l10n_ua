@@ -6,20 +6,14 @@
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="priority">50</field>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="before">
-                <header>
-                    <button name="action_import_ua_leave_types"
-                            string="Import UA Leave Types"
-                            type="object"
-                            class="btn-primary"
-                            invisible="ua_leave_types_imported"/>
-                    <button name="action_import_ua_leave_types"
-                            string="Re-import UA Leave Types"
-                            type="object"
-                            class="btn-secondary"
-                            invisible="not ua_leave_types_imported"
-                            confirm="This will create any missing UA leave types. Continue?"/>
-                </header>
+            <!-- Кнопок імпорту видів відпустки більше немає: у Odoo 20
+                 hr.work.entry.type прив'язана до країни, тож 15 наших
+                 видів приходять з даними модуля на всі компанії. -->
+            <xpath expr="//sheet" position="inside">
+                <group string="Time Off (UA)" name="l10n_ua_holidays">
+                    <field name="l10n_ua_default_leave_type_id"
+                           options="{'no_quick_create': True}"/>
+                </group>
             </xpath>
         </field>
     </record>

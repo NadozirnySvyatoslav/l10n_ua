@@ -134,13 +134,13 @@ class HrLeave(models.Model):
         string='Vacation Period',
         index=True,
         domain="[('employee_id', '=', employee_id),"
-               " ('leave_type_id', '=', holiday_status_id)]",
+               " ('leave_type_id', '=', work_entry_type_id)]",
         help='Accounting period this leave is charged against. Chosen manually '
              '(defaults to the period that contains today); the leave dates '
              'need not fall inside the selected period.'
     )
 
-    @api.onchange('holiday_status_id', 'employee_id', 'request_date_from')
+    @api.onchange('work_entry_type_id', 'employee_id', 'request_date_from')
     def _onchange_default_vacation_period(self):
         """When the leave type, employee or start date is set, backfill every
         accounting period for the employee/type from the hire date up to today
@@ -149,7 +149,7 @@ class HrLeave(models.Model):
         period for a vacation planned ahead. HR can still change it to any
         period in the list; the leave dates need not fall inside the chosen
         period."""
-        lt = self.holiday_status_id
+        lt = self.work_entry_type_id
         emp = self.employee_id
         if not lt or not lt.ua_leave_category or not emp:
             return
@@ -166,7 +166,7 @@ class HrLeave(models.Model):
              'transfer rules (Transferable / Max Transfer Days).'
     )
 
-    @api.depends('holiday_status_id', 'request_date_from', 'employee_id',
+    @api.depends('work_entry_type_id', 'request_date_from', 'employee_id',
                  'vacation_balance_id')
     def _compute_carryover_warning(self):
         for leave in self:
@@ -178,7 +178,7 @@ class HrLeave(models.Model):
         (they would be forfeited), or False when nothing is at risk. Purely
         advisory — never blocks saving."""
         self.ensure_one()
-        lt = self.holiday_status_id
+        lt = self.work_entry_type_id
         emp = self.employee_id
         if not lt or not emp or not self.request_date_from:
             return False
@@ -251,7 +251,7 @@ class HrLeave(models.Model):
             end=balance.period_end.strftime('%d.%m.%Y'),
         )
 
-    @api.onchange('holiday_status_id', 'request_date_from', 'request_date_to',
+    @api.onchange('work_entry_type_id', 'request_date_from', 'request_date_to',
                   'employee_id', 'vacation_balance_id')
     def _onchange_vacation_warnings(self):
         """Pop a non-blocking warning on the form as soon as the chosen type,
@@ -290,7 +290,7 @@ class HrLeave(models.Model):
              'but one can be resolved for its type and year.'
     )
 
-    @api.depends('employee_id', 'holiday_status_id',
+    @api.depends('employee_id', 'work_entry_type_id',
                  'request_date_from', 'vacation_balance_id')
     def _compute_show_create_vacation_period(self):
         # Offered for any leave type available to the employee, as long as
@@ -299,7 +299,7 @@ class HrLeave(models.Model):
         for leave in self:
             show = False
             if (not leave.vacation_balance_id and leave.employee_id
-                    and leave.holiday_status_id):
+                    and leave.work_entry_type_id):
                 start, _end, _index = leave._resolve_leave_period()
                 show = bool(start)
             leave.show_create_vacation_period = show
@@ -312,7 +312,7 @@ class HrLeave(models.Model):
         cannot be resolved (e.g. a work-year type without a hire anchor)."""
         self.ensure_one()
         Balance = self.env['hr.vacation.balance']
-        lt = self.holiday_status_id
+        lt = self.work_entry_type_id
         emp = self.employee_id
         if not lt or not emp or not self.request_date_from:
             return (False, False, 0)
@@ -324,7 +324,7 @@ class HrLeave(models.Model):
         automatically on save; this stays as an explicit fallback."""
         self.ensure_one()
         balance = self.env['hr.vacation.balance'].sudo()._get_or_create_period(
-            self.employee_id, self.holiday_status_id, self.request_date_from)
+            self.employee_id, self.work_entry_type_id, self.request_date_from)
         if not balance:
             raise UserError(_(
                 'Cannot determine the accounting period. For work-year leave '
@@ -333,7 +333,7 @@ class HrLeave(models.Model):
         return True
 
     @api.constrains('vacation_balance_id', 'request_date_from',
-                    'holiday_status_id', 'employee_id')
+                    'work_entry_type_id', 'employee_id')
     def _check_vacation_balance_period(self):
         """Block saving only when the linked vacation period does not belong to
         the leave's employee and leave type. The period is chosen manually and
@@ -344,19 +344,19 @@ class HrLeave(models.Model):
             if not bal:
                 continue
             if (bal.employee_id != leave.employee_id
-                    or bal.leave_type_id != leave.holiday_status_id):
+                    or bal.leave_type_id != leave.work_entry_type_id):
                 raise ValidationError(_(
                     'The vacation period does not belong to this employee '
                     'and leave type.'))
 
-    @api.constrains('request_date_from', 'employee_id', 'holiday_status_id')
+    @api.constrains('request_date_from', 'employee_id', 'work_entry_type_id')
     def _check_leave_after_hire(self):
         """A UA-managed leave cannot start before the employee was hired —
         neither the leave nor its accounting period may predate the hire
         date."""
         Balance = self.env['hr.vacation.balance']
         for leave in self:
-            lt = leave.holiday_status_id
+            lt = leave.work_entry_type_id
             if (not lt or not lt.ua_leave_category
                     or not leave.employee_id or not leave.request_date_from):
                 continue
@@ -422,34 +422,31 @@ class HrLeave(models.Model):
     @api.model
     def default_get(self, fields_list):
         """Pre-fill the leave type on the new-leave form with the company's
-        default (ua_is_default) type, so it shows up before the record is
-        saved. hr_holidays' own default_get picks an arbitrary first type;
-        we override it with the UA company default unless the caller passed
-        an explicit default_holiday_status_id via context."""
+        default type, so it shows up before the record is saved.
+        hr_holidays' own default_get picks an arbitrary first type; we
+        override it with res.company.l10n_ua_default_leave_type_id unless
+        the caller passed an explicit default_work_entry_type_id via
+        context."""
         res = super().default_get(fields_list)
-        if ('holiday_status_id' in fields_list
-                and not self.env.context.get('default_holiday_status_id')):
-            company_id = res.get('company_id') or self.env.company.id
-            default_lt = self.env['hr.leave.type'].search([
-                ('ua_is_default', '=', True),
-                ('company_id', '=', company_id),
-            ], limit=1)
-            if default_lt:
-                res['holiday_status_id'] = default_lt.id
+        if ('work_entry_type_id' in fields_list
+                and not self.env.context.get('default_work_entry_type_id')):
+            company = self.env['res.company'].browse(
+                res.get('company_id')) or self.env.company
+            if company.l10n_ua_default_leave_type_id:
+                res['work_entry_type_id'] = \
+                    company.l10n_ua_default_leave_type_id.id
         return res
 
     @api.model_create_multi
     def create(self, vals_list):
         # Preselect default leave type if not provided
         for vals in vals_list:
-            if not vals.get('holiday_status_id'):
-                company_id = vals.get('company_id') or self.env.company.id
-                default_lt = self.env['hr.leave.type'].search([
-                    ('ua_is_default', '=', True),
-                    ('company_id', '=', company_id),
-                ], limit=1)
-                if default_lt:
-                    vals['holiday_status_id'] = default_lt.id
+            if not vals.get('work_entry_type_id'):
+                company = self.env['res.company'].browse(
+                    vals.get('company_id')) or self.env.company
+                if company.l10n_ua_default_leave_type_id:
+                    vals['work_entry_type_id'] = \
+                        company.l10n_ua_default_leave_type_id.id
         # A leave opened from an order's "New Time Off" button carries the
         # order in the context. Re-apply it here as well: navigating away from
         # the unsaved form and back can drop the field, which would silently
@@ -469,14 +466,14 @@ class HrLeave(models.Model):
         today = fields.Date.context_today(self)
         for vals in vals_list:
             emp_id = vals.get('employee_id')
-            lt_id = vals.get('holiday_status_id')
+            lt_id = vals.get('work_entry_type_id')
             if emp_id and lt_id and not vals.get('vacation_balance_id'):
                 start = (fields.Date.to_date(vals.get('request_date_from'))
                          or fields.Date.to_date(vals.get('date_from'))
                          or today)
                 period = Balance._ensure_periods_up_to(
                     self.env['hr.employee'].browse(emp_id),
-                    self.env['hr.leave.type'].browse(lt_id),
+                    self.env['hr.work.entry.type'].browse(lt_id),
                     max(today, start), select_date=start,
                 )
                 if period:
@@ -512,11 +509,11 @@ class HrLeave(models.Model):
         today = fields.Date.context_today(self)
         for leave in self:
             if (leave.vacation_balance_id
-                    or not leave.employee_id or not leave.holiday_status_id):
+                    or not leave.employee_id or not leave.work_entry_type_id):
                 continue
             start = leave.request_date_from or today
             period = Balance._ensure_periods_up_to(
-                leave.employee_id, leave.holiday_status_id,
+                leave.employee_id, leave.work_entry_type_id,
                 max(today, start), select_date=start)
             if period:
                 leave.vacation_balance_id = period.id
@@ -536,7 +533,7 @@ class HrLeave(models.Model):
         # period; this only fills the gap. Skipped when the caller sets the
         # period explicitly in the same write.
         if ({'request_date_from', 'request_date_to', 'date_from', 'date_to',
-             'employee_id', 'holiday_status_id'} & vals.keys()
+             'employee_id', 'work_entry_type_id'} & vals.keys()
                 and 'vacation_balance_id' not in vals):
             self._ensure_vacation_period()
         # Keep an already-linked order's dates in step with the leave, so edits
@@ -552,7 +549,7 @@ class HrLeave(models.Model):
                 })
         # Per-leave Balance Before/After for subsequent leaves.
         if any(f in vals for f in ('date_from', 'date_to', 'request_date_from',
-                                    'request_date_to', 'state', 'holiday_status_id')):
+                                    'request_date_to', 'state', 'work_entry_type_id')):
             self._recompute_subsequent_leaves()
         # Rollup fields on hr.vacation.balance.
         if self._BALANCE_TRIGGER_FIELDS & vals.keys():
@@ -607,13 +604,13 @@ class HrLeave(models.Model):
         # their per-leave Balance Before/After after super().unlink().
         leaves_to_recompute = self.env['hr.leave']
         for leave in self:
-            if leave.employee_id and leave.holiday_status_id and leave.request_date_from:
+            if leave.employee_id and leave.work_entry_type_id and leave.request_date_from:
                 period_domain = leave._period_domain()
                 if period_domain is None:
                     continue
                 leaves_to_recompute |= self.env['hr.leave'].search([
                     ('employee_id', '=', leave.employee_id.id),
-                    ('holiday_status_id', '=', leave.holiday_status_id.id),
+                    ('work_entry_type_id', '=', leave.work_entry_type_id.id),
                     ('request_date_from', '>', leave.request_date_from),
                     *period_domain,
                     ('id', 'not in', self.ids)
@@ -632,7 +629,7 @@ class HrLeave(models.Model):
         self._recompute_balances_for_keys(affected_balance_keys)
         return res
 
-    @api.constrains('employee_id', 'holiday_status_id', 'date_from')
+    @api.constrains('employee_id', 'work_entry_type_id', 'date_from')
     def _check_minimum_experience(self):
         """Check minimum work experience for first annual leave.
 
@@ -640,12 +637,12 @@ class HrLeave(models.Model):
         Exception: pregnant women, minors, part-time workers, etc.
         """
         for leave in self:
-            if not leave.holiday_status_id or not leave.holiday_status_id.requires_experience:
+            if not leave.work_entry_type_id or not leave.work_entry_type_id.requires_experience:
                 continue
             if not leave.employee_id or not leave.date_from:
                 continue
 
-            min_months = leave.holiday_status_id.min_experience_months or 6
+            min_months = leave.work_entry_type_id.min_experience_months or 6
 
             # Get contract start date from version (Odoo 19)
             version = leave.employee_id.current_version_id
@@ -657,7 +654,7 @@ class HrLeave(models.Model):
             if leave.date_from.date() < experience_date:
                 existing_leaves = self.env['hr.leave'].search_count([
                     ('employee_id', '=', leave.employee_id.id),
-                    ('holiday_status_id', '=', leave.holiday_status_id.id),
+                    ('work_entry_type_id', '=', leave.work_entry_type_id.id),
                     ('state', '=', 'validate'),
                     ('id', '!=', leave.id),
                 ])
@@ -670,11 +667,11 @@ class HrLeave(models.Model):
                         current=(leave.date_from.date() - contract_start).days // 30,
                     ))
 
-    @api.onchange('employee_id', 'date_from', 'holiday_status_id')
+    @api.onchange('employee_id', 'date_from', 'work_entry_type_id')
     def _onchange_calculate_vacation_pay(self):
         """Auto-calculate average salary when creating vacation"""
-        if self.employee_id and self.date_from and self.holiday_status_id:
-            if self.holiday_status_id.is_paid:
+        if self.employee_id and self.date_from and self.work_entry_type_id:
+            if self.work_entry_type_id.is_paid:
                 self.average_daily_salary = self._calculate_average_salary()
 
     @api.depends('request_date_from', 'request_date_to')
@@ -688,11 +685,11 @@ class HrLeave(models.Model):
             else:
                 leave.calendar_days = 0
 
-    @api.depends('date_from', 'date_to', 'resource_calendar_id', 'holiday_status_id.request_unit',
-                 'holiday_status_id.is_calendar_days', 'request_date_from', 'request_date_to')
+    @api.depends('date_from', 'date_to', 'resource_calendar_id', 'work_entry_type_id.request_unit',
+                 'work_entry_type_id.is_calendar_days', 'request_date_from', 'request_date_to')
     def _compute_duration(self):
         calendar_days_leaves = self.filtered(
-            lambda l: l.holiday_status_id and l.holiday_status_id.is_calendar_days
+            lambda l: l.work_entry_type_id and l.work_entry_type_id.is_calendar_days
         )
         other_leaves = self - calendar_days_leaves
 
@@ -763,20 +760,20 @@ class HrLeave(models.Model):
             else:
                 leave.working_days = 0
 
-    @api.depends('calendar_days', 'average_daily_salary', 'holiday_status_id.is_paid')
+    @api.depends('calendar_days', 'average_daily_salary', 'work_entry_type_id.is_paid')
     def _compute_vacation_pay(self):
         for leave in self:
-            if leave.holiday_status_id.is_paid and leave.average_daily_salary:
+            if leave.work_entry_type_id.is_paid and leave.average_daily_salary:
                 leave.vacation_pay_amount = leave.calendar_days * leave.average_daily_salary
             else:
                 leave.vacation_pay_amount = 0.0
 
-    @api.depends('employee_id', 'holiday_status_id', 'vacation_balance_id',
+    @api.depends('employee_id', 'work_entry_type_id', 'vacation_balance_id',
                  'vacation_year', 'request_date_from')
     def _compute_remaining_before(self):
         """Computes the balance before the start of a specific leave in chronological order."""
         for leave in self:
-            if not leave.employee_id or not leave.holiday_status_id:
+            if not leave.employee_id or not leave.work_entry_type_id:
                 leave.remaining_days_before = 0
                 continue
 
@@ -801,7 +798,7 @@ class HrLeave(models.Model):
                 if not year:
                     leave.remaining_days_before = 0
                     continue
-                total_available = leave.holiday_status_id.annual_days or 0
+                total_available = leave.work_entry_type_id.annual_days or 0
                 period_start = fields.Date.from_string(f'{year}-01-01')
                 period_domain = [
                     '|', ('vacation_year', '=', year),
@@ -816,7 +813,7 @@ class HrLeave(models.Model):
             # reflects "available − already used/planned this period".
             domain = [
                 ('employee_id', '=', leave.employee_id.id),
-                ('holiday_status_id', '=', leave.holiday_status_id.id),
+                ('work_entry_type_id', '=', leave.work_entry_type_id.id),
                 ('state', 'not in', ['cancel', 'refuse']), # Count both planned and approved leaves
             ] + period_domain
             # Apply the chronological "earlier than this leave" filter ONLY
@@ -858,7 +855,7 @@ class HrLeave(models.Model):
     # concern, same hook points).
     # ------------------------------------------------------------------
     _BALANCE_TRIGGER_FIELDS = frozenset({
-        'state', 'employee_id', 'holiday_status_id',
+        'state', 'employee_id', 'work_entry_type_id',
         'date_from', 'date_to',
         'request_date_from', 'request_date_to',
         'vacation_year', 'vacation_balance_id',
@@ -899,13 +896,13 @@ class HrLeave(models.Model):
         keys = set(self.mapped('vacation_balance_id').ids)
         unlinked = self.filtered(
             lambda l: not l.vacation_balance_id and l.employee_id
-            and l.holiday_status_id and l.request_date_from)
+            and l.work_entry_type_id and l.request_date_from)
         if unlinked:
             Balance = self.env['hr.vacation.balance'].sudo()
             for leave in unlinked:
                 fallback = Balance.search([
                     ('employee_id', '=', leave.employee_id.id),
-                    ('leave_type_id', '=', leave.holiday_status_id.id),
+                    ('leave_type_id', '=', leave.work_entry_type_id.id),
                     ('period_start', '<=', leave.request_date_from),
                     ('period_end', '>=', leave.request_date_from),
                 ], limit=1)
@@ -932,7 +929,7 @@ class HrLeave(models.Model):
     def _recompute_subsequent_leaves(self):
         """Helper method: forcibly updates the balance for leaves that come AFTER the current one."""
         for leave in self:
-            if not leave.employee_id or not leave.holiday_status_id or not leave.request_date_from:
+            if not leave.employee_id or not leave.work_entry_type_id or not leave.request_date_from:
                 continue
             period_domain = leave._period_domain()
             if period_domain is None:
@@ -941,7 +938,7 @@ class HrLeave(models.Model):
             # Find all leaves with a date greater than the date of the changed leave
             subsequent_leaves = self.env['hr.leave'].search([
                 ('employee_id', '=', leave.employee_id.id),
-                ('holiday_status_id', '=', leave.holiday_status_id.id),
+                ('work_entry_type_id', '=', leave.work_entry_type_id.id),
                 ('request_date_from', '>', leave.request_date_from),
                 *period_domain,
                 ('id', '!=', leave.id)
@@ -1014,10 +1011,10 @@ class HrLeave(models.Model):
             total_earnings += payslip.gross_salary or 0
 
         # Calculate excluded days from sick leave and unpaid leave in the period
-        sick_leave_type = self.env['hr.leave.type'].search([
+        sick_leave_type = self.env['hr.work.entry.type'].search([
             ('ua_leave_category', '=', 'sick')
         ], limit=1)
-        unpaid_leave_type = self.env['hr.leave.type'].search([
+        unpaid_leave_type = self.env['hr.work.entry.type'].search([
             ('ua_leave_category', '=', 'unpaid')
         ])
 
@@ -1025,7 +1022,7 @@ class HrLeave(models.Model):
         if excluded_leave_types:
             excluded_leaves = self.env['hr.leave'].search([
                 ('employee_id', '=', self.employee_id.id),
-                ('holiday_status_id', 'in', excluded_leave_types),
+                ('work_entry_type_id', 'in', excluded_leave_types),
                 ('state', '=', 'validate'),
                 ('date_from', '>=', date_from),
                 ('date_to', '<=', date_to),
