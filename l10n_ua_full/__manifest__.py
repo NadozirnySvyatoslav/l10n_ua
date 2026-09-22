@@ -5,7 +5,7 @@
 Ukraine - Full Localization Package
 ===================================
 
-This meta-package installs the complete Ukrainian localization for Odoo 19,
+This meta-package installs the complete Ukrainian localization for Odoo 20,
 including all modules for HR, Payroll, Accounting, Tax Reporting, Banking,
 Delivery, Marketplaces, and PRRO (cash registers).
 

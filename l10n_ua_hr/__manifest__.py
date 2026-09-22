@@ -33,7 +33,7 @@ Features:
 * Personal files management
 * Regulatory reports generation
 
-This package is designed for Odoo 19 Community Edition.
+This package is designed for Odoo 20 Community Edition.
     """,
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://many2one.online',

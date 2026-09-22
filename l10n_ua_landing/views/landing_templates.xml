@@ -6,8 +6,8 @@
         <head>
             <meta charset="utf-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title>many2one — Українська локалізація Odoo 19</title>
-            <meta name="description" content="68 модулів української локалізації Odoo 19: бухгалтерія, податки, ПРРО, банки, HR/зарплата, маркетплейси, договори та галузеві рішення."/>
+            <title>many2one — Українська локалізація Odoo 20</title>
+            <meta name="description" content="68 модулів української локалізації Odoo 20: бухгалтерія, податки, ПРРО, банки, HR/зарплата, маркетплейси, договори та галузеві рішення."/>
             <link type="image/x-icon" rel="shortcut icon" href="/web/image/website/1/favicon"/>
             <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -108,7 +108,7 @@
 
         <div class="wrap">
           <div class="stats">
-            <div class="stat"><b>68</b><span>модулів для Odoo 19</span></div>
+            <div class="stat"><b>68</b><span>модулів для Odoo 20</span></div>
             <div class="stat"><b>11</b><span>напрямків</span></div>
             <div class="stat"><b>1С:ЗУП</b><span>заміна HR/зарплати</span></div>
             <div class="stat"><b>UA</b><span>відповідність законодавству</span></div>
@@ -141,7 +141,7 @@
             <div class="frow">
               <div class="feat"><h3>Сумісність із законодавством</h3><p>Розрахунки податків, регламентні форми та XML-звітність за чинними нормами України.</p></div>
               <div class="feat"><h3>Модульність</h3><p>Чітка ієрархія залежностей — від мінімального ФОП до повного стека l10n_ua_full.</p></div>
-              <div class="feat"><h3>Open-source сумісність</h3><p>Працює поверх Odoo CE та OCA-модулів; портовано на Odoo 19.</p></div>
+              <div class="feat"><h3>Open-source сумісність</h3><p>Працює поверх Odoo CE та OCA-модулів; портовано на Odoo 20.</p></div>
               <div class="feat"><h3>Покриття тестами</h3><p>Стабільні модулі покриті автотестами та перевірені на демо-сервері.</p></div>
             </div>
           </div>

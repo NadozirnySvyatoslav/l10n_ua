@@ -7,7 +7,7 @@
 Ukraine HR Contracts Module
 ===========================
 
-Extension of hr.version for Ukrainian localization (Odoo 19 architecture):
+Extension of hr.version for Ukrainian localization (Odoo 20 architecture):
 
 * Contract types (permanent, fixed-term, civil, gig-contract)
 * Main workplace / part-time work tracking
@@ -21,7 +21,7 @@ Extension of hr.version for Ukrainian localization (Odoo 19 architecture):
 * Diia.City employee support
 * Job combining management
 
-Uses native Odoo 19 hr.version model instead of separate hr.contract.
+Uses native Odoo 20 hr.version model instead of separate hr.contract.
 
 Requires l10n_ua_hr_base module.
     """,
