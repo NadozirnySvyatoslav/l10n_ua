@@ -81,7 +81,7 @@ class TestHrEmployeeRnokpp(TestHrUaBase):
 
     def test_rnokpp_validation_disabled(self):
         """Test that RNOKPP validation can be disabled via system parameter."""
-        self.env['ir.config_parameter'].sudo().set_param('hr_ua.validate_rnokpp', 'False')
+        self.env['ir.config_parameter'].sudo().set_str('hr_ua.validate_rnokpp', 'False')
 
         # Use a unique invalid RNOKPP to avoid conflicts
         invalid_rnokpp = '0000000001'  # Invalid checksum but unique
@@ -90,7 +90,7 @@ class TestHrEmployeeRnokpp(TestHrUaBase):
         self.assertEqual(employee.rnokpp, invalid_rnokpp)
 
         # Re-enable validation
-        self.env['ir.config_parameter'].sudo().set_param('hr_ua.validate_rnokpp', 'True')
+        self.env['ir.config_parameter'].sudo().set_str('hr_ua.validate_rnokpp', 'True')
 
 
 @tagged('post_install', '-at_install')

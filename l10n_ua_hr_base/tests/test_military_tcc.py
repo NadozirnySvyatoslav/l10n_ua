@@ -1,6 +1,5 @@
 """Тести експорту військового обліку до ТЦК (#156)."""
 
-import base64
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -30,7 +29,7 @@ class TestMilitaryTcc(TestHrUaBase):
         report.action_export_csv()
         self.assertTrue(report.export_data)
         self.assertTrue(report.export_filename.endswith('.csv'))
-        text = base64.b64decode(report.export_data).decode('cp1251')
+        text = report.export_data.content.decode('cp1251')
         self.assertIn('РНОКПП', text)
         self.assertIn(emp.rnokpp, text)
         self.assertIn('Військовий Іван', text)
@@ -54,7 +53,7 @@ class TestMilitaryTcc(TestHrUaBase):
         self.assertEqual(notif.snapshot_rnokpp, emp.rnokpp)
         self.assertTrue(notif.submitted_date)
         # Файл повідомлення сформовано і містить реквізити.
-        text = base64.b64decode(notif.export_data).decode('cp1251')
+        text = notif.export_data.content.decode('cp1251')
         self.assertIn('Прийняття на роботу', text)
         self.assertIn(emp.rnokpp, text)
 
@@ -63,7 +62,7 @@ class TestMilitaryTcc(TestHrUaBase):
         notif = self.env['hr.military.notification'].create({
             'notification_type': 'dismissal', 'employee_id': emp.id})
         notif.action_submit()
-        text = base64.b64decode(notif.export_data).decode('cp1251')
+        text = notif.export_data.content.decode('cp1251')
         self.assertIn('Звільнення', text)
 
     def test_form5_groups_follow_paragraph_36(self):

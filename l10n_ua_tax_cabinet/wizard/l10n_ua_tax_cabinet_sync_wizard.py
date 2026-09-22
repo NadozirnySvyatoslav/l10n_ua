@@ -1,4 +1,3 @@
-import base64
 import logging
 import xml.etree.ElementTree as ET
 from datetime import date
@@ -166,7 +165,7 @@ class L10nUaTaxCabinetSyncWizard(models.TransientModel):
     def _parse_xml_document(self, file_content, vals):
         """Try to parse XML and extract document info."""
         try:
-            xml_data = base64.b64decode(file_content)
+            xml_data = file_content.content
             root = ET.fromstring(xml_data)
 
             # Try to find common Ukrainian tax XML elements

@@ -26,7 +26,7 @@ class TestErpnRegister(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
-            'name': 'ТОВ Покупець ЄРПН', 'company_type': 'company'})
+            'name': 'ТОВ Покупець ЄРПН'})
         cls.company.write({
             'l10n_ua_is_vat_payer': True,
             'l10n_ua_vat_ipn': '123456789012',

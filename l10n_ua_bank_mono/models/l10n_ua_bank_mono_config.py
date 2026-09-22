@@ -42,7 +42,7 @@ class L10nUaBankSyncConfig(models.Model):
 
     @api.depends_context('company')
     def _compute_mono_webhook_url(self):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
         for record in self:
             record.mono_webhook_url = f'{base_url}/l10n_ua_bank_mono/webhook/{record.id}'
 

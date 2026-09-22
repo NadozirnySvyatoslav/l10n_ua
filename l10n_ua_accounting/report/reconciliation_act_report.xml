@@ -34,8 +34,8 @@
                             <div class="col-6">
                                 <div class="bold mb-2">Замовник:</div>
                                 <div t-field="wizard.company_id.name"/>
-                                <div t-if="wizard.company_id.company_registry">
-                                    ЄДРПОУ: <span t-field="wizard.company_id.company_registry"/>
+                                <div t-if="wizard.company_id.edrpou">
+                                    ЄДРПОУ: <span t-field="wizard.company_id.edrpou"/>
                                 </div>
                                 <div t-if="wizard.company_id.vat">
                                     ІПН: <span t-field="wizard.company_id.vat"/>
@@ -44,8 +44,8 @@
                             <div class="col-6">
                                 <div class="bold mb-2">Виконавець:</div>
                                 <div t-field="wizard.partner_id.name"/>
-                                <div t-if="wizard.partner_id.company_registry">
-                                    ЄДРПОУ: <span t-field="wizard.partner_id.company_registry"/>
+                                <div t-if="wizard.partner_id.edrpou">
+                                    ЄДРПОУ: <span t-field="wizard.partner_id.edrpou"/>
                                 </div>
                                 <div t-if="wizard.partner_id.vat">
                                     ІПН: <span t-field="wizard.partner_id.vat"/>

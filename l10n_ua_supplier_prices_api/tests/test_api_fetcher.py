@@ -1,6 +1,5 @@
 """Тести API fetcher. HTTP мокований через unittest.mock."""
 
-import base64
 import json
 from unittest.mock import patch, MagicMock
 
@@ -70,7 +69,7 @@ class TestApiFetcher(TransactionCase):
         imp = self._make_import(source)
         imp.action_fetch()
         self.assertEqual(imp.state, 'fetched')
-        self.assertEqual(base64.b64decode(imp.raw_file), payload)
+        self.assertEqual(imp.raw_file.content, payload)
         self.assertEqual(imp.raw_filename, 'prices.json')
         mock_request.assert_called_once()
 
@@ -146,7 +145,7 @@ class TestApiFetcher(TransactionCase):
         imp = self._make_import(source)
         imp.action_fetch()
         self.assertEqual(imp.state, 'fetched')
-        self.assertEqual(base64.b64decode(imp.raw_file), b'csv,content,here')
+        self.assertEqual(imp.raw_file.content, b'csv,content,here')
         mock_request.assert_called_once()
         mock_get.assert_called_once_with('https://files.example.com/p.csv', timeout=(60, 60))
 

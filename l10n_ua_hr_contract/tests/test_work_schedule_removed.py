@@ -36,10 +36,8 @@ class TestWorkScheduleRemoved(TransactionCase):
         self.assertFalse(
             leftovers,
             'Leftover XML ids: %s' % leftovers.mapped('complete_name'))
-        self.assertFalse(self.env['ir.model.access'].search([
-            ('model_id.model', 'like', 'hr.work.schedule'),
-        ]))
-        self.assertFalse(self.env['ir.rule'].search([
+        # Odoo 20 merged ir.model.access and ir.rule into ir.access.
+        self.assertFalse(self.env['ir.access'].search([
             ('model_id.model', 'like', 'hr.work.schedule'),
         ]))
 

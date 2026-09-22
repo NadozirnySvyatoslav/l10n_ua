@@ -23,7 +23,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address_inline if company.partner_id else (company.partner_id.contact_address if company.partner_id else '')"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -81,7 +81,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -144,7 +144,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -232,7 +232,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -292,7 +292,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 12pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
+        <span style="font-size: 12pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 30px 0;">
@@ -453,7 +453,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 11pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/></span>
     </div>
 
     <div style="text-align: center; margin: 20px 0;">
@@ -538,7 +538,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 11pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
+        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/><span t-if="company.phone">, тел.: <t t-esc="company.phone"/></span></span>
     </div>
 
     <div style="text-align: center; margin: 20px 0;">
@@ -551,7 +551,7 @@
 
     <p>1. Прізвище, ім'я, по батькові: <strong><t t-esc="employee.name or ''"/></strong></p>
     <p>2. РНОКПП: <strong><t t-esc="rnokpp or ''"/></strong></p>
-    <p>3. Найменування підприємства, ЄДРПОУ: <strong><t t-esc="company.name or ''"/>, <t t-esc="company.company_registry or ''"/></strong></p>
+    <p>3. Найменування підприємства, ЄДРПОУ: <strong><t t-esc="company.name or ''"/>, <t t-esc="company.edrpou or ''"/></strong></p>
     <p>4. Дата прийняття на роботу: <strong><t t-esc="format_date(hire_date)"/></strong>
         <span t-if="contract_end_date">, дата звільнення: <strong><t t-esc="format_date(contract_end_date)"/></strong></span></p>
     <p>5. Посада: <strong><t t-esc="employee.job_id.name if employee.job_id else ''"/></strong></p>
@@ -624,7 +624,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
         <strong><t t-esc="company.name or ''"/></strong><br/>
         <span style="font-size: 11pt;"><t t-esc="company.partner_id.contact_address if company.partner_id else ''"/></span><br/>
-        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.company_registry or ''"/></span>
+        <span style="font-size: 11pt;">ЄДРПОУ: <t t-esc="company.edrpou or ''"/></span>
     </div>
 
     <div style="text-align: center; margin: 20px 0;">

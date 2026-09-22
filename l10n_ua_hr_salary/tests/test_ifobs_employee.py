@@ -1,6 +1,5 @@
 """Тести експорту даних працівників для карток iFOBS (#195)."""
 
-import base64
 import struct
 from datetime import date
 
@@ -15,7 +14,7 @@ class TestIfobsEmployeeExport(SalaryTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env['ir.config_parameter'].sudo().set_param(
+        cls.env['ir.config_parameter'].sudo().set_str(
             'hr_ua.validate_rnokpp', 'False')
         cls.employee.write({
             'rnokpp': '1234567890',
@@ -35,7 +34,7 @@ class TestIfobsEmployeeExport(SalaryTestCase):
         wiz.action_generate()
         self.assertEqual(wiz.state, 'done')
         self.assertTrue(wiz.file_name.endswith('.dbf'))
-        b = base64.b64decode(wiz.file_data)
+        b = wiz.file_data.content
         # dBASE III, 1 запис, 36 полів → header_len = 32 + 32*36 + 1.
         self.assertEqual(struct.unpack('<B', b[:1])[0], 0x03)
         self.assertEqual(struct.unpack('<I', b[4:8])[0], 1)
@@ -44,7 +43,7 @@ class TestIfobsEmployeeExport(SalaryTestCase):
     def test_fio_and_inn_in_record(self):
         wiz = self._wizard(self.employee)
         wiz.action_generate()
-        b = base64.b64decode(wiz.file_data)
+        b = wiz.file_data.content
         hlen = struct.unpack('<H', b[8:10])[0]
         rec = b[hlen:]
         # прапорець(1) + BRANCHPART(N10) → FIO(C120) з позиції 11.

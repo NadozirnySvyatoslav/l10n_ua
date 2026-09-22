@@ -164,7 +164,7 @@ class HrPayslipBankExport(models.TransientModel):
     # --- Реквізити платника для банк-специфічних форматів ---
     def _company_edrpou(self):
         company = self.company_id
-        return (getattr(company, 'company_registry', False)
+        return (company.edrpou
                 or (company.vat or '').replace('UA', '').strip() or '')
 
     def _payer_mfo(self):

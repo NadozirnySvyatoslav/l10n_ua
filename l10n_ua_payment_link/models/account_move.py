@@ -22,7 +22,7 @@ class AccountMove(models.Model):
         template_raw = (
             self.env['ir.config_parameter']
             .sudo()
-            .get_param('l10n_ua.nbu_qr_template', '')
+            .get_str('l10n_ua.nbu_qr_template', '')
         )
         template = template_raw.replace('\\n', '\n').replace('\\r', '\r')
         for move in self:

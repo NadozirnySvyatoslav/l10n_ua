@@ -21,7 +21,6 @@ class TestVatRegister(TransactionCase):
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
             'name': 'ТОВ Контрагент ПДВ',
-            'company_type': 'company',
         })
         cls.company.l10n_ua_is_vat_payer = True
         # Create tax period

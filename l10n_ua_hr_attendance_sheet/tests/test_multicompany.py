@@ -19,7 +19,9 @@ class TestAttendanceSheetMultiCompany(TransactionCase):
         for ref in refs:
             rule = self.env.ref(ref)
             self.assertTrue(rule, f"Rule {ref} must exist")
-            self.assertTrue(rule['global'], f"Rule {ref} must be global")
+            self.assertEqual(
+                rule.kind, 'restriction',
+                f"Rule {ref} must be a restriction")
 
     def test_disabled_company_is_refused_on_save(self):
         """Табель у вимкненій компанії не зберігається (record rule)."""

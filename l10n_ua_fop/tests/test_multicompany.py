@@ -58,4 +58,6 @@ class TestFopMultiCompany(TransactionCase):
             'l10n_ua_fop.l10n_ua_fop_income_book_company_rule',
         ):
             rule = self.env.ref(xmlid)
-            self.assertTrue(rule['global'], '%s must be global' % xmlid)
+            self.assertEqual(
+                rule.kind, 'restriction',
+                '%s must be a restriction' % xmlid)

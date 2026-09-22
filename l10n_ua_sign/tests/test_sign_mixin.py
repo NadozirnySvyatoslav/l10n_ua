@@ -1,6 +1,7 @@
 """Тести домішки клієнтського КЕП-підпису (l10n_ua.sign.mixin).
 
-Домішку перевіряємо напряму (in-memory record через .new()):
+Домішку перевіряємо напряму (порожній browse-запис — Odoo 20 не дає
+робити .new() на абстрактній моделі, а жодного з методів БД не торкається):
 - action_kep_sign повертає правильний client action із model/res_id;
 - дефолтні kep_prepare_signing/kep_submit_signed кидають UserError
   (щоб споживач був змушений їх реалізувати).
@@ -16,7 +17,7 @@ from odoo.tests import TransactionCase, tagged
 class TestSignMixin(TransactionCase):
 
     def _rec(self):
-        return self.env['l10n_ua.sign.mixin'].new({})
+        return self.env['l10n_ua.sign.mixin'].browse(1)
 
     def test_action_returns_client_action(self):
         action = self._rec().action_kep_sign()

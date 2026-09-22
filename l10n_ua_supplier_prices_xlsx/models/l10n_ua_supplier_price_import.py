@@ -1,4 +1,3 @@
-import base64
 import io
 import logging
 from datetime import date, datetime, timedelta
@@ -43,7 +42,7 @@ class L10nUaSupplierPriceImport(models.Model):
         has_header = bool(config.get('has_header', True))
         skip_rows = int(config.get('skip_rows', 0))
 
-        raw_bytes = base64.b64decode(self.raw_file)
+        raw_bytes = self.raw_file.content
         try:
             workbook = openpyxl.load_workbook(io.BytesIO(raw_bytes), data_only=True, read_only=True)
         except Exception as e:

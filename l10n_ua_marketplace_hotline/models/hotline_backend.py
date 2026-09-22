@@ -31,7 +31,7 @@ class MarketplaceBackendHotline(models.Model):
     def _get_hotline_feed_url(self):
         """Get the feed URL for Hotline submission."""
         self.ensure_one()
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
         return f'{base_url}/marketplace/feed/{self.id}'
 
     def action_copy_feed_url(self):

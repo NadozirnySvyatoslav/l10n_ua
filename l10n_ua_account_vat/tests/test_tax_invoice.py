@@ -28,7 +28,6 @@ class TestTaxInvoice(TransactionCase):
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
             'name': 'ТОВ Тестовий покупець',
-            'company_type': 'company',
         })
         # Enable VAT payer
         cls.company.write({

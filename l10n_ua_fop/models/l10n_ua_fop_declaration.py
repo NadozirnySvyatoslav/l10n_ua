@@ -457,7 +457,7 @@ class L10nUaFopDeclaration(models.Model):
         ]
 
         vals = {
-            'taxpayer_tin': company.vat or company.company_registry or '',
+            'taxpayer_tin': company.vat or company.edrpou or '',
             'taxpayer_name': company.name or '',
             'taxpayer_address': self.env['l10n_ua.tax.document.wizard']
                 ._format_company_address(company),

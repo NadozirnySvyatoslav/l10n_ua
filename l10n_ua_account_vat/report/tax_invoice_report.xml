@@ -36,7 +36,7 @@
                                     <strong>Постачальник:</strong><br/>
                                     <t t-if="o.invoice_type == 'issued'">
                                         <span t-field="o.company_id.name"/><br/>
-                                        ІПН: <span t-esc="o.company_id.vat or o.company_id.company_registry or ''"/>
+                                        ІПН: <span t-esc="o.company_id.vat or o.company_id.edrpou or ''"/>
                                     </t>
                                     <t t-else="">
                                         <span t-field="o.partner_id.name"/><br/>
@@ -51,7 +51,7 @@
                                     </t>
                                     <t t-else="">
                                         <span t-field="o.company_id.name"/><br/>
-                                        ІПН: <span t-esc="o.company_id.vat or o.company_id.company_registry or ''"/>
+                                        ІПН: <span t-esc="o.company_id.vat or o.company_id.edrpou or ''"/>
                                     </t>
                                 </td>
                             </tr>

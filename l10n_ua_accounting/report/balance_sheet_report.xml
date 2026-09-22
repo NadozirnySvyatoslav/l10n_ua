@@ -31,9 +31,9 @@
                                         <td style="width: 120px;">Підприємство</td>
                                         <td class="border-bottom"><span t-field="report.company_id.name"/></td>
                                     </tr>
-                                    <tr t-if="report.company_id.company_registry">
+                                    <tr t-if="report.company_id.edrpou">
                                         <td>за ЄДРПОУ</td>
-                                        <td class="border-bottom"><span t-field="report.company_id.company_registry"/></td>
+                                        <td class="border-bottom"><span t-field="report.company_id.edrpou"/></td>
                                     </tr>
                                 </table>
                             </div>

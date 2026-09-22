@@ -21,7 +21,7 @@ class TestVatMultiCompany(TransactionCase):
         cls.company_other = Company.create({
             'name': 'Other Co (test)', 'country_id': cls.env.ref('base.fr').id})
         cls.partner = cls.env['res.partner'].create({
-            'name': 'Buyer', 'company_type': 'company'})
+            'name': 'Buyer'})
         # user whose ONLY allowed company is the non-UA one
         cls.user_other = cls.env['res.users'].create({
             'name': 'Other User', 'login': 'vat_other_user',

@@ -79,7 +79,7 @@ class HrVersionAllowance(models.Model):
             ], limit=1)
             if psp_params:
                 return psp_params.min_wage
-        param = self.env['ir.config_parameter'].sudo().get_param(
+        param = self.env['ir.config_parameter'].sudo().get_str(
             'l10n_ua_hr.minimum_wage', '8000'
         )
         return float(param)

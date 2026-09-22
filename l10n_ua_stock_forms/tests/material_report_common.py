@@ -45,7 +45,7 @@ class MaterialReportCase(TransactionCase):
         move = self.env['stock.move'].create({
             'product_id': product.id,
             'product_uom_qty': qty,
-            'product_uom': (uom or product.uom_id).id,
+            'uom_id': (uom or product.uom_id).id,
             'location_id': source.id,
             'location_dest_id': dest.id,
         })

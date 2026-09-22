@@ -21,7 +21,7 @@ class TestAccountingMultiCompany(TransactionCase):
         cls.company_other = Company.create({
             'name': 'Other Co (test)', 'country_id': cls.env.ref('base.fr').id})
         cls.partner = cls.env['res.partner'].create({
-            'name': 'Customer', 'company_type': 'company'})
+            'name': 'Customer'})
         # user whose ONLY allowed company is the non-UA one
         cls.user_other = cls.env['res.users'].create({
             'name': 'Other User', 'login': 'acc_other_user',
@@ -65,4 +65,6 @@ class TestAccountingMultiCompany(TransactionCase):
         ]
         for xmlid in rule_xmlids:
             rule = self.env.ref(xmlid)
-            self.assertTrue(rule['global'], '%s must be global' % xmlid)
+            self.assertEqual(
+                rule.kind, 'restriction',
+                '%s must be a restriction' % xmlid)

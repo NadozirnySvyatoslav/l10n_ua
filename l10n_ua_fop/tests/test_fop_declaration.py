@@ -8,7 +8,6 @@ Tests cover:
 - State workflow
 """
 
-import base64
 from datetime import date
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
@@ -154,7 +153,7 @@ class TestFopDeclaration(TransactionCase):
         self.assertTrue(decl.xml_file, 'xml_file must be populated')
         self.assertTrue(decl.xml_filename.endswith('_F0103309.xml'))
 
-        xml = base64.b64decode(decl.xml_file).decode('windows-1251')
+        xml = decl.xml_file.content.decode('windows-1251')
         # Canonical F0103309 structure and the declaration's own figures.
         self.assertIn('<C_DOC>F01</C_DOC>', xml)
         self.assertIn('<C_DOC_SUB>033</C_DOC_SUB>', xml)
@@ -181,7 +180,7 @@ class TestFopDeclaration(TransactionCase):
             decl = self._create_declaration(period, 2025)
             decl.action_calculate()
             decl.action_generate_xml()
-            xml = base64.b64decode(decl.xml_file).decode('windows-1251')
+            xml = decl.xml_file.content.decode('windows-1251')
             self.assertIn(f'<{marker}>1</{marker}>', xml,
                           f'Period {period} should emit marker {marker}')
             decl.unlink()

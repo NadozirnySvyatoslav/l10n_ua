@@ -22,9 +22,9 @@ class TestAccountCard(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
-            'name': 'ТОВ Контрагент КР', 'company_type': 'company'})
+            'name': 'ТОВ Контрагент КР'})
         cls.partner2 = cls.env['res.partner'].create({
-            'name': 'ТОВ Другий КР', 'company_type': 'company'})
+            'name': 'ТОВ Другий КР'})
         cls.journal = cls.env['account.journal'].create({
             'name': 'Картка тест', 'code': 'ACRD',
             'type': 'general', 'company_id': cls.company.id})

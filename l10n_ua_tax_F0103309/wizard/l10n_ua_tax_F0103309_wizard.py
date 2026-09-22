@@ -1,4 +1,3 @@
-import base64
 import logging
 import re
 from datetime import date
@@ -310,7 +309,7 @@ class L10nUaTaxDocumentWizardF0103309(models.TransientModel):
 
         # Parse XML to extract tax amounts
         try:
-            xml_content = base64.b64decode(prev_docs.file_xml).decode('windows-1251', errors='replace')
+            xml_content = prev_docs.file_xml.content.decode('windows-1251', errors='replace')
 
             # Extract R011G3 (single tax amount)
             tax_match = re.search(r'<R011G3>([0-9.]+)</R011G3>', xml_content)

@@ -50,7 +50,7 @@
                             <tr>
                                 <td class="no-border">РНОКПП (ІПН):</td>
                                 <td class="no-border" style="border-bottom: 1px solid black;">
-                                    <t t-esc="comp_partner.vat or comp_partner.company_registry or ''"/>
+                                    <t t-esc="comp_partner.vat or comp_partner.edrpou or ''"/>
                                 </td>
                             </tr>
                             <tr>

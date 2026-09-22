@@ -35,10 +35,10 @@
                         <div class="company-header">
                             <div class="company-name" t-field="company.name"/>
                             <div class="small">(найменування підприємства)</div>
-                            <t t-if="comp_partner.company_registry">
+                            <t t-if="comp_partner.edrpou">
                                 <div class="company-code">
                                     Ідентифікаційний код ЄДРПОУ:
-                                    <span t-field="comp_partner.company_registry"/>
+                                    <span t-field="comp_partner.edrpou"/>
                                 </div>
                             </t>
                         </div>

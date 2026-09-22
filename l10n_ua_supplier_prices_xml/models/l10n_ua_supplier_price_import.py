@@ -1,4 +1,3 @@
-import base64
 import logging
 from datetime import datetime, timedelta
 
@@ -29,7 +28,7 @@ class L10nUaSupplierPriceImport(models.Model):
         namespaces = config.get('namespaces') or {}
         forced_encoding = config.get('encoding')
 
-        raw_bytes = base64.b64decode(self.raw_file)
+        raw_bytes = self.raw_file.content
         if forced_encoding:
             try:
                 raw_bytes = raw_bytes.decode(forced_encoding).encode('utf-8')

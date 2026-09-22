@@ -1,6 +1,5 @@
 """Тести експорту зарплатного файлу для клієнт-банку (#152)."""
 
-import base64
 import io
 import struct
 import zipfile
@@ -20,7 +19,7 @@ class TestBankExport(SalaryTestCase):
     def setUpClass(cls):
         super().setUpClass()
         # Вимкнути перевірку контрольної суми РНОКПП у тестах.
-        cls.env['ir.config_parameter'].sudo().set_param(
+        cls.env['ir.config_parameter'].sudo().set_str(
             'hr_ua.validate_rnokpp', 'False')
         cls.employee.rnokpp = '1234567890'
         # The native bank_account_ids only accepts accounts held by the
@@ -58,7 +57,7 @@ class TestBankExport(SalaryTestCase):
         wiz.action_generate()
         self.assertEqual(wiz.state, 'done')
         self.assertTrue(wiz.file_name.endswith('.xml'))
-        content = base64.b64decode(wiz.file_data)
+        content = wiz.file_data.content
         root = etree.fromstring(content)
         self.assertEqual(root.tag, 'PaymentPackage')
         payments = root.findall('Payment')
@@ -75,7 +74,7 @@ class TestBankExport(SalaryTestCase):
         wiz = self._wizard(file_format='dbf')
         wiz.action_generate()
         self.assertTrue(wiz.file_name.endswith('.dbf'))
-        b = base64.b64decode(wiz.file_data)
+        b = wiz.file_data.content
         version, = struct.unpack('<B', b[:1])
         nrec, = struct.unpack('<I', b[4:8])
         hlen, = struct.unpack('<H', b[8:10])
@@ -118,7 +117,7 @@ class TestBankExport(SalaryTestCase):
         wiz.salary_project_code = '12345'
         wiz.action_generate()
         self.assertTrue(wiz.file_name.endswith('.zip'))
-        zf = zipfile.ZipFile(io.BytesIO(base64.b64decode(wiz.file_data)))
+        zf = zipfile.ZipFile(io.BytesIO(wiz.file_data.content))
         self.assertEqual(set(zf.namelist()), {'ScheduleInfo.dbf', 'Amounts.dbf'})
         # ScheduleInfo — рівно 1 запис.
         sched = zf.read('ScheduleInfo.dbf')
@@ -143,7 +142,7 @@ class TestBankExport(SalaryTestCase):
         wiz.accrual_name = 'Заробітна плата'
         wiz.action_generate()
         self.assertTrue(wiz.file_name.endswith('.txt'))
-        text = base64.b64decode(wiz.file_data).decode('cp1251')
+        text = wiz.file_data.content.decode('cp1251')
         self.assertIn('Content-Type=doc/pay_sheet', text)
         self.assertIn('ONFLOW_TYPE=Заробітна плата', text)
         self.assertIn('CARD_HOLDERS.0.CARD_NUM=%s' % self.iban, text)
@@ -166,7 +165,7 @@ class TestBankExport(SalaryTestCase):
         self._done_payslip()
         wiz = self._wizard(file_format='xml')
         wiz.action_generate()
-        root = etree.fromstring(base64.b64decode(wiz.file_data))
+        root = etree.fromstring(wiz.file_data.content)
         payments = root.findall('Payment')
         self.assertEqual(len(payments), 1)
         self.assertEqual(payments[0].findtext('Account'), expected.acc_number)
@@ -177,7 +176,7 @@ class TestBankExport(SalaryTestCase):
         self._done_payslip()
         wiz = self._wizard(file_format='xml')
         wiz.action_generate()
-        root = etree.fromstring(base64.b64decode(wiz.file_data))
+        root = etree.fromstring(wiz.file_data.content)
         account = root.findall('Payment')[0].findtext('Account')
         self.assertEqual(account, self.iban)
         self.assertEqual(len(account), 29)
@@ -199,12 +198,12 @@ class TestBankExport(SalaryTestCase):
         wiz.action_generate()
         # DBF is binary, so the account is looked for as encoded bytes.
         encoded_iban = self.iban.encode('cp1251')
-        zf = zipfile.ZipFile(io.BytesIO(base64.b64decode(wiz.file_data)))
+        zf = zipfile.ZipFile(io.BytesIO(wiz.file_data.content))
         self.assertIn(encoded_iban, zf.read('Amounts.dbf'))
 
         wiz_dbf = self._wizard(file_format='dbf')
         wiz_dbf.action_generate()
-        self.assertIn(encoded_iban, base64.b64decode(wiz_dbf.file_data))
+        self.assertIn(encoded_iban, wiz_dbf.file_data.content)
 
     def test_run_defaults_period(self):
         run = self.env['hr.payslip.run'].create({
@@ -217,5 +216,5 @@ class TestBankExport(SalaryTestCase):
         wiz = self.env['hr.payslip.bank.export'].create({
             'payslip_run_id': run.id, 'file_format': 'xml'})
         wiz.action_generate()
-        root = etree.fromstring(base64.b64decode(wiz.file_data))
+        root = etree.fromstring(wiz.file_data.content)
         self.assertEqual(len(root.findall('Payment')), 1)

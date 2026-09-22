@@ -44,7 +44,7 @@
                             <tr>
                                 <td class="bold">Код платника:</td>
                                 <td>
-                                    <span t-field="o.company_id.company_registry"/>
+                                    <span t-field="o.company_id.edrpou"/>
                                 </td>
                             </tr>
                             <tr>
@@ -76,8 +76,8 @@
                             <tr>
                                 <td class="bold">Код отримувача:</td>
                                 <td>
-                                    <t t-if="o.partner_id.company_registry">
-                                        <span t-field="o.partner_id.company_registry"/>
+                                    <t t-if="o.partner_id.edrpou">
+                                        <span t-field="o.partner_id.edrpou"/>
                                     </t>
                                     <t t-elif="o.partner_id.vat">
                                         <span t-field="o.partner_id.vat"/>

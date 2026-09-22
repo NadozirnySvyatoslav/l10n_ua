@@ -13,7 +13,6 @@
 Для реальних форматів — переозначити `_parse_lines` у дочірньому модулі
 (наприклад, `l10n_ua_budget_treasury_dbf` для UTF8 DBF-форматів).
 """
-import base64
 import csv
 import io
 from datetime import datetime
@@ -43,7 +42,7 @@ class L10nUaTreasuryStatementImport(models.TransientModel):
         if not self.file:
             raise UserError(_('Завантажте файл виписки.'))
 
-        content = base64.b64decode(self.file).decode(self.encoding or 'utf-8', errors='replace')
+        content = self.file.content.decode(self.encoding or 'utf-8', errors='replace')
 
         if self.file_format == 'csv':
             parsed_lines = self._parse_csv(content)

@@ -92,7 +92,7 @@ class L10nUaTaxCabinetConfig(models.Model):
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if self.company_id:
-            self.taxpayer_code = self.company_id.vat or self.company_id.company_registry
+            self.taxpayer_code = self.company_id.vat or self.company_id.edrpou
 
     def _get_api_url(self):
         """Get API URL based on environment setting."""
@@ -136,7 +136,7 @@ class L10nUaTaxCabinetConfig(models.Model):
         ], limit=1)
 
         if attachment:
-            return base64.b64decode(attachment.datas)
+            return attachment.datas.content
 
         # Download certificate
         _logger.info("Downloading DPS encryption certificate from %s", DPS_ENCRYPT_CERT_URL)

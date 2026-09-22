@@ -111,7 +111,7 @@ class L10nUaTaxDocument(models.Model):
         for record in self:
             if record.file_xml:
                 try:
-                    content = base64.b64decode(record.file_xml)
+                    content = record.file_xml.content
                     # Try different encodings
                     for encoding in ['utf-8', 'windows-1251', 'cp1251']:
                         try:
@@ -161,7 +161,7 @@ class L10nUaTaxDocument(models.Model):
         for vals in vals_list:
             if not vals.get('taxpayer_code') and vals.get('company_id'):
                 company = self.env['res.company'].browse(vals['company_id'])
-                vals['taxpayer_code'] = company.vat or company.company_registry
+                vals['taxpayer_code'] = company.vat or company.edrpou
         return super().create(vals_list)
 
     def action_prepare(self):

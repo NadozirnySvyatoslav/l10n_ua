@@ -25,7 +25,6 @@ class TestOsv(TransactionCase):
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
             'name': 'ТОВ Контрагент ОСВ',
-            'company_type': 'company',
         })
         cls.journal = cls.env['account.journal'].search([
             ('type', '=', 'general'),
@@ -162,7 +161,6 @@ class TestOsv(TransactionCase):
         """Analytic OSV splits the same account across partners."""
         partner2 = self.env['res.partner'].create({
             'name': 'ТОВ Другий ОСВ',
-            'company_type': 'company',
         })
         self._post_move(date(2025, 4, 1), 100.0, partner=self.partner)
         self._post_move(date(2025, 4, 2), 60.0, partner=partner2)

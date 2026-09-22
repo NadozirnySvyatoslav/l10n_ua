@@ -23,7 +23,7 @@ class TestJournalOrder(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
-            'name': 'ТОВ Контрагент ЖО', 'company_type': 'company'})
+            'name': 'ТОВ Контрагент ЖО'})
         # Власний журнал — щоб у ньому були лише проводки цього тесту.
         cls.journal = cls.env['account.journal'].create({
             'name': 'Журнал-ордер тест', 'code': 'JOT',

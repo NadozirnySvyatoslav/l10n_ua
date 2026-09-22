@@ -13,4 +13,6 @@ class TestMedecinNszuMultiCompany(TransactionCase):
     def test_contract_rule_exists_and_global(self):
         rule = self.env.ref(
             'l10n_ua_medecin_nszu.l10n_ua_medecin_nszu_contract_company_rule')
-        self.assertTrue(rule['global'], 'НСЗУ contract rule must be global')
+        self.assertEqual(
+                rule.kind, 'restriction',
+                'НСЗУ contract rule must be a restriction')

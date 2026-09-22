@@ -1,5 +1,4 @@
 """Wizard for bulk-loading КПКВК directory from CSV or DBF."""
-import base64
 import csv
 import io
 
@@ -32,7 +31,7 @@ class L10nUaKpkvkImport(models.TransientModel):
         self.ensure_one()
         if not self.file:
             raise UserError(_('Завантажте файл.'))
-        raw = base64.b64decode(self.file)
+        raw = self.file.content
         if self.file_format == 'csv':
             rows = self._parse_csv(raw)
         else:

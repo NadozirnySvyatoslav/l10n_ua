@@ -103,7 +103,7 @@ class MonoAcquiringMixin(models.AbstractModel):
         }
 
     def _mono_product_icon(self, product):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
         return (f"{base_url}/web/image?model=product.template"
                 f"&field=image_128&id={product.product_tmpl_id.id}")
 
@@ -119,7 +119,7 @@ class MonoAcquiringMixin(models.AbstractModel):
             raise UserError(_("Немає суми до оплати."))
 
         journal = self._get_mono_acquiring_journal()
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
 
         payload = {
             'amount': int(round(amount * 100)),

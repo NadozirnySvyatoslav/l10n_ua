@@ -60,7 +60,6 @@ class AccountingTestCase(TransactionCase):
         # Partner
         cls.partner = cls.env['res.partner'].create({
             'name': 'Тестовий контрагент',
-            'company_type': 'company',
         })
 
         # Employee (for advance reports)

@@ -1,4 +1,3 @@
-import base64
 import contextlib
 import logging
 import os
@@ -215,8 +214,8 @@ class L10nUaBankSyncConfig(models.Model):
         record = self.sudo()
         if not record.pumb_cert_file:
             raise UserError(_('Upload the PUMB client certificate (QWAC).'))
-        cert_data = base64.b64decode(record.pumb_cert_file)
-        key_data = (base64.b64decode(record.pumb_key_file)
+        cert_data = record.pumb_cert_file.content
+        key_data = (record.pumb_key_file.content
                     if record.pumb_key_file else b'')
         password = (record.pumb_key_password or '').encode() or None
 

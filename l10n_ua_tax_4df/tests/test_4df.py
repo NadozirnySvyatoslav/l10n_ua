@@ -1,6 +1,5 @@
 """Тести 4ДФ — об'єднана звітність ПДФО/ВЗ/ЄСВ."""
 
-import base64
 from datetime import date
 
 from odoo.tests import TransactionCase, tagged
@@ -16,7 +15,7 @@ class TestReport4DF(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
         # Disable RNOKPP checksum validation for tests
-        cls.env['ir.config_parameter'].sudo().set_param(
+        cls.env['ir.config_parameter'].sudo().set_str(
             'hr_ua.validate_rnokpp', 'False')
         cls.emp1 = cls.env['hr.employee'].create({
             'name': 'Тестова Іванна',
@@ -165,7 +164,7 @@ class TestReport4DF(TransactionCase):
         rec.action_generate_xml()
         self.assertTrue(rec.xml_file)
         self.assertTrue(rec.xml_filename.startswith('J0510410'))
-        xml = base64.b64decode(rec.xml_file).decode('windows-1251')
+        xml = rec.xml_file.content.decode('windows-1251')
         # Валідна структура Додатка 4ДФ (не старий стаб).
         self.assertIn('<C_DOC>J05</C_DOC>', xml)
         self.assertIn('<C_DOC_SUB>104</C_DOC_SUB>', xml)

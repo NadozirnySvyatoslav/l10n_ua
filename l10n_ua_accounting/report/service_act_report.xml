@@ -51,15 +51,15 @@
                                 <p>
                                     <strong>Виконавець: </strong>
                                     <span t-field="act.company_id.name"/>
-                                    <t t-if="act.company_id.company_registry">
-                                        , ЄДРПОУ: <span t-field="act.company_id.company_registry"/>
+                                    <t t-if="act.company_id.edrpou">
+                                        , ЄДРПОУ: <span t-field="act.company_id.edrpou"/>
                                     </t>
                                 </p>
                                 <p>
                                     <strong>Замовник: </strong>
                                     <span t-field="act.partner_id.name"/>
-                                    <t t-if="act.partner_id.company_registry">
-                                        , ЄДРПОУ: <span t-field="act.partner_id.company_registry"/>
+                                    <t t-if="act.partner_id.edrpou">
+                                        , ЄДРПОУ: <span t-field="act.partner_id.edrpou"/>
                                     </t>
                                 </p>
                             </div>

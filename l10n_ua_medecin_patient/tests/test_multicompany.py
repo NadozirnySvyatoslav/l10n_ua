@@ -45,7 +45,9 @@ class TestMedecinPatientMultiCompany(TransactionCase):
             'l10n_ua_medecin_declaration_company_rule',
         ):
             rule = self.env.ref('l10n_ua_medecin_patient.%s' % xmlid)
-            self.assertTrue(rule['global'], '%s must be global' % xmlid)
+            self.assertEqual(
+                rule.kind, 'restriction',
+                '%s must be a restriction' % xmlid)
 
     def test_other_company_user_cannot_see_ua_patient(self):
         """A user of the non-UA company must not see the UA clinic's patient."""

@@ -11,7 +11,6 @@
 - F0103309 — декларація 3 групи: для 1–2 груп XML і подання відмовляють.
 """
 
-import base64
 from datetime import date
 
 from odoo.exceptions import UserError
@@ -95,7 +94,7 @@ class TestFopMilitaryLevy(TransactionCase):
         decl = self._declaration(2026, 'q1', self.group_3)
         decl.action_calculate()
         decl.action_generate_xml()
-        xml = base64.b64decode(decl.xml_file).decode('windows-1251')
+        xml = decl.xml_file.content.decode('windows-1251')
         self.assertIn('<R023G3>1234.56</R023G3>', xml)
         self.assertIn('<R025G3>1234.56</R025G3>', xml)
 

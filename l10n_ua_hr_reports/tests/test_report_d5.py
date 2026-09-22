@@ -10,7 +10,6 @@ Tests cover:
 - XML export of Додаток 1 (ЄСВ), #187
 """
 
-import base64
 
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
@@ -143,7 +142,7 @@ class TestReportD5(TransactionCase):
         report.action_export_xml()
         self.assertTrue(report.xml_file)
         self.assertTrue(report.xml_filename.startswith('J0510210_2027_09'))
-        xml = base64.b64decode(report.xml_file).decode('windows-1251')
+        xml = report.xml_file.content.decode('windows-1251')
         self.assertIn('<C_DOC>J05</C_DOC>', xml)
         self.assertIn('<T1RXXXXG6S ROWNUM="1">3184710691</T1RXXXXG6S>', xml)
 

@@ -16,4 +16,6 @@ class TestMedecinEhealthMultiCompany(TransactionCase):
     def test_declaration_rule_exists_and_global(self):
         rule = self.env.ref(
             'l10n_ua_medecin_patient.l10n_ua_medecin_declaration_company_rule')
-        self.assertTrue(rule['global'], 'declaration rule must be global')
+        self.assertEqual(
+                rule.kind, 'restriction',
+                'declaration rule must be a restriction')

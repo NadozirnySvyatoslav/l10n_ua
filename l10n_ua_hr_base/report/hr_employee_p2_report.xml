@@ -40,7 +40,7 @@
                         <td style="width: 30%; text-align: right;">
                             Ідентифікаційний код ЄДРПОУ<br/>
                             <span style="border: 1px solid #000; padding: 2px 10px;">
-                                <t t-esc="employee.company_id.company_registry or ''"/>
+                                <t t-esc="employee.company_id.edrpou or ''"/>
                             </span>
                         </td>
                     </tr>

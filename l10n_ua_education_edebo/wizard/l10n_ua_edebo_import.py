@@ -4,7 +4,6 @@
 закритий і регулярно змінюється — цей wizard надає базовий CSV-парсер
 та точку розширення `_parse_custom()` для реальних форматів.
 """
-import base64
 import csv
 import io
 from datetime import datetime
@@ -51,7 +50,7 @@ class L10nUaEdeboImport(models.TransientModel):
         self.ensure_one()
         if not self.file:
             raise UserError(_('Завантажте файл.'))
-        content = base64.b64decode(self.file).decode(self.encoding or 'utf-8', errors='replace')
+        content = self.file.content.decode(self.encoding or 'utf-8', errors='replace')
         if self.file_format == 'csv':
             rows = self._parse_csv(content)
         else:

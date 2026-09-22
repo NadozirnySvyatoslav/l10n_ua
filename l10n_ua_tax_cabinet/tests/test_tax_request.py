@@ -8,7 +8,6 @@
   _dps_on_submitted фіксує стан і квитанцію.
 """
 
-import base64
 import os
 from datetime import date
 
@@ -57,16 +56,15 @@ class TestTaxRequest(TransactionCase):
         self.assertEqual(req.state, 'generated')
         self.assertTrue(req.xml_file)
         self.assertTrue(req.xml_filename.startswith('J13002'))
-        xml = base64.b64decode(req.xml_file)
+        xml = req.xml_file.content
         schema = etree.XMLSchema(etree.parse(SCHEMA_PATH))
         doc = etree.fromstring(xml)  # байти вже windows-1251 з декларацією
         self.assertTrue(schema.validate(doc),
                         'XSD-невалідний XML: %s' % schema.error_log)
 
     def test_missing_company_data_raises(self):
-        # Прибрати всі джерела ЄДРПОУ (edrpou + company_registry + vat).
-        self.company.write({
-            'edrpou': False, 'company_registry': False, 'vat': False})
+        # Прибрати всі джерела ЄДРПОУ (edrpou + vat).
+        self.company.write({'edrpou': False, 'vat': False})
         req = self._request()
         with self.assertRaises(UserError):
             req.action_generate_xml()

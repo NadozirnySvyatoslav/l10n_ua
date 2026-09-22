@@ -26,11 +26,11 @@ class EhealthClient(models.AbstractModel):
         """Read eHealth API credentials from ir.config_parameter."""
         ICP = self.env['ir.config_parameter'].sudo()
         return {
-            'base_url': ICP.get_param('l10n_ua_medecin_ehealth.base_url', '').rstrip('/'),
-            'client_id': ICP.get_param('l10n_ua_medecin_ehealth.client_id', ''),
-            'client_secret': ICP.get_param('l10n_ua_medecin_ehealth.client_secret', ''),
-            'dry_run': ICP.get_param('l10n_ua_medecin_ehealth.dry_run', 'True') == 'True',
-            'access_token': ICP.get_param('l10n_ua_medecin_ehealth.access_token', ''),
+            'base_url': ICP.get_str('l10n_ua_medecin_ehealth.base_url', '').rstrip('/'),
+            'client_id': ICP.get_str('l10n_ua_medecin_ehealth.client_id', ''),
+            'client_secret': ICP.get_str('l10n_ua_medecin_ehealth.client_secret', ''),
+            'dry_run': ICP.get_str('l10n_ua_medecin_ehealth.dry_run', 'True') == 'True',
+            'access_token': ICP.get_str('l10n_ua_medecin_ehealth.access_token', ''),
         }
 
     def _check_requests(self):
@@ -66,7 +66,7 @@ class EhealthClient(models.AbstractModel):
         token = (resp.json() or {}).get('access_token')
         if not token:
             raise UserError(_('У відповіді не знайдено access_token.'))
-        self.env['ir.config_parameter'].sudo().set_param(
+        self.env['ir.config_parameter'].sudo().set_str(
             'l10n_ua_medecin_ehealth.access_token', token)
         return token
 

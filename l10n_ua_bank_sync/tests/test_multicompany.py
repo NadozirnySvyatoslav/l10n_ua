@@ -67,4 +67,6 @@ class TestBankSyncMultiCompany(TransactionCase):
             'l10n_ua_bank_sync_job_company_rule',
         ):
             rule = self.env.ref('l10n_ua_bank_sync.%s' % xmlid)
-            self.assertTrue(rule['global'], '%s must be global' % xmlid)
+            self.assertEqual(
+                rule.kind, 'restriction',
+                '%s must be a restriction' % xmlid)

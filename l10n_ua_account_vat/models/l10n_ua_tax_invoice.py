@@ -371,9 +371,9 @@ class L10nUaTaxInvoice(models.Model):
         """Generate filename per Order №729 pattern."""
         self.ensure_one()
         company = self.company_id
-        edrpou = company.company_registry or company.vat or '000000000'
+        edrpou = company.edrpou or company.vat or '000000000'
         # J for legal entity, F for FOP
-        entity = 'J' if company.company_registry else 'F'
+        entity = 'J' if company.edrpou else 'F'
         date_str = (self.date or fields.Date.today()).strftime('%Y%m%d%H%M%S')
         return f'{entity}1201011_{edrpou}_{date_str}_1.xml'
 
@@ -381,7 +381,7 @@ class L10nUaTaxInvoice(models.Model):
         """Build basic XML structure for tax invoice."""
         self.ensure_one()
         company = self.company_id
-        seller_ipn = company.l10n_ua_vat_ipn or company.vat or company.company_registry or ''
+        seller_ipn = company.l10n_ua_vat_ipn or company.vat or company.edrpou or ''
         buyer_ipn = self.partner_ipn or ''
 
         lines_xml = []

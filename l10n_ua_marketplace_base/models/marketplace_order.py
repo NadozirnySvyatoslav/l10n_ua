@@ -767,7 +767,7 @@ class MarketplaceOrderLine(models.Model):
         if product:
             vals['product_id'] = product.id
             if product.uom_id:
-                vals['product_uom'] = product.uom_id.id
+                vals['product_uom_id'] = product.uom_id.id
 
         if self.discount:
             vals['discount'] = self.discount

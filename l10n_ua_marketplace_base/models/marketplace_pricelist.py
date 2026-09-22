@@ -262,7 +262,7 @@ class MarketplacePricelist(models.Model):
             etree.SubElement(offer, 'vendorCode').text = product.default_code
 
         # URL (if website module installed)
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
         etree.SubElement(offer, 'url').text = f"{base_url}/shop/product/{product.id}"
 
         # Price

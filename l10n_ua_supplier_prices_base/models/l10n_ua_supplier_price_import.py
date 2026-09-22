@@ -1,4 +1,3 @@
-import base64
 import json
 import logging
 from datetime import datetime, timedelta
@@ -221,7 +220,7 @@ class L10nUaSupplierPriceImport(models.Model):
         """Парсер JSON: завантажує raw_file, розгортає mapping, створює line_ids."""
         self.ensure_one()
         try:
-            raw_bytes = base64.b64decode(self.raw_file)
+            raw_bytes = self.raw_file.content
             data = json.loads(raw_bytes.decode('utf-8'))
         except (ValueError, UnicodeDecodeError) as e:
             raise UserError(_("Invalid JSON file: %s") % e)

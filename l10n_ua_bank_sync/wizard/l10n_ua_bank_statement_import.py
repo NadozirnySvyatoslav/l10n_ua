@@ -29,7 +29,7 @@ class L10nUaBankStatementImport(models.TransientModel):
         if self.config_id.exchange_type != 'file':
             raise UserError(_('Оберіть конфігурацію з файловим обміном.'))
         import base64
-        content = base64.b64decode(self.statement_file)
+        content = self.statement_file.content
         raw_data = self.config_id._file_to_payload(content, self.file_name)
 
         job = self.env['l10n_ua.bank.sync.job'].create({

@@ -22,7 +22,6 @@ class TestVatDeclaration(TransactionCase):
         cls.company.l10n_ua_is_vat_payer = True
         cls.partner = cls.env['res.partner'].create({
             'name': 'ТОВ Декларація Тест',
-            'company_type': 'company',
         })
         cls.period = cls.env['l10n_ua.tax.period'].search([
             ('company_id', '=', cls.company.id),

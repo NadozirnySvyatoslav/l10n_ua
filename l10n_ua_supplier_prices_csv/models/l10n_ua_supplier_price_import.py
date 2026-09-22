@@ -1,4 +1,3 @@
-import base64
 import csv
 import io
 import logging
@@ -34,7 +33,7 @@ class L10nUaSupplierPriceImport(models.Model):
         skip_rows = int(config.get('skip_rows', 0))
         quotechar = config.get('quotechar', '"')
 
-        raw_bytes = base64.b64decode(self.raw_file)
+        raw_bytes = self.raw_file.content
         text = self._decode_csv_bytes(raw_bytes, encoding)
 
         stream = io.StringIO(text)

@@ -59,7 +59,9 @@ class TestAssetsMultiCompany(TransactionCase):
             'l10n_ua_assets.l10n_ua_mnma_company_rule',
         ):
             rule = self.env.ref(xmlid)
-            self.assertTrue(rule['global'], "%s must be global" % xmlid)
+            self.assertEqual(
+                rule.kind, 'restriction',
+                "%s must be a restriction" % xmlid)
 
     def test_other_company_user_cannot_see_ua_asset(self):
         """A user of the non-UA company must not see the UA company's asset."""

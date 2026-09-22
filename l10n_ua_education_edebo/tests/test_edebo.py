@@ -91,7 +91,7 @@ class TestEdebo(TransactionCase):
         wizard.action_export()
         self.assertTrue(wizard.file)
         self.assertIn('edebo_export', wizard.filename)
-        content = base64.b64decode(wizard.file).decode('utf-8')
+        content = wizard.file.content.decode('utf-8')
         self.assertIn('EXP-001', content)
         # Name is split into last_name / first_name columns by the wizard
         self.assertIn('EXP', content)

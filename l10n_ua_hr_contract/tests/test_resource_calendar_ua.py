@@ -25,7 +25,6 @@ class TestResourceCalendarUa(ContractTestCase):
         vals = {
             'name': 'Тестовий календар',
             'company_id': self.company.id,
-            'tz': 'Europe/Kiev',
         }
         vals.update(kwargs)
         return self.env['resource.calendar'].create(vals)

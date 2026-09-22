@@ -43,7 +43,7 @@ class TestBankPayment(TransactionCase):
         pay.action_generate_file()
         self.assertEqual(pay.state, 'generated')
         self.assertTrue(pay.file_name.endswith('.xml'))
-        root = etree.fromstring(base64.b64decode(pay.file_data))
+        root = etree.fromstring(pay.file_data.content)
         self.assertEqual(root.tag, 'PaymentOrder')
         self.assertEqual(root.get('count'), '1')
         p = root.find('Payment')

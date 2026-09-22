@@ -1140,7 +1140,7 @@ class HrEmployee(models.Model):
 
     @api.constrains('rnokpp')
     def _check_rnokpp(self):
-        validate_rnokpp = self.env['ir.config_parameter'].sudo().get_param(
+        validate_rnokpp = self.env['ir.config_parameter'].sudo().get_str(
             'hr_ua.validate_rnokpp', 'True')
         if validate_rnokpp.lower() == 'true':
             for employee in self:

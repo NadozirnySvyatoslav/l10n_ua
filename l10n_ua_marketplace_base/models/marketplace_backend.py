@@ -314,7 +314,7 @@ class MarketplaceBackend(models.Model):
         return super().create(vals_list)
 
     def _compute_feed_url(self):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
         for backend in self:
             if backend.id and backend.feed_enabled:
                 backend.feed_url = f'{base_url}/marketplace/feed/{backend.id}'
@@ -322,7 +322,7 @@ class MarketplaceBackend(models.Model):
                 backend.feed_url = False
 
     def _compute_webhook_url(self):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        base_url = self.env['ir.config_parameter'].sudo().get_str('web.base.url')
         for backend in self:
             if backend.id and backend.webhook_enabled:
                 backend.webhook_url = f'{base_url}/marketplace/webhook/{backend.id}'

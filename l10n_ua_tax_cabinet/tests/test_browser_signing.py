@@ -131,7 +131,7 @@ class TestCabinetBrowserSigning(TransactionCase):
         signing.kep_submit_signed({'doc': 'UDdTLVNJR05BVFVSRQ=='})
         self.assertEqual(doc.state, 'signed')
         self.assertEqual(doc.file_signed_name, 'F0103309.p7s')
-        self.assertEqual(base64.b64decode(doc.file_signed), b'P7S-SIGNATURE')
+        self.assertEqual(doc.file_signed.content, b'P7S-SIGNATURE')
 
     def test_submit_mode_relays_envelope_and_auth(self):
         doc = self._document()

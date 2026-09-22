@@ -31,7 +31,7 @@
                             <div class="small">(найменування підприємства (організації))</div>
                             <div class="company-code">
                                 Ідентифікаційний код ЄДРПОУ:
-                                <span t-field="wizard.company_id.company_registry"/>
+                                <span t-field="wizard.company_id.edrpou"/>
                             </div>
                         </div>
 

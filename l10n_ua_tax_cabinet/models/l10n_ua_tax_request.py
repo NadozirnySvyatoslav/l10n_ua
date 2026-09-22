@@ -72,8 +72,8 @@ class L10nUaTaxRequest(models.Model):
 
     @staticmethod
     def _request_edrpou(company):
-        """Код ЄДРПОУ компанії; `company_registry`/`vat` — запасні джерела."""
-        return company.edrpou or company.company_registry or company.vat or ''
+        """Код ЄДРПОУ компанії; `vat` — запасне джерело."""
+        return company.edrpou or company.vat or ''
 
     def _request_vals(self):
         """Зібрати реквізити запиту (компанія + період). Відсутні обов'язкові —
