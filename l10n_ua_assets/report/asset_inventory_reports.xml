@@ -42,7 +42,7 @@
                         </div>
 
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            № <strong t-esc="o.name"/>
+                            № <strong t-out="o.name"/>
                             від
                             <span t-field="o.date" t-options='{"widget": "date"}'/>
                         </div>
@@ -54,13 +54,13 @@
                                     <span t-field="o.order_date" t-options='{"widget": "date"}'/>
                                 </t>
                                 <t t-else="">«___» ___________ 20__ р.</t>
-                                №&#160;<span t-esc="o.order_number or '_____'"/>
+                                №&#160;<span t-out="o.order_number or '_____'"/>
                                 комісія у складі:
                             </p>
                             <p>
                                 голова комісії —
                                 <strong>
-                                    <span t-esc="o.commission_chair_id.name or '________________________'"/>
+                                    <span t-out="o.commission_chair_id.name or '________________________'"/>
                                 </strong>,
                                 члени комісії — ________________________, ________________________
                             </p>
@@ -87,36 +87,36 @@
                                 <t t-set="non_surplus_lines" t-value="o.line_ids.filtered(lambda l: not l.is_surplus)"/>
                                 <t t-foreach="non_surplus_lines" t-as="line">
                                     <tr>
-                                        <td class="text-center"><span t-esc="line_index + 1"/></td>
-                                        <td><span t-esc="line.asset_id.name"/></td>
+                                        <td class="text-center"><span t-out="line_index + 1"/></td>
+                                        <td><span t-out="line.asset_id.name"/></td>
                                         <td class="text-center"
-                                            t-esc="line.asset_id.inventory_number or '—'"/>
+                                            t-out="line.asset_id.inventory_number or '—'"/>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % line.original_value"/>
+                                            <span t-out="'%.2f' % line.original_value"/>
                                         </td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % line.accumulated_depreciation"/>
+                                            <span t-out="'%.2f' % line.accumulated_depreciation"/>
                                         </td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % line.book_value"/>
+                                            <span t-out="'%.2f' % line.book_value"/>
                                         </td>
                                         <td class="text-center">
                                             <strong t-if="line.found">так</strong>
                                             <strong t-else="" style="color: #b22222;">нестача</strong>
                                         </td>
-                                        <td><span t-esc="line.condition_note or ''"/></td>
+                                        <td><span t-out="line.condition_note or ''"/></td>
                                     </tr>
                                 </t>
                                 <tr style="font-weight: bold;">
                                     <td colspan="3" class="text-right">Разом:</td>
                                     <td class="text-right">
-                                        <span t-esc="'%.2f' % sum(non_surplus_lines.mapped('original_value'))"/>
+                                        <span t-out="'%.2f' % sum(non_surplus_lines.mapped('original_value'))"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="'%.2f' % sum(non_surplus_lines.mapped('accumulated_depreciation'))"/>
+                                        <span t-out="'%.2f' % sum(non_surplus_lines.mapped('accumulated_depreciation'))"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-esc="'%.2f' % sum(non_surplus_lines.mapped('book_value'))"/>
+                                        <span t-out="'%.2f' % sum(non_surplus_lines.mapped('book_value'))"/>
                                     </td>
                                     <td colspan="2"></td>
                                 </tr>
@@ -125,10 +125,10 @@
 
                         <div style="margin: 20px 0; font-size: 10pt;">
                             <p>
-                                Усього найменувань: <strong t-esc="o.line_count"/>
-                                (з них знайдено: <strong t-esc="o.matched_count"/>,
-                                нестачі: <strong t-esc="o.shortage_count"/>,
-                                лишків зафіксовано: <strong t-esc="o.surplus_count"/>).
+                                Усього найменувань: <strong t-out="o.line_count"/>
+                                (з них знайдено: <strong t-out="o.matched_count"/>,
+                                нестачі: <strong t-out="o.shortage_count"/>,
+                                лишків зафіксовано: <strong t-out="o.surplus_count"/>).
                             </p>
                         </div>
 
@@ -139,7 +139,7 @@
                                     <td style="width: 30%; border-bottom: 1px solid black;"></td>
                                     <td style="width: 5%;"></td>
                                     <td style="width: 30%; border-bottom: 1px solid black;">
-                                        <span t-esc="o.commission_chair_id.name or ''"/>
+                                        <span t-out="o.commission_chair_id.name or ''"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -236,7 +236,7 @@
                         </div>
 
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            до інвентаризації № <strong t-esc="o.name"/>
+                            до інвентаризації № <strong t-out="o.name"/>
                             від
                             <span t-field="o.date" t-options='{"widget": "date"}'/>
                         </div>
@@ -260,34 +260,34 @@
                                 <tbody>
                                     <t t-foreach="shortage_lines" t-as="line">
                                         <tr>
-                                            <td class="text-center"><span t-esc="line_index + 1"/></td>
-                                            <td><span t-esc="line.asset_id.name"/></td>
+                                            <td class="text-center"><span t-out="line_index + 1"/></td>
+                                            <td><span t-out="line.asset_id.name"/></td>
                                             <td class="text-center"
-                                                t-esc="line.asset_id.inventory_number or '—'"/>
+                                                t-out="line.asset_id.inventory_number or '—'"/>
                                             <td class="text-right">
-                                                <span t-esc="'%.2f' % line.original_value"/>
+                                                <span t-out="'%.2f' % line.original_value"/>
                                             </td>
                                             <td class="text-right">
-                                                <span t-esc="'%.2f' % line.accumulated_depreciation"/>
+                                                <span t-out="'%.2f' % line.accumulated_depreciation"/>
                                             </td>
                                             <td class="text-right">
-                                                <strong t-esc="'%.2f' % line.book_value"/>
+                                                <strong t-out="'%.2f' % line.book_value"/>
                                             </td>
                                             <td>
-                                                <span t-esc="line.asset_id.responsible_id.name or '—'"/>
+                                                <span t-out="line.asset_id.responsible_id.name or '—'"/>
                                             </td>
                                         </tr>
                                     </t>
                                     <tr style="font-weight: bold;">
                                         <td colspan="3" class="text-right">Разом нестач:</td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % sum(shortage_lines.mapped('original_value'))"/>
+                                            <span t-out="'%.2f' % sum(shortage_lines.mapped('original_value'))"/>
                                         </td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % sum(shortage_lines.mapped('accumulated_depreciation'))"/>
+                                            <span t-out="'%.2f' % sum(shortage_lines.mapped('accumulated_depreciation'))"/>
                                         </td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % sum(shortage_lines.mapped('book_value'))"/>
+                                            <span t-out="'%.2f' % sum(shortage_lines.mapped('book_value'))"/>
                                         </td>
                                         <td></td>
                                     </tr>
@@ -311,20 +311,20 @@
                                 <tbody>
                                     <t t-foreach="surplus_lines" t-as="line">
                                         <tr>
-                                            <td class="text-center"><span t-esc="line_index + 1"/></td>
-                                            <td><span t-esc="line.surplus_name or '—'"/></td>
+                                            <td class="text-center"><span t-out="line_index + 1"/></td>
+                                            <td><span t-out="line.surplus_name or '—'"/></td>
                                             <td class="text-right">
-                                                <strong t-esc="'%.2f' % line.surplus_value"/>
+                                                <strong t-out="'%.2f' % line.surplus_value"/>
                                             </td>
                                             <td>
-                                                <span t-esc="line.created_asset_id.display_name or '—'"/>
+                                                <span t-out="line.created_asset_id.display_name or '—'"/>
                                             </td>
                                         </tr>
                                     </t>
                                     <tr style="font-weight: bold;">
                                         <td colspan="2" class="text-right">Разом лишків:</td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % sum(surplus_lines.mapped('surplus_value'))"/>
+                                            <span t-out="'%.2f' % sum(surplus_lines.mapped('surplus_value'))"/>
                                         </td>
                                         <td></td>
                                     </tr>
@@ -345,13 +345,13 @@
                                 <tr>
                                     <td>Сума нестач (залишкова вартість):</td>
                                     <td class="text-right">
-                                        <strong t-esc="'%.2f грн.' % o.shortage_amount"/>
+                                        <strong t-out="'%.2f грн.' % o.shortage_amount"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Сума лишків (справедлива вартість):</td>
                                     <td class="text-right">
-                                        <strong t-esc="'%.2f грн.' % o.surplus_amount"/>
+                                        <strong t-out="'%.2f грн.' % o.surplus_amount"/>
                                     </td>
                                 </tr>
                             </table>
@@ -364,7 +364,7 @@
                                     <td style="width: 30%; border-bottom: 1px solid black;"></td>
                                     <td style="width: 5%;"></td>
                                     <td style="width: 30%; border-bottom: 1px solid black;">
-                                        <span t-esc="o.commission_chair_id.name or ''"/>
+                                        <span t-out="o.commission_chair_id.name or ''"/>
                                     </td>
                                 </tr>
                                 <tr>

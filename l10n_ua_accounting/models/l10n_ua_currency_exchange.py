@@ -143,7 +143,7 @@ class L10nUaCurrencyExchange(models.Model):
         for rec in self:
             if rec.foreign_currency_id and rec.date:
                 # Курс = вартість 1 одиниці валюти в грн на дату.
-                rate = rec.foreign_currency_id._convert(
+                rate = rec.foreign_currency_id._l10n_ua_convert(
                     1.0, rec.company_id.currency_id, rec.company_id, rec.date)
                 if rate:
                     rec.nbu_rate = rate

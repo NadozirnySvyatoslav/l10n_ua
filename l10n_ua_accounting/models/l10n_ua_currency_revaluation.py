@@ -102,7 +102,7 @@ class L10nUaCurrencyRevaluation(models.Model):
             if not fc_balance and not book_balance:
                 continue
             # Переоцінена вартість = валютний залишок за курсом на дату.
-            revalued = currency._convert(
+            revalued = currency._l10n_ua_convert(
                 fc_balance, company_currency, company, self.date)
             fx_diff = revalued - book_balance
             if company_currency.is_zero(fx_diff):

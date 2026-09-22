@@ -27,10 +27,10 @@
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <strong t-esc="company.name"/>
+                    <strong t-out="company.name"/>
                     <h3 style="margin: 10px 0;">СПИСОК ПРАЦІВНИКІВ</h3>
                     <p style="font-size: 10pt;">
-                        станом на <span t-esc="report_doc.date.strftime('%d.%m.%Y')"/>
+                        станом на <span t-out="report_doc.date.strftime('%d.%m.%Y')"/>
                     </p>
                 </div>
 
@@ -53,31 +53,31 @@
                             <t t-set="row_num" t-value="row_num + 1"/>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="row_num"/>
+                                    <t t-out="row_num"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="employee.name"/>
+                                    <t t-out="employee.name"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="employee.department_id.name or ''"/>
+                                    <t t-out="employee.department_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="employee.job_id.name or ''"/>
+                                    <t t-out="employee.job_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
                                     <t t-set="hire_dt" t-value="employee.hire_date"/>
                                     <t t-if="hire_dt">
-                                        <t t-esc="hire_dt.strftime('%d.%m.%Y')"/>
+                                        <t t-out="hire_dt.strftime('%d.%m.%Y')"/>
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="employee.rnokpp or ''"/>
+                                    <t t-out="employee.rnokpp or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="employee.mobile_phone or employee.work_phone or ''"/>
+                                    <t t-out="employee.mobile_phone or employee.work_phone or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; font-size: 8pt;">
-                                    <t t-esc="employee.work_email or ''"/>
+                                    <t t-out="employee.work_email or ''"/>
                                 </td>
                             </tr>
                         </t>
@@ -85,7 +85,7 @@
                 </table>
 
                 <div style="margin-top: 20px; font-size: 10pt;">
-                    <p>Всього працівників: <strong><t t-esc="len(employees)"/></strong></p>
+                    <p>Всього працівників: <strong><t t-out="len(employees)"/></strong></p>
                 </div>
 
                 <div style="margin-top: 30px;">

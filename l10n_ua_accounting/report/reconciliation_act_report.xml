@@ -67,22 +67,22 @@
                         <table class="mb-4" style="width: 50%;">
                             <tr>
                                 <td class="bold">Сальдо на початок періоду:</td>
-                                <td class="text-right money" t-esc="'%.2f' % data['opening_balance']"/>
+                                <td class="text-right money" t-out="'%.2f' % data['opening_balance']"/>
                                 <td>грн.</td>
                             </tr>
                             <tr>
                                 <td class="bold">Обороти (дебет):</td>
-                                <td class="text-right money" t-esc="'%.2f' % data['total_debit']"/>
+                                <td class="text-right money" t-out="'%.2f' % data['total_debit']"/>
                                 <td>грн.</td>
                             </tr>
                             <tr>
                                 <td class="bold">Обороти (кредит):</td>
-                                <td class="text-right money" t-esc="'%.2f' % data['total_credit']"/>
+                                <td class="text-right money" t-out="'%.2f' % data['total_credit']"/>
                                 <td>грн.</td>
                             </tr>
                             <tr style="border-top: 2px solid black;">
                                 <td class="bold">Сальдо на кінець періоду:</td>
-                                <td class="text-right money bold" t-esc="'%.2f' % data['closing_balance']"/>
+                                <td class="text-right money bold" t-out="'%.2f' % data['closing_balance']"/>
                                 <td>грн.</td>
                             </tr>
                         </table>
@@ -109,35 +109,35 @@
                                         <td class="italic">Сальдо на початок</td>
                                         <td></td>
                                         <td></td>
-                                        <td class="text-right money" t-esc="'%.2f' % data['opening_balance']"/>
+                                        <td class="text-right money" t-out="'%.2f' % data['opening_balance']"/>
                                     </tr>
 
                                     <!-- Transactions -->
                                     <t t-foreach="data['lines']" t-as="line">
                                         <tr>
-                                            <td class="text-center" t-esc="line['date']"/>
-                                            <td t-esc="line['ref']"/>
-                                            <td t-esc="line['name']"/>
+                                            <td class="text-center" t-out="line['date']"/>
+                                            <td t-out="line['ref']"/>
+                                            <td t-out="line['name']"/>
                                             <td class="text-right money">
                                                 <t t-if="line['debit']">
-                                                    <t t-esc="'%.2f' % line['debit']"/>
+                                                    <t t-out="'%.2f' % line['debit']"/>
                                                 </t>
                                             </td>
                                             <td class="text-right money">
                                                 <t t-if="line['credit']">
-                                                    <t t-esc="'%.2f' % line['credit']"/>
+                                                    <t t-out="'%.2f' % line['credit']"/>
                                                 </t>
                                             </td>
-                                            <td class="text-right money" t-esc="'%.2f' % line['balance']"/>
+                                            <td class="text-right money" t-out="'%.2f' % line['balance']"/>
                                         </tr>
                                     </t>
 
                                     <!-- Totals -->
                                     <tr style="border-top: 2px solid black;">
                                         <td colspan="3" class="text-right bold">Разом:</td>
-                                        <td class="text-right money bold" t-esc="'%.2f' % data['total_debit']"/>
-                                        <td class="text-right money bold" t-esc="'%.2f' % data['total_credit']"/>
-                                        <td class="text-right money bold" t-esc="'%.2f' % data['closing_balance']"/>
+                                        <td class="text-right money bold" t-out="'%.2f' % data['total_debit']"/>
+                                        <td class="text-right money bold" t-out="'%.2f' % data['total_credit']"/>
+                                        <td class="text-right money bold" t-out="'%.2f' % data['closing_balance']"/>
                                     </tr>
                                 </tbody>
                             </table>
@@ -149,13 +149,13 @@
                                 <span class="bold">Заборгованість на користь </span>
                                 <span t-field="wizard.company_id.name"/>
                                 <span> становить </span>
-                                <span class="bold" t-esc="'%.2f' % data['closing_balance']"/> грн.
+                                <span class="bold" t-out="'%.2f' % data['closing_balance']"/> грн.
                             </t>
                             <t t-elif="data['closing_balance'] &lt; 0">
                                 <span class="bold">Заборгованість на користь </span>
                                 <span t-field="wizard.partner_id.name"/>
                                 <span> становить </span>
-                                <span class="bold" t-esc="'%.2f' % abs(data['closing_balance'])"/> грн.
+                                <span class="bold" t-out="'%.2f' % abs(data['closing_balance'])"/> грн.
                             </t>
                             <t t-else="">
                                 <span class="bold">Взаємні зобов'язання сторін відсутні.</span>

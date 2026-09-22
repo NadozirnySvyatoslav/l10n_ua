@@ -40,7 +40,7 @@
 
                         <!-- Number and date -->
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            № <strong t-esc="o.name"/>
+                            № <strong t-out="o.name"/>
                             від
                             <span t-field="o.date" t-options='{"widget": "date"}'/>
                         </div>
@@ -58,7 +58,7 @@
                             </p>
                             <t t-if="o.document_reference">
                                 <p>
-                                    Документ-підстава: <strong t-esc="o.document_reference"/>.
+                                    Документ-підстава: <strong t-out="o.document_reference"/>.
                                 </p>
                             </t>
                         </div>
@@ -79,25 +79,25 @@
                             <tbody>
                                 <t t-foreach="o.line_ids" t-as="line">
                                     <tr>
-                                        <td class="text-center"><span t-esc="line_index + 1"/></td>
-                                        <td><span t-esc="line.asset_id.name"/></td>
-                                        <td class="text-center" t-esc="line.asset_id.inventory_number or '—'"/>
-                                        <td><span t-esc="line.work_description or '—'"/></td>
+                                        <td class="text-center"><span t-out="line_index + 1"/></td>
+                                        <td><span t-out="line.asset_id.name"/></td>
+                                        <td class="text-center" t-out="line.asset_id.inventory_number or '—'"/>
+                                        <td><span t-out="line.work_description or '—'"/></td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % line.original_value_before"/>
+                                            <span t-out="'%.2f' % line.original_value_before"/>
                                         </td>
                                         <td class="text-right">
-                                            <strong t-esc="'%.2f' % line.amount"/>
+                                            <strong t-out="'%.2f' % line.amount"/>
                                         </td>
                                         <td class="text-right">
-                                            <span t-esc="'%.2f' % line.original_value_after"/>
+                                            <span t-out="'%.2f' % line.original_value_after"/>
                                         </td>
                                     </tr>
                                 </t>
                                 <tr style="font-weight: bold;">
                                     <td colspan="5" class="text-right">Разом:</td>
                                     <td class="text-right">
-                                        <span t-esc="'%.2f' % o.total_amount"/>
+                                        <span t-out="'%.2f' % o.total_amount"/>
                                     </td>
                                     <td></td>
                                 </tr>
@@ -107,7 +107,7 @@
                         <t t-if="o.description">
                             <div style="margin: 15px 0;">
                                 <strong>Опис робіт:</strong>
-                                <p t-esc="o.description"/>
+                                <p t-out="o.description"/>
                             </div>
                         </t>
 
@@ -125,10 +125,10 @@
                                     </tr>
                                     <t t-foreach="o.line_ids.filtered(lambda l: l.useful_life_extension)" t-as="line">
                                         <tr>
-                                            <td><span t-esc="line.asset_id.name"/></td>
-                                            <td class="text-right"><span t-esc="line.useful_life_before"/></td>
-                                            <td class="text-right"><strong t-esc="line.useful_life_extension"/></td>
-                                            <td class="text-right"><span t-esc="line.useful_life_after"/></td>
+                                            <td><span t-out="line.asset_id.name"/></td>
+                                            <td class="text-right"><span t-out="line.useful_life_before"/></td>
+                                            <td class="text-right"><strong t-out="line.useful_life_extension"/></td>
+                                            <td class="text-right"><span t-out="line.useful_life_after"/></td>
                                         </tr>
                                     </t>
                                 </table>

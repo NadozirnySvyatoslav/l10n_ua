@@ -57,7 +57,7 @@
 
                         <!-- Act number and date -->
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            № <strong t-esc="o.writeoff_act_number or '___'"/>
+                            № <strong t-out="o.writeoff_act_number or '___'"/>
                             від
                             <t t-if="o.writeoff_date">
                                 <span t-field="o.writeoff_date" t-options='{"widget": "date"}'/>
@@ -80,17 +80,17 @@
                             <tr>
                                 <td class="text-center">1</td>
                                 <td><strong t-field="o.name"/></td>
-                                <td class="text-center" t-esc="o.inventory_number or '—'"/>
-                                <td class="text-center" t-esc="o.group_id.code if o.group_id else '—'"/>
+                                <td class="text-center" t-out="o.inventory_number or '—'"/>
+                                <td class="text-center" t-out="o.group_id.code if o.group_id else '—'"/>
                                 <td class="text-center">
                                     <t t-if="o.commission_date">
                                         <span t-field="o.commission_date" t-options='{"widget": "date"}'/>
                                     </t>
                                     <t t-else="">—</t>
                                 </td>
-                                <td class="text-right"><span t-esc="'%.2f' % o.original_value"/></td>
-                                <td class="text-right"><span t-esc="'%.2f' % o.accumulated_depreciation"/></td>
-                                <td class="text-right"><span t-esc="'%.2f' % o.book_value"/></td>
+                                <td class="text-right"><span t-out="'%.2f' % o.original_value"/></td>
+                                <td class="text-right"><span t-out="'%.2f' % o.accumulated_depreciation"/></td>
+                                <td class="text-right"><span t-out="'%.2f' % o.book_value"/></td>
                             </tr>
                         </table>
 
@@ -98,7 +98,7 @@
                         <div class="mb-3">
                             <div class="bold" style="margin-bottom: 5px;">Причина списання:</div>
                             <div style="border-bottom: 1px solid black; min-height: 40px; padding: 3px;">
-                                <span t-esc="o.writeoff_reason or ''"/>
+                                <span t-out="o.writeoff_reason or ''"/>
                             </div>
                         </div>
 
@@ -106,15 +106,15 @@
                         <table class="no-border-all mb-3" style="width: 100%;">
                             <tr>
                                 <td style="width: 40%;">Метод амортизації:</td>
-                                <td><span t-esc="o._get_depreciation_method_name()"/></td>
+                                <td><span t-out="o._get_depreciation_method_name()"/></td>
                             </tr>
                             <tr>
                                 <td>Строк корисного використання:</td>
-                                <td><span t-esc="o.useful_life"/> міс.</td>
+                                <td><span t-out="o.useful_life"/> міс.</td>
                             </tr>
                             <tr>
                                 <td>Ліквідаційна вартість:</td>
-                                <td><span t-esc="'%.2f' % o.salvage_value"/> грн.</td>
+                                <td><span t-out="'%.2f' % o.salvage_value"/> грн.</td>
                             </tr>
                         </table>
 

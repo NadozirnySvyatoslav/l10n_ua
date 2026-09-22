@@ -31,7 +31,7 @@
                         </div>
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
                             № <span t-field="o.name"/>
-                            від <span t-esc="o._get_ua_date_formatted()"/> року
+                            від <span t-out="o._get_ua_date_formatted()"/> року
                         </div>
 
                         <!-- Parties -->
@@ -53,7 +53,7 @@
                                         <br/>Адреса: <span t-field="comp_partner.l10n_ua_legal_address"/>
                                     </t>
                                     <t t-elif="comp_partner.contact_address">
-                                        <br/>Адреса: <span t-esc="comp_partner.contact_address"/>
+                                        <br/>Адреса: <span t-out="comp_partner.contact_address"/>
                                     </t>
                                 </td>
                             </tr>
@@ -74,7 +74,7 @@
                                         <br/>Адреса: <span t-field="partner.l10n_ua_legal_address"/>
                                     </t>
                                     <t t-elif="partner.contact_address">
-                                        <br/>Адреса: <span t-esc="partner.contact_address"/>
+                                        <br/>Адреса: <span t-out="partner.contact_address"/>
                                     </t>
                                 </td>
                             </tr>
@@ -105,23 +105,23 @@
                                 <t t-foreach="lines" t-as="line">
                                     <t t-set="row_num" t-value="row_num + 1"/>
                                     <tr>
-                                        <td class="text-center" t-esc="row_num"/>
+                                        <td class="text-center" t-out="row_num"/>
                                         <td><span t-field="line.name"/></td>
-                                        <td class="text-center" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.quantity"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_unit"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_subtotal"/>
+                                        <td class="text-center" t-out="line.product_uom_id.name if line.product_uom_id else '-'"/>
+                                        <td class="text-right" t-out="'%.2f' % line.quantity"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_unit"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_subtotal"/>
                                     </tr>
                                 </t>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td colspan="5" class="text-right bold" style="border: none !important;">Разом без ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_untaxed"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_untaxed"/>
                                 </tr>
                                 <tr t-if="o.amount_tax">
                                     <td colspan="5" class="text-right bold" style="border: none !important;">ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_tax"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_tax"/>
                                 </tr>
                                 <tr t-if="not o.amount_tax">
                                     <td colspan="5" class="text-right" style="border: none !important;">ПДВ не нараховується</td>
@@ -129,7 +129,7 @@
                                 </tr>
                                 <tr>
                                     <td colspan="5" class="text-right bold" style="border: none !important;">Всього:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_total"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_total"/>
                                 </tr>
                             </tfoot>
                         </table>
@@ -137,11 +137,11 @@
                         <!-- Summary -->
                         <div style="margin-bottom: 10px;">
                             <p>
-                                Всього найменувань <strong t-esc="len(lines)"/>, на суму:
-                                <strong t-esc="'%.2f' % o.amount_total"/> грн.
+                                Всього найменувань <strong t-out="len(lines)"/>, на суму:
+                                <strong t-out="'%.2f' % o.amount_total"/> грн.
                             </p>
                             <t t-if="o.l10n_ua_amount_words">
-                                <p><strong t-esc="o.l10n_ua_amount_words.capitalize()"/></p>
+                                <p><strong t-out="o.l10n_ua_amount_words.capitalize()"/></p>
                             </t>
                         </div>
 

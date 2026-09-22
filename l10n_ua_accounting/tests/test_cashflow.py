@@ -42,7 +42,13 @@ class TestCashflowReport(AccountingTestCase):
         ], limit=1)
         if account:
             return account
-        return cls.env['account.account'].create({
+        # chart_template_load: в Odoo 20 кожен створений рахунок типу
+        # asset_cash тягне за собою власний банківський журнал, а два
+        # журнали однієї компанії стикаються поштовим аліасом. Це рядки
+        # плану рахунків, не нові рахунки в банку, тож користуємось тим
+        # самим винятком, що й завантаження плану.
+        return cls.env['account.account'].with_context(
+            chart_template_load=True).create({
             'code': code,
             'name': name,
             'account_type': account_type,

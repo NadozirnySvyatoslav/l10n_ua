@@ -29,17 +29,17 @@
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 10px;">
-                    <strong t-esc="timesheet.company_id.name"/>
+                    <strong t-out="timesheet.company_id.name"/>
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 15px;">
                     <h3 style="margin: 5px 0;">ТАБЕЛЬ ОБЛІКУ РОБОЧОГО ЧАСУ</h3>
                     <p style="margin: 0;">
-                        за <span t-esc="dict(timesheet._fields['month'].selection).get(timesheet.month)"/> 
-                        <span t-esc="timesheet.year"/> року
+                        за <span t-out="dict(timesheet._fields['month'].selection).get(timesheet.month)"/> 
+                        <span t-out="timesheet.year"/> року
                     </p>
                     <t t-if="timesheet.department_id">
-                        <p style="margin: 0;">Підрозділ: <span t-esc="timesheet.department_id.name"/></p>
+                        <p style="margin: 0;">Підрозділ: <span t-out="timesheet.department_id.name"/></p>
                     </t>
                 </div>
                 
@@ -56,7 +56,7 @@
                         <tr style="background-color: #f0f0f0;">
                             <t t-foreach="range(1, 32)" t-as="day">
                                 <th style="border: 1px solid #000; padding: 2px; width: 20px; font-size: 7pt;">
-                                    <t t-esc="day"/>
+                                    <t t-out="day"/>
                                 </th>
                             </t>
                         </tr>
@@ -67,30 +67,30 @@
                             <t t-set="row_num" t-value="row_num + 1"/>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                    <t t-esc="row_num"/>
+                                    <t t-out="row_num"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 2px; white-space: nowrap;">
-                                    <t t-esc="line.employee_id.name"/>
+                                    <t t-out="line.employee_id.name"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 2px; font-size: 7pt;">
-                                    <t t-esc="line.job_id.name or ''"/>
+                                    <t t-out="line.job_id.name or ''"/>
                                 </td>
                                 <t t-foreach="range(1, 32)" t-as="day">
                                     <t t-set="day_rec" t-value="line.day_ids.filtered(lambda d: d.day_number == day)"/>
                                     <td style="border: 1px solid #000; padding: 1px; text-align: center; font-size: 7pt;">
                                         <t t-if="day_rec">
-                                            <t t-esc="day_rec.code_id.code"/>
+                                            <t t-out="day_rec.code_id.code"/>
                                             <t t-if="day_rec.hours > 0">
-                                                <br/><small><t t-esc="int(day_rec.hours)"/></small>
+                                                <br/><small><t t-out="int(day_rec.hours)"/></small>
                                             </t>
                                         </t>
                                     </td>
                                 </t>
                                 <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                    <t t-esc="line.worked_days"/>
+                                    <t t-out="line.worked_days"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                    <t t-esc="line.worked_hours"/>
+                                    <t t-out="line.worked_hours"/>
                                 </td>
                             </tr>
                         </t>
@@ -101,7 +101,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="width: 50%;">
-                                Відповідальна особа: _____________ / <t t-esc="timesheet.responsible_id.name"/> /
+                                Відповідальна особа: _____________ / <t t-out="timesheet.responsible_id.name"/> /
                             </td>
                             <td style="width: 50%; text-align: right;">
                                 Дата: _______________

@@ -87,7 +87,7 @@ class HrVersion(models.Model):
         # round=False з тієї ж причини, що й у розрахунковому листку:
         # інакше курс стискається до копійки й дає похибку на кожній
         # тисячі окладу.
-        return currency._convert(
+        return currency._l10n_ua_convert(
             wage, company_currency, company, date, round=False)
 
     def _l10n_ua_effective_wage(self, date=None, company=None):

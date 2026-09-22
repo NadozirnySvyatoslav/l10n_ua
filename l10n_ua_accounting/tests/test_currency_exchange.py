@@ -25,7 +25,11 @@ class TestCurrencyExchange(TransactionCase):
             cls.fx_currency = cls.env.ref('base.EUR')
 
         def acc(code, name, atype):
-            return cls.env['account.account'].create({
+            # chart_template_load: див. test_cashflow — інакше кожен
+            # asset_cash родить банківський журнал, і другий падає на
+            # неунікальному поштовому аліасі.
+            return cls.env['account.account'].with_context(
+                chart_template_load=True).create({
                 'code': code, 'name': name, 'account_type': atype,
                 'company_ids': [(4, cls.company.id)]})
         cls.acc_312 = acc('3120X', 'Валютний рахунок', 'asset_cash')

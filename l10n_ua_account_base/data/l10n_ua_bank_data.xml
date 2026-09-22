@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Банки, з якими працюють модулі клієнт-банку та зарплатних
+         проєктів. Повний довідник МФО веде НБУ й регулярно оновлює;
+         тут лише посів, щоб типова установка одразу розгортала IBAN у
+         назву банку. Решту додає користувач або імпорт.
+
+         ЄДРПОУ і SWIFT свідомо не заповнені: їх ставлять у документи
+         як реквізити, тож вигадане значення тут гірше за порожнє. -->
+
+    <record id="bank_privatbank" model="l10n_ua.bank">
+        <field name="name">ПриватБанк</field>
+        <field name="mfo">305299</field>
+    </record>
+
+    <record id="bank_monobank" model="l10n_ua.bank">
+        <field name="name">monobank (Universal Bank)</field>
+        <field name="mfo">322001</field>
+    </record>
+
+    <record id="bank_oschadbank" model="l10n_ua.bank">
+        <field name="name">Ощадбанк</field>
+        <field name="mfo">322669</field>
+    </record>
+
+    <record id="bank_ukrsibbank" model="l10n_ua.bank">
+        <field name="name">УкрСиббанк</field>
+        <field name="mfo">351005</field>
+    </record>
+
+    <record id="bank_raiffeisen" model="l10n_ua.bank">
+        <field name="name">Райффайзен Банк</field>
+        <field name="mfo">380805</field>
+    </record>
+
+    <record id="bank_alfa" model="l10n_ua.bank">
+        <field name="name">Альфа-Банк (Сенс Банк)</field>
+        <field name="mfo">300346</field>
+    </record>
+
+    <record id="bank_pumb" model="l10n_ua.bank">
+        <field name="name">ПУМБ</field>
+        <field name="mfo">334851</field>
+    </record>
+
+    <record id="bank_kredobank" model="l10n_ua.bank">
+        <field name="name">Кредобанк</field>
+        <field name="mfo">325365</field>
+    </record>
+
+    <record id="bank_ukrgasbank" model="l10n_ua.bank">
+        <field name="name">Укргазбанк</field>
+        <field name="mfo">320478</field>
+    </record>
+
+    <record id="bank_vostok" model="l10n_ua.bank">
+        <field name="name">VST Bank (Банк Восток)</field>
+        <field name="mfo">307123</field>
+    </record>
+
+</odoo>

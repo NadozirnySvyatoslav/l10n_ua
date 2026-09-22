@@ -77,8 +77,9 @@ class TestBankPayment(TransactionCase):
         res = pay.kep_submit_signed({'payment': sig})
         self.assertTrue(res['ok'])
         self.assertEqual(pay.state, 'signed')
-        # Підпис збережено (Binary зберігає той самий base64).
-        self.assertEqual(pay.signature_data.decode(), sig)
+        # Підпис збережено: Binary у Odoo 20 віддає сирі байти,
+        # base64 — через to_base64().
+        self.assertEqual(pay.signature_data.to_base64(), sig)
 
     def test_submit_without_signature_raises(self):
         pay = self._payment()

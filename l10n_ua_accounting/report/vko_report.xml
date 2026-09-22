@@ -84,7 +84,7 @@
                         <div class="mb-2">
                             <span class="bold">Сума: </span>
                             <span class="amount-words">
-                                <t t-esc="o.amount"/> грн.
+                                <t t-out="o.amount"/> грн.
                             </span>
                         </div>
 
@@ -117,7 +117,7 @@
                             <div class="mb-2">
                                 <span class="bold">Одержав: </span>
                                 <span class="amount-words">
-                                    <t t-esc="o.amount"/> грн.
+                                    <t t-out="o.amount"/> грн.
                                 </span>
                             </div>
 

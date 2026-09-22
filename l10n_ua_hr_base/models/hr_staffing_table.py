@@ -766,7 +766,7 @@ class HrStaffingTable(models.Model):
 
         # round=False for the reason it is false everywhere else here: a rate
         # squeezed to the kopiyka costs two hryvnia on every thousand.
-        return currency._convert(
+        return currency._l10n_ua_convert(
             salary, company_currency, company, date, round=False)
 
     @api.constrains('units')

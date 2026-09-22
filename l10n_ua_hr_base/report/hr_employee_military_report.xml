@@ -27,10 +27,10 @@
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <strong t-esc="company.name"/>
+                    <strong t-out="company.name"/>
                     <h3 style="margin: 10px 0;">СПИСОК ВІЙСЬКОВОЗОБОВ'ЯЗАНИХ</h3>
                     <p style="font-size: 10pt;">
-                        станом на <span t-esc="report_doc.date.strftime('%d.%m.%Y')"/>
+                        станом на <span t-out="report_doc.date.strftime('%d.%m.%Y')"/>
                     </p>
                 </div>
 
@@ -57,24 +57,24 @@
                             <t t-set="row_num" t-value="row_num + 1"/>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
-                                    <t t-esc="row_num"/>
+                                    <t t-out="row_num"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px;">
-                                    <t t-esc="employee.name"/>
+                                    <t t-out="employee.name"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
                                     <t t-if="employee.birthday">
-                                        <t t-esc="employee.birthday.strftime('%d.%m.%Y')"/>
+                                        <t t-out="employee.birthday.strftime('%d.%m.%Y')"/>
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px;">
-                                    <t t-esc="employee.job_id.name or ''"/>
+                                    <t t-out="employee.job_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px;">
-                                    <t t-esc="employee.military_rank_id.name or ''"/>
+                                    <t t-out="employee.military_rank_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
-                                    <t t-esc="employee.military_specialty or ''"/>
+                                    <t t-out="employee.military_specialty or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
                                     <t t-if="employee.military_register_category == 'conscript'">Призовник</t>
@@ -88,20 +88,20 @@
                                     <t t-if="employee.military_fitness == 'unfit'">Непридатний</t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
-                                    <t t-esc="employee.military_medical_category or ''"/>
+                                    <t t-out="employee.military_medical_category or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
                                     <t t-if="employee.military_mlk_retest_date">
-                                        <t t-esc="employee.military_mlk_retest_date.strftime('%d.%m.%y')"/>
+                                        <t t-out="employee.military_mlk_retest_date.strftime('%d.%m.%y')"/>
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; font-size: 8pt;">
-                                    <t t-esc="employee.military_tcc_id.name or ''"/>
+                                    <t t-out="employee.military_tcc_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 3px; text-align: center;">
                                     <t t-if="employee.military_reservation">
                                         <t t-if="employee.military_reservation_until">
-                                            до <t t-esc="employee.military_reservation_until.strftime('%d.%m.%y')"/>
+                                            до <t t-out="employee.military_reservation_until.strftime('%d.%m.%y')"/>
                                         </t>
                                         <t t-else="">Так</t>
                                     </t>
@@ -112,8 +112,8 @@
                 </table>
 
                 <div style="margin-top: 20px; font-size: 10pt;">
-                    <p>Всього військовозобов'язаних: <strong><t t-esc="report_doc.employee_count"/></strong></p>
-                    <p>З них заброньовано: <strong><t t-esc="report_doc.reserved_count"/></strong></p>
+                    <p>Всього військовозобов'язаних: <strong><t t-out="report_doc.employee_count"/></strong></p>
+                    <p>З них заброньовано: <strong><t t-out="report_doc.reserved_count"/></strong></p>
                 </div>
 
                 <div style="margin-top: 30px;">

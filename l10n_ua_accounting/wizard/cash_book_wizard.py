@@ -78,7 +78,7 @@ class CashBookWizard(models.TransientModel):
             ('journal_id', '=', self.journal_id.id),
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
-            ('state', 'in', ('posted', 'in_process', 'paid', 'reconciled', 'sent')),
+            ('state', 'in', ('paid', 'reconciled')),
         ], order='date, id')
 
         # Group by date
@@ -163,7 +163,7 @@ class CashBookWizard(models.TransientModel):
             ('journal_id', '=', self.journal_id.id),
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
-            ('state', 'in', ('posted', 'in_process', 'paid', 'reconciled', 'sent')),
+            ('state', 'in', ('paid', 'reconciled')),
         ], order='date, id')
 
         lines = []

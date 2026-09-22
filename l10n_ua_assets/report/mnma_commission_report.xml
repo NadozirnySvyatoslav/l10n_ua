@@ -40,7 +40,7 @@
                         </div>
 
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            № <strong t-esc="o.commission_act_number or '___'"/>
+                            № <strong t-out="o.commission_act_number or '___'"/>
                             від
                             <t t-if="o.commission_date">
                                 <span t-field="o.commission_date" t-options='{"widget": "date"}'/>
@@ -61,18 +61,18 @@
                             <tr>
                                 <td class="text-center">1</td>
                                 <td><strong t-field="o.name"/></td>
-                                <td class="text-center" t-esc="o.inventory_number or '—'"/>
-                                <td class="text-right"><span t-esc="'%.2f' % o.original_value"/></td>
+                                <td class="text-center" t-out="o.inventory_number or '—'"/>
+                                <td class="text-right"><span t-out="'%.2f' % o.original_value"/></td>
                                 <td class="text-center">
                                     <t t-if="o.write_off_method == '50_50'">50/50</t>
                                     <t t-else="">100%</t>
                                 </td>
                                 <td class="text-right">
                                     <t t-if="o.write_off_method == '100'">
-                                        <span t-esc="'%.2f' % o.original_value"/>
+                                        <span t-out="'%.2f' % o.original_value"/>
                                     </t>
                                     <t t-else="">
-                                        <span t-esc="'%.2f' % (o.original_value / 2)"/>
+                                        <span t-out="'%.2f' % (o.original_value / 2)"/>
                                     </t>
                                 </td>
                             </tr>
@@ -82,15 +82,15 @@
                         <table class="no-border-all mb-3" style="width: 100%;">
                             <tr>
                                 <td style="width: 30%;">Підрозділ:</td>
-                                <td><span t-esc="o.department_id.name if o.department_id else '________________________'"/></td>
+                                <td><span t-out="o.department_id.name if o.department_id else '________________________'"/></td>
                             </tr>
                             <tr>
                                 <td>Місцезнаходження:</td>
-                                <td><span t-esc="o.location or '________________________'"/></td>
+                                <td><span t-out="o.location or '________________________'"/></td>
                             </tr>
                             <tr>
                                 <td>Відповідальна особа:</td>
-                                <td><span t-esc="o.responsible_id.name if o.responsible_id else '________________________'"/></td>
+                                <td><span t-out="o.responsible_id.name if o.responsible_id else '________________________'"/></td>
                             </tr>
                         </table>
 
@@ -115,7 +115,7 @@
                                     <td style="border-bottom: 1px solid black;"></td>
                                     <td></td>
                                     <td style="border-bottom: 1px solid black;">
-                                        <span t-esc="o.responsible_id.name if o.responsible_id else ''"/>
+                                        <span t-out="o.responsible_id.name if o.responsible_id else ''"/>
                                     </td>
                                 </tr>
                                 <tr>

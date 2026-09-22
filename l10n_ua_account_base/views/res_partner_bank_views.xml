@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_bank_form_ua" model="ir.ui.view">
+        <field name="name">res.partner.bank.form.ua</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <!-- Праворуч від SWIFT: український банк і його МФО. Обидва
+                 читаються з IBAN, банк можна перевизначити вручну. -->
+            <field name="bank_bic" position="after">
+                <field name="l10n_ua_mfo" readonly="1"
+                       invisible="not l10n_ua_mfo"/>
+                <field name="l10n_ua_bank_id"
+                       options="{'no_quick_create': True}"
+                       invisible="not l10n_ua_mfo"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

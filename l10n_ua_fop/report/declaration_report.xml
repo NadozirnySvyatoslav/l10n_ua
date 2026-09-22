@@ -44,26 +44,26 @@
                             <tr>
                                 <td class="no-border" style="width: 30%;">ПІБ підприємця:</td>
                                 <td class="no-border" style="border-bottom: 1px solid black;">
-                                    <t t-esc="comp_partner.name or ''"/>
+                                    <t t-out="comp_partner.name or ''"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="no-border">РНОКПП (ІПН):</td>
                                 <td class="no-border" style="border-bottom: 1px solid black;">
-                                    <t t-esc="comp_partner.vat or comp_partner.edrpou or ''"/>
+                                    <t t-out="comp_partner.vat or comp_partner.edrpou or ''"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="no-border">Група ЄП:</td>
                                 <td class="no-border" style="border-bottom: 1px solid black;">
-                                    <strong t-esc="o.fop_group_id.name"/>
+                                    <strong t-out="o.fop_group_id.name"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="no-border">Звітний період:</td>
                                 <td class="no-border" style="border-bottom: 1px solid black;">
-                                    <strong><t t-esc="period_names.get(o.period, '')"/>
-                                    <t t-esc="o.year"/> року</strong>
+                                    <strong><t t-out="period_names.get(o.period, '')"/>
+                                    <t t-out="o.year"/> року</strong>
                                 </td>
                             </tr>
                         </table>
@@ -85,18 +85,18 @@
                                 <td>Обсяг доходу за звітний період</td>
                                 <td class="text-center">01</td>
                                 <td class="text-right bold">
-                                    <span t-esc="'%.2f' % o.total_income"/>
+                                    <span t-out="'%.2f' % o.total_income"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center">2</td>
                                 <td>
                                     Обсяг доходу, що оподатковується за ставкою
-                                    <span t-esc="'%.0f' % o.tax_rate"/> %
+                                    <span t-out="'%.0f' % o.tax_rate"/> %
                                 </td>
                                 <td class="text-center">02</td>
                                 <td class="text-right">
-                                    <span t-esc="'%.2f' % o.total_income"/>
+                                    <span t-out="'%.2f' % o.total_income"/>
                                 </td>
                             </tr>
                         </table>
@@ -118,15 +118,15 @@
                                 <td>
                                     Сума єдиного податку за ставкою
                                     <t t-if="o.fop_group_id.code in ('1', '2')">
-                                        (фіксована × <t t-esc="o.esv_months"/> міс.)
+                                        (фіксована × <t t-out="o.esv_months"/> міс.)
                                     </t>
                                     <t t-else="">
-                                        <span t-esc="'%.0f' % o.tax_rate"/> %
+                                        <span t-out="'%.0f' % o.tax_rate"/> %
                                     </t>
                                 </td>
                                 <td class="text-center">03</td>
                                 <td class="text-right bold">
-                                    <span t-esc="'%.2f' % o.single_tax"/>
+                                    <span t-out="'%.2f' % o.single_tax"/>
                                 </td>
                             </tr>
                         </table>
@@ -150,7 +150,7 @@
                                 </td>
                                 <td class="text-center">04</td>
                                 <td class="text-right">
-                                    <span t-esc="'%.2f' % o.min_wage"/>
+                                    <span t-out="'%.2f' % o.min_wage"/>
                                 </td>
                             </tr>
                             <tr>
@@ -160,7 +160,7 @@
                                 </td>
                                 <td class="text-center">05</td>
                                 <td class="text-right">
-                                    <span t-esc="o.esv_months"/>
+                                    <span t-out="o.esv_months"/>
                                 </td>
                             </tr>
                             <tr>
@@ -170,18 +170,18 @@
                                 </td>
                                 <td class="text-center">06</td>
                                 <td class="text-right">
-                                    <span t-esc="'%.2f' % o.esv_base"/>
+                                    <span t-out="'%.2f' % o.esv_base"/>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="text-center">7</td>
                                 <td>
                                     Сума ЄСВ (р.06 ×
-                                    <span t-esc="'%.0f' % o.esv_rate"/>%)
+                                    <span t-out="'%.0f' % o.esv_rate"/>%)
                                 </td>
                                 <td class="text-center">07</td>
                                 <td class="text-right bold">
-                                    <span t-esc="'%.2f' % o.esv_amount"/>
+                                    <span t-out="'%.2f' % o.esv_amount"/>
                                 </td>
                             </tr>
                             <tr>
@@ -193,7 +193,7 @@
                                 </td>
                                 <td class="text-center">08</td>
                                 <td class="text-right bold">
-                                    <span t-esc="'%.2f' % o.military_levy"/>
+                                    <span t-out="'%.2f' % o.military_levy"/>
                                 </td>
                             </tr>
                         </table>
@@ -204,7 +204,7 @@
                                 <td style="width: 60%;">Усього до сплати (р.03 + р.07 + р.08):</td>
                                 <td class="text-center" style="width: 20%;"></td>
                                 <td class="text-right" style="width: 20%;">
-                                    <span t-esc="'%.2f' % o.total_payable"/> грн
+                                    <span t-out="'%.2f' % o.total_payable"/> грн
                                 </td>
                             </tr>
                         </table>
@@ -213,7 +213,7 @@
                         <t t-if="o.income_limit_exceeded">
                             <div class="bold" style="color: red; margin: 10px 0;">
                                 УВАГА: Дохід перевищує ліміт
-                                (<span t-esc="'%.2f' % o.income_limit"/> грн)
+                                (<span t-out="'%.2f' % o.income_limit"/> грн)
                                 для обраної групи ЄП!
                             </div>
                         </t>
@@ -226,7 +226,7 @@
                                     <td class="no-border" style="width: 25%; border-bottom: 1px solid black;"></td>
                                     <td class="no-border" style="width: 5%;"></td>
                                     <td class="no-border" style="width: 35%; border-bottom: 1px solid black;">
-                                        <t t-esc="comp_partner.name or ''"/>
+                                        <t t-out="comp_partner.name or ''"/>
                                     </td>
                                 </tr>
                                 <tr>

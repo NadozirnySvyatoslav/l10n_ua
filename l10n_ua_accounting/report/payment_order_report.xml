@@ -58,8 +58,8 @@
                             <tr>
                                 <td class="bold">Банк платника:</td>
                                 <td>
-                                    <t t-if="o.journal_id.bank_account_id and o.journal_id.bank_account_id.bank_id">
-                                        <span t-field="o.journal_id.bank_account_id.bank_id.name"/>
+                                    <t t-if="o.journal_id.bank_account_id.l10n_ua_bank_name">
+                                        <span t-field="o.journal_id.bank_account_id.l10n_ua_bank_name"/>
                                     </t>
                                 </td>
                             </tr>
@@ -95,8 +95,8 @@
                             <tr>
                                 <td class="bold">Банк отримувача:</td>
                                 <td>
-                                    <t t-if="o.partner_bank_id and o.partner_bank_id.bank_id">
-                                        <span t-field="o.partner_bank_id.bank_id.name"/>
+                                    <t t-if="o.partner_bank_id.l10n_ua_bank_name">
+                                        <span t-field="o.partner_bank_id.l10n_ua_bank_name"/>
                                     </t>
                                 </td>
                             </tr>
@@ -114,7 +114,7 @@
                             <tr>
                                 <td class="bold">Сума прописом:</td>
                                 <td>
-                                    <t t-esc="o.amount"/> грн.
+                                    <t t-out="o.amount"/> грн.
                                 </td>
                             </tr>
                         </table>

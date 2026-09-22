@@ -174,7 +174,7 @@ class HrEmployeeTransferWizard(models.TransientModel):
             target_currency = wiz.target_company_id.currency_id
             if amount and source_currency and target_currency \
                     and source_currency != target_currency:
-                amount = source_currency._convert(
+                amount = source_currency._l10n_ua_convert(
                     amount, target_currency, wiz.target_company_id, date,
                     round=False)
             wiz.new_wage = amount

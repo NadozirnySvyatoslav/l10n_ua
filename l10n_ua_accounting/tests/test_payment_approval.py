@@ -87,17 +87,19 @@ class TestPaymentApproval(AccountingTestCase):
         payment.action_approve()
         # Should not raise
         payment.action_post()
-        # Odoo 19 may set state to 'in_process' or 'posted'
-        self.assertIn(payment.state, ('posted', 'in_process'),
-                      'Payment should be posted or in process after action_post')
+        # Odoo 20 replaced the payment states posted/in_process/sent
+        # with paid/reconciled.
+        self.assertIn(payment.state, ('paid', 'reconciled'),
+                      'Payment should be paid or reconciled after action_post')
 
     def test_post_allowed_below_threshold(self):
         """Posting should work without approval when below threshold."""
         payment = self._create_outbound_payment(30000)
         payment.action_post()
-        # Odoo 19 may set state to 'in_process' or 'posted'
-        self.assertIn(payment.state, ('posted', 'in_process'),
-                      'Payment should be posted or in process after action_post')
+        # Odoo 20 replaced the payment states posted/in_process/sent
+        # with paid/reconciled.
+        self.assertIn(payment.state, ('paid', 'reconciled'),
+                      'Payment should be paid or reconciled after action_post')
 
     def test_approval_disabled(self):
         """When approval is disabled, no payments should require approval."""
@@ -106,6 +108,7 @@ class TestPaymentApproval(AccountingTestCase):
         self.assertFalse(payment.ua_approval_required)
         # Should be able to post
         payment.action_post()
-        # Odoo 19 may set state to 'in_process' or 'posted'
-        self.assertIn(payment.state, ('posted', 'in_process'),
-                      'Payment should be posted or in process after action_post')
+        # Odoo 20 replaced the payment states posted/in_process/sent
+        # with paid/reconciled.
+        self.assertIn(payment.state, ('paid', 'reconciled'),
+                      'Payment should be paid or reconciled after action_post')

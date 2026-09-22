@@ -499,6 +499,6 @@ class HrVersion(models.Model):
             # missing rate is already reported where it does block - payroll.
             return wage
         if line.currency_id and line.currency_id != company.currency_id:
-            return company.currency_id._convert(
+            return company.currency_id._l10n_ua_convert(
                 converted, line.currency_id, company, date)
         return converted

@@ -24,7 +24,7 @@
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -35,9 +35,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -45,9 +45,9 @@
     <div style="margin-bottom: 20px;">
         <p>
             <strong>ПРИЙНЯТИ</strong> на роботу
-            з <t t-esc="format_date_ua(order.date_start) if order.date_start else format_date_ua(order.date)"/>
+            з <t t-out="format_date_ua(order.date_start) if order.date_start else format_date_ua(order.date)"/>
             <t t-if="order.is_fixed_term and order.date_end">
-                до <t t-esc="format_date_ua(order.date_end)"/>
+                до <t t-out="format_date_ua(order.date_end)"/>
             </t>
             <t t-else="">
                 (безстроково)
@@ -57,19 +57,19 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Прізвище, ім'я, по батькові:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Табельний номер:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Структурний підрозділ:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="department.name if department else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="department.name if department else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Посада (професія):</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="job.name if job else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Працевлаштування:</td>
@@ -88,7 +88,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -104,7 +104,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -143,7 +143,7 @@
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -154,9 +154,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -167,24 +167,24 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Прізвище, ім'я, по батькові:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Табельний номер:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Структурний підрозділ:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="department.name if department else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="department.name if department else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Посада (професія):</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="job.name if job else '________________________________'"/></td>
             </tr>
         </table>
 
-        <p style="margin: 10px 0;"><strong>Дата звільнення:</strong> <t t-esc="format_date_ua(order.date_dismissal) if order.date_dismissal else format_date_ua(order.date)"/></p>
-        <p style="margin: 10px 0;"><strong>Причина звільнення:</strong> <t t-esc="order.dismissal_reason or (order.termination_reason_id and order.termination_reason_id.full_text) or 'за власним бажанням, ст. 38 КЗпП України'"/></p>
+        <p style="margin: 10px 0;"><strong>Дата звільнення:</strong> <t t-out="format_date_ua(order.date_dismissal) if order.date_dismissal else format_date_ua(order.date)"/></p>
+        <p style="margin: 10px 0;"><strong>Причина звільнення:</strong> <t t-out="order.dismissal_reason or (order.termination_reason_id and order.termination_reason_id.full_text) or 'за власним бажанням, ст. 38 КЗпП України'"/></p>
         <p style="margin: 10px 0;"><strong>Підстава:</strong> заява працівника</p>
         <!-- Rendered once, when the template is loaded, exactly like every
              other value in these templates (employee, dates, job). Re-load
@@ -207,7 +207,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -223,7 +223,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -262,7 +262,7 @@
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -273,9 +273,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -286,11 +286,11 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Прізвище, ім'я, по батькові:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Табельний номер:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
             </tr>
         </table>
 
@@ -298,11 +298,11 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Структурний підрозділ:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="department.name if department else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="department.name if department else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Посада (професія):</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="job.name if job else '________________________________'"/></td>
             </tr>
         </table>
 
@@ -314,7 +314,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -330,7 +330,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -369,7 +369,7 @@
     </div>
 
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -380,9 +380,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -393,24 +393,24 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Прізвище, ім'я, по батькові:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Табельний номер:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Структурний підрозділ:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="department.name if department else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="department.name if department else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Посада (професія):</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="job.name if job else '________________________________'"/></td>
             </tr>
         </table>
 
 	<p style="margin: 15px 0 5px 0;"><strong>Вид відпустки:</strong> 
-    	    <t t-esc="order.holiday_status_id.name if order.holiday_status_id else 'щорічна основна відпустка'"/>
+    	    <t t-out="order.holiday_status_id.name if order.holiday_status_id else 'щорічна основна відпустка'"/>
 	</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
@@ -419,7 +419,7 @@
 		<td style="width: 50%; padding: 5px; border-bottom: 1px solid #000;">
 		    <t t-if="order.leave_id and order.leave_id.calendar_days">
 			<t t-set="vbal" t-value="order.leave_id.vacation_balance_id if 'vacation_balance_id' in order.leave_id._fields else False"/>
-        		<t t-esc="order.leave_id.calendar_days"/> календарних дні(в)<t t-if="vbal"> за період <t t-esc="format_date(vbal.period_start)"/>-<t t-esc="format_date(vbal.period_end)"/></t>
+        		<t t-out="order.leave_id.calendar_days"/> календарних дні(в)<t t-if="vbal"> за період <t t-out="format_date(vbal.period_start)"/>-<t t-out="format_date(vbal.period_end)"/></t>
     	            </t>
        		    <t t-else="">____ календарних дні(в)</t>
 		</td>
@@ -427,13 +427,13 @@
             <tr>
                 <td style="padding: 5px;">Дата початку відпустки:</td>
 		<td style="padding: 5px; border-bottom: 1px solid #000;">
-		    <t t-esc="format_date_ua(order.vacation_date_from)"/>
+		    <t t-out="format_date_ua(order.vacation_date_from)"/>
 		</td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Дата закінчення відпустки:</td>
 		<td style="padding: 5px; border-bottom: 1px solid #000;">
-		    <t t-esc="format_date_ua(order.vacation_date_to)"/>
+		    <t t-out="format_date_ua(order.vacation_date_to)"/>
 		</td>
             </tr>
         </table>
@@ -446,7 +446,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -462,7 +462,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -488,7 +488,7 @@
             <field name="body"><![CDATA[
 <div class="order-document" style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -499,9 +499,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -509,7 +509,7 @@
     <div style="margin-bottom: 20px;">
         <p style="text-indent: 30px;">
             На підставі статті 97 Кодексу законів про працю України,
-            Положення про преміювання працівників <t t-esc="company.name or '_______________'"/>,
+            Положення про преміювання працівників <t t-out="company.name or '_______________'"/>,
             з метою матеріального стимулювання працівників,
         </p>
 
@@ -531,8 +531,8 @@
             <tbody>
                 <tr>
                     <td style="border: 1px solid #000; padding: 8px; text-align: center;">1</td>
-                    <td style="border: 1px solid #000; padding: 8px;"><t t-esc="employee.name if employee else '________________________________'"/></td>
-                    <td style="border: 1px solid #000; padding: 8px;"><t t-esc="job.name if job else '________________________________'"/></td>
+                    <td style="border: 1px solid #000; padding: 8px;"><t t-out="employee.name if employee else '________________________________'"/></td>
+                    <td style="border: 1px solid #000; padding: 8px;"><t t-out="job.name if job else '________________________________'"/></td>
                     <td style="border: 1px solid #000; padding: 8px; text-align: right;">________</td>
                 </tr>
             </tbody>
@@ -552,7 +552,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -566,7 +566,7 @@
         <p>З наказом ознайомлені:</p>
         <table style="width: 100%; margin-top: 10px;">
             <tr>
-                <td style="width: 40%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 40%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
                 <td style="width: 30%; padding: 5px; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 30%; padding: 5px; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -590,7 +590,7 @@
             <field name="body"><![CDATA[
 <div class="order-document" style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -601,9 +601,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -622,19 +622,19 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Прізвище, ім'я, по батькові:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Табельний номер:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Структурний підрозділ:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="department.name if department else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="department.name if department else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Посада (професія):</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="job.name if job else '________________________________'"/></td>
             </tr>
         </table>
 
@@ -669,7 +669,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -685,7 +685,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>
@@ -711,7 +711,7 @@
             <field name="body"><![CDATA[
 <div class="order-document" style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
     <div style="text-align: center; margin-bottom: 20px;">
-        <strong><t t-esc="company.name or '_______________'"/></strong><br/>
+        <strong><t t-out="company.name or '_______________'"/></strong><br/>
         <span style="font-size: 10pt;">(найменування підприємства, організації)</span>
     </div>
 
@@ -722,9 +722,9 @@
 
     <table style="width: 100%; margin-bottom: 20px;">
         <tr>
-            <td style="width: 50%;">№ <t t-esc="order.name or '______'"/></td>
+            <td style="width: 50%;">№ <t t-out="order.name or '______'"/></td>
             <td style="width: 50%; text-align: right;">
-                від <t t-esc="format_date_ua(order.date)"/>
+                від <t t-out="format_date_ua(order.date)"/>
             </td>
         </tr>
     </table>
@@ -743,19 +743,19 @@
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 30%; padding: 5px;">Прізвище, ім'я, по батькові:</td>
-                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else '________________________________'"/></td>
+                <td style="width: 70%; padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Табельний номер:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="employee.employee_number or '____________'" t-if="employee"/><t t-else="">____________</t></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Структурний підрозділ:</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="department.name if department else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="department.name if department else '________________________________'"/></td>
             </tr>
             <tr>
                 <td style="padding: 5px;">Посада (професія):</td>
-                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-esc="job.name if job else '________________________________'"/></td>
+                <td style="padding: 5px; border-bottom: 1px solid #000;"><t t-out="job.name if job else '________________________________'"/></td>
             </tr>
         </table>
 
@@ -805,7 +805,7 @@
             <tr>
                 <td style="width: 40%;">Керівник підприємства</td>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
-                <td style="width: 30%; text-align: center;"><t t-esc="director.name if director else '________________'"/></td>
+                <td style="width: 30%; text-align: center;"><t t-out="director.name if director else '________________'"/></td>
             </tr>
             <tr>
                 <td></td>
@@ -821,7 +821,7 @@
             <tr>
                 <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"></td>
                 <td style="width: 10%;"></td>
-                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-esc="employee.name if employee else ''"/></td>
+                <td style="width: 30%; text-align: center; border-bottom: 1px solid #000;"><t t-out="employee.name if employee else ''"/></td>
                 <td style="width: 10%;"></td>
                 <td style="width: 20%; text-align: center; border-bottom: 1px solid #000;"></td>
             </tr>

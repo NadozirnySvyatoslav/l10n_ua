@@ -42,7 +42,7 @@
 
                         <!-- Number and date -->
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            № <strong t-esc="o.name"/>
+                            № <strong t-out="o.name"/>
                             від
                             <span t-field="o.date" t-options='{"widget": "date"}'/>
                         </div>
@@ -62,8 +62,8 @@
                             <t t-if="o.group_id">
                                 <p>
                                     Група ОЗ, що переоцінюється:
-                                    <strong t-esc="o.group_id.code"/> —
-                                    <strong t-esc="o.group_id.name"/>
+                                    <strong t-out="o.group_id.code"/> —
+                                    <strong t-out="o.group_id.name"/>
                                 </p>
                             </t>
                         </div>
@@ -93,26 +93,26 @@
                             <tbody>
                                 <t t-foreach="o.line_ids" t-as="line">
                                     <tr>
-                                        <td class="text-center"><span t-esc="line_index + 1"/></td>
-                                        <td><span t-esc="line.asset_id.name"/></td>
-                                        <td class="text-center" t-esc="line.asset_id.inventory_number or '—'"/>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.original_value_before"/></td>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.accumulated_before"/></td>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.book_value_before"/></td>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.fair_value"/></td>
-                                        <td class="text-right"><span t-esc="'%.4f' % line.revaluation_index"/></td>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.original_value_after"/></td>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.accumulated_after"/></td>
-                                        <td class="text-right"><span t-esc="'%.2f' % line.book_value_after"/></td>
+                                        <td class="text-center"><span t-out="line_index + 1"/></td>
+                                        <td><span t-out="line.asset_id.name"/></td>
+                                        <td class="text-center" t-out="line.asset_id.inventory_number or '—'"/>
+                                        <td class="text-right"><span t-out="'%.2f' % line.original_value_before"/></td>
+                                        <td class="text-right"><span t-out="'%.2f' % line.accumulated_before"/></td>
+                                        <td class="text-right"><span t-out="'%.2f' % line.book_value_before"/></td>
+                                        <td class="text-right"><span t-out="'%.2f' % line.fair_value"/></td>
+                                        <td class="text-right"><span t-out="'%.4f' % line.revaluation_index"/></td>
+                                        <td class="text-right"><span t-out="'%.2f' % line.original_value_after"/></td>
+                                        <td class="text-right"><span t-out="'%.2f' % line.accumulated_after"/></td>
+                                        <td class="text-right"><span t-out="'%.2f' % line.book_value_after"/></td>
                                         <td class="text-right">
-                                            <strong t-esc="'%+.2f' % line.revaluation_amount"/>
+                                            <strong t-out="'%+.2f' % line.revaluation_amount"/>
                                         </td>
                                     </tr>
                                 </t>
                                 <tr style="font-weight: bold;">
                                     <td colspan="11" class="text-right">Разом:</td>
                                     <td class="text-right">
-                                        <span t-esc="'%+.2f' % o.total_net_change"/>
+                                        <span t-out="'%+.2f' % o.total_net_change"/>
                                     </td>
                                 </tr>
                             </tbody>
@@ -124,19 +124,19 @@
                                 <tr>
                                     <td>Загальна зміна первісної вартості:</td>
                                     <td class="text-right">
-                                        <strong t-esc="'%+.2f грн.' % o.total_original_change"/>
+                                        <strong t-out="'%+.2f грн.' % o.total_original_change"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Загальна зміна накопиченого зносу:</td>
                                     <td class="text-right">
-                                        <strong t-esc="'%+.2f грн.' % o.total_accumulated_change"/>
+                                        <strong t-out="'%+.2f грн.' % o.total_accumulated_change"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Чиста сума переоцінки:</td>
                                     <td class="text-right">
-                                        <strong t-esc="'%+.2f грн.' % o.total_net_change"/>
+                                        <strong t-out="'%+.2f грн.' % o.total_net_change"/>
                                     </td>
                                 </tr>
                             </table>
@@ -145,7 +145,7 @@
                         <t t-if="o.note">
                             <div style="margin: 15px 0;">
                                 <strong>Примітки:</strong>
-                                <p t-esc="o.note"/>
+                                <p t-out="o.note"/>
                             </div>
                         </t>
 

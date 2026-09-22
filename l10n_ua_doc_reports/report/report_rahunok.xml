@@ -47,9 +47,9 @@
                                     <strong t-field="company.name"/><br/>
                                     <t t-if="bank">
                                         IBAN: <span t-field="bank.account_number"/><br/>
-                                        <t t-if="bank.bank_id">
-                                            в банку <span t-field="bank.bank_id.name"/>
-                                            <t t-if="bank.bank_id.bic">, МФО <span t-field="bank.bank_id.bic"/></t>
+                                        <t t-if="bank.l10n_ua_bank_name">
+                                            в банку <span t-field="bank.l10n_ua_bank_name"/>
+                                            <t t-if="bank.l10n_ua_mfo">, МФО <span t-field="bank.l10n_ua_mfo"/></t>
                                             <br/>
                                         </t>
                                     </t>
@@ -76,7 +76,7 @@
                         <div class="ua-report-title" style="margin: 15px 0;">
                             Рахунок-фактура № <span t-field="o.name"/><br/>
                             <span style="font-size: 11pt;">
-                                від <span t-esc="o._get_ua_date_formatted()"/> року
+                                від <span t-out="o._get_ua_date_formatted()"/> року
                             </span>
                         </div>
 
@@ -96,7 +96,7 @@
                                         <br/><span t-field="partner.l10n_ua_legal_address"/>
                                     </t>
                                     <t t-if="partner.phone">
-                                        <br/>тел. <span t-esc="partner.phone"/>
+                                        <br/>тел. <span t-out="partner.phone"/>
                                     </t>
                                 </td>
                             </tr>
@@ -120,24 +120,24 @@
                                 <t t-foreach="lines" t-as="line">
                                     <t t-set="row_num" t-value="row_num + 1"/>
                                     <tr>
-                                        <td class="text-center" t-esc="row_num"/>
+                                        <td class="text-center" t-out="row_num"/>
                                         <td><span t-field="line.name"/></td>
-                                        <td class="text-center" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.quantity"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_unit"/>
-                                        <td t-if="has_discount" class="text-right" t-esc="'%.1f' % line.discount if line.discount else ''"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_subtotal"/>
+                                        <td class="text-center" t-out="line.product_uom_id.name if line.product_uom_id else '-'"/>
+                                        <td class="text-right" t-out="'%.2f' % line.quantity"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_unit"/>
+                                        <td t-if="has_discount" class="text-right" t-out="'%.1f' % line.discount if line.discount else ''"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_subtotal"/>
                                     </tr>
                                 </t>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right bold no-border" style="border: none !important;">Разом без ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_untaxed"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_untaxed"/>
                                 </tr>
                                 <tr t-if="o.amount_tax">
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right bold no-border" style="border: none !important;">ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_tax"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_tax"/>
                                 </tr>
                                 <tr t-if="not o.amount_tax">
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right no-border" style="border: none !important;">ПДВ не нараховується</td>
@@ -145,7 +145,7 @@
                                 </tr>
                                 <tr>
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right bold no-border" style="border: none !important;">Всього:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_total"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_total"/>
                                 </tr>
                             </tfoot>
                         </table>
@@ -153,17 +153,17 @@
                         <!-- Summary -->
                         <div style="margin-bottom: 10px;">
                             <p>
-                                Всього найменувань <strong t-esc="len(lines)"/>, на суму:
-                                <strong t-esc="'%.2f' % o.amount_total"/> грн.
+                                Всього найменувань <strong t-out="len(lines)"/>, на суму:
+                                <strong t-out="'%.2f' % o.amount_total"/> грн.
                             </p>
                             <t t-if="o.l10n_ua_amount_words">
-                                <p><strong t-esc="o.l10n_ua_amount_words.capitalize()"/></p>
+                                <p><strong t-out="o.l10n_ua_amount_words.capitalize()"/></p>
                             </t>
                         </div>
 
                         <!-- Discount total -->
                         <div t-if="o.l10n_ua_discount_total" style="margin-bottom: 10px;">
-                            <p>Сума знижки: <strong t-esc="'%.2f' % o.l10n_ua_discount_total"/> грн.</p>
+                            <p>Сума знижки: <strong t-out="'%.2f' % o.l10n_ua_discount_total"/> грн.</p>
                         </div>
 
                         <!-- Payment due -->
@@ -217,9 +217,9 @@
                                     <strong t-field="company.name"/><br/>
                                     <t t-if="bank">
                                         IBAN: <span t-field="bank.account_number"/><br/>
-                                        <t t-if="bank.bank_id">
-                                            в банку <span t-field="bank.bank_id.name"/>
-                                            <t t-if="bank.bank_id.bic">, МФО <span t-field="bank.bank_id.bic"/></t>
+                                        <t t-if="bank.l10n_ua_bank_name">
+                                            в банку <span t-field="bank.l10n_ua_bank_name"/>
+                                            <t t-if="bank.l10n_ua_mfo">, МФО <span t-field="bank.l10n_ua_mfo"/></t>
                                             <br/>
                                         </t>
                                     </t>
@@ -246,7 +246,7 @@
                         <div class="ua-report-title" style="margin: 15px 0;">
                             Рахунок-фактура № <span t-field="o.name"/><br/>
                             <span style="font-size: 11pt;">
-                                від <span t-esc="o._get_ua_date_formatted()"/> року
+                                від <span t-out="o._get_ua_date_formatted()"/> року
                             </span>
                         </div>
 
@@ -263,7 +263,7 @@
                                         , ІПН: <span t-field="partner.ipn"/>
                                     </t>
                                     <t t-if="partner.phone">
-                                        <br/>тел. <span t-esc="partner.phone"/>
+                                        <br/>тел. <span t-out="partner.phone"/>
                                     </t>
                                 </td>
                             </tr>
@@ -287,24 +287,24 @@
                                 <t t-foreach="lines" t-as="line">
                                     <t t-set="row_num" t-value="row_num + 1"/>
                                     <tr>
-                                        <td class="text-center" t-esc="row_num"/>
+                                        <td class="text-center" t-out="row_num"/>
                                         <td><span t-field="line.name"/></td>
-                                        <td class="text-center" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.product_uom_qty"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_unit"/>
-                                        <td t-if="has_discount" class="text-right" t-esc="'%.1f' % line.discount if line.discount else ''"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_subtotal"/>
+                                        <td class="text-center" t-out="line.product_uom_id.name if line.product_uom_id else '-'"/>
+                                        <td class="text-right" t-out="'%.2f' % line.product_uom_qty"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_unit"/>
+                                        <td t-if="has_discount" class="text-right" t-out="'%.1f' % line.discount if line.discount else ''"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_subtotal"/>
                                     </tr>
                                 </t>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right bold" style="border: none !important;">Разом без ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_untaxed"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_untaxed"/>
                                 </tr>
                                 <tr t-if="o.amount_tax">
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right bold" style="border: none !important;">ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_tax"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_tax"/>
                                 </tr>
                                 <tr t-if="not o.amount_tax">
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right" style="border: none !important;">ПДВ не нараховується</td>
@@ -312,7 +312,7 @@
                                 </tr>
                                 <tr>
                                     <td t-att-colspan="6 if has_discount else 5" class="text-right bold" style="border: none !important;">Всього:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % o.amount_total"/>
+                                    <td class="text-right bold" t-out="'%.2f' % o.amount_total"/>
                                 </tr>
                             </tfoot>
                         </table>
@@ -320,11 +320,11 @@
                         <!-- Summary -->
                         <div style="margin-bottom: 10px;">
                             <p>
-                                Всього найменувань <strong t-esc="len(lines)"/>, на суму:
-                                <strong t-esc="'%.2f' % o.amount_total"/> грн.
+                                Всього найменувань <strong t-out="len(lines)"/>, на суму:
+                                <strong t-out="'%.2f' % o.amount_total"/> грн.
                             </p>
                             <t t-if="o.l10n_ua_amount_words">
-                                <p><strong t-esc="o.l10n_ua_amount_words.capitalize()"/></p>
+                                <p><strong t-out="o.l10n_ua_amount_words.capitalize()"/></p>
                             </t>
                         </div>
 
@@ -338,7 +338,7 @@
                             <p>
                                 Увага! При заповненні платіжного доручення у графі "призначення платежу"
                                 слід вказувати: Оплата згідно з рахунком № <span t-field="o.name"/>
-                                від <span t-esc="o._get_ua_date_formatted()"/>
+                                від <span t-out="o._get_ua_date_formatted()"/>
                             </p>
                         </div>
 

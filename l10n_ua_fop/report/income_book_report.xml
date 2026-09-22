@@ -41,13 +41,13 @@
                         <!-- Period info -->
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
                             <t t-set="quarter_names" t-value="{'1': 'I', '2': 'II', '3': 'III', '4': 'IV'}"/>
-                            за <strong><t t-esc="quarter_names.get(o.quarter, '')"/> квартал
-                            <t t-esc="o.year"/> року</strong>
+                            за <strong><t t-out="quarter_names.get(o.quarter, '')"/> квартал
+                            <t t-out="o.year"/> року</strong>
                         </div>
 
                         <div style="margin-bottom: 10px;">
                             Група єдиного податку:
-                            <strong t-esc="o.fop_group_id.name"/>
+                            <strong t-out="o.fop_group_id.name"/>
                         </div>
 
                         <!-- Income lines table -->
@@ -64,23 +64,23 @@
                             <t t-set="income_types" t-value="{'cash': 'Готівка', 'bank': 'Безготівковий', 'card': 'Картка'}"/>
                             <t t-foreach="o.line_ids" t-as="line">
                                 <tr>
-                                    <td class="text-center"><t t-esc="line_index + 1"/></td>
+                                    <td class="text-center"><t t-out="line_index + 1"/></td>
                                     <td class="text-center">
                                         <span t-field="line.date" t-options='{"widget": "date"}'/>
                                     </td>
-                                    <td class="text-center" t-esc="line.document_number or '—'"/>
-                                    <td t-esc="line.description or ''"/>
-                                    <td t-esc="line.partner_id.name if line.partner_id else '—'"/>
-                                    <td class="text-center" t-esc="income_types.get(line.income_type, '')"/>
+                                    <td class="text-center" t-out="line.document_number or '—'"/>
+                                    <td t-out="line.description or ''"/>
+                                    <td t-out="line.partner_id.name if line.partner_id else '—'"/>
+                                    <td class="text-center" t-out="income_types.get(line.income_type, '')"/>
                                     <td class="text-right">
-                                        <span t-esc="'%.2f' % line.amount"/>
+                                        <span t-out="'%.2f' % line.amount"/>
                                     </td>
                                 </tr>
                             </t>
                             <tr class="bold">
                                 <td colspan="6" class="text-right">Разом за квартал:</td>
                                 <td class="text-right">
-                                    <span t-esc="'%.2f' % o.total_income"/>
+                                    <span t-out="'%.2f' % o.total_income"/>
                                 </td>
                             </tr>
                         </table>

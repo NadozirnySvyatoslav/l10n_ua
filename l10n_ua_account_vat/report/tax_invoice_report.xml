@@ -36,7 +36,7 @@
                                     <strong>Постачальник:</strong><br/>
                                     <t t-if="o.invoice_type == 'issued'">
                                         <span t-field="o.company_id.name"/><br/>
-                                        ІПН: <span t-esc="o.company_id.vat or o.company_id.edrpou or ''"/>
+                                        ІПН: <span t-out="o.company_id.vat or o.company_id.edrpou or ''"/>
                                     </t>
                                     <t t-else="">
                                         <span t-field="o.partner_id.name"/><br/>
@@ -51,7 +51,7 @@
                                     </t>
                                     <t t-else="">
                                         <span t-field="o.company_id.name"/><br/>
-                                        ІПН: <span t-esc="o.company_id.vat or o.company_id.edrpou or ''"/>
+                                        ІПН: <span t-out="o.company_id.vat or o.company_id.edrpou or ''"/>
                                     </t>
                                 </td>
                             </tr>
@@ -89,16 +89,16 @@
                                     <t t-set="seq" t-value="seq + 1"/>
                                     <tr>
                                         <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                            <t t-esc="seq"/>
+                                            <t t-out="seq"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 4px;">
                                             <span t-field="line.name"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 4px;">
-                                            <span t-esc="line.uktzed_code or line.dkpp_code or ''"/>
+                                            <span t-out="line.uktzed_code or line.dkpp_code or ''"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                            <span t-esc="line.uom_id.name if line.uom_id else 'шт.'"/>
+                                            <span t-out="line.uom_id.name if line.uom_id else 'шт.'"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 4px; text-align: right;">
                                             <span t-field="line.quantity" t-options="{'precision': 2}"/>

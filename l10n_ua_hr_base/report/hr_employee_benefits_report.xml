@@ -27,10 +27,10 @@
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <strong t-esc="company.name"/>
+                    <strong t-out="company.name"/>
                     <h3 style="margin: 10px 0;">СПИСОК ПРАЦІВНИКІВ З ПІЛЬГАМИ</h3>
                     <p style="font-size: 10pt;">
-                        станом на <span t-esc="report_doc.date.strftime('%d.%m.%Y')"/>
+                        станом на <span t-out="report_doc.date.strftime('%d.%m.%Y')"/>
                     </p>
                 </div>
 
@@ -52,25 +52,25 @@
                             <t t-set="row_num" t-value="row_num + 1"/>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="row_num"/>
+                                    <t t-out="row_num"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="employee.name"/>
+                                    <t t-out="employee.name"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="employee.job_id.name or ''"/>
+                                    <t t-out="employee.job_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
                                     <t t-if="employee.disability_group and employee.disability_group != 'none'">
-                                        Група <t t-esc="employee.disability_group"/>
+                                        Група <t t-out="employee.disability_group"/>
                                         <t t-if="employee.disability_date_to">
-                                            <br/><span style="font-size: 8pt;">до <t t-esc="employee.disability_date_to.strftime('%d.%m.%Y')"/></span>
+                                            <br/><span style="font-size: 8pt;">до <t t-out="employee.disability_date_to.strftime('%d.%m.%Y')"/></span>
                                         </t>
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
                                     <t t-if="employee.chornobyl_category and employee.chornobyl_category != 'none'">
-                                        Категорія <t t-esc="employee.chornobyl_category"/>
+                                        Категорія <t t-out="employee.chornobyl_category"/>
                                     </t>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
@@ -80,7 +80,7 @@
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; font-size: 8pt;">
                                     <t t-foreach="employee.benefit_ids" t-as="benefit">
-                                        <t t-esc="benefit.name"/>
+                                        <t t-out="benefit.name"/>
                                         <t t-if="not benefit_last">; </t>
                                     </t>
                                 </td>
@@ -90,10 +90,10 @@
                 </table>
 
                 <div style="margin-top: 20px; font-size: 10pt;">
-                    <p>Всього працівників з пільгами: <strong><t t-esc="report_doc.employee_count"/></strong></p>
-                    <p>З них: інвалідів — <strong><t t-esc="report_doc.disabled_count"/></strong>,
-                       чорнобильців — <strong><t t-esc="report_doc.chornobyl_count"/></strong>,
-                       ветеранів — <strong><t t-esc="report_doc.veteran_count"/></strong></p>
+                    <p>Всього працівників з пільгами: <strong><t t-out="report_doc.employee_count"/></strong></p>
+                    <p>З них: інвалідів — <strong><t t-out="report_doc.disabled_count"/></strong>,
+                       чорнобильців — <strong><t t-out="report_doc.chornobyl_count"/></strong>,
+                       ветеранів — <strong><t t-out="report_doc.veteran_count"/></strong></p>
                 </div>
 
                 <div style="margin-top: 30px;">

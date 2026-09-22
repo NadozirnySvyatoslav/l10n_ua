@@ -33,14 +33,14 @@
                 <table style="width: 100%; margin-bottom: 10px;">
                     <tr>
                         <td style="width: 70%;">
-                            <strong t-esc="employee.company_id.name or ''"/>
+                            <strong t-out="employee.company_id.name or ''"/>
                             <br/>
                             <span style="font-size: 9pt;">(найменування підприємства, організації)</span>
                         </td>
                         <td style="width: 30%; text-align: right;">
                             Ідентифікаційний код ЄДРПОУ<br/>
                             <span style="border: 1px solid #000; padding: 2px 10px;">
-                                <t t-esc="employee.company_id.edrpou or ''"/>
+                                <t t-out="employee.company_id.edrpou or ''"/>
                             </span>
                         </td>
                     </tr>
@@ -51,9 +51,9 @@
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 10pt;">
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px; width: 25%;">Табельний номер</td>
-                        <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-esc="employee.employee_number or ''"/></td>
+                        <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-out="employee.employee_number or ''"/></td>
                         <td style="border: 1px solid #000; padding: 3px; width: 25%;">РНОКПП</td>
-                        <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-esc="employee.rnokpp or ''"/></td>
+                        <td style="border: 1px solid #000; padding: 3px; width: 25%;"><t t-out="employee.rnokpp or ''"/></td>
                     </tr>
                 </table>
                 
@@ -64,7 +64,7 @@
                         <td style="border: 1px solid #000; padding: 3px; width: 5%;">1.</td>
                         <td style="border: 1px solid #000; padding: 3px; width: 25%;">Прізвище, ім'я, по батькові</td>
                         <td style="border: 1px solid #000; padding: 3px; width: 70%;" colspan="3">
-                            <strong><t t-esc="employee.name or ''"/></strong>
+                            <strong><t t-out="employee.name or ''"/></strong>
                         </td>
                     </tr>
                     <tr>
@@ -72,7 +72,7 @@
                         <td style="border: 1px solid #000; padding: 3px;">Дата народження</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
                             <t t-if="employee.birthday">
-                                <t t-esc="employee.birthday.strftime('%d.%m.%Y')"/>
+                                <t t-out="employee.birthday.strftime('%d.%m.%Y')"/>
                             </t>
                         </td>
                     </tr>
@@ -80,37 +80,37 @@
                         <td style="border: 1px solid #000; padding: 3px;">3.</td>
                         <td style="border: 1px solid #000; padding: 3px;">Громадянство</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
-                            <t t-esc="employee.country_id.name or 'Україна'"/>
+                            <t t-out="employee.country_id.name or 'Україна'"/>
                         </td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">4.</td>
                         <td style="border: 1px solid #000; padding: 3px;">Освіта</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
-                            <t t-esc="employee.education_level_id.name or ''"/>
+                            <t t-out="employee.education_level_id.name or ''"/>
                         </td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;" rowspan="3"></td>
                         <td style="border: 1px solid #000; padding: 3px;">Навчальний заклад</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
-                            <t t-esc="employee.study_school or ''"/>
+                            <t t-out="employee.study_school or ''"/>
                         </td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">Спеціальність</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
-                            <t t-esc="employee.study_field or ''"/>
+                            <t t-out="employee.study_field or ''"/>
                         </td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">Диплом (серія, номер, дата)</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
                             <t t-if="employee.diploma_series or employee.diploma_number">
-                                <t t-esc="employee.diploma_series or ''"/>
-                                <t t-esc="employee.diploma_number or ''"/>
+                                <t t-out="employee.diploma_series or ''"/>
+                                <t t-out="employee.diploma_number or ''"/>
                                 <t t-if="employee.diploma_date">
-                                    від <t t-esc="employee.diploma_date.strftime('%d.%m.%Y')"/>
+                                    від <t t-out="employee.diploma_date.strftime('%d.%m.%Y')"/>
                                 </t>
                             </t>
                         </td>
@@ -131,14 +131,14 @@
                         <td style="border: 1px solid #000; padding: 3px;">Склад сім'ї</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
                             <t t-if="employee.spouse_complete_name">
-                                Чоловік/дружина: <t t-esc="employee.spouse_complete_name"/><br/>
+                                Чоловік/дружина: <t t-out="employee.spouse_complete_name"/><br/>
                             </t>
                             <t t-if="employee.children_ids">
                                 Діти: 
                                 <t t-foreach="employee.children_ids" t-as="child">
-                                    <t t-esc="child.name"/>
+                                    <t t-out="child.name"/>
                                     <t t-if="child.birthday">
-                                        (<t t-esc="child.birthday.strftime('%d.%m.%Y')"/>)
+                                        (<t t-out="child.birthday.strftime('%d.%m.%Y')"/>)
                                     </t>
                                     <t t-if="not child_last">, </t>
                                 </t>
@@ -150,17 +150,17 @@
                         <td style="border: 1px solid #000; padding: 3px;">Паспорт</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
                             <t t-if="employee.document_type == 'passport'">
-                                серія <t t-esc="employee.passport_series or ''"/>
-                                № <t t-esc="employee.passport_id or ''"/>
+                                серія <t t-out="employee.passport_series or ''"/>
+                                № <t t-out="employee.passport_id or ''"/>
                             </t>
                             <t t-if="employee.document_type == 'id_card'">
-                                ID-картка № <t t-esc="employee.passport_id or ''"/>
+                                ID-картка № <t t-out="employee.passport_id or ''"/>
                             </t>
                             <t t-if="employee.passport_issued_by">
-                                <br/>виданий <t t-esc="employee.passport_issued_by"/>
+                                <br/>виданий <t t-out="employee.passport_issued_by"/>
                             </t>
                             <t t-if="employee.passport_issued_date">
-                                <t t-esc="employee.passport_issued_date.strftime('%d.%m.%Y')"/>
+                                <t t-out="employee.passport_issued_date.strftime('%d.%m.%Y')"/>
                             </t>
                         </td>
                     </tr>
@@ -168,7 +168,7 @@
                         <td style="border: 1px solid #000; padding: 3px;">8.</td>
                         <td style="border: 1px solid #000; padding: 3px;">Місце проживання (реєстрації)</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
-                            <t t-esc="employee._get_ua_registration_address_display()"/>
+                            <t t-out="employee._get_ua_registration_address_display()"/>
                         </td>
                     </tr>
                     <tr>
@@ -179,7 +179,7 @@
                                 (те саме)
                             </t>
                             <t t-else="">
-                                <t t-esc="employee._get_ua_actual_address_display()"/>
+                                <t t-out="employee._get_ua_actual_address_display()"/>
                             </t>
                         </td>
                     </tr>
@@ -187,7 +187,7 @@
                         <td style="border: 1px solid #000; padding: 3px;">9.</td>
                         <td style="border: 1px solid #000; padding: 3px;">Телефон</td>
                         <td style="border: 1px solid #000; padding: 3px;" colspan="3">
-                            <t t-esc="employee.mobile_phone or employee.work_phone or ''"/>
+                            <t t-out="employee.mobile_phone or employee.work_phone or ''"/>
                         </td>
                     </tr>
                 </table>
@@ -207,19 +207,19 @@
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">Категорія обліку</td>
                         <td style="border: 1px solid #000; padding: 3px;">
-                            <t t-esc="employee.military_category or ''"/>
+                            <t t-out="employee.military_category or ''"/>
                         </td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">Військове звання</td>
                         <td style="border: 1px solid #000; padding: 3px;">
-                            <t t-esc="employee.military_rank_id.name or ''"/>
+                            <t t-out="employee.military_rank_id.name or ''"/>
                         </td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">ВОС (військово-облікова спеціальність)</td>
                         <td style="border: 1px solid #000; padding: 3px;">
-                            <t t-esc="employee.military_specialty or ''"/>
+                            <t t-out="employee.military_specialty or ''"/>
                         </td>
                     </tr>
                     <tr>
@@ -233,7 +233,7 @@
                     <tr>
                         <td style="border: 1px solid #000; padding: 3px;">Найменування ТЦК</td>
                         <td style="border: 1px solid #000; padding: 3px;">
-                            <t t-esc="employee.military_tcc_id.name or ''"/>
+                            <t t-out="employee.military_tcc_id.name or ''"/>
                         </td>
                     </tr>
                     <t t-if="employee.military_reservation">
@@ -242,7 +242,7 @@
                             <td style="border: 1px solid #000; padding: 3px;">
                                 Заброньований
                                 <t t-if="employee.military_reservation_until">
-                                    до <t t-esc="employee.military_reservation_until.strftime('%d.%m.%Y')"/>
+                                    до <t t-out="employee.military_reservation_until.strftime('%d.%m.%Y')"/>
                                 </t>
                             </td>
                         </tr>
@@ -250,7 +250,7 @@
                             <tr>
                                 <td style="border: 1px solid #000; padding: 3px;">Резерв+ ID</td>
                                 <td style="border: 1px solid #000; padding: 3px;">
-                                    <t t-esc="employee.military_reservplus_id"/>
+                                    <t t-out="employee.military_reservplus_id"/>
                                 </td>
                             </tr>
                         </t>
@@ -301,14 +301,14 @@
                         <td style="border: 1px solid #000; padding: 3px;">
                             <t t-set="p2_hire_date" t-value="employee._get_p2_hire_date()"/>
                             <t t-if="p2_hire_date">
-                                <t t-esc="p2_hire_date.strftime('%d.%m.%Y')"/>
+                                <t t-out="p2_hire_date.strftime('%d.%m.%Y')"/>
                             </t>
                         </td>
                         <td style="border: 1px solid #000; padding: 3px;">
-                            <t t-esc="employee.department_id.name or ''"/>
+                            <t t-out="employee.department_id.name or ''"/>
                         </td>
                         <td style="border: 1px solid #000; padding: 3px;">
-                            <t t-esc="employee.job_id.name or ''"/>
+                            <t t-out="employee.job_id.name or ''"/>
                         </td>
                         <td style="border: 1px solid #000; padding: 3px;"></td>
                         <td style="border: 1px solid #000; padding: 3px;"></td>
@@ -332,32 +332,32 @@
 		    <t t-foreach="leaves" t-as="leave">
     		        <tr>
         		    <td style="border: 1px solid #000; padding: 3px;">
-            			<t t-esc="leave.holiday_status_id.name or ''"/>
+            			<t t-out="leave.holiday_status_id.name or ''"/>
         		    </td>
         		    <td style="border: 1px solid #000; padding: 3px;">
             			<t t-if="'vacation_balance_id' in leave._fields and leave.vacation_balance_id">
-                		    <t t-esc="leave.vacation_balance_id.period_start.strftime('%d.%m.%Y')"/>-<t t-esc="leave.vacation_balance_id.period_end.strftime('%d.%m.%Y')"/>
+                		    <t t-out="leave.vacation_balance_id.period_start.strftime('%d.%m.%Y')"/>-<t t-out="leave.vacation_balance_id.period_end.strftime('%d.%m.%Y')"/>
             			</t>
             			<t t-else="">
-                		    <t t-esc="leave.vacation_year or (leave.date_from.year if leave.date_from else '')"/>
+                		    <t t-out="leave.vacation_year or (leave.date_from.year if leave.date_from else '')"/>
             			</t>
         		    </td>
         		    <td style="border: 1px solid #000; padding: 3px;">
-            			<t t-if="leave.date_from"><t t-esc="leave.date_from.strftime('%d.%m.%Y')"/></t>
+            			<t t-if="leave.date_from"><t t-out="leave.date_from.strftime('%d.%m.%Y')"/></t>
         		    </td>
         		    <td style="border: 1px solid #000; padding: 3px;">
-            			<t t-if="leave.date_to"><t t-esc="leave.date_to.strftime('%d.%m.%Y')"/></t>
+            			<t t-if="leave.date_to"><t t-out="leave.date_to.strftime('%d.%m.%Y')"/></t>
         		    </td>
         		    <td style="border: 1px solid #000; padding: 3px;">
             			<t t-if="leave.order_id">
-                		    наказ № <t t-esc="leave.order_id.name"/>
-                		    від <t t-esc="leave.order_id.date.strftime('%d.%m.%Y')"/>
+                		    наказ № <t t-out="leave.order_id.name"/>
+                		    від <t t-out="leave.order_id.date.strftime('%d.%m.%Y')"/>
             	        	</t>
 
             			<t t-elif="leave.order_number">
-                		    наказ № <t t-esc="leave.order_number"/>
+                		    наказ № <t t-out="leave.order_number"/>
                 		    <t t-if="leave.order_date">
-                    		        від <t t-esc="leave.order_date.strftime('%d.%m.%Y')"/>
+                    		        від <t t-out="leave.order_date.strftime('%d.%m.%Y')"/>
                 		    </t>
             			</t>
         		    </td>
@@ -383,7 +383,7 @@
                     <tr>
                         <td style="white-space: nowrap; padding: 8px 4px 0 0; vertical-align: bottom;">Додаткові відомості</td>
                         <td style="width: 100%; border-bottom: 1px solid #000; vertical-align: bottom;">
-                            <t t-esc="employee._get_p2_additional_info()"/>
+                            <t t-out="employee._get_p2_additional_info()"/>
                         </td>
                     </tr>
                 </table>
@@ -391,7 +391,7 @@
                     <tr>
                         <td style="white-space: nowrap; padding: 8px 4px 0 0; vertical-align: bottom;">Дата і причина звільнення (підстава)</td>
                         <td style="width: 100%; border-bottom: 1px solid #000; vertical-align: bottom;">
-                            <t t-esc="employee._get_p2_dismissal_text()"/>
+                            <t t-out="employee._get_p2_dismissal_text()"/>
                         </td>
                     </tr>
                 </table>
@@ -400,7 +400,7 @@
                     <table style="width: 100%;">
                         <tr>
                             <td style="width: 50%;">
-                                Дата заповнення: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d.%m.%Y')"/>
+                                Дата заповнення: <span t-out="context_timestamp(datetime.datetime.now()).strftime('%d.%m.%Y')"/>
                             </td>
                             <td style="width: 50%; text-align: right;">
                                 Підпис працівника: _______________

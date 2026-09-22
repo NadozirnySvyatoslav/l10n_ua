@@ -42,7 +42,7 @@
                                 <table class="small" style="float: right;">
                                     <tr>
                                         <td class="border">Дата (рік, місяць, число)</td>
-                                        <td class="border text-center" t-esc="report.date_to.strftime('%Y.%m.%d')"/>
+                                        <td class="border text-center" t-out="report.date_to.strftime('%Y.%m.%d')"/>
                                     </tr>
                                 </table>
                             </div>
@@ -72,31 +72,31 @@
                                 <t t-foreach="report.line_ids.sorted('sequence')" t-as="line">
                                     <!-- Section header -->
                                     <tr t-if="line.line_type == 'section'">
-                                        <td class="bold" t-esc="line.name"/>
+                                        <td class="bold" t-out="line.name"/>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
                                     <!-- Detail line -->
                                     <tr t-if="line.line_type == 'detail'">
-                                        <td t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
+                                        <td t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
+                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
                                     </tr>
                                     <!-- Subtotal -->
                                     <tr t-if="line.line_type == 'subtotal'">
-                                        <td class="bold" t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right bold" t-esc="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right bold" t-esc="'%.0f' % line.current_amount"/>
+                                        <td class="bold" t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right bold" t-out="'%.0f' % line.previous_amount"/>
+                                        <td class="text-right bold" t-out="'%.0f' % line.current_amount"/>
                                     </tr>
                                     <!-- Total -->
                                     <tr t-if="line.line_type == 'total'" style="border-top: 2px solid black;">
-                                        <td class="bold" t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right bold" t-esc="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right bold" t-esc="'%.0f' % line.current_amount"/>
+                                        <td class="bold" t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right bold" t-out="'%.0f' % line.previous_amount"/>
+                                        <td class="text-right bold" t-out="'%.0f' % line.current_amount"/>
                                     </tr>
                                 </t>
                             </tbody>

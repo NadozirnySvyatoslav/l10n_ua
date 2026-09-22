@@ -9,8 +9,7 @@ Ukraine Bank Sync Base Module
 
 Base module for Ukrainian bank integrations providing:
 
-* Bank extensions (MFO code)
-* Partner bank account extensions (IBAN validation)
+* Bank sync configuration model
 * Bank sync configuration model
 * Sync job model with state management
 * Import logging with stored raw payload
@@ -31,11 +30,8 @@ from this module and implement bank-specific API calls.
     'data': [
         'security/ir.access.csv',
         'security/multicompany_security.xml',
-        'data/res_bank_data.xml',
         'data/ir_cron_data.xml',
         'wizard/l10n_ua_bank_sync_wizard_views.xml',
-        'views/res_bank_views.xml',
-        'views/res_partner_bank_views.xml',
         'views/l10n_ua_bank_sync_config_views.xml',
         'views/l10n_ua_bank_sync_job_views.xml',
         'views/account_bank_statement_views.xml',

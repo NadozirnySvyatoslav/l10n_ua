@@ -24,6 +24,12 @@
               action="l10n_ua_kved_action"
               sequence="20"/>
 
+    <menuitem id="menu_l10n_ua_bank"
+              name="Banks (MFO)"
+              parent="menu_l10n_ua_directories"
+              action="l10n_ua_bank_action"
+              sequence="30"/>
+
     <!-- Tax Offices moved to l10n_ua_tax module (Taxes UA -> Configuration) -->
 
     <!-- UA Accounting -->

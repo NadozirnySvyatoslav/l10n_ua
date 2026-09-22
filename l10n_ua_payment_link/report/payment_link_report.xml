@@ -52,10 +52,10 @@
                                     </t>
                                     <t t-if="bank">
                                         IBAN: <span t-field="bank.account_number"/><br/>
-                                        <t t-if="bank.bank_id">
-                                            Банк: <span t-field="bank.bank_id.name"/>
-                                            <t t-if="bank.bank_id.bic">
-                                                , МФО <span t-field="bank.bank_id.bic"/>
+                                        <t t-if="bank.l10n_ua_bank_name">
+                                            Банк: <span t-field="bank.l10n_ua_bank_name"/>
+                                            <t t-if="bank.l10n_ua_mfo">
+                                                , МФО <span t-field="bank.l10n_ua_mfo"/>
                                             </t>
                                             <br/>
                                         </t>
@@ -65,7 +65,7 @@
                             <tr>
                                 <td style="padding: 5px;"><strong>Сума до сплати:</strong></td>
                                 <td style="padding: 5px; font-size: 14pt;">
-                                    <strong t-esc="'%.2f' % o.amount_total"/> грн.
+                                    <strong t-out="'%.2f' % o.amount_total"/> грн.
                                 </td>
                             </tr>
                             <tr>
@@ -122,10 +122,10 @@
                                     </t>
                                     <t t-if="bank">
                                         IBAN: <span t-field="bank.account_number"/><br/>
-                                        <t t-if="bank.bank_id">
-                                            Банк: <span t-field="bank.bank_id.name"/>
-                                            <t t-if="bank.bank_id.bic">
-                                                , МФО <span t-field="bank.bank_id.bic"/>
+                                        <t t-if="bank.l10n_ua_bank_name">
+                                            Банк: <span t-field="bank.l10n_ua_bank_name"/>
+                                            <t t-if="bank.l10n_ua_mfo">
+                                                , МФО <span t-field="bank.l10n_ua_mfo"/>
                                             </t>
                                             <br/>
                                         </t>
@@ -135,7 +135,7 @@
                             <tr>
                                 <td style="padding: 5px;"><strong>Сума до сплати:</strong></td>
                                 <td style="padding: 5px; font-size: 14pt;">
-                                    <strong t-esc="'%.2f' % o.amount_residual"/> грн.
+                                    <strong t-out="'%.2f' % o.amount_residual"/> грн.
                                 </td>
                             </tr>
                             <tr>

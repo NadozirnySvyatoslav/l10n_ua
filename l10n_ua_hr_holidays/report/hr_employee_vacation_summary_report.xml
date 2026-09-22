@@ -27,10 +27,10 @@
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 11pt;">
 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <strong t-esc="company.name"/>
+                    <strong t-out="company.name"/>
                     <h3 style="margin: 10px 0;">ПІДСУМОК ВІДПУСТОК</h3>
                     <p style="font-size: 10pt;">
-                        на <span t-esc="report_doc.report_date and report_doc.report_date.strftime('%d.%m.%Y')"/>
+                        на <span t-out="report_doc.report_date and report_doc.report_date.strftime('%d.%m.%Y')"/>
                     </p>
                 </div>
 
@@ -56,37 +56,37 @@
                             <t t-set="row_num" t-value="row_num + 1"/>
                             <tr>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="row_num"/>
+                                    <t t-out="row_num"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="balance.employee_id.name"/>
+                                    <t t-out="balance.employee_id.name"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="balance.employee_id.department_id.name or ''"/>
+                                    <t t-out="balance.employee_id.department_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px;">
-                                    <t t-esc="balance.leave_type_id.name or ''"/>
+                                    <t t-out="balance.leave_type_id.name or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="balance.period_label or ''"/>
+                                    <t t-out="balance.period_label or ''"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="'%g' % (balance.entitled_days or 0)"/>
+                                    <t t-out="'%g' % (balance.entitled_days or 0)"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="'%g' % (balance.carried_over or 0)"/>
+                                    <t t-out="'%g' % (balance.carried_over or 0)"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="'%g' % (balance.total_available or 0)"/>
+                                    <t t-out="'%g' % (balance.total_available or 0)"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="'%g' % (balance.used_days or 0)"/>
+                                    <t t-out="'%g' % (balance.used_days or 0)"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="'%g' % (balance.planned_days or 0)"/>
+                                    <t t-out="'%g' % (balance.planned_days or 0)"/>
                                 </td>
                                 <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                    <t t-esc="'%g' % (balance.remaining_days or 0)"/>
+                                    <t t-out="'%g' % (balance.remaining_days or 0)"/>
                                 </td>
                             </tr>
                         </t>
@@ -97,29 +97,29 @@
                                 Разом:
                             </td>
                             <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                <t t-esc="'%g' % sum(balances.mapped('entitled_days'))"/>
+                                <t t-out="'%g' % sum(balances.mapped('entitled_days'))"/>
                             </td>
                             <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                <t t-esc="'%g' % sum(balances.mapped('carried_over'))"/>
+                                <t t-out="'%g' % sum(balances.mapped('carried_over'))"/>
                             </td>
                             <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                <t t-esc="'%g' % sum(balances.mapped('total_available'))"/>
+                                <t t-out="'%g' % sum(balances.mapped('total_available'))"/>
                             </td>
                             <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                <t t-esc="'%g' % sum(balances.mapped('used_days'))"/>
+                                <t t-out="'%g' % sum(balances.mapped('used_days'))"/>
                             </td>
                             <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                <t t-esc="'%g' % sum(balances.mapped('planned_days'))"/>
+                                <t t-out="'%g' % sum(balances.mapped('planned_days'))"/>
                             </td>
                             <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                <t t-esc="'%g' % sum(balances.mapped('remaining_days'))"/>
+                                <t t-out="'%g' % sum(balances.mapped('remaining_days'))"/>
                             </td>
                         </tr>
                     </tfoot>
                 </table>
 
                 <div style="margin-top: 20px; font-size: 10pt;">
-                    <p>Всього працівників у звіті: <strong><t t-esc="report_doc.employee_count"/></strong></p>
+                    <p>Всього працівників у звіті: <strong><t t-out="report_doc.employee_count"/></strong></p>
                 </div>
 
                 <div style="margin-top: 30px;">

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="l10n_ua_bank_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.bank.list</field>
+        <field name="model">l10n_ua.bank</field>
+        <field name="arch" type="xml">
+            <list string="Banks" editable="bottom">
+                <field name="mfo"/>
+                <field name="name"/>
+                <field name="edrpou" optional="show"/>
+                <field name="bic" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_bank_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.bank.form</field>
+        <field name="model">l10n_ua.bank</field>
+        <field name="arch" type="xml">
+            <form string="Bank">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. ПриватБанк"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mfo" placeholder="305299"/>
+                            <field name="edrpou" placeholder="14360570"/>
+                        </group>
+                        <group>
+                            <field name="bic" placeholder="PBANUA2X"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_bank_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.bank.search</field>
+        <field name="model">l10n_ua.bank</field>
+        <field name="arch" type="xml">
+            <search string="Banks">
+                <field name="name"/>
+                <field name="mfo"/>
+                <field name="edrpou"/>
+                <separator/>
+                <filter string="Archived" name="filter_archived"
+                        domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_bank_action" model="ir.actions.act_window">
+        <field name="name">Banks (MFO)</field>
+        <field name="res_model">l10n_ua.bank</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a bank
+            </p>
+            <p>
+                Довідник банків України за МФО. Банківський рахунок
+                знаходить свій банк сам — МФО стоїть у самому IBAN.
+            </p>
+        </field>
+    </record>
+
+</odoo>

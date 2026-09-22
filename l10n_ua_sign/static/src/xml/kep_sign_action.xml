@@ -14,7 +14,7 @@
 
                 <t t-elif="state.phase === 'error'">
                     <div class="alert alert-danger" role="alert">
-                        <t t-esc="state.error"/>
+                        <t t-out="state.error"/>
                     </div>
                     <button class="btn btn-secondary" t-on-click="onClose">Назад</button>
                 </t>
@@ -22,7 +22,7 @@
                 <t t-elif="state.phase === 'done'">
                     <div class="alert alert-success" role="alert">
                         <div><strong>Готово.</strong></div>
-                        <div class="mt-1"><small t-esc="state.receipt"/></div>
+                        <div class="mt-1"><small t-out="state.receipt"/></div>
                     </div>
                     <button class="btn btn-primary" t-on-click="onClose">Закрити</button>
                 </t>
@@ -44,14 +44,14 @@
                             електронному кабінеті.
                         </t>
                         <t t-else="">
-                            Документів до підпису: <strong t-esc="docCount"/>.
+                            Документів до підпису: <strong t-out="docCount"/>.
                         </t>
                         Ключ і пароль обробляються лише у вашому браузері й не
                         передаються на сервер.
                     </p>
 
                     <t t-if="state.error">
-                        <div class="alert alert-danger" role="alert" t-esc="state.error"/>
+                        <div class="alert alert-danger" role="alert" t-out="state.error"/>
                     </t>
 
                     <!-- Крок 1: зчитати ключ -->
@@ -67,7 +67,7 @@
                                 <t t-foreach="state.caList" t-as="ca" t-key="ca.name">
                                     <option t-att-value="ca.name"
                                             t-att-selected="ca.name === state.caName"
-                                            t-esc="ca.name"/>
+                                            t-out="ca.name"/>
                                 </t>
                             </select>
                             <small t-if="!state.caName" class="text-muted">
@@ -81,7 +81,7 @@
                                    accept=".dat,.jks,.pfx,.pk8,.zs2"
                                    t-on-change="onKeyFileChange"/>
                             <small t-if="state.keyFileName" class="text-muted"
-                                   t-esc="state.keyFileName"/>
+                                   t-out="state.keyFileName"/>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Пароль до ключа</label>
@@ -107,9 +107,9 @@
                                 <tbody>
                                     <tr t-foreach="state.ownerRows" t-as="row" t-key="row.label">
                                         <td class="text-muted" style="width: 40%">
-                                            <t t-esc="row.label"/>
+                                            <t t-out="row.label"/>
                                         </td>
-                                        <td><t t-esc="row.value"/></td>
+                                        <td><t t-out="row.value"/></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -134,13 +134,13 @@
                     <!-- Крок 3: відправити (після кроку 2) -->
                     <t t-if="state.signed">
                         <div class="o_kep_step mb-3">
-                            <h5>3. <t t-esc="submitLabel"/></h5>
+                            <h5>3. <t t-out="submitLabel"/></h5>
                             <button class="btn btn-success" t-on-click="onSend"
                                     t-att-disabled="state.busy">
                                 <t t-if="state.busy">
                                     <i class="fa fa-spinner fa-spin me-2"/>Відправлення…
                                 </t>
-                                <t t-else=""><t t-esc="submitLabel"/></t>
+                                <t t-else=""><t t-out="submitLabel"/></t>
                             </button>
                         </div>
                     </t>

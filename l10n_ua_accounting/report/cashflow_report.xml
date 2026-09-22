@@ -42,7 +42,7 @@
                                 <table class="small" style="float: right;">
                                     <tr>
                                         <td class="border">Дата (рік, місяць, число)</td>
-                                        <td class="border text-center" t-esc="report.date_to.strftime('%Y.%m.%d')"/>
+                                        <td class="border text-center" t-out="report.date_to.strftime('%Y.%m.%d')"/>
                                     </tr>
                                 </table>
                             </div>
@@ -74,34 +74,34 @@
                                     <!-- Заголовок розділу друкується перед його першим рядком:
                                          бланк вимагає римські підзаголовки I–III. -->
                                     <tr t-if="line.section and line.section != current_section" class="bold">
-                                        <td colspan="4" t-esc="report._section_title(line.section)"/>
+                                        <td colspan="4" t-out="report._section_title(line.section)"/>
                                     </tr>
                                     <t t-set="current_section" t-value="line.section or current_section"/>
 
                                     <!-- Витрачання друкуються в дужках -->
                                     <tr t-if="line.line_type == 'detail' and report._is_outflow_line(line)">
-                                        <td t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right" t-esc="'(%.0f)' % line.current_amount"/>
-                                        <td class="text-right" t-esc="'(%.0f)' % line.previous_amount"/>
+                                        <td t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right" t-out="'(%.0f)' % line.current_amount"/>
+                                        <td class="text-right" t-out="'(%.0f)' % line.previous_amount"/>
                                     </tr>
                                     <tr t-if="line.line_type == 'detail' and not report._is_outflow_line(line)">
-                                        <td t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                        <td t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
                                     </tr>
                                     <tr t-if="line.line_type == 'subtotal'" class="bold">
-                                        <td t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                        <td t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
                                     </tr>
                                     <tr t-if="line.line_type == 'total'" class="bold" style="border-top: 2px solid black;">
-                                        <td t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                        <td t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
                                     </tr>
                                 </t>
                             </tbody>

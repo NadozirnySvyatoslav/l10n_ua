@@ -24,46 +24,46 @@
             <div class="page" style="font-family: 'Times New Roman', serif; font-size: 12pt;">
                 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <strong t-esc="leave.employee_id.company_id.name"/>
+                    <strong t-out="leave.employee_id.company_id.name"/>
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h2 style="margin: 0;">НАКАЗ</h2>
                     <p style="margin: 5px 0;">
-                        № <span t-esc="leave.order_number or '___'"/> 
-                        від <span t-esc="leave.order_date.strftime('%d.%m.%Y') if leave.order_date else '__.__.____'"/>
+                        № <span t-out="leave.order_number or '___'"/> 
+                        від <span t-out="leave.order_date.strftime('%d.%m.%Y') if leave.order_date else '__.__.____'"/>
                     </p>
                     <p style="margin: 5px 0;">Про надання відпустки</p>
                 </div>
                 
                 <p style="text-indent: 30px; text-align: justify;">
-                    Надати <strong><t t-esc="leave.employee_id.name"/></strong>,
+                    Надати <strong><t t-out="leave.employee_id.name"/></strong>,
                     <t t-if="leave.employee_id.job_id">
-                        <t t-esc="leave.employee_id.job_id.name"/>,
+                        <t t-out="leave.employee_id.job_id.name"/>,
                     </t>
                     <t t-if="leave.employee_id.department_id">
-                        <t t-esc="leave.employee_id.department_id.name"/>,
+                        <t t-out="leave.employee_id.department_id.name"/>,
                     </t>
-                    <strong><t t-esc="leave.holiday_status_id.name"/></strong>
-                    тривалістю <strong><t t-esc="leave.calendar_days"/></strong> календарних днів
-                    з <strong><t t-esc="leave.date_from.strftime('%d.%m.%Y')"/></strong>
-                    по <strong><t t-esc="leave.date_to.strftime('%d.%m.%Y')"/></strong>.
+                    <strong><t t-out="leave.holiday_status_id.name"/></strong>
+                    тривалістю <strong><t t-out="leave.calendar_days"/></strong> календарних днів
+                    з <strong><t t-out="leave.date_from.strftime('%d.%m.%Y')"/></strong>
+                    по <strong><t t-out="leave.date_to.strftime('%d.%m.%Y')"/></strong>.
                 </p>
                 
                 <t t-if="leave.vacation_balance_id">
                     <p style="text-indent: 30px;">
-                        За обліковий період: <t t-esc="leave.vacation_balance_id.period_label"/>
+                        За обліковий період: <t t-out="leave.vacation_balance_id.period_label"/>
                     </p>
                 </t>
                 <t t-elif="leave.vacation_year">
                     <p style="text-indent: 30px;">
-                        За робочий рік: <t t-esc="leave.vacation_year"/>
+                        За робочий рік: <t t-out="leave.vacation_year"/>
                     </p>
                 </t>
                 
                 <t t-if="leave.holiday_status_id.is_paid and leave.vacation_pay_amount">
                     <p style="text-indent: 30px;">
-                        Відпускні: <t t-esc="'{:,.2f}'.format(leave.vacation_pay_amount)"/> грн
+                        Відпускні: <t t-out="'{:,.2f}'.format(leave.vacation_pay_amount)"/> грн
                     </p>
                 </t>
                 
@@ -76,7 +76,7 @@
                         <tr>
                             <td style="width: 50%;">Директор</td>
                             <td style="width: 50%; text-align: right;">
-                                _____________ / <t t-esc="leave.employee_id.company_id.director_id.name or '_____________'"/> /
+                                _____________ / <t t-out="leave.employee_id.company_id.director_id.name or '_____________'"/> /
                             </td>
                         </tr>
                     </table>
@@ -85,7 +85,7 @@
                 <div style="margin-top: 30px;">
                     <p>З наказом ознайомлений(а):</p>
                     <p style="margin-top: 20px;">
-                        _____________ / <t t-esc="leave.employee_id.name"/> /
+                        _____________ / <t t-out="leave.employee_id.name"/> /
                         <span style="margin-left: 50px;">«___» _____________ 20__ р.</span>
                     </p>
                 </div>

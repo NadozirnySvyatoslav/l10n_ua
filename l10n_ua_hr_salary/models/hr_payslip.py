@@ -639,7 +639,7 @@ class HrPayslip(models.Model):
                 # Поле оголошене на шість знаків не з примхи — офіційний курс
                 # НБУ має чотири, і 44.2680, стиснутий до 44.27, дає зайві дві
                 # гривні на кожній тисячі доларів окладу.
-                slip.salary_rate = cur._convert(
+                slip.salary_rate = cur._l10n_ua_convert(
                     1.0, comp_cur, slip.company_id, slip.date_to, round=False)
             else:
                 slip.salary_rate = 1.0

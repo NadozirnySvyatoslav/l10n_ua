@@ -53,7 +53,7 @@
                         <table class="no-border-all mb-3" style="width: 60%; margin: 0 auto;">
                             <tr>
                                 <td class="text-center" style="width: 50%; border-bottom: 1px solid black;">
-                                    <span t-esc="o.inventory_number or '—'"/>
+                                    <span t-out="o.inventory_number or '—'"/>
                                 </td>
                                 <td style="width: 10%;"></td>
                                 <td class="text-center" style="width: 40%; border-bottom: 1px solid black;">
@@ -78,15 +78,15 @@
                             </tr>
                             <tr>
                                 <td>Група основних засобів:</td>
-                                <td><span t-esc="o._get_group_name() or '—'"/></td>
+                                <td><span t-out="o._get_group_name() or '—'"/></td>
                             </tr>
                             <tr>
                                 <td>Місцезнаходження:</td>
-                                <td><span t-esc="o.location or '—'"/></td>
+                                <td><span t-out="o.location or '—'"/></td>
                             </tr>
                             <tr>
                                 <td>МВО:</td>
-                                <td><span t-esc="o.responsible_id.name if o.responsible_id else '—'"/></td>
+                                <td><span t-out="o.responsible_id.name if o.responsible_id else '—'"/></td>
                             </tr>
                         </table>
 
@@ -110,15 +110,15 @@
                             </tr>
                             <tr>
                                 <td>Акт введення №:</td>
-                                <td><span t-esc="o.commission_act_number or '—'"/></td>
+                                <td><span t-out="o.commission_act_number or '—'"/></td>
                             </tr>
                             <tr>
                                 <td>Первісна вартість:</td>
-                                <td class="bold"><span t-esc="'%.2f' % o.original_value"/> грн.</td>
+                                <td class="bold"><span t-out="'%.2f' % o.original_value"/> грн.</td>
                             </tr>
                             <tr>
                                 <td>Ліквідаційна вартість:</td>
-                                <td><span t-esc="'%.2f' % o.salvage_value"/> грн.</td>
+                                <td><span t-out="'%.2f' % o.salvage_value"/> грн.</td>
                             </tr>
                         </table>
 
@@ -129,27 +129,27 @@
                             </tr>
                             <tr>
                                 <td style="width: 35%;">Метод амортизації:</td>
-                                <td><span t-esc="o._get_depreciation_method_name() or '—'"/></td>
+                                <td><span t-out="o._get_depreciation_method_name() or '—'"/></td>
                             </tr>
                             <tr>
                                 <td>Строк корисного використання:</td>
-                                <td><span t-esc="o.useful_life"/> міс. (<span t-esc="'%.1f' % (o.useful_life / 12)"/> р.)</td>
+                                <td><span t-out="o.useful_life"/> міс. (<span t-out="'%.1f' % (o.useful_life / 12)"/> р.)</td>
                             </tr>
                             <t t-if="o.depreciation_method == 'declining_balance' and o.annual_depreciation_rate">
                                 <tr>
                                     <td>Річна норма амортизації:</td>
-                                    <td><span t-esc="'%.2f' % o.annual_depreciation_rate"/>%</td>
+                                    <td><span t-out="'%.2f' % o.annual_depreciation_rate"/>%</td>
                                 </tr>
                             </t>
                             <t t-if="o.depreciation_method == 'production'">
                                 <tr>
                                     <td>Виробнича потужність:</td>
-                                    <td><span t-esc="'%.0f' % o.production_capacity"/> од.</td>
+                                    <td><span t-out="'%.0f' % o.production_capacity"/> од.</td>
                                 </tr>
                             </t>
                             <tr>
                                 <td>Місячна амортизація:</td>
-                                <td class="bold"><span t-esc="'%.2f' % o.depreciation_amount"/> грн.</td>
+                                <td class="bold"><span t-out="'%.2f' % o.depreciation_amount"/> грн.</td>
                             </tr>
                         </table>
 
@@ -170,13 +170,13 @@
                             <t t-foreach="posted_lines" t-as="line">
                                 <t t-set="row_num" t-value="row_num + 1"/>
                                 <tr>
-                                    <td class="text-center" t-esc="row_num"/>
+                                    <td class="text-center" t-out="row_num"/>
                                     <td class="text-center">
                                         <span t-field="line.date" t-options='{"widget": "date"}'/>
                                     </td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.amount"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.accumulated"/></td>
-                                    <td class="text-right"><span t-esc="'%.2f' % line.remaining"/></td>
+                                    <td class="text-right"><span t-out="'%.2f' % line.amount"/></td>
+                                    <td class="text-right"><span t-out="'%.2f' % line.accumulated"/></td>
+                                    <td class="text-right"><span t-out="'%.2f' % line.remaining"/></td>
                                 </tr>
                             </t>
                             <t t-if="not posted_lines">
@@ -195,11 +195,11 @@
                             </tr>
                             <tr>
                                 <td style="width: 35%;">Накопичена амортизація:</td>
-                                <td class="bold"><span t-esc="'%.2f' % o.accumulated_depreciation"/> грн.</td>
+                                <td class="bold"><span t-out="'%.2f' % o.accumulated_depreciation"/> грн.</td>
                             </tr>
                             <tr>
                                 <td>Залишкова вартість:</td>
-                                <td class="bold"><span t-esc="'%.2f' % o.book_value"/> грн.</td>
+                                <td class="bold"><span t-out="'%.2f' % o.book_value"/> грн.</td>
                             </tr>
                         </table>
 

@@ -7,7 +7,7 @@
                 <div class="text-muted p-3">Loading...</div>
             </t>
             <t t-elif="state.error">
-                <div class="text-danger p-3">Error: <t t-esc="state.error"/></div>
+                <div class="text-danger p-3">Error: <t t-out="state.error"/></div>
             </t>
             <t t-elif="hasContent">
                 <pre class="xml-content" t-out="highlightedXml"/>

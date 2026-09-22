@@ -41,19 +41,19 @@
 
                 <div style="margin-bottom: 20px; font-size: 10pt; overflow: hidden;">
                     <div style="width: 50%; float: left; text-align: left;">
-                        <strong t-esc="company.name"/>
+                        <strong t-out="company.name"/>
                     </div>
                     <div style="width: 50%; float: right; text-align: left;">
                         <div><strong>ЗАТВЕРДЖУЮ</strong></div>
-                        <div>Директор <t t-esc="company.name"/></div>
-                        <div>____________________ <t t-esc="company.director_id.name or ''"/></div>
-                        <div><t t-esc="report_doc._report_generation_date()"/></div>
+                        <div>Директор <t t-out="company.name"/></div>
+                        <div>____________________ <t t-out="company.director_id.name or ''"/></div>
+                        <div><t t-out="report_doc._report_generation_date()"/></div>
                     </div>
                 </div>
 
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h3 style="margin: 10px 0;">ГРАФІК ВІДПУСТОК</h3>
-                    <p style="font-size: 10pt;">на <span t-esc="report_doc.year"/> рік</p>
+                    <p style="font-size: 10pt;">на <span t-out="report_doc.year"/> рік</p>
                 </div>
 
                 <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
@@ -85,31 +85,31 @@
                                         <t t-if="tg_index == 0 and line_index == 0">
                                             <td style="border: 1px solid #000; padding: 4px; text-align: center; vertical-align: middle;"
                                                 t-att-rowspan="grp['total']">
-                                                <t t-esc="row_num"/>
+                                                <t t-out="row_num"/>
                                             </td>
                                             <td style="border: 1px solid #000; padding: 4px; vertical-align: middle;"
                                                 t-att-rowspan="grp['total']">
-                                                <t t-esc="grp['employee'].name"/>
+                                                <t t-out="grp['employee'].name"/>
                                             </td>
                                             <td style="border: 1px solid #000; padding: 4px; vertical-align: middle;"
                                                 t-att-rowspan="grp['total']">
-                                                <t t-esc="grp['employee'].job_id.name or ''"/>
+                                                <t t-out="grp['employee'].job_id.name or ''"/>
                                             </td>
                                         </t>
                                         <t t-if="line_index == 0">
                                             <td style="border: 1px solid #000; padding: 4px; vertical-align: middle;"
                                                 t-att-rowspan="len(tg['lines'])">
-                                                <t t-esc="tg['leave_type'].name or ''"/>
+                                                <t t-out="tg['leave_type'].name or ''"/>
                                             </td>
                                         </t>
                                         <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                            <t t-esc="line.planned_days"/>
+                                            <t t-out="line.planned_days"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                            <t t-esc="line.vacation_balance_id.period_label or ''"/>
+                                            <t t-out="line.vacation_balance_id.period_label or ''"/>
                                         </td>
                                         <td style="border: 1px solid #000; padding: 4px; text-align: center;">
-                                            <t t-esc="line.vacation_period_display or ''"/>
+                                            <t t-out="line.vacation_period_display or ''"/>
                                         </td>
                                         <t t-if="tg_index == 0 and line_index == 0">
                                             <td style="border: 1px solid #000; padding: 4px; vertical-align: middle;"
@@ -119,7 +119,7 @@
                                         <td style="border: 1px solid #000; padding: 4px;"/>
                                         <td style="border: 1px solid #000; padding: 4px;"/>
                                         <td style="border: 1px solid #000; padding: 4px;">
-                                            <t t-esc="line.notes or ''"/>
+                                            <t t-out="line.notes or ''"/>
                                         </td>
                                     </tr>
                                 </t>
@@ -130,7 +130,7 @@
 
                 <div style="margin-top: 30px; overflow: hidden;">
                     <div style="width: 40%; float: left; padding-top: 16px;">
-                        <t t-esc="company.hr_manager_id.job_id.name or 'Керівник кадрової служби'"/>
+                        <t t-out="company.hr_manager_id.job_id.name or 'Керівник кадрової служби'"/>
                     </div>
                     <div style="width: 30%; float: left; text-align: center;">
                         <div style="border-bottom: 1px solid #000; height: 16px;"></div>
@@ -138,7 +138,7 @@
                     </div>
                     <div style="width: 30%; float: left; text-align: center;">
                         <div style="border-bottom: 1px solid #000; height: 16px;">
-                            <t t-esc="company.hr_manager_id.name or ''"/>
+                            <t t-out="company.hr_manager_id.name or ''"/>
                         </div>
                         <div style="font-size: 9pt;">(П.І.Б.)</div>
                     </div>

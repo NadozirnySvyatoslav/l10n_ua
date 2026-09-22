@@ -91,27 +91,27 @@
                             <tbody>
                                 <t t-foreach="act.line_ids" t-as="line">
                                     <tr>
-                                        <td class="text-center" t-esc="line_index + 1"/>
+                                        <td class="text-center" t-out="line_index + 1"/>
                                         <td><span t-field="line.name"/></td>
-                                        <td class="text-center" t-esc="line.uom_id.name if line.uom_id else '-'"/>
-                                        <td class="text-center" t-esc="'%.2f' % line.quantity"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_unit"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.price_subtotal"/>
+                                        <td class="text-center" t-out="line.uom_id.name if line.uom_id else '-'"/>
+                                        <td class="text-center" t-out="'%.2f' % line.quantity"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_unit"/>
+                                        <td class="text-right" t-out="'%.2f' % line.price_subtotal"/>
                                     </tr>
                                 </t>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td colspan="5" class="text-right bold">Разом без ПДВ:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % act.amount_untaxed"/>
+                                    <td class="text-right bold" t-out="'%.2f' % act.amount_untaxed"/>
                                 </tr>
                                 <tr t-if="act.amount_tax">
                                     <td colspan="5" class="text-right bold">ПДВ 20%:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % act.amount_tax"/>
+                                    <td class="text-right bold" t-out="'%.2f' % act.amount_tax"/>
                                 </tr>
                                 <tr>
                                     <td colspan="5" class="text-right bold">Всього:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % act.amount_total"/>
+                                    <td class="text-right bold" t-out="'%.2f' % act.amount_total"/>
                                 </tr>
                             </tfoot>
                         </table>
@@ -119,10 +119,10 @@
                         <!-- Total in words -->
                         <div class="mb-4">
                             <strong>Загальна вартість послуг складає: </strong>
-                            <span t-esc="'%.2f' % act.amount_total"/> грн.
+                            <span t-out="'%.2f' % act.amount_total"/> грн.
                             <t t-if="act.amount_tax">
                                 <span>, у т.ч. ПДВ </span>
-                                <span t-esc="'%.2f' % act.amount_tax"/> грн.
+                                <span t-out="'%.2f' % act.amount_tax"/> грн.
                             </t>
                         </div>
 

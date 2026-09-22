@@ -143,10 +143,10 @@
             <strong t-field="company.name"/><br/>
             <t t-if="bank">
                 <span>IBAN: <span t-field="bank.account_number"/></span><br/>
-                <t t-if="bank.bank_id">
-                    <span>в банку <span t-field="bank.bank_id.name"/></span>
-                    <t t-if="bank.bank_id.bic">
-                        <span>, МФО <span t-field="bank.bank_id.bic"/></span>
+                <t t-if="bank.l10n_ua_bank_name">
+                    <span>в банку <span t-field="bank.l10n_ua_bank_name"/></span>
+                    <t t-if="bank.l10n_ua_mfo">
+                        <span>, МФО <span t-field="bank.l10n_ua_mfo"/></span>
                     </t>
                     <br/>
                 </t>
@@ -155,7 +155,7 @@
                 <span>Адреса: <span t-field="partner.l10n_ua_legal_address"/></span><br/>
             </t>
             <t t-elif="partner.contact_address">
-                <span>Адреса: <span t-esc="partner.contact_address"/></span><br/>
+                <span>Адреса: <span t-out="partner.contact_address"/></span><br/>
             </t>
             <t t-if="partner.phone">
                 <span>тел. <span t-field="partner.phone"/></span><br/>
@@ -184,10 +184,10 @@
                 <span>Адреса: <span t-field="partner.l10n_ua_legal_address"/></span><br/>
             </t>
             <t t-elif="partner.contact_address">
-                <span>Адреса: <span t-esc="partner.contact_address"/></span><br/>
+                <span>Адреса: <span t-out="partner.contact_address"/></span><br/>
             </t>
             <t t-if="partner.phone">
-                <span>тел. <span t-esc="partner.phone or ''"/></span><br/>
+                <span>тел. <span t-out="partner.phone or ''"/></span><br/>
             </t>
             <t t-if="partner.edrpou">
                 <span>ЄДРПОУ: <span t-field="partner.edrpou"/></span>

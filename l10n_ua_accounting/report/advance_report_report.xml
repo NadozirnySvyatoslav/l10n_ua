@@ -57,11 +57,11 @@
                                 </tr>
                                 <tr>
                                     <td>Посада:</td>
-                                    <td class="border-bottom" t-esc="report.employee_id.job_id.name if report.employee_id.job_id else '-'"/>
+                                    <td class="border-bottom" t-out="report.employee_id.job_id.name if report.employee_id.job_id else '-'"/>
                                 </tr>
                                 <tr>
                                     <td>Підрозділ:</td>
-                                    <td class="border-bottom" t-esc="report.employee_id.department_id.name if report.employee_id.department_id else '-'"/>
+                                    <td class="border-bottom" t-out="report.employee_id.department_id.name if report.employee_id.department_id else '-'"/>
                                 </tr>
                                 <tr>
                                     <td>Призначення авансу:</td>
@@ -79,15 +79,15 @@
                                     </tr>
                                     <tr t-if="report.previous_balance">
                                         <td>Залишок попереднього авансу:</td>
-                                        <td class="text-right" t-esc="'%.2f' % report.previous_balance"/>
+                                        <td class="text-right" t-out="'%.2f' % report.previous_balance"/>
                                     </tr>
                                     <tr>
                                         <td>Аванс від <span t-field="report.advance_date" t-options='{"widget": "date"}'/>:</td>
-                                        <td class="text-right" t-esc="'%.2f' % (report.advance_amount or 0)"/>
+                                        <td class="text-right" t-out="'%.2f' % (report.advance_amount or 0)"/>
                                     </tr>
                                     <tr class="bold">
                                         <td>Всього отримано:</td>
-                                        <td class="text-right" t-esc="'%.2f' % ((report.advance_amount or 0) + (report.previous_balance or 0))"/>
+                                        <td class="text-right" t-out="'%.2f' % ((report.advance_amount or 0) + (report.previous_balance or 0))"/>
                                     </tr>
                                 </table>
                             </div>
@@ -98,12 +98,12 @@
                                     </tr>
                                     <tr>
                                         <td>Всього витрачено:</td>
-                                        <td class="text-right" t-esc="'%.2f' % report.total_expenses"/>
+                                        <td class="text-right" t-out="'%.2f' % report.total_expenses"/>
                                     </tr>
                                     <tr class="bold">
                                         <td t-if="report.balance >= 0">Залишок (до повернення):</td>
                                         <td t-if="report.balance &lt; 0">Перевитрата (до виплати):</td>
-                                        <td class="text-right" t-esc="'%.2f' % abs(report.balance)"/>
+                                        <td class="text-right" t-out="'%.2f' % abs(report.balance)"/>
                                     </tr>
                                 </table>
                             </div>
@@ -125,7 +125,7 @@
                             <tbody>
                                 <t t-foreach="report.line_ids" t-as="line">
                                     <tr>
-                                        <td class="text-center" t-esc="line_index + 1"/>
+                                        <td class="text-center" t-out="line_index + 1"/>
                                         <td class="text-center"><span t-field="line.date" t-options='{"widget": "date"}'/></td>
                                         <td>
                                             <t t-if="line.expense_type == 'transport'">Транспорт</t>
@@ -141,15 +141,15 @@
                                                 <span t-field="line.document_number"/>
                                             </t>
                                         </td>
-                                        <td t-esc="line.partner_id.name if line.partner_id else '-'"/>
-                                        <td class="text-right" t-esc="'%.2f' % line.amount"/>
+                                        <td t-out="line.partner_id.name if line.partner_id else '-'"/>
+                                        <td class="text-right" t-out="'%.2f' % line.amount"/>
                                     </tr>
                                 </t>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td colspan="6" class="text-right bold">Разом:</td>
-                                    <td class="text-right bold" t-esc="'%.2f' % report.total_expenses"/>
+                                    <td class="text-right bold" t-out="'%.2f' % report.total_expenses"/>
                                 </tr>
                             </tfoot>
                         </table>

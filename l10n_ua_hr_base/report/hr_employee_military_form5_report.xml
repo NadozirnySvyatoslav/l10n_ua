@@ -50,16 +50,16 @@
                         <t t-if="company.edrpou">, код ЄДРПОУ <span t-field="company.edrpou"/></t>
                     </div>
                     <div style="font-size: 9pt;">
-                        станом на <span t-esc="report_doc.date.strftime('%d.%m.%Y')"/>
+                        станом на <span t-out="report_doc.date.strftime('%d.%m.%Y')"/>
                     </div>
                 </div>
 
                 <t t-foreach="groups" t-as="group">
                     <t t-set="group_employees" t-value="group[2]"/>
                     <div style="font-weight: bold; font-size: 8.5pt; margin: 8px 0 3px 0;">
-                        <t t-esc="group[1]"/>
+                        <t t-out="group[1]"/>
                         <span style="font-weight: normal;">
-                            (осіб: <t t-esc="len(group_employees)"/>)
+                            (осіб: <t t-out="len(group_employees)"/>)
                         </span>
                     </div>
 
@@ -88,7 +88,7 @@
                             <tr style="font-size: 6pt;">
                                 <t t-foreach="range(1, 19)" t-as="col">
                                     <th style="border: 1px solid #000; padding: 1px; text-align: center; font-weight: normal;">
-                                        <t t-esc="col"/>
+                                        <t t-out="col"/>
                                     </th>
                                 </t>
                             </tr>
@@ -106,7 +106,7 @@
                                 <t t-set="row_num" t-value="row_num + 1"/>
                                 <tr>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                        <t t-esc="row_num"/>
+                                        <t t-out="row_num"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
                                         <t t-if="employee.military_register_category == 'conscript'">призовник</t>
@@ -114,54 +114,54 @@
                                         <t t-if="employee.military_register_category == 'reservist'">резервіст</t>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee.military_rank_id.name or ''"/>
+                                        <t t-out="employee.military_rank_id.name or ''"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee.name"/>
+                                        <t t-out="employee.name"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
                                         <t t-if="employee.birthday">
-                                            <t t-esc="employee.birthday.strftime('%d.%m.%Y')"/>
+                                            <t t-out="employee.birthday.strftime('%d.%m.%Y')"/>
                                         </t>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                        <t t-esc="employee.military_vin_code or ''"/>
+                                        <t t-out="employee.military_vin_code or ''"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                        <t t-esc="employee.rnokpp or ''"/>
+                                        <t t-out="employee.rnokpp or ''"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                        <t t-esc="employee.military_specialty or ''"/>
+                                        <t t-out="employee.military_specialty or ''"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_document_label()"/>
+                                        <t t-out="employee._military_document_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_passport_label()"/>
+                                        <t t-out="employee._military_passport_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_address_label()"/>
+                                        <t t-out="employee._military_address_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee.military_tcc_id.name or ''"/>
+                                        <t t-out="employee.military_tcc_id.name or ''"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_deferment_label()"/>
+                                        <t t-out="employee._military_deferment_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                        <t t-esc="employee._military_special_register_label()"/>
+                                        <t t-out="employee._military_special_register_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 2px; text-align: center;">
-                                        <t t-esc="employee._military_service_label()"/>
+                                        <t t-out="employee._military_service_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_mob_order_label() or 'ні'"/>
+                                        <t t-out="employee._military_mob_order_label() or 'ні'"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_position_label()"/>
+                                        <t t-out="employee._military_position_label()"/>
                                     </td>
                                     <td style="border: 1px solid #000; padding: 1.5px;">
-                                        <t t-esc="employee._military_notice_label()"/>
+                                        <t t-out="employee._military_notice_label()"/>
                                     </td>
                                 </tr>
                             </t>
@@ -170,8 +170,8 @@
                 </t>
 
                 <div style="margin-top: 10px; font-size: 8pt;">
-                    Усього в Списках: <strong><t t-esc="report_doc.employee_count"/></strong>,
-                    з них заброньовано: <strong><t t-esc="report_doc.reserved_count"/></strong>.
+                    Усього в Списках: <strong><t t-out="report_doc.employee_count"/></strong>,
+                    з них заброньовано: <strong><t t-out="report_doc.reserved_count"/></strong>.
                 </div>
 
                 <!-- Підписи за п. 40 Порядку № 1487: щороку до 25 січня станом
@@ -185,7 +185,7 @@
                             </td>
                             <td style="width: 25%; border-bottom: 1px solid #000;"></td>
                             <td style="width: 30%; border-bottom: 1px solid #000; text-align: center;">
-                                <t t-esc="report_doc.military_officer_id.name or ''"/>
+                                <t t-out="report_doc.military_officer_id.name or ''"/>
                             </td>
                         </tr>
                         <tr>
@@ -195,12 +195,12 @@
                         </tr>
                         <tr>
                             <td style="padding-top: 14px;">
-                                <t t-esc="company.name"/><br/>
+                                <t t-out="company.name"/><br/>
                                 Керівник
                             </td>
                             <td style="border-bottom: 1px solid #000; vertical-align: bottom;"></td>
                             <td style="border-bottom: 1px solid #000; vertical-align: bottom; text-align: center;">
-                                <t t-esc="report_doc.director_id.name or ''"/>
+                                <t t-out="report_doc.director_id.name or ''"/>
                             </td>
                         </tr>
                         <tr>
@@ -212,7 +212,7 @@
                     <div style="margin-top: 10px;">
                         Зареєстровано у службі діловодства
                         <t t-if="report_doc.registration_ref">
-                            за № <strong><t t-esc="report_doc.registration_ref"/></strong>
+                            за № <strong><t t-out="report_doc.registration_ref"/></strong>
                         </t>
                         <t t-else="">за № ______________</t>
                         «____» ______________ 20____ р.

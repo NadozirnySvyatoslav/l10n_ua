@@ -38,3 +38,5 @@ access_l10n_ua_chess_sheet_user,l10n_ua.chess.sheet.user,model_l10n_ua_chess_she
 access_l10n_ua_chess_sheet_manager,l10n_ua.chess.sheet.manager,model_l10n_ua_chess_sheet,l10n_ua_account_base.group_ua_manager,crud,
 access_l10n_ua_chess_sheet_line_user,l10n_ua.chess.sheet.line.user,model_l10n_ua_chess_sheet_line,l10n_ua_account_base.group_ua_accountant,cru,
 access_l10n_ua_chess_sheet_line_manager,l10n_ua.chess.sheet.line.manager,model_l10n_ua_chess_sheet_line,l10n_ua_account_base.group_ua_manager,crud,
+access_l10n_ua_bank_all,l10n_ua.bank.all,model_l10n_ua_bank,base.group_user,r,
+access_l10n_ua_bank_manager,l10n_ua.bank.manager,model_l10n_ua_bank,l10n_ua_account_base.group_ua_manager,crud,

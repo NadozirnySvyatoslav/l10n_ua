@@ -68,25 +68,25 @@
                                 <!-- Opening balance -->
                                 <tr>
                                     <td colspan="4" class="text-right bold">Залишок на початок періоду:</td>
-                                    <td class="text-right money bold" t-esc="'%.2f' % data['opening_balance']"/>
+                                    <td class="text-right money bold" t-out="'%.2f' % data['opening_balance']"/>
                                     <td></td>
                                 </tr>
 
                                 <!-- Transactions -->
                                 <t t-foreach="data['lines']" t-as="line">
                                     <tr>
-                                        <td class="text-center" t-esc="line['number']"/>
-                                        <td class="text-center" t-esc="line['date']"/>
-                                        <td t-esc="line['partner']"/>
-                                        <td class="text-center" t-esc="line['account']"/>
+                                        <td class="text-center" t-out="line['number']"/>
+                                        <td class="text-center" t-out="line['date']"/>
+                                        <td t-out="line['partner']"/>
+                                        <td class="text-center" t-out="line['account']"/>
                                         <td class="text-right money">
                                             <t t-if="line['debit']">
-                                                <t t-esc="'%.2f' % line['debit']"/>
+                                                <t t-out="'%.2f' % line['debit']"/>
                                             </t>
                                         </td>
                                         <td class="text-right money">
                                             <t t-if="line['credit']">
-                                                <t t-esc="'%.2f' % line['credit']"/>
+                                                <t t-out="'%.2f' % line['credit']"/>
                                             </t>
                                         </td>
                                     </tr>
@@ -95,14 +95,14 @@
                                 <!-- Totals -->
                                 <tr>
                                     <td colspan="4" class="text-right bold">Обороти за період:</td>
-                                    <td class="text-right money bold" t-esc="'%.2f' % data['total_debit']"/>
-                                    <td class="text-right money bold" t-esc="'%.2f' % data['total_credit']"/>
+                                    <td class="text-right money bold" t-out="'%.2f' % data['total_debit']"/>
+                                    <td class="text-right money bold" t-out="'%.2f' % data['total_credit']"/>
                                 </tr>
 
                                 <!-- Closing balance -->
                                 <tr>
                                     <td colspan="4" class="text-right bold">Залишок на кінець періоду:</td>
-                                    <td class="text-right money bold" t-esc="'%.2f' % data['closing_balance']"/>
+                                    <td class="text-right money bold" t-out="'%.2f' % data['closing_balance']"/>
                                     <td></td>
                                 </tr>
                             </tbody>
@@ -128,7 +128,7 @@
 
                         <div class="mt-3 small">
                             Документи в кількості
-                            <span class="underline" t-esc="len(data['lines'])"/>
+                            <span class="underline" t-out="len(data['lines'])"/>
                             прийняті.
                         </div>
                     </div>

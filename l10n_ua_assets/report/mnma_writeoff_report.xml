@@ -40,7 +40,7 @@
                         </div>
 
                         <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
-                            № <strong t-esc="o.writeoff_act_number or '___'"/>
+                            № <strong t-out="o.writeoff_act_number or '___'"/>
                             від
                             <t t-if="o.writeoff_date">
                                 <span t-field="o.writeoff_date" t-options='{"widget": "date"}'/>
@@ -63,16 +63,16 @@
                             <tr>
                                 <td class="text-center">1</td>
                                 <td><strong t-field="o.name"/></td>
-                                <td class="text-center" t-esc="o.inventory_number or '—'"/>
+                                <td class="text-center" t-out="o.inventory_number or '—'"/>
                                 <td class="text-center">
                                     <t t-if="o.commission_date">
                                         <span t-field="o.commission_date" t-options='{"widget": "date"}'/>
                                     </t>
                                     <t t-else="">—</t>
                                 </td>
-                                <td class="text-right"><span t-esc="'%.2f' % o.original_value"/></td>
-                                <td class="text-right"><span t-esc="'%.2f' % o.depreciation_value"/></td>
-                                <td class="text-right"><span t-esc="'%.2f' % o.residual_value"/></td>
+                                <td class="text-right"><span t-out="'%.2f' % o.original_value"/></td>
+                                <td class="text-right"><span t-out="'%.2f' % o.depreciation_value"/></td>
+                                <td class="text-right"><span t-out="'%.2f' % o.residual_value"/></td>
                                 <td class="text-center">
                                     <t t-if="o.write_off_method == '50_50'">50/50</t>
                                     <t t-else="">100%</t>
@@ -84,7 +84,7 @@
                         <div class="mb-3">
                             <div class="bold" style="margin-bottom: 5px;">Причина списання:</div>
                             <div style="border-bottom: 1px solid black; min-height: 40px; padding: 3px;">
-                                <span t-esc="o.writeoff_reason or ''"/>
+                                <span t-out="o.writeoff_reason or ''"/>
                             </div>
                         </div>
 
@@ -96,7 +96,7 @@
                                     <td style="width: 25%; border-bottom: 1px solid black;"></td>
                                     <td style="width: 10%;"></td>
                                     <td style="width: 30%; border-bottom: 1px solid black;">
-                                        <span t-esc="o.responsible_id.name if o.responsible_id else ''"/>
+                                        <span t-out="o.responsible_id.name if o.responsible_id else ''"/>
                                     </td>
                                 </tr>
                                 <tr>

@@ -139,8 +139,9 @@ class L10nUaBankPayment(models.Model):
             'auth_subject': None,
             'documents': [{
                 'name': 'payment',
-                'data_b64': self.file_data.decode()
-                if isinstance(self.file_data, bytes) else self.file_data,
+                # Binary у Odoo 20 тримає сирі байти, а браузерний
+                # підписувач чекає base64.
+                'data_b64': self.file_data.to_base64(),
                 'format': 'cades',
                 'filename': self.file_name or 'payment.xml',
             }],
