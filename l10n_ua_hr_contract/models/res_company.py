@@ -64,11 +64,18 @@ class ResCompany(models.Model):
                     # up with a zero weekly norm.
                     'hours_per_week': template.hours_per_week,
                 })
-                # The name has to be fixed after creation: the core copy_data
-                # appends " (copy)" AFTER merging the default
-                # (addons/resource/models/resource_calendar.py:286), so it
-                # cannot be passed through default.
+                # Odoo 19 appended " (copy)" to the name in copy_data, after
+                # merging the default, so it could not be passed through it;
+                # Odoo 20 dropped that override, but pinning the name here
+                # keeps the schedules identically named across companies.
                 copy.name = template.name
+                # resource.calendar.leave_ids is copy=False in Odoo 20, so a
+                # company's copy would come without the public holidays and
+                # corporate days off its template carries. They belong to the
+                # calendar (their company_id is a stored compute over
+                # calendar_id.company_id), so each company needs its own row.
+                for leave in template.sudo().leave_ids:
+                    leave.copy({'calendar_id': copy.id})
 
     @api.model_create_multi
     def create(self, vals_list):

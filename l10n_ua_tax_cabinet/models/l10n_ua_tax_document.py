@@ -102,8 +102,7 @@ class L10nUaTaxDocumentCabinet(models.Model):
         self.ensure_one()
         if not self.file_xml:
             raise UserError(_("No XML file to submit"))
-        xml = self.file_xml
-        return xml.decode() if isinstance(xml, bytes) else xml
+        return self.file_xml.to_base64()
 
     def _dps_filename(self):
         return self._generate_filename()

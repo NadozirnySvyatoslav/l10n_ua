@@ -67,6 +67,11 @@ class TestEdebo(TransactionCase):
             wizard.action_import()
 
     def test_custom_format_requires_plugin(self):
+        # The base implementation is called directly: whether a plugin module
+        # (l10n_ua_education_edebo_xml) happens to be installed alongside must
+        # not change what this module promises on its own.
+        from odoo.addons.l10n_ua_education_edebo.wizard.l10n_ua_edebo_import \
+            import L10nUaEdeboImport
         wizard = self.env['l10n_ua.edebo.import'].create({
             'academic_year_id': self.year.id,
             'file': base64.b64encode(b"any content").decode(),
@@ -74,7 +79,7 @@ class TestEdebo(TransactionCase):
             'file_format': 'custom',
         })
         with self.assertRaises(UserError) as cm:
-            wizard.action_import()
+            L10nUaEdeboImport._parse_custom(wizard, b"any content")
         self.assertIn('плагіну', cm.exception.args[0])
 
     def test_export_active_only(self):

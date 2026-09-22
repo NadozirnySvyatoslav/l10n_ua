@@ -126,7 +126,7 @@ class TestCabinetBrowserSigning(TransactionCase):
         spec = signing.kep_prepare_signing()
         self.assertFalse(spec['auth_subject'])
         self.assertEqual(spec['documents'][0]['format'], 'cades')
-        self.assertEqual(spec['documents'][0]['data_b64'], XML.decode())
+        self.assertEqual(spec["documents"][0]["data_b64"], XML)
 
         signing.kep_submit_signed({'doc': 'UDdTLVNJR05BVFVSRQ=='})
         self.assertEqual(doc.state, 'signed')

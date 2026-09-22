@@ -79,8 +79,10 @@ class TestKpkvk(TransactionCase):
         Kpkvk = self.env['l10n_ua.kpkvk']
         with self.assertRaises(ValidationError):
             Kpkvk.create({'code': '12345', 'name': 'Short', 'year': 2025})
+        # 7 characters on purpose: Odoo 20 no longer truncates a Char to its
+        # `size`, so a longer value dies in Postgres before the constraint runs.
         with self.assertRaises(ValidationError):
-            Kpkvk.create({'code': '12345abc', 'name': 'Bad', 'year': 2025})
+            Kpkvk.create({'code': '1234abc', 'name': 'Bad', 'year': 2025})
 
     def test_kvkv_auto_link(self):
         """kvkv_code and kvkv_id should be derived from the leading 3 digits of code."""

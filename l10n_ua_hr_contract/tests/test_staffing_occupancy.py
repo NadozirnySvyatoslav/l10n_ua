@@ -353,8 +353,10 @@ class TestStaffingOccupancy(ContractTestCase):
         version = self._holder(date(2019, 6, 1), work_rate=1.0).version_ids
         self.assertAlmostEqual(line.filled_units, 1.0)
 
+        # `wage` is manager-only; Odoo 20 opened contract_date_start to
+        # hr.group_hr_user, so it no longer proves the officer lacks rights.
         with self.assertRaises(AccessError):
-            version.with_user(officer).read(['contract_date_start'])
+            version.with_user(officer).read(['wage'])
 
         # A version written by the officer drags the recount along.
         version.with_user(officer).write({'job_id': self.job.id})

@@ -50,10 +50,11 @@ class TestAccountBaseMultiCompany(TransactionCase):
         self.assertIn(osv, visible)
 
     def test_rules_are_global(self):
-        """Both multi-company rules must exist and be global."""
+        """Both multi-company accesses must exist and be restrictions."""
         for rule_id in (
             'l10n_ua_account_base.l10n_ua_journal_order_company_rule',
             'l10n_ua_account_base.l10n_ua_osv_company_rule',
         ):
             rule = self.env.ref(rule_id)
-            self.assertTrue(getattr(rule, 'global'), f'{rule_id} must be a global rule')
+            self.assertEqual(rule.kind, 'restriction',
+                             f'{rule_id} must be a restriction')

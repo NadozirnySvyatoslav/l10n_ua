@@ -146,8 +146,13 @@ class TestResourceCalendarMultiCompany(ContractTestCase):
         company_id - record rules do not cascade through a many2one, so the
         rule has to walk version_id.company_id explicitly.
         """
-        version = self.env['hr.version'].search(
-            [('company_id', '=', self.env.company.id)], limit=1)
+        # Create the employee instead of fishing one out of the database:
+        # a fresh install carries no employees at all.
+        employee = self.env['hr.employee'].create({
+            'name': 'Гнатюк Олег Петрович',
+            'company_id': self.env.company.id,
+        })
+        version = employee.version_id
         self.assertTrue(version, 'no version to attach an allowance to')
         allowance = self.env['hr.version.allowance'].create({
             'version_id': version.id,

@@ -29,6 +29,10 @@ This module is required for all other l10n_ua_hr_* modules.
     'license': 'LGPL-3',
     'depends': [
         'hr',
+        # Odoo 20 moved mail.tracking.value (and mail.message.tracking_value_ids)
+        # out of `mail` into `mail_tracking`; the military operational report is
+        # built from the tracked changes of the military fields.
+        'mail_tracking',
         'l10n_ua_company_base',
     ],
     'data': [

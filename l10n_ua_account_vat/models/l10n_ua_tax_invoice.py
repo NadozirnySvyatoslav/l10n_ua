@@ -315,8 +315,7 @@ class L10nUaTaxInvoice(models.Model):
 
     def _dps_document_b64(self):
         self._dps_ensure_xml()
-        xml = self.file_xml or b''
-        return xml.decode() if isinstance(xml, bytes) else xml
+        return self.file_xml.to_base64() if self.file_xml else ''
 
     def _dps_filename(self):
         return self._generate_xml_filename()

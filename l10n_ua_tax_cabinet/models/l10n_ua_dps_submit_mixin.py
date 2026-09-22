@@ -60,10 +60,12 @@ class L10nUaDpsSubmitMixin(models.AbstractModel):
 
     def _dps_document_b64(self):
         self._dps_ensure_xml()
-        xml = getattr(self, 'xml_file', False)
+        xml = self.xml_file if 'xml_file' in self._fields else False
         if not xml:
             raise UserError(_('Немає XML для підпису — згенеруйте документ.'))
-        return xml.decode() if isinstance(xml, bytes) else xml
+        # Odoo 20 keeps binaries raw in a BinaryValue; the browser signer
+        # expects base64.
+        return xml.to_base64()
 
     def _dps_filename(self):
         return getattr(self, 'xml_filename', False) or 'document.xml'

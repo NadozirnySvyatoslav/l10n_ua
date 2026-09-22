@@ -30,20 +30,18 @@ class TestResourceCalendarUa(ContractTestCase):
         return self.env['resource.calendar'].create(vals)
 
     @staticmethod
-    def _week(hour_from, hour_to, days=5, period='morning', week_type=None):
-        lines = []
-        for day in range(days):
-            vals = {
-                'name': 'Робочий день',
+    def _week(hour_from, hour_to, days=5, period='morning'):
+        # Odoo 20 dropped resource.calendar.attendance.name and week_type
+        # (multi-week rotations are a 'variable' calendar now).
+        return [
+            (0, 0, {
                 'dayofweek': str(day),
                 'day_period': period,
                 'hour_from': hour_from,
                 'hour_to': hour_to,
-            }
-            if week_type is not None:
-                vals['week_type'] = week_type
-            lines.append((0, 0, vals))
-        return lines
+            })
+            for day in range(days)
+        ]
 
     def test_hours_per_week_from_attendances(self):
         """40 год/тиждень рахуються з рядків присутності самим ядром."""
@@ -64,13 +62,14 @@ class TestResourceCalendarUa(ContractTestCase):
         self.assertAlmostEqual(calendar.hours_per_day, 7.2, places=2)
         self.assertTrue(calendar.ua_reduced_hours)
 
-    def test_hours_per_week_two_weeks_calendar(self):
-        """Двотижневий календар ділить суму інтервалів навпіл."""
+    def test_hours_per_week_variable_calendar_is_user_set(self):
+        """Багатотижневу ротацію Odoo 20 описує календарем calendar_type
+        'variable': норму тижня там задає користувач, ядро її не перераховує
+        з рядків присутності, і наш код має читати саме задане значення."""
         calendar = self._calendar(
-            two_weeks_calendar=True,
-            attendance_ids=[(5, 0, 0)]
-            + self._week(9.0, 17.0, week_type='0')
-            + self._week(9.0, 17.0, week_type='1'))
+            calendar_type='variable',
+            hours_per_week=40.0,
+            attendance_ids=[(5, 0, 0)] + self._week(9.0, 17.0))
         self.assertAlmostEqual(calendar.hours_per_week, 40.0, places=2)
 
     def test_hours_per_week_empty_calendar(self):
