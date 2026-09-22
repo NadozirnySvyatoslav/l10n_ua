@@ -38,7 +38,7 @@ class AccountMove(models.Model):
                     try:
                         data = template.format(
                             name=company_partner.name or '',
-                            account=bank.sanitized_acc_number or bank.acc_number or '',
+                            account=bank.sanitized_account_number or bank.account_number or '',
                             currency='UAH',
                             amount=move.amount_residual,
                             edrpou=company_partner.edrpou or '',

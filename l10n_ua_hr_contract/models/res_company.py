@@ -74,8 +74,10 @@ class ResCompany(models.Model):
                 # corporate days off its template carries. They belong to the
                 # calendar (their company_id is a stored compute over
                 # calendar_id.company_id), so each company needs its own row.
+                # `name` is passed explicitly: Odoo 20 appends " (copy)" to
+                # any Char field called `name` when a record is duplicated.
                 for leave in template.sudo().leave_ids:
-                    leave.copy({'calendar_id': copy.id})
+                    leave.copy({'calendar_id': copy.id, 'name': leave.name})
 
     @api.model_create_multi
     def create(self, vals_list):

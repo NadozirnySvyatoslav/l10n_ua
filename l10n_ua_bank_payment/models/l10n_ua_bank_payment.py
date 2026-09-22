@@ -81,7 +81,7 @@ class L10nUaBankPayment(models.Model):
         root.set('company', self.company_id.name or '')
         root.set('edrpou', self._company_edrpou())
         root.set('payer_account',
-                 (self.payer_account_id.acc_number or '').replace(' ', ''))
+                 (self.payer_account_id.account_number or '').replace(' ', ''))
         root.set('date', self.payment_date.strftime('%d.%m.%Y'))
         root.set('count', str(len(self.line_ids)))
         root.set('total', '%.2f' % self.total_amount)
@@ -101,7 +101,7 @@ class L10nUaBankPayment(models.Model):
         self.ensure_one()
         if not self.line_ids:
             raise UserError(_('Додайте хоча б одне платіжне доручення.'))
-        if not self.payer_account_id.acc_number:
+        if not self.payer_account_id.account_number:
             raise UserError(_('У рахунку платника не заповнено номер/IBAN.'))
         for line in self.line_ids:
             if line.amount <= 0:

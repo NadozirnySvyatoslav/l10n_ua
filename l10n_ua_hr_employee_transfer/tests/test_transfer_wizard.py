@@ -191,12 +191,12 @@ class TestEmployeeTransfer(TransactionCase):
         """
         source_contact = self.source_employee.work_contact_id
         salary_account = self.env['res.partner.bank'].create({
-            'acc_number': 'UA213223130000026007233566001',
+            'account_number': 'UA213223130000026007233566001',
             'partner_id': source_contact.id,
             'allow_out_payment': True,
         })
         private_account = self.env['res.partner.bank'].create({
-            'acc_number': 'UA913223130000026007233566002',
+            'account_number': 'UA913223130000026007233566002',
             'partner_id': source_contact.id,
         })
         self.source_employee.bank_account_ids = [(4, salary_account.id)]
@@ -208,7 +208,7 @@ class TestEmployeeTransfer(TransactionCase):
         linked = new_employee.bank_account_ids
         self.assertEqual(len(linked), 1)
         self.assertNotIn(linked.id, (salary_account.id, private_account.id))
-        self.assertEqual(linked.acc_number, salary_account.acc_number)
+        self.assertEqual(linked.account_number, salary_account.account_number)
         self.assertEqual(linked.partner_id, new_employee.work_contact_id)
         self.assertEqual(linked.company_id, self.company_b)
         # copy=False on allow_out_payment: the copy must arrive untrusted.
@@ -219,7 +219,7 @@ class TestEmployeeTransfer(TransactionCase):
     def test_bank_accounts_not_copied_when_flag_off(self):
         source_contact = self.source_employee.work_contact_id
         account = self.env['res.partner.bank'].create({
-            'acc_number': 'UA213223130000026007233566001',
+            'account_number': 'UA213223130000026007233566001',
             'partner_id': source_contact.id,
         })
         self.source_employee.bank_account_ids = [(4, account.id)]

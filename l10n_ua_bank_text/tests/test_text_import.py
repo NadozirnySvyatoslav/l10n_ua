@@ -21,7 +21,7 @@ class TestTextImport(TransactionCase):
             'name': 'Text Bank', 'type': 'bank', 'code': 'TXBK'})
         partner = cls.env['res.partner'].create({'name': 'C'})
         acc = cls.env['res.partner.bank'].create({
-            'acc_number': '26001112223334', 'partner_id': partner.id})
+            'account_number': '26001112223334', 'partner_id': partner.id})
         cls.config = cls.env['l10n_ua.bank.sync.config'].create({
             'name': 'BUH-1', 'provider': 'text',
             'journal_id': journal.id, 'bank_account_id': acc.id,

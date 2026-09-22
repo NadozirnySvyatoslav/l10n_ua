@@ -142,7 +142,7 @@
         <div style="margin-bottom: 8px;">
             <strong t-field="company.name"/><br/>
             <t t-if="bank">
-                <span>IBAN: <span t-field="bank.acc_number"/></span><br/>
+                <span>IBAN: <span t-field="bank.account_number"/></span><br/>
                 <t t-if="bank.bank_id">
                     <span>в банку <span t-field="bank.bank_id.name"/></span>
                     <t t-if="bank.bank_id.bic">

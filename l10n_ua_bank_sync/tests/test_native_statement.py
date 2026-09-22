@@ -15,7 +15,7 @@ class TestNativeStatement(TransactionCase):
             'company_id': cls.company.id})
         partner = cls.env['res.partner'].create({'name': 'P'})
         cls.acc = cls.env['res.partner.bank'].create({
-            'acc_number': '26001234567890', 'partner_id': partner.id})
+            'account_number': '26001234567890', 'partner_id': partner.id})
         cls.config = cls.env['l10n_ua.bank.sync.config'].create({
             'name': 'NS', 'provider': 'manual',
             'journal_id': cls.journal.id, 'bank_account_id': cls.acc.id})
@@ -100,7 +100,7 @@ class TestNativeStatement(TransactionCase):
         # Контрагент підбирається за IBAN і ставиться на native-рядок.
         partner = self.env['res.partner'].create({'name': 'ТОВ Контрагент'})
         self.env['res.partner.bank'].create({
-            'acc_number': '26007654321098', 'partner_id': partner.id})
+            'account_number': '26007654321098', 'partner_id': partner.id})
         job = self._job()
         stmt = job._create_native_statement([{
             'id': 'p1', 'date': '2018-06-01', 'amount': 500.0,

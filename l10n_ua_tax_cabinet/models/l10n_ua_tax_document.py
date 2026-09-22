@@ -167,8 +167,10 @@ class L10nUaTaxDocumentCabinet(models.Model):
         if not signed_filename.endswith('.p7s'):
             signed_filename += '.p7s'
 
-        if isinstance(signature_b64, str):
-            signature_b64 = signature_b64.encode('ascii')
+        # Keep it a base64 str: Odoo 20 refuses base64 `bytes` on a Binary
+        # field (it cannot tell them from raw content) but still decodes a str.
+        if isinstance(signature_b64, bytes):
+            signature_b64 = signature_b64.decode('ascii')
 
         self.write({
             'file_signed': signature_b64,

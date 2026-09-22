@@ -397,7 +397,7 @@ class L10nUaBankSyncJob(models.Model):
 
         if not partner and iban:
             bank_account = self.env['res.partner.bank'].search([
-                ('acc_number', '=', iban)
+                ('account_number', '=', iban)
             ], limit=1)
             if bank_account:
                 partner = bank_account.partner_id

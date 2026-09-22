@@ -46,7 +46,7 @@
                                 <td style="width: 85%;">
                                     <strong t-field="company.name"/><br/>
                                     <t t-if="bank">
-                                        IBAN: <span t-field="bank.acc_number"/><br/>
+                                        IBAN: <span t-field="bank.account_number"/><br/>
                                         <t t-if="bank.bank_id">
                                             в банку <span t-field="bank.bank_id.name"/>
                                             <t t-if="bank.bank_id.bic">, МФО <span t-field="bank.bank_id.bic"/></t>
@@ -216,7 +216,7 @@
                                 <td style="width: 85%;">
                                     <strong t-field="company.name"/><br/>
                                     <t t-if="bank">
-                                        IBAN: <span t-field="bank.acc_number"/><br/>
+                                        IBAN: <span t-field="bank.account_number"/><br/>
                                         <t t-if="bank.bank_id">
                                             в банку <span t-field="bank.bank_id.name"/>
                                             <t t-if="bank.bank_id.bic">, МФО <span t-field="bank.bank_id.bic"/></t>

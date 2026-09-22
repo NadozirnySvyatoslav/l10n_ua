@@ -51,7 +51,7 @@
                                         ЄДРПОУ: <span t-field="comp_partner.edrpou"/><br/>
                                     </t>
                                     <t t-if="bank">
-                                        IBAN: <span t-field="bank.acc_number"/><br/>
+                                        IBAN: <span t-field="bank.account_number"/><br/>
                                         <t t-if="bank.bank_id">
                                             Банк: <span t-field="bank.bank_id.name"/>
                                             <t t-if="bank.bank_id.bic">
@@ -121,7 +121,7 @@
                                         ЄДРПОУ: <span t-field="comp_partner.edrpou"/><br/>
                                     </t>
                                     <t t-if="bank">
-                                        IBAN: <span t-field="bank.acc_number"/><br/>
+                                        IBAN: <span t-field="bank.account_number"/><br/>
                                         <t t-if="bank.bank_id">
                                             Банк: <span t-field="bank.bank_id.name"/>
                                             <t t-if="bank.bank_id.bic">

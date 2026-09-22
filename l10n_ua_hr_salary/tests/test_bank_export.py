@@ -26,7 +26,7 @@ class TestBankExport(SalaryTestCase):
         # employee's own work contact, which hr.employee.create provisions.
         cls.iban = 'UA213223130000026007233566001'
         cls.bank = cls.env['res.partner.bank'].create({
-            'acc_number': cls.iban,
+            'account_number': cls.iban,
             'partner_id': cls.employee.work_contact_id.id,
         })
         cls.employee.bank_account_ids = [(4, cls.bank.id)]
@@ -109,7 +109,7 @@ class TestBankExport(SalaryTestCase):
     def test_ifobs_export(self):
         slip = self._done_payslip()
         transit = self.env['res.partner.bank'].create({
-            'acc_number': '26005678901234',
+            'account_number': '26005678901234',
             'partner_id': self.bank.partner_id.id,
         })
         wiz = self._wizard(file_format='ifobs')
@@ -155,7 +155,7 @@ class TestBankExport(SalaryTestCase):
     def test_primary_account_used_for_export(self):
         """With several accounts the export must pay the primary one."""
         second = self.env['res.partner.bank'].create({
-            'acc_number': 'UA913223130000026007233566002',
+            'account_number': 'UA913223130000026007233566002',
             'partner_id': self.employee.work_contact_id.id,
         })
         self.employee.bank_account_ids = [(4, second.id)]
@@ -168,11 +168,11 @@ class TestBankExport(SalaryTestCase):
         root = etree.fromstring(wiz.file_data.content)
         payments = root.findall('Payment')
         self.assertEqual(len(payments), 1)
-        self.assertEqual(payments[0].findtext('Account'), expected.acc_number)
+        self.assertEqual(payments[0].findtext('Account'), expected.account_number)
 
     def test_iban_written_without_spaces(self):
         """A grouped IBAN reaches the bank file as 29 contiguous characters."""
-        self.bank.acc_number = 'UA21 3223 1300 0002 6007 2335 6600 1'
+        self.bank.account_number = 'UA21 3223 1300 0002 6007 2335 6600 1'
         self._done_payslip()
         wiz = self._wizard(file_format='xml')
         wiz.action_generate()
@@ -189,7 +189,7 @@ class TestBankExport(SalaryTestCase):
         """
         self._done_payslip()
         transit = self.env['res.partner.bank'].create({
-            'acc_number': 'UA983053990000026007233566003',
+            'account_number': 'UA983053990000026007233566003',
             'partner_id': self.bank.partner_id.id,
         })
         wiz = self._wizard(file_format='ifobs')

@@ -47,7 +47,7 @@ def migrate(cr, version):
     # Accounts whose partner is not the employee's work contact: they survive
     # the merge but stay invisible in the native widget until reassigned.
     cr.execute("""
-        SELECT e.id, e.name, b.acc_number
+        SELECT e.id, e.name, b.account_number
           FROM hr_employee e
           JOIN res_partner_bank b ON b.id = e.bank_account_id
          WHERE e.bank_account_id IS NOT NULL

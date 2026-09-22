@@ -47,7 +47,7 @@ class TestOpenBanking(TransactionCase):
             'name': 'OB', 'type': 'bank', 'code': 'OBNK'})
         partner = cls.env['res.partner'].create({'name': 'C'})
         acc = cls.env['res.partner.bank'].create({
-            'acc_number': '26001112223334', 'partner_id': partner.id})
+            'account_number': '26001112223334', 'partner_id': partner.id})
         cls.config = cls.env['l10n_ua.bank.sync.config'].create({
             'name': 'OB', 'provider': 'openbanking',
             'journal_id': journal.id, 'bank_account_id': acc.id,

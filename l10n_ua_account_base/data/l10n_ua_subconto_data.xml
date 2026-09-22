@@ -24,7 +24,7 @@
             <field name="code">BANK</field>
             <field name="sequence">20</field>
             <field name="model_id" ref="base.model_res_partner_bank"/>
-            <field name="field_name">acc_number</field>
+            <field name="field_name">account_number</field>
             <field name="description">Bank accounts (Банківські рахунки)</field>
         </record>
 

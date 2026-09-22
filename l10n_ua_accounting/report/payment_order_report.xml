@@ -51,7 +51,7 @@
                                 <td class="bold">Рахунок №:</td>
                                 <td>
                                     <t t-if="o.journal_id.bank_account_id">
-                                        <span t-field="o.journal_id.bank_account_id.acc_number"/>
+                                        <span t-field="o.journal_id.bank_account_id.account_number"/>
                                     </t>
                                 </td>
                             </tr>
@@ -88,7 +88,7 @@
                                 <td class="bold">Рахунок №:</td>
                                 <td>
                                     <t t-if="o.partner_bank_id">
-                                        <span t-field="o.partner_bank_id.acc_number"/>
+                                        <span t-field="o.partner_bank_id.account_number"/>
                                     </t>
                                 </td>
                             </tr>

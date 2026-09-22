@@ -165,7 +165,7 @@ class L10nUaBankSyncConfig(models.Model):
     def _pumb_iban(self):
         self.ensure_one()
         return self._pumb_norm_iban(
-            self.pumb_account_iban or self.bank_account_id.acc_number)
+            self.pumb_account_iban or self.bank_account_id.account_number)
 
     def _pumb_currency(self):
         self.ensure_one()

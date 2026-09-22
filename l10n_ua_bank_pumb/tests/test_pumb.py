@@ -60,7 +60,7 @@ class TestPumb(TransactionCase):
             serialization.NoEncryption())
         partner = cls.env.company.partner_id
         bank_account = cls.env['res.partner.bank'].create({
-            'acc_number': OWN_IBAN, 'partner_id': partner.id})
+            'account_number': OWN_IBAN, 'partner_id': partner.id})
         uah = cls.env.ref('base.UAH')
         uah.active = True
         cls.journal = cls.env['account.journal'].create({

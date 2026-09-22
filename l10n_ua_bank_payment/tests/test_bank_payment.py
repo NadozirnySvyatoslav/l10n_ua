@@ -16,7 +16,7 @@ class TestBankPayment(TransactionCase):
         super().setUpClass()
         partner = cls.env['res.partner'].create({'name': 'Payer'})
         cls.payer = cls.env['res.partner.bank'].create({
-            'acc_number': '26001234567890', 'partner_id': partner.id})
+            'account_number': '26001234567890', 'partner_id': partner.id})
 
     def _payment(self, lines=None):
         pay = self.env['l10n_ua.bank.payment'].create({

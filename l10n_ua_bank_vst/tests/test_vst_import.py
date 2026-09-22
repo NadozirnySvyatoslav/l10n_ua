@@ -33,7 +33,7 @@ class TestVstImport(TransactionCase):
         })
         partner = cls.env['res.partner'].create({'name': 'Company'})
         cls.acc = cls.env['res.partner.bank'].create({
-            'acc_number': '26001236521254', 'partner_id': partner.id,
+            'account_number': '26001236521254', 'partner_id': partner.id,
         })
         cls.config = cls.env['l10n_ua.bank.sync.config'].create({
             'name': 'VST', 'provider': 'vst',

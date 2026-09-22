@@ -97,7 +97,7 @@ class HrPayslipBankExport(models.TransientModel):
             # ranked first in salary_distribution, or the only account when no
             # distribution is set.
             bank = employee.primary_bank_account_id
-            if not bank or not bank.acc_number:
+            if not bank or not bank.account_number:
                 missing_account.append(employee.name)
                 continue
             purpose = (self.payment_purpose or '').format(
@@ -106,7 +106,7 @@ class HrPayslipBankExport(models.TransientModel):
             rows.append({
                 'rnokpp': employee.rnokpp or '',
                 'name': employee.name or '',
-                'account': (bank.acc_number or '').replace(' ', ''),
+                'account': (bank.account_number or '').replace(' ', ''),
                 'amount': amount,
                 'purpose': purpose,
             })
@@ -126,7 +126,7 @@ class HrPayslipBankExport(models.TransientModel):
         root = etree.Element('PaymentPackage')
         root.set('company', self.company_id.name or '')
         root.set('payer_account',
-                 (self.payer_account_id.acc_number or '').replace(' ', ''))
+                 (self.payer_account_id.account_number or '').replace(' ', ''))
         root.set('period', period)
         root.set('count', str(len(rows)))
         root.set('total', f'{total:.2f}')
@@ -168,8 +168,16 @@ class HrPayslipBankExport(models.TransientModel):
                 or (company.vat or '').replace('UA', '').strip() or '')
 
     def _payer_mfo(self):
-        bank = self.payer_account_id.bank_id
-        return getattr(bank, 'ua_mfo', False) or ''
+        """МФО банку платника з IBAN.
+
+        Odoo 20 прибрав res.bank разом із res.partner.bank.bank_id, тож
+        довідник більше не можна спитати. В українському IBAN
+        (UAkk MFOOOO ...) МФО — це шість цифр після контрольного розряду,
+        позиції 5-10, тому беремо звідти.
+        """
+        iban = (self.payer_account_id.account_number or '').replace(' ', '')
+        mfo = iban[4:10] if iban[:2].upper() == 'UA' else ''
+        return mfo if mfo.isdigit() else ''
 
     @staticmethod
     def _split_name(full_name):
@@ -188,8 +196,8 @@ class HrPayslipBankExport(models.TransientModel):
         звірте з документом «Опис форматів» вашого банку.
         """
         total = sum(r['amount'] for r in rows)
-        transit = (self.transit_account_id.acc_number or '').replace(' ', '')
-        debit = (self.payer_account_id.acc_number or '').replace(' ', '')
+        transit = (self.transit_account_id.account_number or '').replace(' ', '')
+        debit = (self.payer_account_id.account_number or '').replace(' ', '')
         sched_fields = [
             ('SHED_DATE', 'D', 8, 0), ('SCHED_NO', 'C', 10, 0),
             ('CLIENTNAME', 'C', 100, 0), ('BANK_MFO', 'N', 6, 0),
@@ -204,7 +212,7 @@ class HrPayslipBankExport(models.TransientModel):
             'SCHED_NO': '1',
             'CLIENTNAME': self.company_id.name or '',
             'BANK_MFO': self._payer_mfo() or 0,
-            'BANK_NAME': self.payer_account_id.bank_id.name or '',
+            'BANK_NAME': self.payer_account_id.bank_name or '',
             'BANK_ACCNO': '',
             'TRACCIBAN': transit,
             'ACCOUNTNO': '',
@@ -247,7 +255,7 @@ class HrPayslipBankExport(models.TransientModel):
             'NUM_DOC=1',
             'CLN_OKPO=%s' % self._company_edrpou(),
             'PAYER_ACCOUNT=%s' % (
-                self.payer_account_id.acc_number or '').replace(' ', ''),
+                self.payer_account_id.account_number or '').replace(' ', ''),
             'ONFLOW_TYPE=%s' % (self.accrual_name or 'Заробітна плата'),
             'AMOUNT=',
             'VALUE_DATE=',
