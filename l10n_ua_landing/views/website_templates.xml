@@ -13,7 +13,7 @@
                         <div class="col-lg-4 col-12 mb-4">
                             <div style="font-weight:800;font-size:22px;color:#fff;">many<span style="color:#2980b9;">2</span>one</div>
                             <p style="color:#8ba0b3;font-size:14px;margin-top:12px;max-width:280px;">
-                                Українська локалізація Odoo&#160;19 — бухгалтерія, податки,
+                                Українська локалізація Odoo&#160;20 — бухгалтерія, податки,
                                 HR/зарплата, банки, ПРРО, маркетплейси та галузеві рішення.
                             </p>
                         </div>
@@ -45,8 +45,8 @@
                     </div>
                     <div class="d-flex justify-content-between flex-wrap"
                          style="border-top:1px solid rgba(255,255,255,.10);padding-top:18px;color:#8ba0b3;font-size:13px;gap:10px;">
-                        <span>© 2026 many2one.online — Українська локалізація Odoo&#160;19</span>
-                        <span>Працює на Odoo&#160;19 · Усі назви належать відповідним власникам</span>
+                        <span>© 2026 many2one.online — Українська локалізація Odoo&#160;20</span>
+                        <span>Працює на Odoo&#160;20 · Усі назви належать відповідним власникам</span>
                     </div>
                 </div>
             </div>

@@ -7,7 +7,7 @@
             <meta charset="utf-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title>many2one — Українська локалізація Odoo 20</title>
-            <meta name="description" content="68 модулів української локалізації Odoo 20: бухгалтерія, податки, ПРРО, банки, HR/зарплата, маркетплейси, договори та галузеві рішення."/>
+            <meta name="description" content="80 модулів української локалізації Odoo 20: бухгалтерія, податки, ПРРО, банки та платежі, доставка, маркетплейси, прайси постачальників, HR/зарплата, договори та галузеві рішення."/>
             <link type="image/x-icon" rel="shortcut icon" href="/web/image/website/1/favicon"/>
             <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -94,7 +94,7 @@
 
         <header class="hero">
           <div class="wrap">
-            <h1>Українська локалізація Odoo&#160;19</h1>
+            <h1>Українська локалізація Odoo&#160;20</h1>
             <p>Комплексне рішення для бізнесу та установ в Україні: бухгалтерія, податки,
                банки, ПРРО, доставка, маркетплейси, HR/зарплата, договори та галузеві рішення.</p>
             <div class="btns">
@@ -108,8 +108,8 @@
 
         <div class="wrap">
           <div class="stats">
-            <div class="stat"><b>68</b><span>модулів для Odoo 20</span></div>
-            <div class="stat"><b>11</b><span>напрямків</span></div>
+            <div class="stat"><b>80</b><span>модулів для Odoo 20</span></div>
+            <div class="stat"><b>12</b><span>напрямків</span></div>
             <div class="stat"><b>1С:ЗУП</b><span>заміна HR/зарплати</span></div>
             <div class="stat"><b>UA</b><span>відповідність законодавству</span></div>
           </div>
@@ -120,14 +120,15 @@
             <h2>Напрямки</h2>
             <p class="sub">Окремі модулі та галузеві збірки — встановлюйте лише потрібне.</p>
             <div class="grid">
-              <div class="card"><div class="ic">📚</div><h3>Бухгалтерія</h3><p class="n">5 модулів</p><p>План рахунків, активи, ПДВ, базовий облік.</p></div>
+              <div class="card"><div class="ic">📚</div><h3>Бухгалтерія</h3><p class="n">8 модулів</p><p>План рахунків, активи, субконто, друковані форми документів і складу.</p></div>
               <div class="card"><div class="ic">🧾</div><h3>Податки та звітність</h3><p class="n">6 модулів</p><p>ПДФО, ВЗ, ЄСВ, ПДВ, ЄП, 4ДФ, кабінет платника.</p></div>
-              <div class="card"><div class="ic">🏦</div><h3>Банки та платежі</h3><p class="n">5 модулів</p><p>ПриватБанк, Mono, синхронізація виписок і курсів.</p></div>
+              <div class="card"><div class="ic">🏦</div><h3>Банки та платежі</h3><p class="n">11 модулів</p><p>ПриватБанк, Mono, ПУМБ, Восток, Open Banking, платіжки з КЕП, курси НБУ, QR-оплата.</p></div>
               <div class="card"><div class="ic">🧮</div><h3>ПРРО</h3><p class="n">2 модулі</p><p>Фіскалізація чеків (Checkbox та ін.).</p></div>
               <div class="card"><div class="ic">📦</div><h3>Доставка</h3><p class="n">4 модулі</p><p>Нова Пошта, Укрпошта, Meest.</p></div>
               <div class="card"><div class="ic">🛒</div><h3>Маркетплейси</h3><p class="n">5 модулів</p><p>Rozetka, Prom, Hotline, Price.ua.</p></div>
-              <div class="card"><div class="ic">📝</div><h3>Договори з клієнтами</h3><p class="n">1 модуль</p><p>Шаблони, e-підпис, дод. угоди, акти, рахунки.</p></div>
-              <div class="card"><div class="ic">👥</div><h3>HR та зарплата</h3><p class="n">13 модулів</p><p>Повна заміна 1С:ЗУП: кадри, відпустки, табелі, зарплата.</p></div>
+              <div class="card"><div class="ic">💹</div><h3>Прайси постачальників</h3><p class="n">6 модулів</p><p>Імпорт прайс-листів: XML, XLSX, CSV, HTTP API, SFTP.</p></div>
+              <div class="card"><div class="ic">📝</div><h3>Договори з клієнтами</h3><p class="n">3 модулі</p><p>Шаблони, КЕП-підпис, дод. угоди, взаєморозрахунки за договорами.</p></div>
+              <div class="card"><div class="ic">👥</div><h3>HR та зарплата</h3><p class="n">15 модулів</p><p>Повна заміна 1С:ЗУП: кадри, відпустки, табелі, зарплата.</p></div>
               <div class="card"><div class="ic">🏛️</div><h3>Бюджетні установи</h3><p class="n">8 модулів</p><p>Кошториси, КПКВК, казначейство.</p></div>
               <div class="card"><div class="ic">🎓</div><h3>Заклади освіти</h3><p class="n">6 модулів</p><p>ЄДЕБО, стипендії, харчування.</p></div>
               <div class="card"><div class="ic">🏥</div><h3>Охорона здоров'я</h3><p class="n">6 модулів</p><p>ЕЗОЗ, НСЗУ, пацієнти, клінічні дані.</p></div>
@@ -165,7 +166,7 @@
             <div class="fcols">
               <div class="fcol">
                 <div class="fbrand">many<span>2</span>one</div>
-                <p>Українська локалізація Odoo&#160;19 — бухгалтерія, податки, HR/зарплата,
+                <p>Українська локалізація Odoo&#160;20 — бухгалтерія, податки, HR/зарплата,
                    банки, ПРРО, маркетплейси та галузеві рішення.</p>
               </div>
               <div class="fcol">
@@ -190,8 +191,8 @@
               </div>
             </div>
             <div class="fbar">
-              <span>© 2026 many2one.online — Українська локалізація Odoo&#160;19</span>
-              <span>Працює на Odoo&#160;19 · Усі назви належать відповідним власникам</span>
+              <span>© 2026 many2one.online — Українська локалізація Odoo&#160;20</span>
+              <span>Працює на Odoo&#160;20 · Усі назви належать відповідним власникам</span>
             </div>
           </div>
         </footer>
