@@ -6,7 +6,7 @@
         <field name="model">hr.department</field>
         <field name="inherit_id" ref="hr.view_department_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='company_id']" position="after">
+            <xpath expr="//sheet//field[@name='company_id']" position="after">
                 <field name="koatuu_code"/>
                 <field name="department_type"/>
                 <field name="is_separate_unit"/>
