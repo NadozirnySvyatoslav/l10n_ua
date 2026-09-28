@@ -28,6 +28,7 @@ msgstr "API повернув помилку: %s"
 
 #. module: l10n_ua_bank_mono
 #: model:ir.model.fields,field_description:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_account_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono.l10n_ua_bank_sync_config_view_form_mono
 msgid "Account ID"
 msgstr "ID рахунку"
 
@@ -88,11 +89,6 @@ msgstr "ID"
 #: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
 msgid "No accounts found"
 msgstr "Рахунків не знайдено"
-
-#. module: l10n_ua_bank_mono
-#: model:ir.model.fields,help:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_api_token
-msgid "Personal token from monobank settings (Настройки → API)"
-msgstr ""
 
 #. module: l10n_ua_bank_mono
 #. odoo-python
@@ -183,6 +179,97 @@ msgid "monobank Webhook"
 msgstr "Webhook monobank"
 
 #. module: l10n_ua_bank_mono
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_api_type
+msgid "API Type"
+msgstr "Тип API"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono.selection__l10n_ua_bank_sync_config__mono_api_type__personal
+msgid "Personal API (individual entrepreneur)"
+msgstr "Персональний API (ФОП)"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono.selection__l10n_ua_bank_sync_config__mono_api_type__corporate
+msgid "Corporate API (legal entity)"
+msgstr "Корпоративний API (юридична особа)"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,help:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_api_type
+msgid "Personal API (api.monobank.ua) serves individuals and individual entrepreneurs, with a token from the monobank app. Corporate API (corp-api.monobank.ua) serves legal entities, with a token issued for the company in the monobank web cabinet."
+msgstr "Персональний API (api.monobank.ua) — для фізичних осіб і ФОП, токен із застосунку monobank. Корпоративний API (corp-api.monobank.ua) — для юридичних осіб, токен видається для компанії у web-кабінеті monobank."
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,help:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_api_token
+msgid "Personal API: token from monobank settings (Настройки → API). Corporate API: company token from web.monobank.ua."
+msgstr "Персональний API: токен із налаштувань monobank (Налаштування → API). Корпоративний API: токен компанії з web.monobank.ua."
+
+#. module: l10n_ua_bank_mono
 #: model:ir.model.fields,help:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_account_id
-msgid "monobank account ID (optional, fetched automatically)"
-msgstr "ID рахунку monobank (необов'язково, отримується автоматично)"
+msgid "Personal API: monobank account ID (optional, fetched automatically). Corporate API: account IBAN (optional, the IBAN of the journal bank account is used by default)."
+msgstr "Персональний API: ID рахунку monobank (необов'язково, визначається автоматично). Корпоративний API: IBAN рахунку (необов'язково, типово береться IBAN банківського рахунку журналу)."
+
+#. module: l10n_ua_bank_mono
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono.l10n_ua_bank_sync_config_view_form_mono
+msgid "Account IBAN"
+msgstr "IBAN рахунку"
+
+#. module: l10n_ua_bank_mono
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono.l10n_ua_bank_sync_config_view_form_mono
+msgid "IBAN of the journal bank account"
+msgstr "IBAN банківського рахунку журналу"
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "monobank API rate limit exceeded. Retry in %s seconds."
+msgstr "Перевищено ліміт запитів monobank API. Повторіть через %s с."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Set the account IBAN or a bank account on the journal to read the monobank corporate statement."
+msgstr "Вкажіть IBAN рахунку або банківський рахунок у журналі, щоб отримати корпоративну виписку monobank."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "monobank statement for %s has more than %s pages; shorten the period."
+msgstr "Виписка monobank за рахунком %s має понад %s сторінок; скоротіть період."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Connected to monobank corporate API, but account %(iban)s is not among the company's %(count)d accounts."
+msgstr "Підключено до корпоративного API monobank, але рахунку %(iban)s немає серед %(count)d рахунків компанії."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Connected to monobank corporate API. Accounts: %d"
+msgstr "Підключено до корпоративного API monobank. Рахунків: %d"
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Warning"
+msgstr "Попередження"
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid ""
+"monobank statement for %s has more than %s operations within one second and "
+"cannot be read page by page."
+msgstr ""
+"Виписка monobank за рахунком %s має понад %s операцій в межах однієї секунди, "
+"тож її неможливо прочитати посторінково."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid ""
+"%s is not an IBAN. The corporate API reads accounts by IBAN: enter it, or "
+"clear the field to use the journal's account."
+msgstr ""
+"%s — не IBAN. Корпоративний API читає рахунки за IBAN: вкажіть його або "
+"очистіть поле, щоб використати рахунок журналу."

@@ -15,10 +15,17 @@
             </xpath>
             <xpath expr="//group[@name='account_group']" position="after">
                 <group string="monobank API" invisible="provider != 'mono'">
+                    <field name="mono_api_type" widget="radio"/>
                     <field name="mono_api_token" password="True"/>
-                    <field name="mono_account_id"/>
+                    <field name="mono_account_id" string="Account ID"
+                           invisible="mono_api_type == 'corporate'"/>
+                    <field name="mono_account_id" string="Account IBAN"
+                           invisible="mono_api_type != 'corporate'"
+                           placeholder="IBAN of the journal bank account"/>
                 </group>
-                <group string="monobank Webhook" invisible="provider != 'mono'">
+                <!-- The corporate API has no webhooks. -->
+                <group string="monobank Webhook"
+                       invisible="provider != 'mono' or mono_api_type == 'corporate'">
                     <field name="mono_webhook_url" widget="CopyClipboardChar"/>
                     <field name="mono_webhook_active" readonly="1"/>
                 </group>
