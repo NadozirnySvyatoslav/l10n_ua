@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Paper format for Ukrainian accounting reports - A4, minimal margins -->
+    <!-- Paper format for Ukrainian accounting reports - A4, minimal margins.
+         Forms use web.basic_layout (no company header/footer): requisites are part of the form itself. -->
     <record id="paperformat_ua_report" model="report.paperformat">
         <field name="name">Ukrainian Report A4</field>
         <field name="default" eval="False"/>
         <field name="format">A4</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">30</field>
+        <field name="margin_top">10</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">20</field>
         <field name="margin_right">10</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">25</field>
+        <field name="header_spacing">0</field>
         <field name="dpi">90</field>
     </record>
 

@@ -16,7 +16,7 @@
     <template id="report_act_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="web.basic_layout">
                     <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
                     <div class="page ua-report">
                         <t t-set="company" t-value="o.company_id"/>
