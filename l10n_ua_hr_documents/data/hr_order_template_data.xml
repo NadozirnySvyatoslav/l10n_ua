@@ -409,17 +409,23 @@
             </tr>
         </table>
 
+	<!-- hr.order carries no link to a time off on its own: leave_id,
+	     holiday_status_id and the leave's calendar_days come from
+	     l10n_ua_hr_holidays. Every one of them is read behind a field-presence
+	     check so the vacation order still prints without that module. -->
+	<t t-set="leave_type" t-value="order.holiday_status_id if 'holiday_status_id' in order._fields else False"/>
+	<t t-set="leave" t-value="order.leave_id if 'leave_id' in order._fields else False"/>
 	<p style="margin: 15px 0 5px 0;"><strong>Вид відпустки:</strong> 
-    	    <t t-esc="order.holiday_status_id.name if order.holiday_status_id else 'щорічна основна відпустка'"/>
+    	    <t t-esc="leave_type.name if leave_type else 'щорічна основна відпустка'"/>
 	</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
             <tr>
                 <td style="width: 50%; padding: 5px;">Тривалість відпустки:</td>
 		<td style="width: 50%; padding: 5px; border-bottom: 1px solid #000;">
-		    <t t-if="order.leave_id and order.leave_id.calendar_days">
-			<t t-set="vbal" t-value="order.leave_id.vacation_balance_id if 'vacation_balance_id' in order.leave_id._fields else False"/>
-        		<t t-esc="order.leave_id.calendar_days"/> календарних дні(в)<t t-if="vbal"> за період <t t-esc="format_date(vbal.period_start)"/>-<t t-esc="format_date(vbal.period_end)"/></t>
+		    <t t-if="leave and leave.calendar_days">
+			<t t-set="vbal" t-value="leave.vacation_balance_id if 'vacation_balance_id' in leave._fields else False"/>
+        		<t t-esc="leave.calendar_days"/> календарних дні(в)<t t-if="vbal"> за період <t t-esc="format_date(vbal.period_start)"/>-<t t-esc="format_date(vbal.period_end)"/></t>
     	            </t>
        		    <t t-else="">____ календарних дні(в)</t>
 		</td>

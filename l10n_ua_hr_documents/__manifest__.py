@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Documents',
-    'version': '19.0.1.1.1',
+    'version': '19.0.1.2.0',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR document templates and orders',
     'description': """
@@ -24,7 +24,6 @@ Requires l10n_ua_hr_base module.
     'website': 'https://many2one.online',
     'license': 'LGPL-3',
     'depends': [
-        'hr_holidays',   # explicit: hr.order.leave_id points at hr.leave
         'l10n_ua_hr_base',
         'l10n_ua_hr_contract',
         'mail',

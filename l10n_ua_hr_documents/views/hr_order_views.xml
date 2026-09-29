@@ -23,18 +23,6 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <!-- "New Time Off" — opens a leave form pre-filled from
-                         this order so the user reviews and saves it. Shown
-                         only on a saved vacation order whose details are
-                         complete and that has no time off linked yet;
-                         confirming the order never creates one. -->
-                    <button name="action_create_leave"
-                            type="object"
-                            string="New Time Off"
-                            class="btn-primary"
-                            icon="fa-plus"
-                            invisible="not can_create_leave or not id"/>
-                    <field name="can_create_leave" invisible="1"/>
                     <button name="action_load_template" string="Load from Template" type="object" class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_cancel" string="Cancel" type="object" invisible="state != 'draft'"/>
@@ -42,25 +30,20 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>
-                    <!-- Time Off smart button — count of the employee's time
-                         off records; opens their list. Only for vacation
-                         orders. -->
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_leaves" type="object"
-                                class="oe_stat_button" icon="fa-plane"
-                                invisible="order_type != 'vacation' or leave_count == 0">
-                            <field name="leave_count" widget="statinfo"/>
-                        </button>
-                    </div>
-                    <!-- Once a time off is linked, the shared data (type,
-                         employee, department, company, dates) must stay
-                         identical on both documents, so it is locked here.
-                         The subject, the order date and the rendered content
-                         stay editable. -->
+                    <!-- Empty on its own; the anchor modules linking an order
+                         to another document hang their smart buttons on. -->
+                    <div class="oe_button_box" name="button_box"/>
+                    <!-- Once another document shares this order's data (type,
+                         employee, department, company, dates), that data must
+                         stay identical on both, so it is locked here — see
+                         is_locked, which is always false without such a
+                         module. The subject, the order date and the rendered
+                         content stay editable. -->
+                    <field name="is_locked" invisible="1"/>
                     <group>
                         <group>
                             <field name="name" readonly="1"/>
-                            <field name="order_type" readonly="bool(leave_id)"/>
+                            <field name="order_type" readonly="is_locked"/>
                             <field name="date"/>
                             <field name="subject"/>
                             <!-- Audit trail: who recorded the signed order in
@@ -69,23 +52,24 @@
                             <field name="confirmed_date" invisible="state == 'draft'"/>
                         </group>
                         <group>
-                            <!-- no_open throughout: an order opened from a
-                                 leave's "New Order" button is still unsaved,
-                                 and navigating to any of these records loses
-                                 the leave it was opened from. -->
+                            <!-- no_open throughout: an order opened from
+                                 another document's "New Order" button is
+                                 still unsaved, and navigating to any of these
+                                 records loses the document it was opened
+                                 from. -->
                             <field name="company_id" groups="base.group_multi_company"
                                    options="{'no_create': True, 'no_open': True}"
-                                   readonly="bool(leave_id)"/>
+                                   readonly="is_locked"/>
                             <field name="employee_id"
-                                   readonly="bool(leave_id)"
+                                   readonly="is_locked"
                                    options="{'no_open': True}"
                                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"/>
                             <field name="department_id"
-                                   readonly="bool(leave_id)"
+                                   readonly="is_locked"
                                    options="{'no_open': True}"
                                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"/>
                             <field name="job_id"
-                                   readonly="bool(leave_id)"
+                                   readonly="is_locked"
                                    options="{'no_open': True}"
                                    domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]"/>
                             <field name="date_start" invisible="order_type != 'hiring'"/>
@@ -98,16 +82,8 @@
                             <field name="dismissal_reason" invisible="order_type != 'dismissal'"/>
                             <field name="include_vacation_compensation" invisible="order_type != 'dismissal'"/>
                             <field name="unused_vacation_days" invisible="order_type != 'dismissal' or not include_vacation_compensation"/>
-                            <field name="holiday_status_id" invisible="order_type != 'vacation'" required="order_type == 'vacation'" readonly="bool(leave_id)"
-                                   options="{'no_open': True}"/>
-                            <field name="vacation_date_from" invisible="order_type != 'vacation'" required="order_type == 'vacation'" readonly="bool(leave_id)"/>
-                            <field name="vacation_date_to" invisible="order_type != 'vacation'" required="order_type == 'vacation'" readonly="bool(leave_id)"/>
-                            <!-- Not shown: the linked time off is reached
-                                 through the "Time Off" smart button. Kept in
-                                 the view (invisible fields are still saved) so
-                                 a default_leave_id passed by the leave form's
-                                 "New Order" button survives the save. -->
-                            <field name="leave_id" invisible="1"/>
+                            <field name="vacation_date_from" invisible="order_type != 'vacation'" required="order_type == 'vacation'" readonly="is_locked"/>
+                            <field name="vacation_date_to" invisible="order_type != 'vacation'" required="order_type == 'vacation'" readonly="is_locked"/>
                         </group>
                     </group>
                     <notebook>

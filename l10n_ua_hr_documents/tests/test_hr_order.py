@@ -10,7 +10,6 @@ Tests cover:
 
 from datetime import date
 from odoo.tests import TransactionCase, tagged
-from unittest.mock import patch
 
 @tagged('post_install', '-at_install')
 class TestHrOrder(TransactionCase):
@@ -39,27 +38,6 @@ class TestHrOrder(TransactionCase):
             'job_id': cls.job.id,
         })
 
-        cls.leave_type = cls.env['hr.leave.type'].create({
-            'name': 'Annual Basic Leave',
-            'time_type': 'leave',
-            'requires_allocation': 'no',
-            'is_paid': True,
-        })
-
-        # Relax allocation requirements so leave validation doesn't block the
-        # order-driven leave creation. Do it per type and skip any type that
-        # already has leaves: Odoo forbids changing the allocation requirement
-        # once leaves of that type exist (and such types aren't used here).
-        Leave = cls.env['hr.leave']
-        for lt in cls.env['hr.leave.type'].search([]):
-            if 'requires_allocation' not in lt._fields:
-                break
-            if lt.requires_allocation == 'no':
-                continue
-            if Leave.search_count([('holiday_status_id', '=', lt.id)]):
-                continue
-            lt.requires_allocation = 'no'
-
     def _create_order(self, order_type='hiring', **kwargs):
         vals = {
             'order_type': order_type,
@@ -69,14 +47,46 @@ class TestHrOrder(TransactionCase):
             'company_id': self.company.id,
         }
         if order_type == 'vacation':
-            vals['holiday_status_id'] = self.leave_type.id
+            # No leave type and no time off: hr.order knows nothing of
+            # hr.leave here — the link is l10n_ua_hr_holidays' business, and
+            # tested there (test_hr_leave_order_sync.py).
             vals['vacation_date_from'] = date(2025, 6, 1)
             vals['vacation_date_to'] = date(2025, 6, 14)
         vals.update(kwargs)
-        # Surgically disable Odoo's core leave validation for the duration of this creation.
-        # This bypasses the allocation check regardless of how the leave type is generated.
-        with patch.object(type(self.env['hr.leave']), '_check_validity', lambda *args, **kwargs: None):
-            return self.env['hr.order'].create(vals)
+        return self.env['hr.order'].create(vals)
+
+    def test_module_knows_nothing_about_time_off(self):
+        """hr_holidays is not a dependency, and no field this module declares
+        on hr.order points at a time off.
+
+        The link to hr.leave lives in l10n_ua_hr_holidays, which depends on
+        this module; declaring either end here would either force a
+        dependency that cannot be declared (a cycle) or leave the order
+        reading a field that may not exist.
+        """
+        module = self.env['ir.module.module'].search(
+            [('name', '=', 'l10n_ua_hr_documents')], limit=1)
+        self.assertNotIn('hr_holidays',
+                         module.dependencies_id.mapped('name'))
+
+        leave_models = ('hr.leave', 'hr.leave.type', 'hr.leave.allocation')
+        own_leave_fields = [
+            field.name
+            for field in self.env['hr.order']._fields.values()
+            if 'l10n_ua_hr_documents' in field._modules
+            and field.comodel_name in leave_models
+        ]
+        self.assertFalse(
+            own_leave_fields,
+            'These hr.order fields belong in l10n_ua_hr_holidays: %s'
+            % ', '.join(own_leave_fields))
+
+    def test_order_is_never_locked_on_its_own(self):
+        """is_locked drives the readonly attributes of the shared fields on
+        the form. Nothing links an order here, so it is always false; the
+        module that adds a link redefines the computation."""
+        order = self._create_order('vacation')
+        self.assertFalse(order.is_locked)
 
     def test_order_creation(self):
         """Order should be created in draft state with auto number."""

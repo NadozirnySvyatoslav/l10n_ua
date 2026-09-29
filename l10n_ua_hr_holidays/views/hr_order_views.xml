@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The vacation order's link to the time off it grants. hr.order and its
+         form live in l10n_ua_hr_documents, which knows nothing of hr.leave;
+         everything about the link is contributed from here. -->
+    <record id="view_hr_order_form_holidays" model="ir.ui.view">
+        <field name="name">hr.order.form.holidays</field>
+        <field name="model">hr.order</field>
+        <field name="inherit_id" ref="l10n_ua_hr_documents.view_hr_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- "New Time Off" — opens a leave form pre-filled from this
+                 order so the user reviews and saves it. Shown only on a saved
+                 vacation order whose details are complete and that has no
+                 time off linked yet; confirming the order never creates one. -->
+            <xpath expr="//header/button[@name='action_load_template']" position="before">
+                <button name="action_create_leave"
+                        type="object"
+                        string="New Time Off"
+                        class="btn-primary"
+                        icon="fa-plus"
+                        invisible="not can_create_leave or not id"/>
+                <field name="can_create_leave" invisible="1"/>
+            </xpath>
+
+            <!-- Time Off smart button — the time off tied to THIS order;
+                 opens it. Only for vacation orders. -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_leaves" type="object"
+                        class="oe_stat_button" icon="fa-plane"
+                        invisible="order_type != 'vacation' or leave_count == 0">
+                    <field name="leave_count" widget="statinfo"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='vacation_date_from']" position="before">
+                <field name="holiday_status_id" invisible="order_type != 'vacation'"
+                       required="order_type == 'vacation'" readonly="is_locked"
+                       options="{'no_open': True}"/>
+            </xpath>
+
+            <!-- Not shown: the linked time off is reached through the "Time
+                 Off" smart button. Kept in the view (invisible fields are
+                 still saved) so a default_leave_id passed by the leave form's
+                 "New Order" button survives the save. -->
+            <xpath expr="//field[@name='vacation_date_to']" position="after">
+                <field name="leave_id" invisible="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

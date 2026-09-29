@@ -304,6 +304,7 @@ msgid "Can Create Order"
 msgstr "Можна створити наказ"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_order__can_create_leave
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_sick_leave__can_create_leave
 msgid "Can Create Time Off"
 msgstr "Можна створити відпустку"
@@ -799,6 +800,12 @@ msgid "Leave Order"
 msgstr "Наказ"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_order__leave_id
+msgid "Leave Record"
+msgstr "Запис відпустки"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_order__holiday_status_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_balance__leave_type_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule_line__leave_type_id
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_vacation_balance_view_search
@@ -824,6 +831,19 @@ msgid ""
 msgstr ""
 "Тип відпустки \"%(type)s\" не дозволяє перенесення днів: %(lost).1f "
 "невикористаних дн(ів) з попереднього періоду (%(period)s) буде втрачено."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_order.py:0
+msgid "Linked vacation order %s was cancelled. Leave state is unchanged."
+msgstr ""
+"Пов'язаний наказ про відпустку %s скасовано. Стан відпустки не змінено."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_order.py:0
+msgid "Linked vacation order was deleted."
+msgstr "Пов'язаний наказ про відпустку видалено."
 
 #. module: l10n_ua_hr_holidays
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_sick_leave_view_form
@@ -930,8 +950,10 @@ msgstr "Новий наказ"
 
 #. module: l10n_ua_hr_holidays
 #. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_order.py:0
 #: code:addons/l10n_ua_hr_holidays/models/hr_sick_leave.py:0
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_sick_leave_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.view_hr_order_form_holidays
 msgid "New Time Off"
 msgstr "Нова відпустка"
 
@@ -1051,6 +1073,17 @@ msgid "Number of messages with delivery error"
 msgstr "Кількість повідомлень з помилкою доставки"
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_order__leave_count
+msgid ""
+"Number of time off records tied to THIS order (0 or 1 — the order and its "
+"leave reference each other). Drives the \"Time Off\" smart button on "
+"vacation orders."
+msgstr ""
+"Кількість відпусток, прив'язаних до ЦЬОГО наказу (0 або 1 — наказ та його "
+"відпустка посилаються одне на одного). Керує смарт-кнопкою «Відпустка» на "
+"наказах про відпустку."
+
+#. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_leave_type__annual_days
 msgid "Number of vacation days per year (24 is standard)"
 msgstr "Кількість днів відпустки на рік (24 - стандарт)"
@@ -1074,6 +1107,12 @@ msgid ""
 msgstr ""
 "Для \"%(type)s\" можна перенести лише %(max)s дн(ів): %(lost).1f дн(ів) з "
 "попереднього періоду (%(period)s) перевищують ліміт і будуть втрачені."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_order.py:0
+msgid "Only a vacation order records time off."
+msgstr "Лише наказ на відпустку оформлює відпустку."
 
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_leave__order_date
@@ -1465,6 +1504,15 @@ msgstr ""
 "із заповненими датами і без прив’язаної відсутності."
 
 #. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_order__can_create_leave
+msgid ""
+"Technical: true when the \"New Time Off\" button should be shown — a "
+"vacation order with all its details filled in and no time off linked yet."
+msgstr ""
+"Технічне: істина, коли слід показати кнопку «Нова відпустка» — наказ на "
+"відпустку із заповненими даними, до якого ще не прив'язано відпустку."
+
+#. module: l10n_ua_hr_holidays
 #. odoo-python
 #: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
 msgid ""
@@ -1529,6 +1577,12 @@ msgstr ""
 
 #. module: l10n_ua_hr_holidays
 #. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_order.py:0
+msgid "This order already has a linked time off."
+msgstr "Цей наказ уже має прив'язану відпустку."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
 #: code:addons/l10n_ua_hr_holidays/models/hr_sick_leave.py:0
 msgid "This sick leave already has a linked order."
 msgstr "Цей лікарняний уже має пов'язаний наказ."
@@ -1545,7 +1599,10 @@ msgid "This will create any missing UA leave types. Continue?"
 msgstr "Це створить відсутні українські типи відпусток. Продовжити?"
 
 #. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_order.py:0
 #: model:ir.model,name:l10n_ua_hr_holidays.model_hr_leave
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_order__leave_count
 msgid "Time Off"
 msgstr "Відпустка"
 
