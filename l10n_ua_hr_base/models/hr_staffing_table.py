@@ -116,30 +116,44 @@ class HrStaffingTable(models.Model):
     # constraint further down keeps a third line from joining the two while
     # nobody has fixed them.
 
+    # What each report is unable to say, if it is the thing that breaks. Read
+    # by `_report_safely`, which has only the name of the method to go on.
+    _REPORTS = {
+        '_report_duplicate_start_dates':
+            "could not check whether two approved staffing lines of a "
+            "position start on the same day; the resolution by date is "
+            "unverified on this database",
+        '_report_stopped_positions':
+            "could not check whether anybody stands on a position that no "
+            "longer resolves to a staffing line; a payslip at zero would not "
+            "be announced on this database",
+    }
+
     def init(self):
         super().init()
-        # Deferred: this writes to the chatter, and the post-init queue runs
+        # Deferred: these write to the chatter, and the post-init queue runs
         # once every model of the module has been through `_auto_init`.
-        self.pool.post_init(self._report_duplicate_start_dates_safely)
+        #
+        # Queued separately rather than run one after the other, so that a
+        # report which cannot be produced does not take the other one with it.
+        for name in self._REPORTS:
+            self.pool.post_init(self._report_safely, name)
 
-    def _report_duplicate_start_dates_safely(self):
-        """The report runs inside `load_modules`, and anything raised there
+    def _report_safely(self, name):
+        """The reports run inside `load_modules`, and anything raised there
         takes the whole database down with it — every module, for every user,
-        over a message about a staffing line. It is a diagnostic: it may fail
-        to be produced, it may not decide whether the database comes up. The
-        traceback goes to the log, where the schema errors it is about already
-        are."""
+        over a message about a staffing line. They are diagnostics: they may
+        fail to be produced, they may not decide whether the database comes up.
+        The traceback goes to the log, where what they are about already is."""
         try:
             # In a savepoint, the way `Registry.post_constraint` runs the index
-            # it is reporting on: a database error left uncaught would poison
-            # the transaction the rest of the loading still has to write in.
+            # one of them is reporting on: a database error left uncaught would
+            # poison the transaction the rest of the loading still has to write
+            # in.
             with self.env.cr.savepoint():
-                self._report_duplicate_start_dates()
+                getattr(self, name)()
         except Exception:  # noqa: BLE001 - a report may not break the upgrade
-            _logger.exception(
-                "could not check whether two approved staffing lines of a "
-                "position start on the same day; the resolution by date is "
-                "unverified on this database")
+            _logger.exception(self._REPORTS[name])
 
     def _report_duplicate_start_dates(self):
         """Say out loud that the one-line-per-start-date guarantee is missing.
@@ -205,6 +219,199 @@ class HrStaffingTable(models.Model):
                 date=format_date(self.env, date_from),
                 ids=', '.join(str(line_id) for line_id in lines.ids))
             lines._message_log_batch({line_id: body for line_id in lines.ids})
+
+    def _report_stopped_positions(self):
+        """Employees whose position pays nothing, said on the line
+        that stopped it.
+
+        #300 changed what `date_to` means. It used to be "Effective Until" —
+        the end of this line's own period, filled in by hand whenever an
+        officer closed a line and opened the next. It now means "Position
+        Discontinued": the resolution stops at a line whose date has passed and
+        deliberately does not fall through to an older one, because a position
+        that was abolished does not come back. On a database where the field
+        was filled in as a matter of habit, positions therefore stopped paying,
+        and the first sign of it is a payslip at zero.
+
+        The report is not about that change, though, and deliberately so. A
+        past end date is, on its own, a perfectly good statement that the
+        position was abolished, and a report about it could only be made once —
+        afterwards nothing in the data separates a line an officer has read and
+        stood by from one nobody has opened, so it would nag about every
+        correctly closed position for ever.
+
+        What is always wrong, whatever the date meant, is somebody standing on
+        a position that pays nothing. That is the condition here: an employee
+        whose version carries no wage of its own, whose company lets the wage
+        fall back to the staffing table, and whose position resolves to no line
+        today. Their next payslip is a zero that looks calculated.
+
+        So it can repeat on every update, the way
+        `_report_duplicate_start_dates` does, and stop for the same reason:
+        because the data stopped being wrong. Opening a line, clearing the
+        date, filling in the wage or moving the employee off the position all
+        silence it; reading it does not.
+
+        Positions that resolve to nothing because the table has no line for
+        them at all are outside this: nothing was discontinued there, and that
+        is a gap in the staffing table rather than a consequence of #300.
+        """
+        today = fields.Date.context_today(self)
+
+        # `sudo`, unlike `_l10n_ua_effective_wage`, which reads the table
+        # `with_company` so that a wage never depends on the company switcher.
+        # Nothing is being read *for* anybody here: this is a statement about
+        # the database, and a report that covered only the companies its caller
+        # happens to have ticked would go quiet exactly where nobody is looking.
+        staffing = self.sudo()
+
+        # Who holds a post today is read from the version timeline, the same
+        # way `_occupancy_from_versions` reads it, and never from
+        # `current_version_id`: that field is refreshed by a daily cron, so
+        # right after a transfer it still names the post the employee left —
+        # and this report is a statement about today. The same rule also drops
+        # the people who no longer stand anywhere: a contract that has ended, a
+        # departure, an employee archived by hand. Counting them would put
+        # "2 employee(s) still stand here" in the chatter of a line whose own
+        # `filled_units` says nobody does.
+        Version = staffing.env['hr.version'].with_context(active_test=False)
+        rows = Version.search_read(
+            [('employee_id', '!=', False), ('date_version', '<=', today)],
+            self._IN_FORCE_COLUMNS, order='date_version, id')
+        archived = set(staffing.env['hr.employee'].with_context(
+            active_test=False).search([('active', '=', False)]).ids)
+        timelines, departures = self._version_timelines(rows)
+        in_force = self._versions_in_force(
+            timelines, departures, today, archived)
+
+        # Mirrors `hr.version._l10n_ua_effective_wage`, which is the thing that
+        # will return the zero: its own wage first, the table only where there
+        # is none, and only where the company allows it. A version that never
+        # reaches the fallback cannot be hurt by a position that stopped.
+        versions = Version.browse(
+            row['id'] for row in in_force.values()).filtered(
+            lambda version: (
+                not version.wage
+                and version.department_id and version.job_id
+                and (version.company_id.wage_from_staffing or 'both')
+                in ('fallback', 'both')))
+        if not versions:
+            return
+
+        # `_resolve_batch` rather than a second reading of the same rule: what
+        # this report is about is what payroll will find, and two derivations
+        # of that drift. One query for the lot of them.
+        keys = {
+            version.id: (version.company_id.id, version.department_id.id,
+                         version.job_id.id, today)
+            for version in versions
+        }
+        resolved = staffing._resolve_batch(list(keys.values()))
+        stopped = versions.filtered(
+            lambda version: not resolved.get(keys[version.id]))
+        if not stopped:
+            return
+
+        lines_by_position = defaultdict(lambda: staffing.browse())
+        for line in staffing.search([
+                ('state', '=', 'approved'),
+                ('company_id', 'in', stopped.company_id.ids),
+                ('department_id', 'in', stopped.department_id.ids),
+                ('job_id', 'in', stopped.job_id.ids)], order='date_from'):
+            lines_by_position[(
+                line.company_id.id, line.department_id.id, line.job_id.id,
+            )] |= line
+
+        exposed = defaultdict(int)
+        next_start = {}
+        for version in stopped:
+            lines = lines_by_position[keys[version.id][:3]]
+            in_force = lines.filtered(lambda line: line.date_from <= today)[-1:]
+            if not in_force.date_to:
+                # Nothing started yet, or nothing at all: the position is not
+                # in the table for today, which no end date caused.
+                continue
+            exposed[in_force.id] += 1
+            following = lines.filtered(lambda line: line.date_from > today)[:1]
+            if following:
+                next_start[in_force.id] = following.date_from
+
+        if not exposed:
+            return
+
+        _logger.error(
+            "%s staffing line(s) end a position that %s employee(s) still "
+            "stand on with no wage of their own. Payroll reads the position "
+            "and finds nothing, so those payslips are calculated at zero: %s",
+            len(exposed), sum(exposed.values()),
+            "; ".join(
+                "%s / %s: line %s ends %s, %s employee(s)" % (
+                    line.department_id.display_name, line.job_id.display_name,
+                    line.id, line.date_to, exposed[line.id])
+                for line in staffing.browse(exposed.keys())))
+
+        # Split by what the officer is looking at: a position that simply ends
+        # and one that comes back later are the same zero, but not the same
+        # correction.
+        gaps = staffing.browse(next_start.keys())
+        dead_ends = staffing.browse(exposed.keys()) - gaps
+        if dead_ends:
+            dead_ends._message_log_position_discontinued(exposed)
+        if gaps:
+            gaps._message_log_position_gap(exposed, next_start)
+
+    def _message_log_position_discontinued(self, employees_without_wage):
+        """Say on the line that it ends a position somebody still stands on.
+
+        The end date is not questioned — only the officer knows whether the
+        position was abolished. What the note says is what follows from it
+        today: the people on that position are paid from a line that no longer
+        applies, and nothing is left to read their salary from.
+
+        :param employees_without_wage: {line id: how many employees stand on
+            that position with no wage of their own}, counted by
+            `_report_stopped_positions`.
+        """
+        self._message_log_batch({
+            line.id: self.env._(
+                'This line ends %(date)s, and an end date says the position '
+                'itself was discontinued: payroll does not fall back to an '
+                'earlier line. %(employees)s employee(s) still stand on this '
+                'position and carry no wage of their own, so their pay is '
+                'read from here and comes out at zero. Open an approved line '
+                'from the day the position continues, clear the end date if '
+                'the position never ended, or move those employees off it.',
+                date=format_date(self.env, line.date_to),
+                employees=employees_without_wage.get(line.id, 0),
+            )
+            for line in self
+        })
+
+    def _message_log_position_gap(self, employees_without_wage, next_start):
+        """Say on the line that the position is unpaid until it resumes.
+
+        The same zero as `_message_log_position_discontinued`, but not the same
+        correction: here the position comes back, so the day it comes back is
+        what the officer has to compare the end date against.
+
+        :param next_start: {line id: the day the next approved line of the
+            same position starts}.
+        """
+        self._message_log_batch({
+            line.id: self.env._(
+                'This line ends %(date)s and the next approved line of the '
+                'position starts only %(next)s; payroll does not fall back to '
+                'an earlier line in between. %(employees)s employee(s) still '
+                'stand on this position and carry no wage of their own, so '
+                'their pay is read from here and comes out at zero until '
+                '%(next)s. Clear the end date if the position never stopped, '
+                'or correct the day the next line starts.',
+                date=format_date(self.env, line.date_to),
+                next=format_date(self.env, next_start[line.id]),
+                employees=employees_without_wage.get(line.id, 0),
+            )
+            for line in self
+        })
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
@@ -444,6 +651,14 @@ class HrStaffingTable(models.Model):
                 totals[key] += rate
         return totals
 
+    # The columns `_version_timelines` and `_versions_in_force` read. Both
+    # callers pass rows from `search_read`, not a recordset: reading a field
+    # off a searched hr.version fetches every stored field it has — over a
+    # hundred — for every version of every employee involved.
+    _IN_FORCE_COLUMNS = ['employee_id', 'company_id', 'department_id', 'job_id',
+                         'date_version', 'contract_date_start',
+                         'contract_date_end', 'departure_date']
+
     @api.model
     def _occupancy_from_versions(self, keys):
         """Employees holding each position on its date, read from hr.version.
@@ -474,9 +689,7 @@ class HrStaffingTable(models.Model):
         # Only the columns needed. Reading fields off a searched recordset
         # makes the ORM fetch every stored field of hr.version — over a
         # hundred of them — for every version of every employee involved.
-        columns = ['employee_id', 'company_id', 'department_id', 'job_id',
-                   'date_version', 'contract_date_start', 'contract_date_end',
-                   'departure_date']
+        columns = list(self._IN_FORCE_COLUMNS)
         if 'work_rate' in Version._fields:
             # Added by l10n_ua_hr_contract, which depends on this module and
             # not the other way round, so the column may be absent.
@@ -495,6 +708,33 @@ class HrStaffingTable(models.Model):
             active_test=False).search([
                 ('id', 'in', employees.ids), ('active', '=', False)]).ids)
 
+        timelines, departures = self._version_timelines(rows)
+
+        wanted = set(keys)
+        totals = defaultdict(float)
+        # Built once, asked per date: the timelines do not change between
+        # dates, and rebuilding them for each would walk every version again.
+        for ref_date in {key[3] for key in keys}:
+            for in_force in self._versions_in_force(
+                    timelines, departures, ref_date, archived).values():
+                key = (in_force['company_id'] and in_force['company_id'][0],
+                       in_force['department_id'] and in_force['department_id'][0],
+                       in_force['job_id'] and in_force['job_id'][0],
+                       ref_date)
+                if key in wanted:
+                    # `work_rate` defaults to 1.0, so a falsy one is missing
+                    # data rather than an unpaid post.
+                    totals[key] += in_force.get('work_rate') or 1.0
+        return totals
+
+    @api.model
+    def _version_timelines(self, rows):
+        """Group `search_read` rows by employee, keeping their order.
+
+        :param rows: version rows ordered by `date_version`, carrying at least
+            `_IN_FORCE_COLUMNS`.
+        :return: ({employee id: their rows}, {employee id: departure date}).
+        """
         timelines = defaultdict(list)
         # A departure is a fact about the person, not about a version: it is
         # written through the employee card, so it lands on whichever version
@@ -510,35 +750,41 @@ class HrStaffingTable(models.Model):
                 previous = departures.get(employee)
                 if not previous or departure > previous:
                     departures[employee] = departure
+        return timelines, departures
 
-        wanted = set(keys)
-        totals = defaultdict(float)
-        for ref_date in {key[3] for key in keys}:
-            for employee, timeline in timelines.items():
-                in_force = None
-                for row in timeline:  # ordered by date_version ascending
-                    if row['date_version'] > ref_date:
-                        break
-                    in_force = row
-                if in_force is None:
-                    continue
-                start = in_force['contract_date_start']
-                if start and start > ref_date:
-                    continue
-                end = in_force['contract_date_end'] or departures.get(employee)
-                if end and end < ref_date:
-                    continue
-                if not end and employee in archived:
-                    continue
-                key = (in_force['company_id'] and in_force['company_id'][0],
-                       in_force['department_id'] and in_force['department_id'][0],
-                       in_force['job_id'] and in_force['job_id'][0],
-                       ref_date)
-                if key in wanted:
-                    # `work_rate` defaults to 1.0, so a falsy one is missing
-                    # data rather than an unpaid post.
-                    totals[key] += in_force.get('work_rate') or 1.0
-        return totals
+    @api.model
+    def _versions_in_force(self, timelines, departures, ref_date, archived=()):
+        """Which version of each employee holds a post on `ref_date`.
+
+        The one statement of that rule in this module: occupancy counts the
+        posts it returns, and `_report_stopped_positions` names the people on
+        them. Two readings of "who works here today" would drift, and a report
+        that contradicts the `filled_units` of the very line it writes on is
+        worse than no report.
+
+        :param archived: employees archived with no end date anywhere;
+            they are dropped rather than left holding the post for ever.
+        :return: {employee id: the row in force, if any}.
+        """
+        in_force_rows = {}
+        for employee, timeline in timelines.items():
+            in_force = None
+            for row in timeline:  # ordered by date_version ascending
+                if row['date_version'] > ref_date:
+                    break
+                in_force = row
+            if in_force is None:
+                continue
+            start = in_force['contract_date_start']
+            if start and start > ref_date:
+                continue
+            end = in_force['contract_date_end'] or departures.get(employee)
+            if end and end < ref_date:
+                continue
+            if not end and employee in archived:
+                continue
+            in_force_rows[employee] = in_force
+        return in_force_rows
 
     @api.model
     def _occupancy_from_combinings(self, keys):
