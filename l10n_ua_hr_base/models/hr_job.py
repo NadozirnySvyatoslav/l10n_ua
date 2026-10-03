@@ -30,7 +30,7 @@ class HrJob(models.Model):
         ('4', 'Class 4 (Dangerous)'),
     ], string='Hazard Class')
     tariff_grade_id = fields.Many2one(
-        'hr.tariff.grade', string='Tariff Grade')
+        'hr.tariff.grade', string='Tariff Grade', check_company=True)
     min_salary = fields.Monetary(
         string='Minimum Salary', currency_field='currency_id',
         help='Minimum salary for this position')
@@ -60,3 +60,11 @@ class HrJob(models.Model):
         if self.department_id and self.department_id.company_id \
                 and self.department_id.company_id != self.company_id:
             self.department_id = False
+        if self.tariff_grade_id and self.tariff_grade_id.company_id != self.company_id:
+            self.tariff_grade_id = False
+
+    @api.constrains('tariff_grade_id', 'company_id')
+    def _check_tariff_grade_company(self):
+        # hr.job does not set _check_company_auto, so check_company alone
+        # would only narrow the dropdown.
+        self._check_company(['tariff_grade_id'])

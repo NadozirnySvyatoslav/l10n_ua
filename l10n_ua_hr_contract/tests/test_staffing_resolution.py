@@ -240,7 +240,7 @@ class TestStaffingResolution(ContractTestCase):
     # === Salary range ===
 
     def test_wage_outside_range_warns_without_blocking(self):
-        self._line(salary=20000.0, salary_min=16000.0, salary_max=22000.0)
+        line = self._line(salary=20000.0, salary_min=16000.0, salary_max=22000.0)
         employee = self._employee()
         version = employee.current_version_id
         version.write({'wage': 20000})
@@ -252,7 +252,9 @@ class TestStaffingResolution(ContractTestCase):
 
         self.assertEqual(version.wage, 35000)
         self.assertEqual(len(employee.message_ids), before + 1)
-        self.assertIn('staffing table', employee.message_ids[0].body)
+        # The note is written in the user's language, so it is recognised by
+        # the staffing line it names rather than by its English wording.
+        self.assertIn(line.name, employee.message_ids[0].body)
 
     def test_wage_inside_range_is_silent(self):
         self._line(salary=20000.0, salary_min=16000.0, salary_max=22000.0)

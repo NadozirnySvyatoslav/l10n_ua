@@ -71,14 +71,28 @@ class HrVersionAllowance(models.Model):
 
     notes = fields.Text(string='Notes')
 
-    def _get_minimum_wage(self):
+    def _get_minimum_wage(self, date=None):
+        """Minimum wage of the version's company in force on `date`.
+
+        Asked of the payroll parameters the same way a payslip asks: by the
+        company the allowance belongs to and by the date it is computed for.
+        Without the company the answer depended on the company switcher, and
+        without the date a payslip recomputed for a past period took today's
+        minimum wage.
+
+        The configuration parameter behind it is reached only where
+        `l10n_ua_hr_salary` is not installed and there are no payroll
+        parameters at all: a payslip stops before this point when its
+        company has none.
+        """
+        self.ensure_one()
         if 'hr.psp.parameters' in self.env:
-            current_year = fields.Date.today().year
-            psp_params = self.env['hr.psp.parameters'].search([
-                ('year', '=', current_year)
-            ], limit=1)
-            if psp_params:
-                return psp_params.min_wage
+            company = self.version_id.company_id or self.env.company
+            date = date or self.date_from or fields.Date.context_today(self)
+            params = self.env['hr.psp.parameters'].get_parameters(
+                date, company.id)
+            if params:
+                return params.min_wage
         param = self.env['ir.config_parameter'].sudo().get_param(
             'l10n_ua_hr.minimum_wage', '8000'
         )
@@ -112,7 +126,7 @@ class HrVersionAllowance(models.Model):
         if self.calculation_method == 'fixed':
             return self.amount or 0.0
         if self.calculation_method == 'percent_min_wage':
-            return self._get_minimum_wage() * (self.percent or 0) / 100
+            return self._get_minimum_wage(date) * (self.percent or 0) / 100
         if self.calculation_method == 'percent_salary':
             version = self.version_id
             if rate is not None:

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_tariff_grade_new_period_view_form" model="ir.ui.view">
+        <field name="name">hr.tariff.grade.new.period.form</field>
+        <field name="model">hr.tariff.grade.new.period</field>
+        <field name="arch" type="xml">
+            <form string="New Tariff Rates from Date">
+                <group>
+                    <group>
+                        <field name="company_id" options="{'no_create': True}"
+                               domain="[('id', 'in', allowed_company_ids)]"/>
+                        <field name="date_from"/>
+                    </group>
+                    <group>
+                        <field name="base_rate"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                </group>
+                <div class="alert alert-info" role="alert">
+                    The first-grade rate recomputes only the grades whose
+                    current rate equals the first-grade rate × coefficient and
+                    those with no rate yet. A rate that differs from the
+                    formula was agreed apart from it and is carried over
+                    unchanged — correct it in "New Rate" if it has to change.
+                    The column "New Rate From" says which is which.
+                </div>
+                <field name="line_ids">
+                    <list editable="bottom" create="false" delete="false">
+                        <!-- The lines are built by a compute and saved back by
+                             the client: a field the view does not carry is
+                             lost on the way, and this one is required. -->
+                        <field name="grade_id" column_invisible="1"/>
+                        <field name="grade"/>
+                        <field name="name"/>
+                        <field name="coefficient"/>
+                        <field name="current_rate"/>
+                        <field name="new_rate"/>
+                        <field name="rate_diff"/>
+                        <field name="rate_source"/>
+                        <field name="currency_id" column_invisible="1"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_apply" type="object" string="Create"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_tariff_grade_new_period" model="ir.actions.act_window">
+        <field name="name">New Rates from Date</field>
+        <field name="res_model">hr.tariff.grade.new.period</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_hr_tariff_grade"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo>

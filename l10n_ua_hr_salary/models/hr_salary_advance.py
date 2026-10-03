@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools import format_date
 
 
 class HrSalaryAdvance(models.Model):
@@ -30,13 +31,21 @@ class HrSalaryAdvance(models.Model):
         compute='_compute_gross_amount', store=True,
         currency_field='currency_id',
     )
-    pdfo_rate = fields.Float(string='PDFO (%)', default=18.0)
+    pdfo_rate = fields.Float(
+        string='PDFO (%)', compute='_compute_tax_rates', store=True,
+        readonly=False, precompute=True,
+        help='Rate of the payroll parameters of the advance company on the '
+             'payment date. Can be corrected by hand.')
     pdfo_amount = fields.Monetary(
         string='PDFO',
         compute='_compute_taxes', store=True,
         currency_field='currency_id',
     )
-    military_rate = fields.Float(string='Military Tax (%)', default=5.0)
+    military_rate = fields.Float(
+        string='Military Tax (%)', compute='_compute_tax_rates', store=True,
+        readonly=False, precompute=True,
+        help='Rate of the payroll parameters of the advance company on the '
+             'payment date. Can be corrected by hand.')
     military_amount = fields.Monetary(
         string='Military Tax',
         compute='_compute_taxes', store=True,
@@ -106,6 +115,25 @@ class HrSalaryAdvance(models.Model):
                         company=advance.company_id or version.company_id)
             advance.gross_amount = round(wage * advance.wage_percent / 100, 2)
 
+    @api.depends('company_id', 'date')
+    def _compute_tax_rates(self):
+        """Rates of the company's payroll parameters on the payment date.
+
+        The advance withholds the same taxes as the payslip, so it reads the
+        rates where the payslip reads them, instead of keeping statutory
+        numbers of its own. A confirmed advance keeps the rates it was
+        computed with; without parameters the rates stay at zero, and
+        `action_confirm` refuses such an advance.
+        """
+        Params = self.env['hr.psp.parameters']
+        for advance in self:
+            if advance.state != 'draft':
+                continue
+            params = Params.get_parameters(advance.date, advance.company_id.id) \
+                if advance.date and advance.company_id else None
+            advance.pdfo_rate = params.pdfo_rate if params else 0.0
+            advance.military_rate = params.military_tax_rate if params else 0.0
+
     @api.depends(
         'gross_amount', 'pdfo_rate', 'military_rate',
         'employee_id.current_version_id.contract_type_ua',
@@ -141,9 +169,20 @@ class HrSalaryAdvance(models.Model):
         return super().create(vals_list)
 
     def action_confirm(self):
+        Params = self.env['hr.psp.parameters']
         for advance in self:
             if advance.state != 'draft':
                 raise UserError(_('Only draft advances can be confirmed.'))
+            if not Params.get_parameters(advance.date, advance.company_id.id):
+                # Otherwise the advance would withhold taxes at rates nobody
+                # has set for this company.
+                raise UserError(_(
+                    'No payroll parameters are defined for company '
+                    '"%(company)s" on %(date)s. Add them in Payroll → '
+                    'Configuration → PSP Parameters before confirming the '
+                    'advance.',
+                    company=advance.company_id.display_name,
+                    date=format_date(self.env, advance.date)))
         self.write({'state': 'confirmed'})
 
     def action_draft(self):

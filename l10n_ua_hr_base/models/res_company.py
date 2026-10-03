@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
@@ -39,3 +39,9 @@ class ResCompany(models.Model):
             '- Suggest: auto-fill wage when selecting staffing position\n'
             '- Fallback: use staffing salary in payslip if contract wage is 0\n'
             '- Both: suggest on selection + fallback in payslip')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        companies = super().create(vals_list)
+        self.env['hr.tariff.grade']._seed_company_grades(companies)
+        return companies

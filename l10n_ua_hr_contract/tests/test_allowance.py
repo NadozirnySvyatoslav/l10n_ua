@@ -112,3 +112,32 @@ class TestVersionAllowance(ContractTestCase):
         version.invalidate_recordset()
         self.assertEqual(version.total_allowances, 7000)
         self.assertEqual(version.total_wage, 32000)
+
+    def test_percent_min_wage_uses_own_company_and_date(self):
+        """The minimum wage comes from the version's company, on the date asked."""
+        if 'hr.psp.parameters' not in self.env:
+            self.skipTest('l10n_ua_hr_salary is not installed')
+        Params = self.env['hr.psp.parameters']
+        own = Params.get_parameters(date(2025, 6, 1), self.company.id)
+        self.assertTrue(own, 'the company has parameters of its own')
+        own.min_wage = 8000.0
+        other_company = self.env['res.company'].create({'name': 'Allowance Other Co'})
+        other = Params.get_parameters(date(2025, 6, 1), other_company.id)
+        other.min_wage = 20000.0
+
+        allowance = self._create_allowance(
+            calculation_method='percent_min_wage', percent=10.0,
+            date_from=date(2025, 6, 1))
+        # 10% of the company's own 8 000, not of another company's 20 000.
+        self.assertAlmostEqual(allowance.calculated_amount, 800.0)
+        self.assertAlmostEqual(
+            allowance._l10n_ua_amount_at(date(2025, 6, 30)), 800.0)
+
+        # A later period of the same company is used for a later date.
+        Params.create({
+            'year': 2027, 'date_from': date(2027, 1, 1),
+            'subsistence_minimum': 3328.0, 'min_wage': 12000.0,
+            'company_id': self.company.id,
+        })
+        self.assertAlmostEqual(
+            allowance._l10n_ua_amount_at(date(2027, 3, 31)), 1200.0)

@@ -9,6 +9,8 @@ access_hr_employee_benefit_user,hr.employee.benefit.user,model_hr_employee_benef
 access_hr_employee_benefit_manager,hr.employee.benefit.manager,model_hr_employee_benefit,hr.group_hr_manager,1,1,1,1
 access_hr_tariff_grade_user,hr.tariff.grade.user,model_hr_tariff_grade,hr.group_hr_user,1,0,0,0
 access_hr_tariff_grade_manager,hr.tariff.grade.manager,model_hr_tariff_grade,hr.group_hr_manager,1,1,1,1
+access_hr_tariff_grade_template_user,hr.tariff.grade.template.user,model_hr_tariff_grade_template,hr.group_hr_user,1,0,0,0
+access_hr_tariff_grade_template_manager,hr.tariff.grade.template.manager,model_hr_tariff_grade_template,hr.group_hr_manager,1,1,1,1
 access_hr_kp2010_user,hr.kp2010.user,model_hr_kp2010,hr.group_hr_user,1,0,0,0
 access_hr_kp2010_manager,hr.kp2010.manager,model_hr_kp2010,hr.group_hr_manager,1,1,1,1
 access_hr_employee_child_user,hr.employee.child.user,model_hr_employee_child,hr.group_hr_user,1,0,0,0
@@ -33,3 +35,5 @@ access_military_op_report_officer,hr.employee.military.operational.report.office
 access_military_op_report_manager,hr.employee.military.operational.report.manager,model_hr_employee_military_operational_report,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
 access_military_op_report_line_user,hr.employee.military.operational.report.line.user,model_hr_employee_military_operational_report_line,hr.group_hr_user,1,0,0,0
 access_military_op_report_line_officer,hr.employee.military.operational.report.line.officer,model_hr_employee_military_operational_report_line,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,1
+access_hr_tariff_grade_new_period,hr.tariff.grade.new.period,model_hr_tariff_grade_new_period,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_tariff_grade_new_period_line,hr.tariff.grade.new.period.line,model_hr_tariff_grade_new_period_line,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

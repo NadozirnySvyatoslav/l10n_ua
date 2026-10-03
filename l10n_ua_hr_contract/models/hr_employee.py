@@ -160,7 +160,7 @@ class HrEmployee(models.Model):
 
     tariff_grade_id = fields.Many2one(
         related='version_id.tariff_grade_id', inherited=True,
-        readonly=False, groups="hr.group_hr_user")
+        readonly=False, check_company=True, groups="hr.group_hr_user")
     work_conditions = fields.Selection(
         related='version_id.work_conditions', inherited=True,
         readonly=False, groups="hr.group_hr_user")

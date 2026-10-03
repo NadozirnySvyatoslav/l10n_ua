@@ -94,6 +94,7 @@ class HrVersion(models.Model):
     tariff_grade_id = fields.Many2one(
         'hr.tariff.grade',
         string='Tariff Grade',
+        check_company=True,
         groups="hr.group_hr_user"
     )
 
@@ -350,6 +351,19 @@ class HrVersion(models.Model):
             staffing = self.staffing_line_id
             if staffing.salary and (not self.wage or self.wage == 0):
                 self.wage = staffing.salary
+
+    @api.onchange('company_id')
+    def _onchange_company_id_tariff_grade(self):
+        for version in self:
+            if version.tariff_grade_id and \
+                    version.tariff_grade_id.company_id != version.company_id:
+                version.tariff_grade_id = False
+
+    @api.constrains('tariff_grade_id', 'company_id')
+    def _check_tariff_grade_company(self):
+        # hr.version does not set _check_company_auto, so check_company alone
+        # would only narrow the dropdown.
+        self._check_company(['tariff_grade_id'])
 
     @api.constrains('work_rate')
     def _check_work_rate(self):

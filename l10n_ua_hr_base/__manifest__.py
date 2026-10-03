@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Base',
-    'version': '19.0.1.7.0',
+    'version': '19.0.1.8.2',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR localization base module',
     'description': """
@@ -56,6 +56,7 @@ This module is required for all other l10n_ua_hr_* modules.
         'views/hr_military_tcc_views.xml',
         'views/hr_education_level_views.xml',
         'views/hr_employee_benefit_views.xml',
+        'wizard/hr_tariff_grade_new_period_views.xml',
         'views/hr_tariff_grade_views.xml',
         'views/hr_kp2010_views.xml',
         'views/res_company_views.xml',

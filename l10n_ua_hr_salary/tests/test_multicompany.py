@@ -189,3 +189,36 @@ class TestPayslipCompanyScope(TransactionCase):
         arch = self.env['hr.payslip'].get_view(
             self.env.ref('l10n_ua_hr_salary.hr_payslip_view_form').id)['arch']
         self.assertIn("('id', 'in', allowed_company_ids)", arch)
+
+    def test_payslip_uses_the_tariff_grade_of_its_own_company(self):
+        """Each company pays by its own agreement, whatever is in the switcher."""
+        # Both companies got the typical set when they were created; each
+        # agrees its own rate for grade 6.
+        Grade = self.env['hr.tariff.grade']
+
+        def grade_of(company, rate):
+            grade = Grade.search([('company_id', '=', company.id),
+                                  ('grade', '=', 6)], limit=1)
+            grade.hourly_rate = rate
+            return grade
+
+        grade_a = grade_of(self.company_a, 100.0)
+        grade_b = grade_of(self.company_b, 200.0)
+        employee_a = self._create_employee(self.company_a, date(2030, 1, 1))
+        employee_a.current_version_id.tariff_grade_id = grade_a
+        self.employee_b.current_version_id.tariff_grade_id = grade_b
+
+        rates = {}
+        for employee, company in ((employee_a, self.company_a),
+                                  (self.employee_b, self.company_b)):
+            # Company A is the one in the switcher for both payslips.
+            env = self._env_with_active(self.company_a)
+            slip = self._create_payslip(env, employee, company, date(2031, 6, 30))
+            slip.write({'scheduled_hours': 160.0, 'worked_hours': 160.0,
+                        'scheduled_days': 20, 'worked_days': 20})
+            slip._generate_accruals()
+            salary = slip.accrual_ids.filtered(
+                lambda accrual: accrual.accrual_type_id.code == 'SALARY')
+            rates[company.name] = salary.rate
+        self.assertAlmostEqual(rates[self.company_a.name], 100.0, places=2)
+        self.assertAlmostEqual(rates[self.company_b.name], 200.0, places=2)

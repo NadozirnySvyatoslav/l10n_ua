@@ -2,95 +2,99 @@
 <odoo>
     <data noupdate="1">
 
-        <record id="tariff_grade_1" model="hr.tariff.grade">
+        <record id="tariff_grade_1" model="hr.tariff.grade.template">
             <field name="name">Розряд 1</field>
             <field name="grade">1</field>
             <field name="coefficient">1.0</field>
         </record>
 
-        <record id="tariff_grade_2" model="hr.tariff.grade">
+        <record id="tariff_grade_2" model="hr.tariff.grade.template">
             <field name="name">Розряд 2</field>
             <field name="grade">2</field>
             <field name="coefficient">1.09</field>
         </record>
 
-        <record id="tariff_grade_3" model="hr.tariff.grade">
+        <record id="tariff_grade_3" model="hr.tariff.grade.template">
             <field name="name">Розряд 3</field>
             <field name="grade">3</field>
             <field name="coefficient">1.18</field>
         </record>
 
-        <record id="tariff_grade_4" model="hr.tariff.grade">
+        <record id="tariff_grade_4" model="hr.tariff.grade.template">
             <field name="name">Розряд 4</field>
             <field name="grade">4</field>
             <field name="coefficient">1.27</field>
         </record>
 
-        <record id="tariff_grade_5" model="hr.tariff.grade">
+        <record id="tariff_grade_5" model="hr.tariff.grade.template">
             <field name="name">Розряд 5</field>
             <field name="grade">5</field>
             <field name="coefficient">1.36</field>
         </record>
 
-        <record id="tariff_grade_6" model="hr.tariff.grade">
+        <record id="tariff_grade_6" model="hr.tariff.grade.template">
             <field name="name">Розряд 6</field>
             <field name="grade">6</field>
             <field name="coefficient">1.45</field>
         </record>
 
-        <record id="tariff_grade_7" model="hr.tariff.grade">
+        <record id="tariff_grade_7" model="hr.tariff.grade.template">
             <field name="name">Розряд 7</field>
             <field name="grade">7</field>
             <field name="coefficient">1.54</field>
         </record>
 
-        <record id="tariff_grade_8" model="hr.tariff.grade">
+        <record id="tariff_grade_8" model="hr.tariff.grade.template">
             <field name="name">Розряд 8</field>
             <field name="grade">8</field>
             <field name="coefficient">1.64</field>
         </record>
 
-        <record id="tariff_grade_9" model="hr.tariff.grade">
+        <record id="tariff_grade_9" model="hr.tariff.grade.template">
             <field name="name">Розряд 9</field>
             <field name="grade">9</field>
             <field name="coefficient">1.73</field>
         </record>
 
-        <record id="tariff_grade_10" model="hr.tariff.grade">
+        <record id="tariff_grade_10" model="hr.tariff.grade.template">
             <field name="name">Розряд 10</field>
             <field name="grade">10</field>
             <field name="coefficient">1.82</field>
         </record>
 
-        <record id="tariff_grade_11" model="hr.tariff.grade">
+        <record id="tariff_grade_11" model="hr.tariff.grade.template">
             <field name="name">Розряд 11</field>
             <field name="grade">11</field>
             <field name="coefficient">1.97</field>
         </record>
 
-        <record id="tariff_grade_12" model="hr.tariff.grade">
+        <record id="tariff_grade_12" model="hr.tariff.grade.template">
             <field name="name">Розряд 12</field>
             <field name="grade">12</field>
             <field name="coefficient">2.12</field>
         </record>
 
-        <record id="tariff_grade_13" model="hr.tariff.grade">
+        <record id="tariff_grade_13" model="hr.tariff.grade.template">
             <field name="name">Розряд 13</field>
             <field name="grade">13</field>
             <field name="coefficient">2.27</field>
         </record>
 
-        <record id="tariff_grade_14" model="hr.tariff.grade">
+        <record id="tariff_grade_14" model="hr.tariff.grade.template">
             <field name="name">Розряд 14</field>
             <field name="grade">14</field>
             <field name="coefficient">2.42</field>
         </record>
 
-        <record id="tariff_grade_15" model="hr.tariff.grade">
+        <record id="tariff_grade_15" model="hr.tariff.grade.template">
             <field name="name">Розряд 15</field>
             <field name="grade">15</field>
             <field name="coefficient">2.58</field>
         </record>
 
     </data>
+
+    <!-- Each company without tariff grades gets these, with zero rates to be
+         filled in from its collective agreement; new companies on creation. -->
+    <function model="hr.tariff.grade" name="_seed_company_grades"/>
 </odoo>

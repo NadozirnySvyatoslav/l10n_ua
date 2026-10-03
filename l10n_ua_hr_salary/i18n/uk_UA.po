@@ -3362,3 +3362,52 @@ msgstr "по"
 #: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
 msgid "сторнування"
 msgstr "сторнування"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid "Tariff: %s"
+msgstr "Тариф: %s"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"Tariff grade %(grade)s of %(employee)s has no hourly rate in force on "
+"%(date)s. Enter it in Tariff Grades."
+msgstr ""
+"Для тарифного розряду %(grade)s працівника %(employee)s на %(date)s немає "
+"чинної ставки за годину. Внесіть її в «Тарифні розряди»."
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_salary_advance__pdfo_rate
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_salary_advance__military_rate
+msgid ""
+"Rate of the payroll parameters of the advance company on the payment date. "
+"Can be corrected by hand."
+msgstr ""
+"Ставка з параметрів розрахунку компанії авансу на дату виплати. Можна "
+"виправити вручну."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_salary_advance.py:0
+msgid ""
+"No payroll parameters are defined for company \"%(company)s\" on %(date)s. "
+"Add them in Payroll → Configuration → PSP Parameters before confirming the "
+"advance."
+msgstr ""
+"Для компанії «%(company)s» на %(date)s не задано параметрів розрахунку. "
+"Додайте їх у Зарплата → Налаштування → Параметри ПСП, перш ніж підтверджувати "
+"аванс."
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_payslip__pdfo_rate
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_payslip__military_tax_rate
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_payslip__esv_rate
+msgid ""
+"Rate of the payroll parameters of the payslip company for the period. Can "
+"be corrected by hand."
+msgstr ""
+"Ставка з параметрів розрахунку компанії листка на цей період. Можна "
+"виправити вручну."

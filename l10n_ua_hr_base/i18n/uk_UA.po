@@ -340,6 +340,8 @@ msgstr "Код Класифікатора адміністративно-тер�
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__coefficient
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_template__coefficient
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__coefficient
 msgid "Coefficient"
 msgstr "Коефіцієнт"
 
@@ -374,6 +376,8 @@ msgstr "Компанії"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_list_report__company_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_military_report__company_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__company_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__company_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period__company_id
 msgid "Company"
 msgstr "Компанія"
 
@@ -764,6 +768,8 @@ msgstr "Генерал"
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__grade
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_template__grade
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__grade
 msgid "Grade"
 msgstr "Розряд"
 
@@ -1259,6 +1265,8 @@ msgstr "Термін моєї активності"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_template__name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__name
 msgid "Name"
 msgstr "Назва"
 
@@ -1709,6 +1717,7 @@ msgstr "ТЦК"
 #. module: l10n_ua_hr_base
 #: model:ir.model,name:l10n_ua_hr_base.model_hr_tariff_grade
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_job__tariff_grade_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__grade_id
 msgid "Tariff Grade"
 msgstr "Тарифний розряд"
 
@@ -1719,7 +1728,7 @@ msgid "Tariff Grades"
 msgstr "Тарифні розряди"
 
 #. module: l10n_ua_hr_base
-#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_tariff_grade_grade_uniq
+#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_tariff_grade_template_grade_uniq
 msgid "Tariff grade must be unique!"
 msgstr "Тарифний розряд повинен бути унікальним!"
 
@@ -2279,3 +2288,284 @@ msgstr ""
 "розрахунок зарплати, друкований штатний розпис — брало число за "
 "%(new)s, валюту %(company)s. Тепер валюта говорить те, що число "
 "означало завжди."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__date_from
+msgid "Valid From"
+msgstr "Діє з"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__date_to
+msgid "Valid To"
+msgstr "Діє по"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__hourly_rate
+msgid "Hourly Rate"
+msgstr "Ставка за годину"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade__hourly_rate
+msgid ""
+"Hourly tariff rate of the grade, as stated in the collective agreement. "
+"Monthly salaries belong to the staffing table."
+msgstr ""
+"Погодинна тарифна ставка розряду, зафіксована в колективному договорі. "
+"Місячні оклади веде штатний розпис."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__computed_rate
+msgid "Computed Rate"
+msgstr "Розрахункова ставка"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade__computed_rate
+msgid ""
+"Base tariff rate × the coefficient of this grade (art. 96 of the Labour "
+"Code), for comparison with the hourly rate of the collective agreement, "
+"which may differ from it, for example by rounding."
+msgstr ""
+"Базова тарифна ставка × коефіцієнт цього розряду (ст. 96 КЗпП) — для "
+"порівняння зі ставкою за годину з колективного договору, яка може від неї "
+"відрізнятися, наприклад, через округлення."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model,name:l10n_ua_hr_base.model_hr_tariff_grade_template
+msgid "Tariff Grade Template"
+msgstr "Типовий тарифний розряд"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_tariff_grade_grade_uniq
+msgid "Tariff grade must be unique for a company and a start date!"
+msgstr "Тарифний розряд має бути унікальним для компанії та дати початку дії!"
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_tariff_grade.py:0
+msgid "Tariff grade %(grade)s ends before it starts."
+msgstr "Тарифний розряд %(grade)s закінчується раніше, ніж починається."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_tariff_grade.py:0
+msgid ""
+"Tariff grade %(grade)s already has a period that overlaps the one starting "
+"on %(date)s. Close the previous period before opening a new one."
+msgstr ""
+"Тарифний розряд %(grade)s уже має період, що перетинається з періодом від "
+"%(date)s. Закрийте попередній період, перш ніж відкривати новий."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_tariff_grade.py:0
+msgid ""
+"Tariff grade %(grade)s is %(rate).2f per hour, %(monthly).2f a month, below "
+"the subsistence minimum for able-bodied persons of %(minimum).2f on 1 January "
+"%(year)s (art. 6 of the Law on Remuneration of Labour)."
+msgstr ""
+"Тарифний розряд %(grade)s становить %(rate).2f за годину, тобто %(monthly).2f "
+"на місяць, що нижче за прожитковий мінімум для працездатних осіб "
+"%(minimum).2f на 1 січня %(year)s року (ст. 6 ЗУ «Про оплату праці»)."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__rate_diff
+msgid "Difference"
+msgstr "Відхилення"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade__rate_diff
+msgid ""
+"Hourly rate minus computed rate. Any difference, down to a kopiyka, is "
+"highlighted."
+msgstr ""
+"Ставка за годину мінус розрахункова ставка. Будь-яке відхилення, навіть на "
+"копійку, підсвічується."
+
+#. module: l10n_ua_hr_base
+#: model:ir.actions.act_window,name:l10n_ua_hr_base.action_hr_tariff_grade_new_period
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_tariff_grade_tree
+msgid "New Rates from Date"
+msgstr "Нові ставки з дати"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model,name:l10n_ua_hr_base.model_hr_tariff_grade_new_period
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_tariff_grade_new_period_view_form
+msgid "New Tariff Rates from Date"
+msgstr "Нові тарифні ставки з дати"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model,name:l10n_ua_hr_base.model_hr_tariff_grade_new_period_line
+msgid "New Tariff Rates from Date Line"
+msgstr "Рядок нових тарифних ставок"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period__date_from
+msgid "Rates Valid From"
+msgstr "Ставки діють з"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade_new_period__date_from
+msgid "The grades in force are closed the day before this date."
+msgstr "Чинні розряди закриваються днем перед цією датою."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade_new_period__base_rate
+msgid ""
+"New hourly rate of grade 1. The grades that followed the formula are "
+"recomputed from it."
+msgstr ""
+"Нова ставка за годину I розряду. Від неї перераховуються розряди, що йшли за "
+"формулою."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__current_rate
+msgid "Current Rate"
+msgstr "Поточна ставка"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__new_rate
+msgid "New Rate"
+msgstr "Нова ставка"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__new_rate
+msgid ""
+"Filled in from the first-grade rate and the coefficient where the current "
+"rate followed that formula, and kept as it is where it was agreed otherwise."
+msgstr ""
+"Заповнюється зі ставки I розряду й коефіцієнта там, де поточна ставка йшла "
+"за цією формулою, і переноситься без змін там, де її погоджено інакше."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__rate_diff
+msgid "Change"
+msgstr "Зміна"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period__line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_tariff_grade_new_period_view_form
+msgid "Grades"
+msgstr "Розряди"
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_tariff_grade_search
+msgid "In Force Today"
+msgstr "Чинні сьогодні"
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/wizard/hr_tariff_grade_new_period.py:0
+msgid ""
+"Company \"%(company)s\" has no tariff grades in force before %(date)s. Enter "
+"the grades first."
+msgstr ""
+"У компанії «%(company)s» немає тарифних розрядів, чинних до %(date)s. "
+"Спершу заведіть розряди."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/wizard/hr_tariff_grade_new_period.py:0
+msgid ""
+"Company \"%(company)s\" already has a period of tariff grade %(grade)s "
+"starting on %(date)s. Close or remove it before opening the new rates."
+msgstr ""
+"У компанії «%(company)s» уже є період тарифного розряду %(grade)s, що "
+"починається %(date)s. Закрийте або приберіть його, перш ніж відкривати нові "
+"ставки."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/wizard/hr_tariff_grade_new_period.py:0
+msgid "A tariff rate cannot be negative."
+msgstr "Тарифна ставка не може бути від'ємною."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_tariff_grade.py:0
+msgid "Grade %(grade)s"
+msgstr "Розряд %(grade)s"
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_tariff_grade.py:0
+msgid ""
+"Tariff grade %(grade)s is used by job positions or employee versions. "
+"Archive it instead of deleting it."
+msgstr ""
+"Тарифний розряд %(grade)s використовують посади або версії договорів "
+"працівників. Замість видалення заархівуйте його."
+
+#. module: l10n_ua_hr_base
+#. odoo-python
+#: code:addons/l10n_ua_hr_base/models/hr_tariff_grade.py:0
+msgid ""
+"Tariff grade %(grade)s of %(company)s has no rate in force between "
+"%(gap_from)s and %(gap_to)s. The later period has to start on %(expected)s, "
+"otherwise payroll for that time stops."
+msgstr ""
+"Тарифний розряд %(grade)s компанії %(company)s не має чинної ставки між "
+"%(gap_from)s і %(gap_to)s. Пізніший період має починатись %(expected)s, "
+"інакше розрахунок зарплати за цей час зупиниться."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period__base_rate
+msgid "First Grade Hourly Rate"
+msgstr "Погодинна ставка I розряду"
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_tariff_grade_new_period_view_form
+msgid "Create"
+msgstr "Створити"
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_tariff_grade_new_period_view_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__rate_source
+msgid "New Rate From"
+msgstr "Джерело нової ставки"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__rate_source
+msgid ""
+"Where the new rate comes from. A rate agreed apart from the formula keeps "
+"its value when the first-grade rate changes, because in the collective "
+"agreement it is a number of its own. Correct it by hand if it has to change "
+"too."
+msgstr ""
+"Звідки береться нова ставка. Ставка, узгоджена поза формулою, не змінюється "
+"разом зі ставкою I розряду: у колективному договорі це окреме число. Якщо "
+"вона теж має змінитись, виправте її вручну."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_tariff_grade_new_period_line__rate_source__base
+msgid "First-grade rate"
+msgstr "Ставка I розряду"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_tariff_grade_new_period_line__rate_source__formula
+msgid "First-grade rate × coefficient"
+msgstr "Ставка I розряду × коефіцієнт"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_tariff_grade_new_period_line__rate_source__agreed
+msgid "Agreed apart from the formula"
+msgstr "Узгоджена поза формулою"
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.hr_tariff_grade_new_period_view_form
+msgid ""
+"The first-grade rate recomputes only the grades whose\n                    "
+"current rate equals the first-grade rate × coefficient and\n                    "
+"those with no rate yet. A rate that differs from the\n                    "
+"formula was agreed apart from it and is carried over\n                    "
+"unchanged — correct it in \"New Rate\" if it has to change.\n                    "
+"The column \"New Rate From\" says which is which."
+msgstr ""
+"Ставка I розряду перераховує лише ті розряди, чия поточна ставка дорівнює "
+"ставці I розряду × коефіцієнт, і ті, де ставки ще немає. Ставку, що "
+"відрізняється від формули, вважаємо узгодженою поза нею й переносимо без "
+"змін — виправте її в колонці «Нова ставка», якщо вона теж має змінитись. "
+"Колонка «Джерело нової ставки» показує, що саме застосовано."

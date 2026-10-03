@@ -10,6 +10,7 @@ Covers:
 """
 
 from datetime import date
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 from .common import SalaryTestCase
 
@@ -209,3 +210,19 @@ class TestSalaryAdvance(SalaryTestCase):
         # Net advance, not gross
         self.assertLess(deduction.amount, advance.gross_amount)
 
+
+    def test_rates_come_from_company_parameters(self):
+        self.psp_params.write({'pdfo_rate': 17.0, 'military_tax_rate': 4.0})
+        advance = self._make_advance()
+        self.assertAlmostEqual(advance.pdfo_rate, 17.0)
+        self.assertAlmostEqual(advance.military_rate, 4.0)
+        advance.action_confirm()
+        # A confirmed advance keeps the rates it was computed with.
+        self.psp_params.write({'pdfo_rate': 18.0})
+        advance.date = advance.date
+        self.assertAlmostEqual(advance.pdfo_rate, 17.0)
+
+    def test_advance_without_parameters_is_not_confirmed(self):
+        advance = self._make_advance(date=date(2020, 6, 15))
+        with self.assertRaises(UserError):
+            advance.action_confirm()
