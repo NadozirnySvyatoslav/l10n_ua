@@ -3463,3 +3463,58 @@ msgid ""
 msgstr ""
 "У періоді %(employee)s є версії різних компаній. Розділіть його на листок за "
 "кожну компанію."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"No average daily salary could be determined for the time off \"%(leave)s\" "
+"of %(employee)s. Enter it on the time off."
+msgstr ""
+"Не вдалося визначити середньоденну заробітну плату для відпустки "
+"«%(leave)s» працівника %(employee)s. Внесіть її у відпустці."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"No average daily salary could be determined for the sick leave "
+"%(certificate)s of %(employee)s. Enter it on the certificate."
+msgstr ""
+"Не вдалося визначити середньоденну заробітну плату для листка "
+"непрацездатності %(certificate)s працівника %(employee)s. Внесіть її в "
+"листку."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"The time off \"%(leave)s\" of %(employee)s has no confirmed sick-leave "
+"certificate, so its days cannot be paid. Enter and confirm the certificate "
+"in Sick Leaves."
+msgstr ""
+"Для відсутності «%(leave)s» працівника %(employee)s немає підтвердженого "
+"листка непрацездатності, тож її дні нема з чого оплатити. Внесіть і "
+"підтвердьте листок у розділі «Лікарняні»."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"The timesheet of %(employee)s has %(dates)s as worked, but they fall on "
+"%(document)s. Correct the timesheet or the absence."
+msgstr ""
+"У табелі працівника %(employee)s дні %(dates)s позначено як відпрацьовані, "
+"але на них припадає %(document)s. Виправте табель або відсутність."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
+msgid ""
+"The time off type \"%(type)s\" has no Ukrainian leave category, so the time "
+"off \"%(leave)s\" of %(employee)s cannot be paid. Set the category on the "
+"time off type."
+msgstr ""
+"Тип відсутності «%(type)s» не має української категорії, тож відсутність "
+"«%(leave)s» працівника %(employee)s неможливо оплатити. Вкажіть категорію в "
+"типі відсутності."

@@ -768,9 +768,10 @@ class TestPayslipSegmentsFromTimesheet(SalaryTestCase):
         return [day for day in range(1, 32) if date(2025, 7, day).weekday() < 5]
 
     def test_a_day_off_worked_brings_hours_not_a_day_of_salary(self):
-        # 16 worked days and 5 sick ones in the norm, and a Saturday worked
-        # on the day-off code: the sheet counts 16 worked days, and so does
-        # the salary; the Saturday is paid by its holiday surcharge.
+        # 16 worked days and 5 sick ones, and a Saturday worked on the
+        # day-off code: the sheet counts 16 worked days, and so does the
+        # salary; the Saturday is paid by its holiday surcharge. The norm is
+        # the 23 working days of July, not the days the sheet schedules.
         self.version.write({'tariff_grade_id': False, 'wage': 21000})
         sick = self.env.ref('l10n_ua_hr_attendance_sheet.timesheet_code_sick')
         weekend = self.env.ref('l10n_ua_hr_attendance_sheet.timesheet_code_weekend')
@@ -781,10 +782,31 @@ class TestPayslipSegmentsFromTimesheet(SalaryTestCase):
         self._timesheet(days)
         slip = self._payslip()
         slip.action_compute_sheet()
-        self.assertEqual(slip.worked_days, 16)
+        self.assertEqual((slip.scheduled_days, slip.worked_days), (23, 16))
         salary = self._of_type(slip, 'SALARY')
         self.assertEqual(salary.mapped('quantity'), [16])
-        self.assertAlmostEqual(salary.amount, 16000.0, places=2)
+        self.assertAlmostEqual(salary.amount, round(21000 * 16 / 23, 2), places=2)
+
+    def test_absent_days_leave_the_norm_and_cut_the_salary(self):
+        # The way the generator writes it: the days of a leave are not
+        # scheduled. They used to leave the norm with them, and 21 of 23
+        # days paid the whole salary next to the vacation pay.
+        self.version.write({'tariff_grade_id': False, 'wage': 23000})
+        self.company.resource_calendar_id = self.env.ref(
+            'l10n_ua_hr_contract.resource_calendar_ua_std40')
+        vacation = self.env.ref(
+            'l10n_ua_hr_attendance_sheet.timesheet_code_vacation')
+        weekdays = self._july_weekdays()
+        days = [(day, 8.0, 0.0) for day in weekdays[:21]]
+        days += [{'day': day, 'code': vacation, 'scheduled': False}
+                 for day in weekdays[21:]]
+        self._timesheet(days)
+        slip = self._payslip()
+        slip.action_compute_sheet()
+        self.assertEqual((slip.scheduled_days, slip.worked_days), (23, 21))
+        self.assertAlmostEqual(slip.scheduled_hours, 184.0, places=2)
+        salary = self._of_type(slip, 'SALARY')
+        self.assertAlmostEqual(salary.amount, 21000.0, places=2)
 
     def test_two_half_month_payslips_pay_the_month_once(self):
         self.version.write({'tariff_grade_id': False, 'wage': 23000})
@@ -843,3 +865,104 @@ class TestPayslipSegmentsFromTimesheet(SalaryTestCase):
                                places=2)
         self.assertAlmostEqual(night[1].amount, round(2.0 * 120.0 * percent, 2),
                                places=2)
+
+
+@tagged('post_install', '-at_install')
+class TestPayslipMonthNorm(SalaryTestCase):
+    """The norm is the month's: the same for everyone, whatever they worked.
+
+    August 2026 has 21 working days from Monday to Friday; 24.08 is one of
+    them while the production calendar is empty.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.company.resource_calendar_id = cls.env.ref(
+            'l10n_ua_hr_contract.resource_calendar_ua_std40')
+        cls.version.write({'tariff_grade_id': False})
+
+    def _norm(self, date_from=date(2026, 8, 1), date_to=date(2026, 8, 31)):
+        slip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'date_from': date_from, 'date_to': date_to,
+        })
+        slip._compute_working_days()
+        return slip
+
+    def test_without_a_production_calendar_the_norm_is_the_weekdays(self):
+        slip = self._norm()
+        self.assertEqual(slip.scheduled_days, 21)
+        self.assertAlmostEqual(slip.scheduled_hours, 168.0, places=2)
+
+    def test_the_norm_does_not_follow_the_work_rate(self):
+        self.version.work_rate = 0.5
+        slip = self._norm()
+        self.assertEqual(slip.scheduled_days, 21)
+        self.assertAlmostEqual(slip.scheduled_hours, 168.0, places=2)
+
+    def test_the_norm_does_not_follow_a_shift_schedule(self):
+        # A 12-hour shift is the norm of its day, not of every weekday.
+        self.version.resource_calendar_id = self.env.ref(
+            'l10n_ua_hr_contract.resource_calendar_ua_shift2x2')
+        slip = self._norm()
+        self.assertAlmostEqual(slip.scheduled_hours, 168.0, places=2)
+
+    def test_a_part_timer_is_paid_surcharges_at_the_position_rate(self):
+        # The full-time salary over the full-time norm: the work rate is
+        # already in the hours a part-timer works, and an hour of their
+        # night work costs what an hour of the position costs.
+        self.version.write({'wage': 25000, 'work_rate': 0.5})
+        self.psp_params.write({'min_hourly_wage': 0.0})
+        slip = self._norm()
+        rate = slip._base_hourly_rate(self.version, self.psp_params)
+        self.assertAlmostEqual(rate, 25000 / 168, places=2)
+
+    def test_a_shift_worker_without_a_timesheet_keeps_the_full_salary(self):
+        # A 12-hour shift is the norm of its day, not of every weekday: the
+        # month stays 23 days / 184 hours, the salary is whole and the hourly
+        # rate of the surcharges is the salary over those 184 hours.
+        if 'hr.production.calendar' in self.env:
+            self.env['hr.production.calendar'].search([
+                ('year', '=', 2025), ('company_id', '=', self.company.id),
+            ]).unlink()
+        self.version.write({
+            'wage': 23000,
+            'resource_calendar_id': self.env.ref(
+                'l10n_ua_hr_contract.resource_calendar_ua_shift2x2').id,
+        })
+        self.psp_params.write({'min_hourly_wage': 0.0})
+        slip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'date_from': date(2025, 7, 1), 'date_to': date(2025, 7, 31),
+        })
+        slip.action_compute_sheet()
+        self.assertEqual((slip.scheduled_days, slip.worked_days), (23, 23))
+        self.assertAlmostEqual(slip.scheduled_hours, 184.0, places=2)
+        salary = slip.accrual_ids.filtered(
+            lambda a: a.accrual_type_id.code == 'SALARY' and a.is_auto_generated)
+        self.assertAlmostEqual(sum(salary.mapped('amount')), 23000.0, places=2)
+        self.assertAlmostEqual(
+            slip._base_hourly_rate(self.version, self.psp_params),
+            23000 / 184, places=2)
+
+    def test_the_production_calendar_overrides_the_days_it_holds(self):
+        if 'hr.production.calendar' not in self.env:
+            self.skipTest('l10n_ua_hr_attendance_sheet is not installed')
+        production = self.env['hr.production.calendar'].search([
+            ('year', '=', 2026), ('company_id', '=', self.company.id)])
+        production.unlink()
+        # Only the days the calendar holds change; the rest of the month
+        # stays Monday to Friday.
+        self.env['hr.production.calendar'].create({
+            'year': 2026, 'company_id': self.company.id,
+            'line_ids': [
+                (0, 0, {'date': date(2026, 8, 21), 'day_type': 'working',
+                        'is_working_day': True, 'working_hours': 7.0}),
+                (0, 0, {'date': date(2026, 8, 24), 'day_type': 'holiday',
+                        'is_working_day': False, 'working_hours': 0.0}),
+            ],
+        })
+        slip = self._norm()
+        self.assertEqual(slip.scheduled_days, 20)
+        self.assertAlmostEqual(slip.scheduled_hours, 159.0, places=2)

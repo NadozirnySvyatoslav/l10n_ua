@@ -996,12 +996,9 @@ class HrLeave(models.Model):
 
         if not payslips:
             # Fallback to version wage (Odoo 19 uses version_ids instead of contract_id)
-            version = self.employee_id.current_version_id
-            if version and version.wage:
-                # Оклад може бути у валюті — курс на початок відпустки.
-                wage = version._l10n_ua_wage_in_company_currency(date_to)
-                return round(wage / 29.3, 2)
-            return 0.0
+            # The wage may be in a foreign currency: the rate of the leave start.
+            wage = self.employee_id._l10n_ua_fallback_wage(date_to)
+            return round(wage / 29.3, 2) if wage else 0.0
 
         # Calculate total earnings from payslip lines
         total_earnings = 0.0

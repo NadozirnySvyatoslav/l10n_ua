@@ -76,7 +76,7 @@
             <field name="is_basic_salary">False</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
-            <field name="is_esv_base">False</field>
+            <field name="is_esv_base">True</field>
             <field name="d4_income_type">127</field>
             <field name="sequence">55</field>
             <field name="description">Допомога по тимчасовій непрацездатності за рахунок ФСС</field>
@@ -90,7 +90,7 @@
             <field name="is_basic_salary">False</field>
             <field name="is_taxable_pdfo">False</field>
             <field name="is_military_tax">False</field>
-            <field name="is_esv_base">False</field>
+            <field name="is_esv_base">True</field>
             <field name="d4_income_type">128</field>
             <field name="sequence">60</field>
         </record>

@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import format_date, float_compare
+from datetime import datetime, time
 from dateutil.relativedelta import relativedelta
 import calendar
 from collections import defaultdict
@@ -599,24 +600,9 @@ class HrPayslip(models.Model):
         if not self.date_from or not self.date_to:
             return
 
-        # Simple calculation - count weekdays
-        month_start = self.date_to.replace(day=1)
-        month_end = month_start + relativedelta(months=1, days=-1)
-
-        # The norm of a day comes from the version in force on it: the work
-        # rate may change inside the month, and half a month at 0.5 does not
-        # give the norm of half a month at a full rate.
-        total_scheduled, scheduled_hours = 0, 0.0
-        curr = month_start
-        while curr <= month_end:
-            if curr.weekday() < 5:  # Monday to Friday
-                total_scheduled += 1
-                scheduled_hours += self._daily_hour_norm(self._version_on(curr))
-            curr += relativedelta(days=1)
-
-        daily_norm = self._daily_hour_norm()
-        self.scheduled_days = total_scheduled
-        self.scheduled_hours = scheduled_hours
+        # The norm is the month's, never the employee's: the timesheet below
+        # brings what was worked, not what was due.
+        self.scheduled_days, self.scheduled_hours = self._l10n_ua_month_norm()
 
         # get amount of working days from timesheet
         ts_line = self._timesheet_line()
@@ -639,22 +625,76 @@ class HrPayslip(models.Model):
             self.holiday_hours = sum(days.filtered(
                 lambda d: d.code_id.code_type == 'holiday').mapped('hours'))
         if ts_line:
-            # in case if there is multiplier in timesheets
-            if ts_line.scheduled_days:
-                self.scheduled_days = ts_line.scheduled_days
-                self.scheduled_hours = ts_line.scheduled_days * daily_norm
             return
 
-        # default if there is no timesheets
+        # default if there is no timesheets: the working days of the norm the
+        # employee was not away on — a day of time off is paid by its own
+        # line, not by the salary.
         worked, worked_hours = 0, 0.0
+        away = self._absence_dates()
+        working = self._working_dates(self.date_from, self.date_to)
         curr = self.date_from
         while curr <= self.date_to:
-            if curr.weekday() < 5:
+            if curr in working and curr not in away:
                 worked += 1
                 worked_hours += self._daily_hour_norm(self._version_on(curr))
             curr += relativedelta(days=1)
         self.worked_days = worked
         self.worked_hours = worked_hours
+
+    def _l10n_ua_month_norm(self):
+        """The working time norm of the month of the period end: (days, hours).
+
+        The norm of the month itself, the same for everyone in the company:
+        an absence, a hire in the middle of the month, a part-time rate or a
+        shift schedule does not shorten it. Each day is read the way the
+        timesheet generator reads it: from the production calendar when the
+        company keeps one for the year and has the day in it, otherwise
+        Monday to Friday. The calendar is optional on purpose — under martial
+        law public holidays are working days, and an empty calendar is a
+        valid setup, not a missing one.
+
+        The hours of a day are those of a full-time day of the company's
+        working schedule, 8 when it has none.
+        """
+        self.ensure_one()
+        month_start = self.date_to.replace(day=1)
+        working = self._working_dates(
+            month_start, month_start + relativedelta(months=1, days=-1))
+        return len(working), sum(working.values())
+
+    def _working_dates(self, date_from, date_to):
+        """{date: full-time hours} of the working days between the two dates.
+
+        From the production calendar when the company keeps one for the year
+        and has the day in it, read by the type of the day as the timesheet
+        generator reads it; otherwise Monday to Friday at the full-time day
+        of the company's working schedule.
+        """
+        self.ensure_one()
+        day_hours = self.company_id.resource_calendar_id.hours_per_day or 8.0
+        calendar_days = {}
+        # The production calendar comes with the attendance sheet module,
+        # which this one does not depend on.
+        if 'hr.production.calendar' in self.env:
+            productions = self.env['hr.production.calendar'].search([
+                ('year', 'in', list(range(date_from.year, date_to.year + 1))),
+                ('company_id', '=', self.company_id.id),
+            ])
+            calendar_days = {
+                line.date: line for line in productions.line_ids
+                if date_from <= line.date <= date_to
+            }
+        working, current = {}, date_from
+        while current <= date_to:
+            line = calendar_days.get(current)
+            if line is not None:
+                if line.day_type not in ('holiday', 'weekend'):
+                    working[current] = line.working_hours or day_hours
+            elif current.weekday() < 5:
+                working[current] = day_hours
+            current += relativedelta(days=1)
+        return working
 
     def _timesheet_line(self):
         """The confirmed timesheet line of this employee for the month.
@@ -781,8 +821,11 @@ class HrPayslip(models.Model):
             ]
             return [day for day in days if any(day[1:])]
         days, current = [], self.date_from
+        away = self._absence_dates()
+        working = self._working_dates(self.date_from, self.date_to) \
+            if self.date_from and self.date_to else {}
         while current and self.date_to and current <= self.date_to:
-            if current.weekday() < 5:
+            if current in working and current not in away:
                 days.append((current, self._daily_hour_norm(
                     self._version_on(current)), 0.0, 0.0, 0.0, 1))
             current += relativedelta(days=1)
@@ -1268,6 +1311,225 @@ class HrPayslip(models.Model):
         # Надбавка за вислугу років — #143.
         self._generate_seniority(segments, params, several, versions)
 
+        # The norm is the month's, so the salary pays only the days worked;
+        # the days away are paid by what pays for them.
+        self._generate_absence_pay()
+
+    def _generate_absence_pay(self):
+        """Accrue the pay of the absences that fall in the period.
+
+        The salary pays the days worked against the norm of the month, so a
+        day away is paid by its own line: a vacation day at the average daily
+        salary of its time off, a sick day at the daily rate of its
+        certificate — the first `employer_days` by the employer, the rest by
+        the fund — and a maternity day by the maternity benefit. The rates are
+        the ones the time off and the certificate already calculate; this only
+        places their days in the payslip of the month each day falls in, so an
+        absence across two months is paid by both.
+
+        A type entered by hand on the payslip is left to it, as the salary
+        is. An absence that cannot be paid stops the calculation instead of
+        leaving its days unpaid without a word.
+
+        Absences come from `l10n_ua_hr_holidays`, which this module does not
+        require: without it there is nothing to read.
+        """
+        self.ensure_one()
+        if 'hr.sick.leave' not in self.env:
+            return
+        Type = self.env['hr.accrual.type']
+        salary = Type.search([('code', '=', 'SALARY')], limit=1)
+        if salary and any(line.accrual_type_id == salary and not line.is_auto_generated
+                          for line in self.accrual_ids):
+            # A salary entered by hand says itself which days it pays for;
+            # the absences are left to whoever entered it, as before.
+            return
+        kinds = {code: Type.search([('code', '=', code)], limit=1)
+                 for code in ('VACATION', 'SICK_EMP', 'SICK_FSS', 'MATERNITY')}
+        manual = {line.accrual_type_id for line in self.accrual_ids
+                  if not line.is_auto_generated}
+
+        def accrue(code, days, rate, note):
+            kind = kinds[code]
+            if not kind or kind in manual or not days or not rate:
+                return
+            self.env['hr.payslip.accrual'].create({
+                'payslip_id': self.id,
+                'accrual_type_id': kind.id,
+                'quantity': days,
+                'rate': rate,
+                'amount': round(rate * days, 2),
+                'is_auto_generated': True,
+                'notes': note,
+            })
+
+        certificates = self.env['hr.sick.leave'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', 'in', ('confirmed', 'paid')),
+            ('date_from', '<=', self.date_to),
+            ('date_to', '>=', self.date_from),
+        ], order='date_from')
+        leaves = self.env['hr.leave'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'validate'),
+            ('request_date_from', '<=', self.date_to),
+            ('request_date_to', '>=', self.date_from),
+        ], order='request_date_from')
+        holidays = self._public_holiday_dates()
+        # Days the timesheet has as worked are paid by the salary already;
+        # paying them as an absence too would pay them twice.
+        line = self._timesheet_line()
+        worked = {day.date for day in self._timesheet_days(line)
+                  if day.code_id.is_worked} if line else set()
+
+        def check_not_worked(dates, document):
+            clash = sorted(worked & dates)
+            if clash:
+                raise UserError(_(
+                    'The timesheet of %(employee)s has %(dates)s as worked, '
+                    'but they fall on %(document)s. Correct the timesheet or '
+                    'the absence.',
+                    employee=self.employee_id.name,
+                    dates=', '.join(format_date(self.env, day) for day in clash),
+                    document=document))
+
+        for leave in leaves:
+            category = leave.holiday_status_id.ua_leave_category
+            if category in ('sick', 'maternity'):
+                # Paid by its certificate below; without one there is nothing
+                # to pay it by.
+                if not (leave.sick_leave_id & certificates
+                        or certificates.filtered(lambda c: c.leave_id == leave)):
+                    raise UserError(_(
+                        'The time off "%(leave)s" of %(employee)s has no '
+                        'confirmed sick-leave certificate, so its days cannot '
+                        'be paid. Enter and confirm the certificate in Sick '
+                        'Leaves.',
+                        leave=leave.display_name,
+                        employee=self.employee_id.name))
+                continue
+            if not leave.holiday_status_id.is_paid or category in ('childcare', 'unpaid') \
+                    or leave.holiday_status_id.request_unit != 'day':
+                continue
+            if not category:
+                # Without it, a paid sickness or maternity leave would be paid
+                # as a vacation.
+                raise UserError(_(
+                    'The time off type "%(type)s" has no Ukrainian leave '
+                    'category, so the time off "%(leave)s" of %(employee)s '
+                    'cannot be paid. Set the category on the time off type.',
+                    type=leave.holiday_status_id.display_name,
+                    leave=leave.display_name,
+                    employee=self.employee_id.name))
+            # The days of the time off in the period, less the public holidays
+            # — the same list its length is reduced by.
+            first = max(leave.request_date_from, self.date_from)
+            last = min(leave.request_date_to, self.date_to)
+            dates = {first + relativedelta(days=n)
+                     for n in range((last - first).days + 1)} - holidays
+            if not dates:
+                continue
+            check_not_worked(dates, leave.display_name)
+            days = len(dates)
+            # Fixed when the time off is first paid, so both months of one
+            # across them are paid at the same rate.
+            if not leave.average_daily_salary:
+                leave.sudo().average_daily_salary = leave._calculate_average_salary()
+            if not leave.average_daily_salary:
+                raise UserError(_(
+                    'No average daily salary could be determined for the time '
+                    'off "%(leave)s" of %(employee)s. Enter it on the time off.',
+                    leave=leave.display_name,
+                    employee=self.employee_id.name))
+            accrue('VACATION', days, leave.average_daily_salary, leave.display_name)
+
+        for certificate in certificates:
+            if not certificate.average_daily_salary:
+                certificate.sudo().action_calculate()
+            if not certificate.average_daily_salary:
+                raise UserError(_(
+                    'No average daily salary could be determined for the sick '
+                    'leave %(certificate)s of %(employee)s. Enter it on the '
+                    'certificate.',
+                    certificate=certificate.name,
+                    employee=self.employee_id.name))
+            rate = certificate.average_daily_salary * certificate.payment_percent / 100
+            check_not_worked({
+                certificate.date_from + relativedelta(days=n)
+                for n in range((certificate.date_to - certificate.date_from).days + 1)
+            }, certificate.name)
+            employer = fund = 0
+            for n in range((certificate.date_to - certificate.date_from).days + 1):
+                day = certificate.date_from + relativedelta(days=n)
+                if self.date_from <= day <= self.date_to:
+                    if n < certificate.employer_days:
+                        employer += 1
+                    else:
+                        fund += 1
+            accrue('SICK_EMP', employer, rate, certificate.name)
+            accrue('MATERNITY' if certificate.sick_leave_type == 'pregnancy'
+                   else 'SICK_FSS', fund, rate, certificate.name)
+
+    def _absence_dates(self):
+        """The days of the period the employee was away on a validated time off
+        counted in days, or on a confirmed sick-leave certificate.
+
+        A public holiday inside a time off is not part of it — the time off is
+        shortened by it and does not pay it — so it is not a day away either.
+        It is left to the source of the norm: where the production calendar
+        marks it a holiday, it is out of the norm and out of the days worked
+        alike, and the salary is not reduced for it. Without a calendar that
+        knows it, the norm counts it as a working day, and so does the
+        fallback, rather than leave a day of the norm paid by nothing. A
+        sickness runs in calendar days, holidays included.
+        """
+        self.ensure_one()
+        if 'hr.sick.leave' not in self.env or not (self.date_from and self.date_to):
+            return set()
+
+        def days_of(records, first_field, last_field):
+            dates = set()
+            for record in records:
+                current = max(record[first_field], self.date_from)
+                while current <= min(record[last_field], self.date_to):
+                    dates.add(current)
+                    current += relativedelta(days=1)
+            return dates
+
+        leaves = self.env['hr.leave'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'validate'),
+            ('holiday_status_id.request_unit', '=', 'day'),
+            ('request_date_from', '<=', self.date_to),
+            ('request_date_to', '>=', self.date_from),
+        ])
+        certificates = self.env['hr.sick.leave'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', 'in', ('confirmed', 'paid')),
+            ('date_from', '<=', self.date_to),
+            ('date_to', '>=', self.date_from),
+        ])
+        return (days_of(leaves, 'request_date_from', 'request_date_to')
+                - self._public_holiday_dates()) \
+            | days_of(certificates, 'date_from', 'date_to')
+
+    def _public_holiday_dates(self):
+        """The public holidays of the period, from the list time off is
+        shortened by."""
+        self.ensure_one()
+        found = self.env['resource.calendar.leaves'].search([
+            ('resource_id', '=', False),
+            ('date_from', '<=', datetime.combine(self.date_to, time.max)),
+            ('date_to', '>=', datetime.combine(self.date_from, time.min)),
+        ])
+        dates = set()
+        for holiday in found:
+            current = max(holiday.date_from.date(), self.date_from)
+            while current <= min(holiday.date_to.date(), self.date_to):
+                dates.add(current)
+                current += relativedelta(days=1)
+        return dates
+
     def _generate_allowances(self, segments, several, versions):
         """The allowances of each version, shared out by the days of its segment.
 
@@ -1499,9 +1761,11 @@ class HrPayslip(models.Model):
         """Base hourly rate for surcharges.
 
         On a tariff grade, the hourly rate of the grade in force; otherwise
-        the monthly salary (with work_rate) over the hours of the period.
-        Never below the statutory minimum hourly wage. With a segment, the
-        grade and the salary are the ones of its days.
+        the full-time salary over the norm of the month. Both are full-time
+        figures, so the work rate does not enter: an hour of a part-timer
+        costs what an hour of the position costs. Never below the statutory
+        minimum hourly wage. With a segment, the grade and the salary are the
+        ones of its days.
         """
         self.ensure_one()
         min_hourly = params.min_hourly_wage or 0.0
@@ -1514,8 +1778,7 @@ class HrPayslip(models.Model):
                 rate = self._tariff_grade(version).hourly_rate
         elif self.scheduled_hours > 0:
             wage = segment['wage'] if segment else self._get_effective_wage(version)
-            monthly = wage * (version.work_rate or 1.0)
-            rate = monthly / self.scheduled_hours
+            rate = wage / self.scheduled_hours
         else:
             rate = 0.0
         return max(rate, min_hourly)

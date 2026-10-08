@@ -263,14 +263,11 @@ class HrSickLeave(models.Model):
 
         if not payslips:
             # Fallback to contract wage (version in Odoo 19)
-            version = self.employee_id.current_version_id
-            if version and version.wage:
-                # Average days in month for fallback calculation.
-                # Оклад може бути у валюті — курс на кінець розрахункового
-                # періоду, тобто перед настанням страхового випадку.
-                wage = version._l10n_ua_wage_in_company_currency(date_to)
-                return round(wage / 30.44, 2)
-            return 0.0
+            # Average days in month for fallback calculation.
+            # The wage may be in a foreign currency: the rate of the end of
+            # the period, that is, before the case.
+            wage = self.employee_id._l10n_ua_fallback_wage(date_to)
+            return round(wage / 30.44, 2) if wage else 0.0
 
         # Calculate total earnings from payslip lines
         total_earnings = 0.0
