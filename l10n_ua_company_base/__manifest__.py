@@ -24,7 +24,7 @@ nothing but `base` means a tax or accounting installation can read it without
 pulling in the HR block, and an HR installation without pulling in accounting.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'base',

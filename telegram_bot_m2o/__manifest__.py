@@ -4,7 +4,7 @@
     'category': 'Marketing/Social Marketing',
     'summary': 'Manage Telegram bots with configurable commands, auto-responses, and CRM integration',
     'author': 'Many2one',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'support': 'nadozirny.s@gmail.com',
     'license': 'LGPL-3',
     'price': 0,

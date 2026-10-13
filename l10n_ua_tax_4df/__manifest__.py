@@ -24,7 +24,7 @@ aggregates payroll data calculated by l10n_ua_hr_salary and produces
 a filing for submission through M.E.Doc / FREDO / Tax Cabinet.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'account',

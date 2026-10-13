@@ -26,7 +26,7 @@ Ukraine Education Base
 * Закон України «Про професійно-технічну освіту» № 103/98-ВР від 10.02.1998
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'base',

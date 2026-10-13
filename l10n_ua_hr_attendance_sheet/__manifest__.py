@@ -21,7 +21,7 @@ Attendance sheet management for Ukrainian localization (Табель П-5):
 Requires l10n_ua_hr_base module.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_hr_base',

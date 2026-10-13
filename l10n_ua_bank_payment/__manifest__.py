@@ -4,6 +4,7 @@
     'summary': 'Вихідні платіжні доручення з клієнтським КЕП-підписом',
     'category': 'Accounting/Localizations',
     'author': 'Svyatoslav Nadozirny',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_bank_sync',

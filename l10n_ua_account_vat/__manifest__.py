@@ -20,7 +20,7 @@ Ukrainian VAT accounting providing:
 Requires l10n_ua_tax module.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'account',

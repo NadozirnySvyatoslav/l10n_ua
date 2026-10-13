@@ -21,7 +21,7 @@ Keeping them here lets a marketplace-only installation have them without
 pulling in the accounting localization.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'product',

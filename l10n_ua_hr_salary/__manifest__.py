@@ -29,7 +29,7 @@ Note: This module was renamed from l10n_ua_hr_payroll to l10n_ua_hr_salary
 to avoid naming conflicts with existing modules on Odoo Apps.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_hr_base',

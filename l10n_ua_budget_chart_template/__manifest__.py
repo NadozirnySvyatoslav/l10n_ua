@@ -33,7 +33,7 @@ Ukraine Budget Chart Template
    на zakon.rada.gov.ua/laws/show/z0161-14.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'account',

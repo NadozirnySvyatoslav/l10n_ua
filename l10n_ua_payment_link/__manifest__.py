@@ -10,7 +10,7 @@
 Monobank Acquiring винесено в окремий модуль l10n_ua_mono_acquiring.
     """,
     'author': 'NDEV',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': ['l10n_ua_account_base', 'sale'],
     'data': [

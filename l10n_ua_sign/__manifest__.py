@@ -31,7 +31,7 @@ base64-підписи.
 з 01.09.2026, і команда, якою це перевіряється в конкретних файлах.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'web',

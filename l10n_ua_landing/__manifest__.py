@@ -9,7 +9,7 @@
     'version': '20.0.1.0.0',
     'category': 'Website',
     'author': 'many2one',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': ['website'],
     'data': [

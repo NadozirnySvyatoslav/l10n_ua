@@ -19,7 +19,7 @@ The accounting base module stays free of any HR dependency; install this bridge
 only when departments should be usable as subconto.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_account_base',

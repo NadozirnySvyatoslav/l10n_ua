@@ -140,7 +140,7 @@ odoo-bin -d <db> -u <module_name> --stop-after-init
 ## Контакти
 
 **Автори:** Святослав Надозірний, Ярослав Кравець
-**Website:** https://many2one.online
+**Website:** https://1c-to-odoo.many2one.online
 
 ## Ліцензія
 

@@ -20,7 +20,7 @@ Umbrella-модуль, що одним кліком встановлює пов�
 відповідну umbrella: `l10n_ua_education`, `l10n_ua_medecin`.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_budget_base',

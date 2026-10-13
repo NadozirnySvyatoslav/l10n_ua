@@ -19,7 +19,7 @@ The feed URL can be submitted to Hotline merchant portal.
     'version': '20.0.1.0.0',
     'category': 'Sales/Sales',
     'author': 'NDEV',
-    'website': 'https://ndev.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_marketplace_base',

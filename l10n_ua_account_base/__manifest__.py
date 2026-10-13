@@ -28,7 +28,7 @@ Accounting features:
 This module is required for all other l10n_ua_* modules.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'account',

@@ -20,7 +20,7 @@ repealed, but the obligation to account for materials held by a person in
 charge has not, so the form is still what Ukrainian accountants ask for.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'stock',

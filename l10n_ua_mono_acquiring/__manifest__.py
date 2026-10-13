@@ -19,7 +19,7 @@
 синхронізацією виписок (l10n_ua_bank_mono).
     """,
     'author': 'NDEV',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': ['account', 'sale'],
     'external_dependencies': {

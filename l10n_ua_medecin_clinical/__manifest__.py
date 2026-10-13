@@ -19,7 +19,7 @@ Medecin Clinical
 * Наказ МОЗ № 110 (форми первинної облікової документації)
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_medecin_patient',

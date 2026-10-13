@@ -20,7 +20,7 @@ Automatic accrual of vacation reserve provisions per П(С)БО 26
 Requires l10n_ua_hr_holidays, l10n_ua_hr_salary, and account modules.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'account',

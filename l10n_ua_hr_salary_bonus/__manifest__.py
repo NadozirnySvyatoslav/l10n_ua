@@ -20,7 +20,7 @@ Bonuses are automatically included in salary calculation when:
 - Bonus date falls within payslip period
     """,
     'author': 'NDEV',
-    'website': 'https://ndev.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_hr_salary',

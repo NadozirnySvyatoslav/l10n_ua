@@ -18,7 +18,7 @@ PUMB Open Banking API (Berlin Group NextGenPSD2) integration providing:
 Extends l10n_ua_bank_sync with PUMB-specific functionality.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_bank_sync',

@@ -28,7 +28,7 @@ Regulatory basis: Бюджетний кодекс України, Наказ М�
 12.03.2012. Always cross-check active redactions on rada.gov.ua.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'account',

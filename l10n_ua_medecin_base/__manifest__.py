@@ -25,7 +25,7 @@ Ukraine Medecin Base
   населення» (НСЗУ)
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'base',

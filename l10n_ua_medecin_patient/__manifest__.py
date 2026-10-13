@@ -23,7 +23,7 @@ Ukraine Medecin Patient
 * Наказ МОЗ № 503 від 19.03.2018 — Порядок вибору лікаря ПМД
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_medecin_base',

@@ -36,7 +36,7 @@ Features:
 This package is designed for Odoo 20 Community Edition.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_hr_base',

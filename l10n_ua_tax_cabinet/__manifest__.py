@@ -26,7 +26,7 @@ l10n_ua_sign, the server only relays ready signatures.
 Extends l10n_ua.tax.document with cabinet-specific fields and actions.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'external_dependencies': {
         'python': ['httpx', 'h2'],  # HTTP/2 support for Tax Cabinet API

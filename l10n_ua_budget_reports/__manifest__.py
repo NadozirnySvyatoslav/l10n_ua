@@ -21,7 +21,7 @@ Ukraine Budget Reports
 * Наказ Мінфіну № 44 від 24.01.2012 — звітність розпорядників (форми 2д/2м/4-1д/4-2д/7д/9д)
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_budget_estimate',

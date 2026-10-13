@@ -4,6 +4,7 @@
     'summary': 'Взаєморозрахунки з ФСС: звірка, сальдо, відшкодування лікарняних',
     'category': 'Human Resources/Payroll',
     'author': 'Svyatoslav Nadozirny',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_hr_holidays',

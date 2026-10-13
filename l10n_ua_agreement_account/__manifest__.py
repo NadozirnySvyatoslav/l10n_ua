@@ -23,7 +23,7 @@ Ukraine Agreements Accounting
 Міст між ``l10n_ua_agreement`` та ``l10n_ua_accounting``.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_agreement',

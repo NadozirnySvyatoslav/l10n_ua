@@ -17,7 +17,7 @@ Umbrella, що встановлює повний набір модулів дл�
 Для повного бюджетного циклу — додатково встановити `l10n_ua_budget`.
     """,
     'author': 'Svyatoslav Nadozirny',
-    'website': 'https://many2one.online',
+    'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
         'l10n_ua_medecin_base',
