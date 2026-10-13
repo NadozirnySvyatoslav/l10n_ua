@@ -1,13 +1,10 @@
 from odoo import api, fields, models
 
-from odoo.addons.l10n_ua_account_base.tools.formatters import (
-    amount_to_words_ua,
-    format_date_ua,
-)
+from odoo.addons.l10n_ua_account_base.tools.formatters import amount_to_words_ua
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = ['sale.order', 'l10n_ua.doc.report.mixin']
 
     l10n_ua_amount_words = fields.Char(
         string='Amount in Words (UA)',
@@ -25,11 +22,20 @@ class SaleOrder(models.Model):
                 order.l10n_ua_amount_words = ''
 
     def _get_ua_report_lines(self):
-        """Return order lines excluding sections and notes."""
-        return self.order_line.filtered(
-            lambda l: l.display_type not in ('line_section', 'line_note')
-        )
+        """Return product lines only: no sections, subsections or notes."""
+        return self.order_line.filtered(lambda l: not l.display_type)
 
-    def _get_ua_date_formatted(self, dt=None):
-        """Format date in Ukrainian long format."""
-        return format_date_ua(dt or self.date_order.date())
+    def _get_ua_doc_date(self):
+        """Order date in the user's timezone."""
+        return fields.Datetime.context_timestamp(self, self.date_order).date()
+
+    def _get_ua_line_qty(self, line):
+        return line.product_uom_qty
+
+    def _get_ua_note(self):
+        return self.note
+
+    def _get_ua_validity_note(self):
+        if self.validity_date:
+            return 'Рахунок дійсний до %s.' % self._get_ua_date_short(self.validity_date)
+        return 'Рахунок дійсний до оплати протягом 3 банківських днів.'

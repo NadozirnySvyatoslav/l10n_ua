@@ -253,6 +253,10 @@ class TestRahunokInvoice(AccountTestInvoicingCommon):
         self.assertIn('Директор', html)
         self.assertIn('Тестенко Т.Т.', html)
 
+    def test_narration_printed(self):
+        invoice = self._invoice(narration='<p>Розрахунок суми за курсом (тест)</p>')
+        self.assertIn('Розрахунок суми за курсом (тест)', self._render(invoice))
+
     def test_render_act_and_vydatkova_date(self):
         """Акт і видаткова накладна: дата без дубля «року»."""
         invoice = self._invoice()
