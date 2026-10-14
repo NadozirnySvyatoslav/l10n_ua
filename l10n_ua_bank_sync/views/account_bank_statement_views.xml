@@ -30,11 +30,142 @@
             (0, 0, {'view_mode': 'list', 'view_id': ref('l10n_ua_bank_statement_view_list')})]"/>
     </record>
 
+    <!-- Community не має в'юх рядка виписки (в Enterprise — віджет звірки),
+         тому для ручного заведення транзакцій потрібні власні. -->
+    <record id="l10n_ua_bank_transaction_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.account.bank.statement.line.list</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list string="Bank Transactions" default_order="date desc, id desc"
+                  decoration-muted="state == 'cancel'" decoration-warning="not is_reconciled">
+                <field name="date"/>
+                <field name="journal_id" optional="show"/>
+                <field name="statement_id" optional="hide"/>
+                <field name="payment_ref" string="Payment Purpose"/>
+                <field name="partner_id" optional="show"/>
+                <field name="partner_name" optional="hide"/>
+                <field name="account_number" optional="hide"/>
+                <field name="l10n_ua_counterpart_account_id" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="amount" sum="Total"/>
+                <field name="is_reconciled" optional="show" widget="boolean"/>
+                <field name="state" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_bank_transaction_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.account.bank.statement.line.form</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form string="Bank Transaction">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_journal_entry" type="object" class="oe_stat_button"
+                                icon="fa-bars" invisible="not move_id">
+                            <span class="o_stat_text">Journal Entry</span>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Reconciled" invisible="not is_reconciled"/>
+                    <div class="oe_title">
+                        <label for="payment_ref" string="Payment Purpose"/>
+                        <h1><field name="payment_ref" placeholder="Payment purpose" required="True"/></h1>
+                    </div>
+                    <group>
+                        <group string="Transaction">
+                            <field name="journal_id" domain="[('type', '=', 'bank')]"
+                                   options="{'no_create': True}" readonly="id"/>
+                            <field name="date"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="amount"
+                                   help="Positive amount: incoming payment (Dt bank). Negative amount: outgoing payment (Kt bank)."/>
+                            <field name="foreign_currency_id" groups="base.group_multi_currency"/>
+                            <field name="amount_currency" groups="base.group_multi_currency"
+                                   invisible="not foreign_currency_id" required="foreign_currency_id"/>
+                            <field name="statement_id" domain="[('journal_id', '=', journal_id)]"
+                                   options="{'no_create': True}"/>
+                        </group>
+                        <group string="Counterpart">
+                            <field name="partner_id"/>
+                            <field name="partner_name" invisible="partner_id"/>
+                            <field name="account_number"/>
+                            <field name="l10n_ua_counterpart_account_id"
+                                   placeholder="Suspense account of the journal"
+                                   options="{'no_create': True}"
+                                   readonly="is_reconciled and not l10n_ua_counterpart_account_id"/>
+                            <field name="ref"/>
+                            <field name="is_reconciled" invisible="1"/>
+                            <field name="move_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Journal Items" name="journal_items" invisible="not id">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="account_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="name"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="debit" sum="Total"/>
+                                    <field name="credit" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="narration" placeholder="Internal note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_bank_transaction_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.account.bank.statement.line.search</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <search string="Bank Transactions">
+                <field name="payment_ref" string="Payment Purpose"/>
+                <field name="partner_id"/>
+                <field name="partner_name"/>
+                <field name="journal_id"/>
+                <field name="l10n_ua_counterpart_account_id"/>
+                <field name="amount"/>
+                <filter name="incoming" string="Incoming" domain="[('amount', '&gt;', 0)]"/>
+                <filter name="outgoing" string="Outgoing" domain="[('amount', '&lt;', 0)]"/>
+                <separator/>
+                <filter name="not_reconciled" string="Not Reconciled" domain="[('is_reconciled', '=', False)]"/>
+                <filter name="reconciled" string="Reconciled" domain="[('is_reconciled', '=', True)]"/>
+                <separator/>
+                <filter name="date" string="Date" date="date"/>
+                <group>
+                    <filter name="group_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
+                    <filter name="group_statement" string="Statement" context="{'group_by': 'statement_id'}"/>
+                    <filter name="group_counterpart" string="Counterpart Account"
+                            context="{'group_by': 'l10n_ua_counterpart_account_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="l10n_ua_bank_transaction_action" model="ir.actions.act_window">
         <field name="name">Bank Transactions</field>
         <field name="res_model">account.bank.statement.line</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('journal_id.type', '=', 'bank')]</field>
+        <field name="search_view_id" ref="l10n_ua_bank_transaction_view_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('l10n_ua_bank_transaction_view_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('l10n_ua_bank_transaction_view_form')})]"/>
     </record>
 
 </odoo>

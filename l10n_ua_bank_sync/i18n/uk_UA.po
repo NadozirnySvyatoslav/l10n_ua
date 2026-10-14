@@ -1175,6 +1175,7 @@ msgstr "Сира відповідь від API банку, збережена я
 #. module: l10n_ua_bank_sync
 #: model:ir.model.fields,field_description:l10n_ua_bank_sync.field_l10n_ua_bank_transaction__is_reconciled
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
 msgid "Reconciled"
 msgstr "Звірено"
 
@@ -1242,6 +1243,7 @@ msgstr "Статус"
 
 #. module: l10n_ua_bank_sync
 #: model:ir.model.fields,field_description:l10n_ua_bank_sync.field_l10n_ua_bank_transaction__statement_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_search
 msgid "Statement"
 msgstr "Виписка"
 
@@ -1369,6 +1371,7 @@ msgstr "Сьогодні"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_statement_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_statement_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
 msgid "Total"
 msgstr "Всього"
 
@@ -1558,3 +1561,58 @@ msgstr "statement_id"
 #: code:addons/l10n_ua_bank_sync/models/l10n_ua_bank_sync_job.py:0
 msgid "sync_job_id"
 msgstr "sync_job_id"
+
+#. module: l10n_ua_bank_sync
+#: model:ir.model.fields,field_description:l10n_ua_bank_sync.field_account_bank_statement_line__l10n_ua_counterpart_account_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_list
+msgid "Counterpart Account"
+msgstr "Кор. рахунок"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Payment purpose"
+msgstr "Призначення платежу"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Counterpart"
+msgstr "Контрагент і рознесення"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Journal Items"
+msgstr "Проводка"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Notes"
+msgstr "Нотатки"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Internal note"
+msgstr "Внутрішня примітка"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Suspense account of the journal"
+msgstr "Рахунок невизначених надходжень журналу"
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+msgid "Positive amount: incoming payment (Dt bank). Negative amount: outgoing payment (Kt bank)."
+msgstr "Додатна сума — надходження (Дт банк). Від'ємна — списання (Кт банк)."
+
+#. module: l10n_ua_bank_sync
+#, python-format
+#: code:addons/l10n_ua_bank_sync/models/account_bank_statement.py:0
+msgid "Transaction \"%s\" is already reconciled. Undo the reconciliation before changing the counterpart account."
+msgstr "Транзакцію «%s» уже звірено. Скасуйте звірку, перш ніж змінювати кор. рахунок."
+
+#. module: l10n_ua_bank_sync
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_sync.l10n_ua_bank_transaction_view_search
+msgid "Payment Purpose"
+msgstr "Призначення платежу"
