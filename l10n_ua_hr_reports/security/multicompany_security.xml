@@ -43,5 +43,14 @@
             </field>
         </record>
 
+        <record id="hr_hire_notice_company_rule" model="ir.rule">
+            <field name="name">Повідомлення про прийняття на роботу: multi-company</field>
+            <field name="model_id" ref="model_hr_hire_notice"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
     </data>
 </odoo>

@@ -18,3 +18,6 @@ access_hr_report_wage_fund_line_user,hr.report.wage_fund.line.user,model_hr_repo
 access_hr_report_wage_fund_line_manager,hr.report.wage_fund.line.manager,model_hr_report_wage_fund_line,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
 access_hr_report_wage_fund_accrual_user,hr.report.wage_fund.accrual.user,model_hr_report_wage_fund_accrual,hr.group_hr_user,1,0,0,0
 access_hr_report_wage_fund_accrual_manager,hr.report.wage_fund.accrual.manager,model_hr_report_wage_fund_accrual,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_hire_notice_user,hr.hire.notice.user,model_hr_hire_notice,hr.group_hr_user,1,0,0,0
+access_hr_hire_notice_officer,hr.hire.notice.officer,model_hr_hire_notice,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,0
+access_hr_hire_notice_manager,hr.hire.notice.manager,model_hr_hire_notice,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1

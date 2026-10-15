@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="hr_hire_notice_view_form" model="ir.ui.view">
+        <field name="name">hr.hire.notice.form</field>
+        <field name="model">hr.hire.notice</field>
+        <field name="arch" type="xml">
+            <form string="Hire Notice">
+                <header>
+                    <button name="action_generate_xml" string="Generate XML" type="object"
+                            class="btn-primary" invisible="state not in ('draft', 'rejected')"/>
+                    <button name="action_generate_xml" string="Regenerate XML" type="object"
+                            invisible="state != 'generated'"/>
+                    <button name="action_download_xml" string="Download XML" type="object"
+                            invisible="not xml_file"/>
+                    <button name="action_submit" string="Sign and Send" type="object"
+                            class="btn-primary" invisible="state != 'generated'"
+                            groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+                    <button name="action_mark_sent" string="Mark as Sent" type="object"
+                            invisible="state != 'generated'"
+                            groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+                    <button name="action_mark_accepted" string="Accepted" type="object"
+                            invisible="state != 'sent'"
+                            groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+                    <button name="action_mark_rejected" string="Rejected" type="object"
+                            invisible="state != 'sent'"
+                            groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+                    <button name="action_create_cancelling" string="Create Cancelling Notice" type="object"
+                            invisible="state not in ('sent', 'accepted') or notice_type == 'cancel'"
+                            groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+                    <button name="action_draft" string="Set to Draft" type="object"
+                            invisible="state not in ('generated', 'rejected')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,sent,accepted"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert" invisible="not is_overdue">
+                        Work has started, but the notice has not been sent to the tax authority
+                        (CMU Resolution No. 413: the notice is filed before work starts).
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="is_mandatory">
+                        The Procedure (CMU Resolution No. 413) requires the notice for employment
+                        and gig contracts. Category 4 (civil law contract) is accepted by the form
+                        but is not subject to the deadline control.
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state not in ('draft', 'generated')">
+                        Electronic form J3001005 / F3001005. The XML structure has not been verified
+                        against the official tax authority XSD yet: check the file in the Electronic
+                        Cabinet before sending.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Notice">
+                            <field name="notice_type" readonly="state != 'draft'"/>
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="order_id" readonly="state != 'draft'"/>
+                            <field name="version_id" readonly="state != 'draft'"/>
+                            <field name="person_category" readonly="state != 'draft'"/>
+                            <field name="is_mandatory" invisible="1"/>
+                            <field name="is_overdue" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Person">
+                            <field name="person_tin" readonly="state != 'draft'"/>
+                            <field name="unzr" readonly="state != 'draft'"/>
+                            <field name="person_name" readonly="state != 'draft'"/>
+                            <field name="citizenship" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Dates">
+                            <field name="order_number" readonly="state != 'draft'"
+                                   invisible="person_category not in ('1', '2')"/>
+                            <field name="order_date" readonly="state != 'draft'"/>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_formed" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Filing">
+                            <field name="doc_cnt" invisible="not doc_cnt"/>
+                            <field name="xml_filename" invisible="1"/>
+                            <field name="xml_file" filename="xml_filename" invisible="not xml_file"/>
+                            <field name="submission_date" invisible="state not in ('sent', 'accepted', 'rejected')"/>
+                            <field name="receipt_number" invisible="state not in ('sent', 'accepted', 'rejected')"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_hire_notice_view_list" model="ir.ui.view">
+        <field name="name">hr.hire.notice.list</field>
+        <field name="model">hr.hire.notice</field>
+        <field name="arch" type="xml">
+            <list string="Hire Notices" decoration-danger="is_overdue">
+                <field name="employee_id"/>
+                <field name="notice_type"/>
+                <field name="person_category"/>
+                <field name="order_id" optional="show"/>
+                <field name="date_start"/>
+                <field name="submission_date" optional="show"/>
+                <field name="receipt_number" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="is_overdue" column_invisible="True"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'accepted'"
+                       decoration-info="state in ('draft', 'sent')"
+                       decoration-warning="state == 'generated'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_hire_notice_view_search" model="ir.ui.view">
+        <field name="name">hr.hire.notice.search</field>
+        <field name="model">hr.hire.notice</field>
+        <field name="arch" type="xml">
+            <search string="Hire Notices">
+                <field name="employee_id"/>
+                <field name="order_id"/>
+                <filter string="Not Sent" name="filter_not_sent"
+                        domain="[('state', 'in', ('draft', 'generated'))]"/>
+                <filter string="Overdue" name="filter_overdue" domain="[('is_overdue', '=', True)]"/>
+                <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <group>
+                    <filter string="Status" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Person Category" name="groupby_category" domain="[]"
+                            context="{'group_by': 'person_category'}"/>
+                    <filter string="Work Start Date" name="groupby_date" domain="[]"
+                            context="{'group_by': 'date_start:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_hire_notice" model="ir.actions.act_window">
+        <field name="name">Hire Notices (Tax Authority)</field>
+        <field name="res_model">hr.hire.notice</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="hr_hire_notice_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a hire notice</p>
+            <p>Notice to the tax authority about hiring an employee or concluding a gig contract
+               (CMU Resolution No. 413). It is filed before work starts.</p>
+        </field>
+    </record>
+
+    <!-- Hiring order: smart button, create action and a missing-notice warning. -->
+    <record id="view_hr_order_form_hire_notice" model="ir.ui.view">
+        <field name="name">hr.order.form.hire.notice</field>
+        <field name="model">hr.order</field>
+        <field name="inherit_id" ref="l10n_ua_hr_documents.view_hr_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_create_hire_notice" string="Hire Notice (Tax)" type="object"
+                        invisible="order_type != 'hiring' or state == 'cancelled' or not employee_id or hire_notice_count"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_hire_notices" type="object" class="oe_stat_button"
+                        icon="fa-paper-plane" invisible="not hire_notice_count">
+                    <field name="hire_notice_count" widget="statinfo" string="Hire Notices"/>
+                </button>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="after">
+                <field name="hire_notice_missing" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not hire_notice_missing">
+                    No hire notice has been sent to the tax authority for this order. It must be
+                    filed before work starts (CMU Resolution No. 413).
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

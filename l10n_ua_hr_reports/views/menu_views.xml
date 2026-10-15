@@ -13,6 +13,12 @@
               action="action_hr_report_d5"
               sequence="20"/>
 
+    <menuitem id="menu_hr_hire_notice"
+              name="Hire Notices (Tax Authority)"
+              parent="hr.hr_menu_hr_reports"
+              action="action_hr_hire_notice"
+              sequence="25"/>
+
     <menuitem id="menu_hr_report_headcount"
               name="Average Headcount"
               parent="hr.hr_menu_hr_reports"

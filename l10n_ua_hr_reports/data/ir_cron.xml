@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Постанова КМУ № 413, ч. 3 ст. 24 КЗпП: повідомлення ДПС про
+             прийняття працівника подається до початку роботи. -->
+        <record id="ir_cron_check_hire_notice_deadlines" model="ir.cron">
+            <field name="name">HR UA: Контроль строків повідомлень ДПС про прийняття на роботу</field>
+            <field name="model_id" ref="model_hr_hire_notice"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_hire_notice_deadlines()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>
