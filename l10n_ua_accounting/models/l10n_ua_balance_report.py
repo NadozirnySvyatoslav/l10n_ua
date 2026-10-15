@@ -7,55 +7,112 @@ from odoo.exceptions import UserError
 
 
 # Line definitions: (sequence, key, name, code, section, line_type, account_codes, balance_type)
+#
+# Every account goes to exactly one detail row: the row with the longest
+# matching prefix (e.g. 100 → 1015, not 1010). A prefix listed in both an asset
+# and a liability row (36, 37, 63, 641, 642, 68) is a settlement account with
+# a «розгорнуте сальдо»: its balance per account and partner goes to the asset
+# row when it is a debit and to the liability row when it is a credit.
+# Asset rows show debit − credit, equity and liability rows credit − debit, so
+# contra accounts (13x, 38, 45, 46) come out negative within their row.
+# Classes 7–9 not yet closed go to 1420: a balance built before the period is
+# closed must still balance.
 BALANCE_LINES = [
     # I. Необоротні активи
-    (10, 'section_noncurrent', 'I. Необоротні активи', '', 'asset_noncurrent', 'section', '', ''),
-    (11, 'intangible_assets', 'Нематеріальні активи', '1000', 'asset_noncurrent', 'detail', '12', 'balance'),
-    (12, 'unfinished_capex', 'Незавершені капітальні інвестиції', '1005', 'asset_noncurrent', 'detail', '15', 'balance'),
-    (13, 'fixed_assets', 'Основні засоби', '1010', 'asset_noncurrent', 'detail', '10,11', 'balance'),
-    (14, 'investment_property', 'Інвестиційна нерухомість', '1015', 'asset_noncurrent', 'detail', '100', 'balance'),
-    (15, 'long_term_receivables', 'Довгострокова дебіторська заборгованість', '1040', 'asset_noncurrent', 'detail', '18', 'balance'),
-    (16, 'deferred_tax_assets', 'Відстрочені податкові активи', '1045', 'asset_noncurrent', 'detail', '17', 'balance'),
-    (19, 'subtotal_noncurrent', 'Усього за розділом I', '1095', 'asset_noncurrent', 'subtotal', '', ''),
+    (100, 'section_noncurrent', 'I. Необоротні активи', '', 'asset_noncurrent', 'section', '', ''),
+    (110, 'intangible_assets', 'Нематеріальні активи', '1000', 'asset_noncurrent', 'detail', '12,133', 'balance'),
+    (120, 'unfinished_capex', 'Незавершені капітальні інвестиції', '1005', 'asset_noncurrent', 'detail', '15', 'balance'),
+    (130, 'fixed_assets', 'Основні засоби', '1010', 'asset_noncurrent', 'detail', '10,11,131,132', 'balance'),
+    (140, 'investment_property', 'Інвестиційна нерухомість', '1015', 'asset_noncurrent', 'detail', '100,135', 'balance'),
+    (142, 'lt_biological_assets', 'Довгострокові біологічні активи', '1020', 'asset_noncurrent', 'detail', '16,134', 'balance'),
+    (145, 'lt_financial_investments', 'Довгострокові фінансові інвестиції', '1030', 'asset_noncurrent', 'detail', '14', 'balance'),
+    (150, 'long_term_receivables', 'Довгострокова дебіторська заборгованість', '1040', 'asset_noncurrent', 'detail', '18', 'balance'),
+    (160, 'deferred_tax_assets', 'Відстрочені податкові активи', '1045', 'asset_noncurrent', 'detail', '17', 'balance'),
+    (190, 'subtotal_noncurrent', 'Усього за розділом I', '1095', 'asset_noncurrent', 'subtotal', '', ''),
 
     # II. Оборотні активи
-    (20, 'section_current', 'II. Оборотні активи', '', 'asset_current', 'section', '', ''),
-    (21, 'inventories', 'Запаси', '1100', 'asset_current', 'detail', '20,21,22,23,24,25,26,27,28', 'balance'),
-    (22, 'receivables_goods', 'Дебіторська заборгованість за товари', '1125', 'asset_current', 'detail', '36', 'balance'),
-    (23, 'receivables_budget', 'Дебіторська заборгованість за розрахунками з бюджетом', '1135', 'asset_current', 'detail', '641,642', 'balance'),
-    (24, 'other_current_receivables', 'Інша поточна дебіторська заборгованість', '1155', 'asset_current', 'detail', '37,63', 'balance'),
-    (25, 'cash', 'Гроші та їх еквіваленти', '1165', 'asset_current', 'detail', '30,31,33,35', 'balance'),
-    (26, 'prepaid_expenses', 'Витрати майбутніх періодів', '1170', 'asset_current', 'detail', '39', 'balance'),
-    (29, 'subtotal_current', 'Усього за розділом II', '1195', 'asset_current', 'subtotal', '', ''),
+    (200, 'section_current', 'II. Оборотні активи', '', 'asset_current', 'section', '', ''),
+    (210, 'inventories', 'Запаси', '1100', 'asset_current', 'detail', '20,21,22,23,24,25,26,27,28', 'balance'),
+    (215, 'bills_received', 'Векселі одержані', '1120', 'asset_current', 'detail', '34', 'balance'),
+    (220, 'receivables_goods', 'Дебіторська заборгованість за продукцію, товари, роботи, послуги', '1125', 'asset_current', 'detail', '36,38', 'balance'),
+    (225, 'receivables_advances', 'Дебіторська заборгованість за виданими авансами', '1130', 'asset_current', 'detail', '63,371', 'balance'),
+    (230, 'receivables_budget', 'Дебіторська заборгованість за розрахунками з бюджетом', '1135', 'asset_current', 'detail', '641,642', 'balance'),
+    (240, 'other_current_receivables', 'Інша поточна дебіторська заборгованість', '1155', 'asset_current', 'detail', '37,68', 'balance'),
+    (245, 'current_investments', 'Поточні фінансові інвестиції', '1160', 'asset_current', 'detail', '35', 'balance'),
+    (250, 'cash', 'Гроші та їх еквіваленти', '1165', 'asset_current', 'detail', '30,31,33', 'balance'),
+    (260, 'prepaid_expenses', 'Витрати майбутніх періодів', '1170', 'asset_current', 'detail', '39', 'balance'),
+    (290, 'subtotal_current', 'Усього за розділом II', '1195', 'asset_current', 'subtotal', '', ''),
 
-    (30, 'total_assets', 'БАЛАНС', '1300', '', 'total', '', ''),
+    (300, 'total_assets', 'БАЛАНС', '1300', '', 'total', '', ''),
 
     # I. Власний капітал
-    (40, 'section_equity', 'I. Власний капітал', '', 'equity', 'section', '', ''),
-    (41, 'registered_capital', 'Зареєстрований капітал', '1400', 'equity', 'detail', '40', 'balance'),
-    (42, 'additional_capital', 'Додатковий капітал', '1410', 'equity', 'detail', '41,42', 'balance'),
-    (43, 'reserve_capital', 'Резервний капітал', '1415', 'equity', 'detail', '43', 'balance'),
-    (44, 'retained_earnings', 'Нерозподілений прибуток (непокритий збиток)', '1420', 'equity', 'detail', '44', 'balance_signed'),
-    (49, 'subtotal_equity', 'Усього за розділом I', '1495', 'equity', 'subtotal', '', ''),
+    (400, 'section_equity', 'I. Власний капітал', '', 'equity', 'section', '', ''),
+    (410, 'registered_capital', 'Зареєстрований (пайовий) капітал', '1400', 'equity', 'detail', '40', 'balance'),
+    (420, 'additional_capital', 'Додатковий капітал', '1410', 'equity', 'detail', '41,42', 'balance'),
+    (430, 'reserve_capital', 'Резервний капітал', '1415', 'equity', 'detail', '43', 'balance'),
+    (440, 'retained_earnings', 'Нерозподілений прибуток (непокритий збиток)', '1420', 'equity', 'detail', '44,7,8,9', 'balance'),
+    (445, 'unpaid_capital', 'Неоплачений капітал', '1425', 'equity', 'detail', '46', 'balance'),
+    (446, 'withdrawn_capital', 'Вилучений капітал', '1430', 'equity', 'detail', '45', 'balance'),
+    (490, 'subtotal_equity', 'Усього за розділом I', '1495', 'equity', 'subtotal', '', ''),
 
     # II. Довгострокові зобов'язання
-    (50, 'section_lt_liab', "II. Довгострокові зобов'язання", '', 'liability_longterm', 'section', '', ''),
-    (51, 'long_term_loans', 'Довгострокові кредити банків', '1510', 'liability_longterm', 'detail', '50', 'balance'),
-    (52, 'long_term_liabilities', "Інші довгострокові зобов'язання", '1515', 'liability_longterm', 'detail', '51,52,53,54,55', 'balance'),
-    (59, 'subtotal_lt_liab', 'Усього за розділом II', '1595', 'liability_longterm', 'subtotal', '', ''),
+    (500, 'section_lt_liab', "II. Довгострокові зобов'язання і забезпечення", '', 'liability_longterm', 'section', '', ''),
+    (510, 'long_term_loans', 'Довгострокові кредити банків', '1510', 'liability_longterm', 'detail', '50', 'balance'),
+    (520, 'long_term_liabilities', "Інші довгострокові зобов'язання", '1515', 'liability_longterm', 'detail', '51,52,53,54,55', 'balance'),
+    (525, 'target_financing', 'Цільове фінансування', '1525', 'liability_longterm', 'detail', '48', 'balance'),
+    (590, 'subtotal_lt_liab', 'Усього за розділом II', '1595', 'liability_longterm', 'subtotal', '', ''),
 
     # III. Поточні зобов'язання
-    (60, 'section_ct_liab', "III. Поточні зобов'язання", '', 'liability_current', 'section', '', ''),
-    (61, 'short_term_loans', 'Короткострокові кредити банків', '1600', 'liability_current', 'detail', '60', 'balance'),
-    (62, 'payables_goods', 'Кредиторська заборгованість за товари', '1615', 'liability_current', 'detail', '63', 'balance'),
-    (63, 'payables_budget', "Поточні зобов'язання за розрахунками з бюджетом", '1620', 'liability_current', 'detail', '641,642', 'balance'),
-    (64, 'payables_insurance', "Поточні зобов'язання зі страхування", '1625', 'liability_current', 'detail', '65', 'balance'),
-    (65, 'payables_wages', "Поточні зобов'язання з оплати праці", '1630', 'liability_current', 'detail', '66', 'balance'),
-    (66, 'other_current_liabilities', "Інші поточні зобов'язання", '1690', 'liability_current', 'detail', '67,68,69', 'balance'),
-    (69, 'subtotal_ct_liab', 'Усього за розділом III', '1695', 'liability_current', 'subtotal', '', ''),
+    (600, 'section_ct_liab', "III. Поточні зобов'язання і забезпечення", '', 'liability_current', 'section', '', ''),
+    (610, 'short_term_loans', 'Короткострокові кредити банків', '1600', 'liability_current', 'detail', '60', 'balance'),
+    (612, 'bills_issued', 'Векселі видані', '1605', 'liability_current', 'detail', '62', 'balance'),
+    (614, 'current_lt_debt', "Поточна кредиторська заборгованість за довгостроковими зобов'язаннями", '1610', 'liability_current', 'detail', '61', 'balance'),
+    (620, 'payables_goods', 'Поточна кредиторська заборгованість за товари, роботи, послуги', '1615', 'liability_current', 'detail', '63', 'balance'),
+    (630, 'payables_budget', 'Поточна кредиторська заборгованість за розрахунками з бюджетом', '1620', 'liability_current', 'detail', '641,642', 'balance'),
+    (640, 'payables_insurance', 'Поточна кредиторська заборгованість за розрахунками зі страхування', '1625', 'liability_current', 'detail', '65', 'balance'),
+    (650, 'payables_wages', 'Поточна кредиторська заборгованість за розрахунками з оплати праці', '1630', 'liability_current', 'detail', '66', 'balance'),
+    (655, 'payables_advances', 'Поточна кредиторська заборгованість за одержаними авансами', '1635', 'liability_current', 'detail', '36,681', 'balance'),
+    (660, 'current_provisions', 'Поточні забезпечення', '1660', 'liability_current', 'detail', '47', 'balance'),
+    (665, 'deferred_income', 'Доходи майбутніх періодів', '1665', 'liability_current', 'detail', '69', 'balance'),
+    (670, 'other_current_liabilities', "Інші поточні зобов'язання", '1690', 'liability_current', 'detail', '37,67,68', 'balance'),
+    (690, 'subtotal_ct_liab', 'Усього за розділом III', '1695', 'liability_current', 'subtotal', '', ''),
 
-    (70, 'total_liabilities', 'БАЛАНС', '1900', '', 'total', '', ''),
+    (700, 'total_liabilities', 'БАЛАНС', '1900', '', 'total', '', ''),
 ]
+
+ASSET_SECTIONS = ('asset_noncurrent', 'asset_current')
+LIABILITY_SECTIONS = ('equity', 'liability_longterm', 'liability_current')
+BALANCE_DETAIL_LINES = [line for line in BALANCE_LINES if line[5] == 'detail']
+
+
+def balance_row_prefixes(line):
+    return [c.strip() for c in (line[6] or '').split(',') if c.strip()]
+
+
+def match_balance_line(code, amount):
+    """The key of the Form 1 detail row an account goes to, or None.
+
+    The longest matching prefix wins; a prefix shared by an asset and a
+    liability row goes to the asset row for a debit balance (``amount`` ≥ 0)
+    and to the liability row for a credit one.
+    """
+    best_len, candidates = 0, []
+    for line in BALANCE_DETAIL_LINES:
+        for prefix in balance_row_prefixes(line):
+            if not code.startswith(prefix):
+                continue
+            if len(prefix) > best_len:
+                best_len, candidates = len(prefix), [line]
+            elif len(prefix) == best_len and line not in candidates:
+                candidates.append(line)
+    if not candidates:
+        return None
+    if len(candidates) > 1:
+        wanted = ASSET_SECTIONS if amount >= 0 else LIABILITY_SECTIONS
+        for line in candidates:
+            if line[4] in wanted:
+                return line[1]
+    return candidates[0][1]
 
 
 class L10nUaBalanceReport(models.Model):
@@ -116,6 +173,12 @@ class L10nUaBalanceReport(models.Model):
         currency_field='currency_id',
     )
     note = fields.Text(string='Notes')
+    unmapped_accounts = fields.Char(
+        string='Accounts Without a Row',
+        readonly=True,
+        help='Accounts with a balance that no row of the form takes. Their '
+             'balance is left out, so the two sides of the balance differ by it.',
+    )
 
     @api.depends('date_to', 'company_id')
     def _compute_name(self):
@@ -189,22 +252,38 @@ class L10nUaBalanceReport(models.Model):
 
     # ── Data generation ─────────────────────────────────────
 
-    def _get_account_balance(self, account_codes, date):
-        """Get balance for accounts matching codes at a date."""
-        domain = [
-            ('date', '<=', date),
-            ('parent_state', '=', 'posted'),
-            ('company_id', '=', self.company_id.id),
-        ]
-        account_domain = []
-        for code in account_codes:
-            if account_domain:
-                account_domain = ['|'] + account_domain
-            account_domain.append(('account_id.code', '=like', f'{code}%'))
-        if account_domain:
-            domain.extend(account_domain)
-        lines = self.env['account.move.line'].search(domain)
-        return sum(lines.mapped('balance'))
+    def _get_row_amounts(self, date):
+        """Signed amounts of the detail rows at a date, and the unmapped accounts.
+
+        Balances are taken per account and partner, so that a settlement
+        account shows both its debit and its credit side (розгорнуте сальдо).
+        Account codes are those of the report's company.
+
+        :return: ({row key: amount}, {account code: balance})
+        """
+        self.ensure_one()
+        MoveLine = self.env['account.move.line'].with_company(self.company_id)
+        groups = MoveLine._read_group(
+            [('date', '<=', date),
+             ('parent_state', '=', 'posted'),
+             ('company_id', '=', self.company_id.id)],
+            ['account_id', 'partner_id'],
+            ['balance:sum'],
+        )
+        amounts, unmapped = {}, {}
+        currency = self.company_id.currency_id
+        for account, _partner, balance in groups:
+            if currency.is_zero(balance):
+                continue
+            code = account.with_company(self.company_id).code or ''
+            key = match_balance_line(code, balance)
+            if not key:
+                unmapped[code] = unmapped.get(code, 0.0) + balance
+                continue
+            section = next(line[4] for line in BALANCE_DETAIL_LINES if line[1] == key)
+            value = balance if section in ASSET_SECTIONS else -balance
+            amounts[key] = amounts.get(key, 0.0) + value
+        return amounts, unmapped
 
     def _generate_lines(self):
         """Generate report lines from account.move.line data."""
@@ -214,43 +293,28 @@ class L10nUaBalanceReport(models.Model):
             f'{self.date_to.year - 1}-12-31'
         )
 
-        # Compute detail amounts
+        current, unmapped = self._get_row_amounts(date_end)
+        previous, _unmapped_prev = self._get_row_amounts(date_comp)
         amounts = {}
+        sections = {}
+        for line in BALANCE_DETAIL_LINES:
+            key, section = line[1], line[4]
+            cur, prev = current.get(key, 0.0), previous.get(key, 0.0)
+            amounts[key] = (cur, prev)
+            sec_cur, sec_prev = sections.get(section, (0.0, 0.0))
+            sections[section] = (sec_cur + cur, sec_prev + prev)
         for seq, key, name, code, section, line_type, acct_codes, bal_type in BALANCE_LINES:
-            if line_type == 'detail' and acct_codes:
-                codes = [c.strip() for c in acct_codes.split(',')]
-                cur = self._get_account_balance(codes, date_end)
-                prev = self._get_account_balance(codes, date_comp)
-                if bal_type == 'balance_signed':
-                    amounts[key] = (cur, prev)
-                else:
-                    amounts[key] = (abs(cur), abs(prev))
-
-        # Compute subtotals
-        section_sums = {
-            'subtotal_noncurrent': ['intangible_assets', 'unfinished_capex', 'fixed_assets',
-                                    'investment_property', 'long_term_receivables', 'deferred_tax_assets'],
-            'subtotal_current': ['inventories', 'receivables_goods', 'receivables_budget',
-                                 'other_current_receivables', 'cash', 'prepaid_expenses'],
-            'subtotal_equity': ['registered_capital', 'additional_capital', 'reserve_capital', 'retained_earnings'],
-            'subtotal_lt_liab': ['long_term_loans', 'long_term_liabilities'],
-            'subtotal_ct_liab': ['short_term_loans', 'payables_goods', 'payables_budget',
-                                 'payables_insurance', 'payables_wages', 'other_current_liabilities'],
-        }
-        for sub_key, detail_keys in section_sums.items():
-            cur = sum(amounts.get(k, (0, 0))[0] for k in detail_keys)
-            prev = sum(amounts.get(k, (0, 0))[1] for k in detail_keys)
-            amounts[sub_key] = (cur, prev)
-
-        # Totals
-        amounts['total_assets'] = (
-            amounts['subtotal_noncurrent'][0] + amounts['subtotal_current'][0],
-            amounts['subtotal_noncurrent'][1] + amounts['subtotal_current'][1],
-        )
-        amounts['total_liabilities'] = (
-            amounts['subtotal_equity'][0] + amounts['subtotal_lt_liab'][0] + amounts['subtotal_ct_liab'][0],
-            amounts['subtotal_equity'][1] + amounts['subtotal_lt_liab'][1] + amounts['subtotal_ct_liab'][1],
-        )
+            if line_type == 'subtotal':
+                amounts[key] = sections.get(section, (0.0, 0.0))
+        for key, side in (('total_assets', ASSET_SECTIONS),
+                          ('total_liabilities', LIABILITY_SECTIONS)):
+            amounts[key] = (
+                sum(sections.get(s, (0.0, 0.0))[0] for s in side),
+                sum(sections.get(s, (0.0, 0.0))[1] for s in side),
+            )
+        self.unmapped_accounts = ', '.join(
+            '%s: %s' % (code, self.company_id.currency_id.format(balance))
+            for code, balance in sorted(unmapped.items())) or False
 
         # Create line records
         vals_list = []

@@ -23,6 +23,9 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not unmapped_accounts">
+                        <strong>Accounts without a row of the form:</strong> <field name="unmapped_accounts" class="d-inline"/>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>

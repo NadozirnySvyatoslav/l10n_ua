@@ -5035,3 +5035,22 @@ msgstr ""
 #: model:ir.ui.menu,name:account.menu_finance
 msgid "Accounting"
 msgstr "Бухоблік"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__unmapped_accounts
+msgid "Accounts Without a Row"
+msgstr "Рахунки без рядка форми"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_balance_report__unmapped_accounts
+msgid ""
+"Accounts with a balance that no row of the form takes. Their balance is left "
+"out, so the two sides of the balance differ by it."
+msgstr ""
+"Рахунки із сальдо, яке не потрапляє в жоден рядок форми. Їхнє сальдо не "
+"враховано, тож актив і пасив балансу різняться на цю суму."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+msgid "Accounts without a row of the form:"
+msgstr "Рахунки без рядка форми:"
