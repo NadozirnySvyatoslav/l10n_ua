@@ -20,10 +20,14 @@ class TestBalanceForm(AccountingTestCase):
         cls.acc_40 = acc('40', 'Зареєстрований капітал', 'equity')
         cls.acc_301 = acc('301', 'Готівка', 'asset_cash')
         cls.acc_104 = acc('104', 'Машини та обладнання', 'asset_fixed')
+        cls.acc_100 = acc('100', 'Інвестиційна нерухомість', 'asset_fixed')
         cls.acc_131 = acc('131', 'Знос основних засобів', 'asset_fixed')
         cls.acc_281 = acc('281', 'Товари на складі', 'asset_current')
         cls.acc_361 = acc('361', 'Розрахунки з покупцями', 'asset_receivable', True)
         cls.acc_631 = acc('631', 'Розрахунки з постачальниками', 'liability_payable', True)
+        cls.acc_641 = acc('641', 'Розрахунки за податками', 'liability_current')
+        cls.acc_643 = acc('643', "Податкові зобов'язання", 'liability_current')
+        cls.acc_644 = acc('644', 'Податковий кредит', 'asset_current')
         cls.acc_702 = acc('702', 'Дохід від реалізації товарів', 'income')
         cls.acc_92 = acc('92', 'Адміністративні витрати', 'expense')
         cls.acc_499 = acc('499', 'Рахунок без рядка форми', 'equity')
@@ -111,3 +115,52 @@ class TestBalanceForm(AccountingTestCase):
         self._entry(d, (self.acc_301, None, 700, 0), (self.acc_499, None, 0, 700))
         report = self._report(date(2041, 3, 31))
         self.assertIn('499', report.unmapped_accounts)
+
+    def test_vat_643_644_balance(self):
+        d = date(2042, 3, 15)
+        self._entry(d, (self.acc_301, None, 12000, 0), (self.acc_40, None, 0, 12000))
+        # Advance received 1200: ПДВ 200 accrued to 643 on the first event
+        self._entry(d, (self.acc_301, None, 1200, 0), (self.acc_361, self.customer_d, 0, 1200))
+        self._entry(d, (self.acc_643, None, 200, 0), (self.acc_641, None, 0, 200))
+        # Advance paid 600: ПДВ 100 of tax credit waits on 644
+        self._entry(d, (self.acc_631, self.supplier_b, 600, 0), (self.acc_301, None, 0, 600))
+        self._entry(d, (self.acc_641, None, 100, 0), (self.acc_644, None, 0, 100))
+        report = self._report(date(2042, 3, 31))
+        self.assertNotIn('643', report.unmapped_accounts or '')
+        self.assertNotIn('644', report.unmapped_accounts or '')
+        self.assertAlmostEqual(self._row(report, '1300'), self._row(report, '1900'), places=2)
+        # Debit balance of 643 is another current asset, credit balance of
+        # 644 another current liability; 641 nets to a debt of 100
+        self.assertAlmostEqual(self._row(report, '1190'), 200.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1690'), 100.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1620'), 100.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1300'), 13400.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1195'), 13400.0, places=2)
+
+    def test_drill_down_follows_row_assignment(self):
+        d = date(2043, 3, 15)
+        self._entry(d, (self.acc_104, None, 2000, 0), (self.acc_100, None, 500, 0),
+                    (self.acc_40, None, 0, 2500))
+        sale = self._entry(d, (self.acc_361, self.customer_c, 1200, 0),
+                           (self.acc_702, None, 0, 1200))
+        advance = self._entry(d, (self.acc_301, None, 300, 0),
+                              (self.acc_361, self.customer_d, 0, 300))
+        report = self._report(date(2043, 3, 31))
+
+        def drill(code):
+            line = report.line_ids.filtered(lambda l: l.code == code)
+            action = line.action_view_move_lines()
+            return self.env['account.move.line'].search(action['domain'])
+
+        lines_1010 = drill('1010')
+        self.assertIn(self.acc_104, lines_1010.account_id)
+        self.assertNotIn(self.acc_100, lines_1010.account_id)
+        self.assertIn(self.acc_100, drill('1015').account_id)
+        sale_line = sale.line_ids.filtered(lambda l: l.account_id == self.acc_361)
+        advance_line = advance.line_ids.filtered(lambda l: l.account_id == self.acc_361)
+        lines_1125 = drill('1125')
+        self.assertIn(sale_line, lines_1125)
+        self.assertNotIn(advance_line, lines_1125)
+        lines_1635 = drill('1635')
+        self.assertIn(advance_line, lines_1635)
+        self.assertNotIn(sale_line, lines_1635)

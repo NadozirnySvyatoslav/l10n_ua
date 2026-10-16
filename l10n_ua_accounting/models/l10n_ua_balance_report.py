@@ -10,11 +10,16 @@ from odoo.exceptions import UserError
 #
 # Every account goes to exactly one detail row: the row with the longest
 # matching prefix (e.g. 100 → 1015, not 1010). A prefix listed in both an asset
-# and a liability row (36, 37, 63, 641, 642, 68) is a settlement account with
-# a «розгорнуте сальдо»: its balance per account and partner goes to the asset
+# and a liability row (36, 37, 63, 641, 642, 643, 644, 68) is a settlement
+# account with a «розгорнуте сальдо»: its balance per account and partner goes to the asset
 # row when it is a debit and to the liability row when it is a credit.
 # Asset rows show debit − credit, equity and liability rows credit − debit, so
 # contra accounts (13x, 38, 45, 46) come out negative within their row.
+# ПДВ on 643 «Податкові зобов'язання» and 644 «Податковий кредит» is not a
+# settlement with the budget (1135/1620): a debit balance goes to 1190 «Інші
+# оборотні активи», a credit one to 1690 «Інші поточні зобов'язання» (643
+# usually has a debit balance after an advance received, 644 a credit one
+# after an advance paid, a debit one for an unregistered tax invoice).
 # Classes 7–9 not yet closed go to 1420: a balance built before the period is
 # closed must still balance.
 BALANCE_LINES = [
@@ -41,6 +46,7 @@ BALANCE_LINES = [
     (245, 'current_investments', 'Поточні фінансові інвестиції', '1160', 'asset_current', 'detail', '35', 'balance'),
     (250, 'cash', 'Гроші та їх еквіваленти', '1165', 'asset_current', 'detail', '30,31,33', 'balance'),
     (260, 'prepaid_expenses', 'Витрати майбутніх періодів', '1170', 'asset_current', 'detail', '39', 'balance'),
+    (270, 'other_current_assets', 'Інші оборотні активи', '1190', 'asset_current', 'detail', '643,644', 'balance'),
     (290, 'subtotal_current', 'Усього за розділом II', '1195', 'asset_current', 'subtotal', '', ''),
 
     (300, 'total_assets', 'БАЛАНС', '1300', '', 'total', '', ''),
@@ -74,7 +80,7 @@ BALANCE_LINES = [
     (655, 'payables_advances', 'Поточна кредиторська заборгованість за одержаними авансами', '1635', 'liability_current', 'detail', '36,681', 'balance'),
     (660, 'current_provisions', 'Поточні забезпечення', '1660', 'liability_current', 'detail', '47', 'balance'),
     (665, 'deferred_income', 'Доходи майбутніх періодів', '1665', 'liability_current', 'detail', '69', 'balance'),
-    (670, 'other_current_liabilities', "Інші поточні зобов'язання", '1690', 'liability_current', 'detail', '37,67,68', 'balance'),
+    (670, 'other_current_liabilities', "Інші поточні зобов'язання", '1690', 'liability_current', 'detail', '37,643,644,67,68', 'balance'),
     (690, 'subtotal_ct_liab', 'Усього за розділом III', '1695', 'liability_current', 'subtotal', '', ''),
 
     (700, 'total_liabilities', 'БАЛАНС', '1900', '', 'total', '', ''),
@@ -252,14 +258,11 @@ class L10nUaBalanceReport(models.Model):
 
     # ── Data generation ─────────────────────────────────────
 
-    def _get_row_amounts(self, date):
-        """Signed amounts of the detail rows at a date, and the unmapped accounts.
+    def _get_row_groups(self, date):
+        """Balances per account and partner at a date, with the detail row
+        (``match_balance_line``) each of them goes to.
 
-        Balances are taken per account and partner, so that a settlement
-        account shows both its debit and its credit side (розгорнуте сальдо).
-        Account codes are those of the report's company.
-
-        :return: ({row key: amount}, {account code: balance})
+        :return: list of (account, partner, balance, row key or None)
         """
         self.ensure_one()
         MoveLine = self.env['account.move.line'].with_company(self.company_id)
@@ -270,14 +273,29 @@ class L10nUaBalanceReport(models.Model):
             ['account_id', 'partner_id'],
             ['balance:sum'],
         )
+        return [
+            (account, partner, balance,
+             match_balance_line(account.with_company(self.company_id).code or '', balance))
+            for account, partner, balance in groups
+        ]
+
+    def _get_row_amounts(self, date):
+        """Signed amounts of the detail rows at a date, and the unmapped accounts.
+
+        Balances are taken per account and partner, so that a settlement
+        account shows both its debit and its credit side (розгорнуте сальдо).
+        Account codes are those of the report's company.
+
+        :return: ({row key: amount}, {account code: balance})
+        """
+        self.ensure_one()
         amounts, unmapped = {}, {}
         currency = self.company_id.currency_id
-        for account, _partner, balance in groups:
+        for account, _partner, balance, key in self._get_row_groups(date):
             if currency.is_zero(balance):
                 continue
-            code = account.with_company(self.company_id).code or ''
-            key = match_balance_line(code, balance)
             if not key:
+                code = account.with_company(self.company_id).code or ''
                 unmapped[code] = unmapped.get(code, 0.0) + balance
                 continue
             section = next(line[4] for line in BALANCE_DETAIL_LINES if line[1] == key)
@@ -450,22 +468,46 @@ class L10nUaBalanceReportLine(models.Model):
     )
 
     def action_view_move_lines(self):
-        """Drill-down: open journal items that compose this line."""
+        """Drill-down: open journal items that compose this line.
+
+        The accounts are resolved as for the amount (``match_balance_line``):
+        an account of a longer prefix of another row is left out, and of a
+        settlement account with a «розгорнуте сальдо» only the partners whose
+        balance is on this row's side are shown.
+        """
         self.ensure_one()
         if not self.account_codes or self.line_type in ('section', 'subtotal', 'total'):
             return
-        codes = [c.strip() for c in self.account_codes.split(',') if c.strip()]
+        report = self.report_id
+        row_key = next((line[1] for line in BALANCE_DETAIL_LINES if line[3] == self.code), None)
+        currency = report.company_id.currency_id
+        accounts, partners_by_account = set(), {}
+        for account, partner, balance, key in report._get_row_groups(report.date_to):
+            code = account.with_company(report.company_id).code or ''
+            split = match_balance_line(code, 1.0) != match_balance_line(code, -1.0)
+            if not split:
+                if key == row_key:
+                    accounts.add(account.id)
+            elif key == row_key and not currency.is_zero(balance):
+                partners_by_account.setdefault(account.id, []).append(partner.id or False)
+        account_domain = []
+        if accounts:
+            account_domain.append([('account_id', 'in', sorted(accounts))])
+        for account_id, partner_ids in partners_by_account.items():
+            partner_domain = [('partner_id', 'in', [p for p in partner_ids if p])]
+            if False in partner_ids:
+                partner_domain = ['|', ('partner_id', '=', False)] + partner_domain
+            account_domain.append(['&', ('account_id', '=', account_id)] + partner_domain)
         domain = [
             ('parent_state', '=', 'posted'),
-            ('company_id', '=', self.report_id.company_id.id),
-            ('date', '<=', self.report_id.date_to),
+            ('company_id', '=', report.company_id.id),
+            ('date', '<=', report.date_to),
         ]
-        account_domain = []
-        for code in codes:
-            if account_domain:
-                account_domain = ['|'] + account_domain
-            account_domain.append(('account_id.code', '=like', f'{code}%'))
-        domain.extend(account_domain)
+        if account_domain:
+            domain += ['|'] * (len(account_domain) - 1) + [
+                leaf for part in account_domain for leaf in part]
+        else:
+            domain.append(('id', '=', 0))
         return {
             'type': 'ir.actions.act_window',
             'name': f'{self.name} ({self.code})',
