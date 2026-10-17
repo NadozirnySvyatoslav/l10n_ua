@@ -8,14 +8,121 @@
                 <field name="date"/>
                 <field name="group_id"/>
                 <field name="enrolled_count" readonly="1"/>
-                <field name="present_count"/>
+                <field name="present_count" readonly="line_ids"/>
                 <field name="absent_count" readonly="1"/>
-                <field name="breakfast_count"/>
-                <field name="lunch_count"/>
-                <field name="afternoon_count" optional="hide"/>
-                <field name="dinner_count" optional="hide"/>
+                <field name="breakfast_count" readonly="line_ids"/>
+                <field name="lunch_count" readonly="line_ids"/>
+                <field name="afternoon_count" optional="hide" readonly="line_ids"/>
+                <field name="dinner_count" optional="hide" readonly="line_ids"/>
+                <field name="free_portion_count" optional="show"/>
+                <field name="paid_portion_count" optional="show"/>
                 <field name="note" optional="hide"/>
+                <field name="line_ids" column_invisible="1"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_attendance_form" model="ir.ui.view">
+        <field name="name">l10n_ua.meal.attendance.form</field>
+        <field name="model">l10n_ua.meal.attendance</field>
+        <field name="arch" type="xml">
+            <form string="Відвідуваність харчування">
+                <header>
+                    <button name="action_fill_lines" type="object" string="Заповнити учнями групи"
+                            class="btn-primary" invisible="line_ids"/>
+                    <button name="action_fill_lines" type="object" string="Додати відсутніх у списку"
+                            invisible="not line_ids"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="group_id"/>
+                            <field name="enrolled_count"/>
+                            <field name="present_count" readonly="line_ids"/>
+                            <field name="absent_count"/>
+                        </group>
+                        <group string="Порцій">
+                            <field name="breakfast_count" readonly="line_ids"/>
+                            <field name="lunch_count" readonly="line_ids"/>
+                            <field name="afternoon_count" readonly="line_ids"/>
+                            <field name="dinner_count" readonly="line_ids"/>
+                        </group>
+                    </group>
+                    <group string="Безоплатне / платне харчування" name="free_paid"
+                           invisible="not line_ids">
+                        <group>
+                            <field name="free_portion_count"/>
+                            <field name="free_benefit_portion_count"/>
+                            <field name="free_universal_portion_count"/>
+                        </group>
+                        <group>
+                            <field name="paid_portion_count"/>
+                            <field name="free_pupil_count"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Поіменний облік" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="member_id"/>
+                                    <field name="present"/>
+                                    <field name="breakfast"/>
+                                    <field name="lunch"/>
+                                    <field name="afternoon" optional="hide"/>
+                                    <field name="dinner" optional="hide"/>
+                                    <field name="free_basis"/>
+                                    <field name="benefit_category_id" optional="show"/>
+                                    <field name="free_count"/>
+                                    <field name="paid_count"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Примітка" name="note">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_attendance_line_list" model="ir.ui.view">
+        <field name="name">l10n_ua.meal.attendance.line.list</field>
+        <field name="model">l10n_ua.meal.attendance.line</field>
+        <field name="arch" type="xml">
+            <list string="Поіменний облік харчування" create="0">
+                <field name="date"/>
+                <field name="attendance_id" string="Група / день"/>
+                <field name="member_id"/>
+                <field name="present"/>
+                <field name="free_basis"/>
+                <field name="benefit_category_id"/>
+                <field name="free_count" sum="Безоплатно"/>
+                <field name="paid_count" sum="Платно"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_attendance_line_search" model="ir.ui.view">
+        <field name="name">l10n_ua.meal.attendance.line.search</field>
+        <field name="model">l10n_ua.meal.attendance.line</field>
+        <field name="arch" type="xml">
+            <search string="Поіменний облік харчування">
+                <field name="member_id"/>
+                <field name="benefit_category_id"/>
+                <filter string="Безоплатні" name="filter_free" domain="[('free_count', '>', 0)]"/>
+                <filter string="Пільгові категорії" name="filter_benefit" domain="[('free_basis', '=', 'benefit')]"/>
+                <filter string="Одноразове безоплатне" name="filter_universal" domain="[('free_basis', '=', 'universal')]"/>
+                <filter string="Платні" name="filter_paid" domain="[('paid_count', '>', 0)]"/>
+                <separator/>
+                <filter string="Дата" name="filter_date" date="date"/>
+                <group>
+                    <filter string="Підстава" name="groupby_basis" domain="[]" context="{'group_by': 'free_basis'}"/>
+                    <filter string="Пільгова категорія" name="groupby_category" domain="[]" context="{'group_by': 'benefit_category_id'}"/>
+                    <filter string="Місяць" name="groupby_month" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -23,5 +130,12 @@
         <field name="name">Відвідуваність харчування</field>
         <field name="res_model">l10n_ua.meal.attendance</field>
         <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_attendance_line" model="ir.actions.act_window">
+        <field name="name">Безоплатне / платне харчування</field>
+        <field name="res_model">l10n_ua.meal.attendance.line</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="context">{'search_default_groupby_month': 1, 'search_default_groupby_basis': 1}</field>
     </record>
 </odoo>

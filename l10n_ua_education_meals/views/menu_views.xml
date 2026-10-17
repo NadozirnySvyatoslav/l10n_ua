@@ -17,6 +17,18 @@
               action="action_attendance"
               sequence="20"/>
 
+    <menuitem id="menu_meals_free_paid"
+              name="Безоплатне / платне харчування"
+              parent="menu_meals"
+              action="action_attendance_line"
+              sequence="30"/>
+
+    <menuitem id="menu_meals_benefit_category"
+              name="Пільгові категорії харчування"
+              parent="l10n_ua_education_base.menu_l10n_ua_education_config"
+              action="action_benefit_category"
+              sequence="31"/>
+
     <menuitem id="menu_meals_recipe"
               name="Технологічні картки"
               parent="l10n_ua_education_base.menu_l10n_ua_education_config"

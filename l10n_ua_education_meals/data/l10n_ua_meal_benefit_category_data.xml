@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Пільгові категорії: абзаци 2-9 п. 4 Порядку організації харчування, затв.
+     постановою КМУ від 24.03.2021 № 305 (перелік однаковий у редакціях
+     від 06.06.2023 по 07.07.2026). -->
+<odoo>
+    <data noupdate="1">
+        <record id="benefit_orphan" model="l10n_ua.meal.benefit.category">
+            <field name="code">orphan</field>
+            <field name="sequence">10</field>
+            <field name="name">Діти-сироти</field>
+            <field name="legal_basis">абз. 2 п. 4 Порядку № 305</field>
+        </record>
+        <record id="benefit_no_parental_care" model="l10n_ua.meal.benefit.category">
+            <field name="code">no_parental_care</field>
+            <field name="sequence">20</field>
+            <field name="name">Діти, позбавлені батьківського піклування</field>
+            <field name="legal_basis">абз. 3 п. 4 Порядку № 305</field>
+        </record>
+        <record id="benefit_sen" model="l10n_ua.meal.benefit.category">
+            <field name="code">sen_special_inclusive</field>
+            <field name="sequence">30</field>
+            <field name="name">Діти з особливими освітніми потребами, які навчаються у спеціальних та інклюзивних класах (групах)</field>
+            <field name="legal_basis">абз. 4 п. 4 Порядку № 305</field>
+        </record>
+        <record id="benefit_low_income" model="l10n_ua.meal.benefit.category">
+            <field name="code">low_income</field>
+            <field name="sequence">40</field>
+            <field name="name">Діти із сімей, які отримують допомогу відповідно до Закону України «Про державну соціальну допомогу малозабезпеченим сім'ям»</field>
+            <field name="legal_basis">абз. 5 п. 4 Порядку № 305</field>
+        </record>
+        <record id="benefit_chornobyl" model="l10n_ua.meal.benefit.category">
+            <field name="code">chornobyl</field>
+            <field name="sequence">50</field>
+            <field name="name">Учні закладів на територіях радіоактивного забруднення, діти, евакуйовані із зони відчуження, діти з інвалідністю внаслідок Чорнобильської катастрофи, діти, що проживали у зоні безумовного (обов'язкового) відселення</field>
+            <field name="legal_basis">абз. 6 п. 4 Порядку № 305; Закон «Про статус і соціальний захист громадян, які постраждали внаслідок Чорнобильської катастрофи»</field>
+        </record>
+        <record id="benefit_idp_war" model="l10n_ua.meal.benefit.category">
+            <field name="code">idp_war_affected</field>
+            <field name="sequence">60</field>
+            <field name="name">Діти з числа внутрішньо переміщених осіб; діти, які мають статус дитини, яка постраждала внаслідок воєнних дій і збройних конфліктів</field>
+            <field name="legal_basis">абз. 7 п. 4 Порядку № 305</field>
+        </record>
+        <record id="benefit_veteran_family" model="l10n_ua.meal.benefit.category">
+            <field name="code">veteran_art10</field>
+            <field name="sequence">70</field>
+            <field name="name">Діти з числа осіб, визначених у статті 10 Закону України «Про статус ветеранів війни, гарантії їх соціального захисту»</field>
+            <field name="legal_basis">абз. 8 п. 4 Порядку № 305</field>
+        </record>
+        <record id="benefit_other" model="l10n_ua.meal.benefit.category">
+            <field name="code">other_local</field>
+            <field name="sequence">80</field>
+            <field name="name">Інші категорії, визначені законодавством та/або рішенням органу місцевого самоврядування</field>
+            <field name="legal_basis">абз. 9 п. 4 Порядку № 305</field>
+        </record>
+    </data>
+</odoo>

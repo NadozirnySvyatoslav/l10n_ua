@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Education Meals',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Human Resources/Education',
     'summary': 'Облік дитячого харчування для ЗДО і ШНЗ',
     'description': """
@@ -12,6 +12,10 @@ Education Meals
 * Облік відвідуваності (`l10n_ua.meal.attendance`) — для розрахунку
   фактичної кількості порцій
 * Вікові норми (`l10n_ua.meal.norm`) — добова норма за категоріями
+* Безоплатне гаряче харчування (п. 4 Порядку № 305): пільгові категорії з
+  періодами дії, одноразове безоплатне харчування учнів ЗЗСО (з 27.06.2026 —
+  початкова, базова та профільна освіта, пост. КМУ № 809), поіменний облік
+  і розподіл порцій на безоплатні / платні
 
 Регуляторна база:
 * Постанова КМУ № 1545 (норми харчування у ЗДО)
@@ -26,9 +30,12 @@ Education Meals
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/meals_security.xml',
+        'data/l10n_ua_meal_benefit_category_data.xml',
         'views/l10n_ua_meal_recipe_views.xml',
         'views/l10n_ua_meal_menu_views.xml',
         'views/l10n_ua_meal_attendance_views.xml',
+        'views/l10n_ua_meal_benefit_views.xml',
         'views/menu_views.xml',
     ],
     'demo': [],
