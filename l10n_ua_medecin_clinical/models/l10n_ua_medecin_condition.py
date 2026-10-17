@@ -9,7 +9,8 @@ class L10nUaMedecinCondition(models.Model):
 
     patient_id = fields.Many2one('l10n_ua.medecin.patient', required=True,
                                    ondelete='cascade', index=True)
-    icd10_id = fields.Many2one('l10n_ua.medecin.icd10', string='МКХ-10', required=True)
+    icd10_id = fields.Many2one('l10n_ua.medecin.icd10', string='МКХ-10', required=True,
+                               domain=[('is_selectable', '=', True)])
     date_onset = fields.Date(string='Дата встановлення',
                               default=fields.Date.context_today)
     date_resolved = fields.Date(string='Дата зняття')

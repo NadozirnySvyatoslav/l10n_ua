@@ -76,7 +76,8 @@ class L10nUaMedecinDiagnosis(models.Model):
                                      ondelete='cascade', index=True)
     sequence = fields.Integer(default=10)
     icd10_id = fields.Many2one('l10n_ua.medecin.icd10', string='МКХ-10', required=True,
-                                 ondelete='restrict')
+                                 ondelete='restrict',
+                                 domain=[('is_selectable', '=', True)])
     icd10_code = fields.Char(related='icd10_id.code', store=True, readonly=True)
     # Збережені related-поля — для групування/звітності «Захворюваність»
     # (пацієнт / лікар / місяць) без JOIN через прийом у кожному запиті.
