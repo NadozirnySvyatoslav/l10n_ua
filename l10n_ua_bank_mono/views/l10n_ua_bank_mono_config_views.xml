@@ -11,23 +11,19 @@
                 <button name="action_test_connection" string="Test Connection" type="object"
                         invisible="provider != 'mono'"/>
                 <button name="action_fetch_accounts" string="Fetch Accounts" type="object"
-                        invisible="provider != 'mono' or not mono_api_token"/>
+                        invisible="provider != 'mono' or not mono_has_token"/>
             </xpath>
             <xpath expr="//group[@name='account_group']" position="after">
                 <group string="monobank API" invisible="provider != 'mono'">
                     <field name="mono_api_type" widget="radio"/>
-                    <field name="mono_api_token" password="True"/>
+                    <field name="mono_has_token" invisible="1"/>
+                    <field name="mono_api_token" password="True"
+                           groups="l10n_ua_account_base.group_ua_manager"/>
                     <field name="mono_account_id" string="Account ID"
                            invisible="mono_api_type == 'corporate'"/>
                     <field name="mono_account_id" string="Account IBAN"
                            invisible="mono_api_type != 'corporate'"
                            placeholder="IBAN of the journal bank account"/>
-                </group>
-                <!-- The corporate API has no webhooks. -->
-                <group string="monobank Webhook"
-                       invisible="provider != 'mono' or mono_api_type == 'corporate'">
-                    <field name="mono_webhook_url" widget="CopyClipboardChar"/>
-                    <field name="mono_webhook_active" readonly="1"/>
                 </group>
             </xpath>
         </field>

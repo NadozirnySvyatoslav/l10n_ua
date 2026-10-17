@@ -21,6 +21,12 @@ def _response(status=200, json_data=None, headers=None):
     return resp
 
 
+def _statement_calls(get):
+    """The statement requests among the mocked calls (the balances one is
+    made after them)."""
+    return [c for c in get.call_args_list if '/ext/v1/statement/' in c.args[0]]
+
+
 def _item(n, ts, **extra):
     vals = {'id': f'op-{n}', 'time': ts, 'amount': 10000,
             'description': f'Операція {n}', 'status': 'DONE'}
@@ -58,12 +64,13 @@ class TestMonoCorporate(TransactionCase):
         with patch(f'{MODULE}.requests.get',
                    return_value=_response(json_data=[])) as get:
             self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
-        url = get.call_args.args[0]
+        call = _statement_calls(get)[-1]
+        url = call.args[0]
         self.assertTrue(url.startswith(
             f'https://corp-api.monobank.ua/ext/v1/statement/{OWN_IBAN}/'))
-        self.assertEqual(get.call_args.kwargs['headers']['x-token'], 'corp-token')
+        self.assertEqual(call.kwargs['headers']['x-token'], 'corp-token')
         # Without an explicit limit the API returns only 10 operations.
-        self.assertEqual(get.call_args.kwargs['params'], {'limit': 500})
+        self.assertEqual(call.kwargs['params'], {'limit': 500})
 
     def test_period_bounds_are_kyiv_days(self):
         with patch(f'{MODULE}.requests.get', return_value=_response(json_data=[])):
@@ -83,10 +90,12 @@ class TestMonoCorporate(TransactionCase):
         second = [_item(499, start + 499)] + [
             _item(n, start + n) for n in range(500, 520)]
         with patch(f'{MODULE}.requests.get', side_effect=[
-                _response(json_data=first), _response(json_data=second)]) as get:
+                _response(json_data=first), _response(json_data=second),
+                _response(json_data=[])]) as get:
             raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
-        self.assertEqual(get.call_count, 2)
-        self.assertIn(f'/{start + 499}/', get.call_args_list[1].args[0])
+        calls = _statement_calls(get)
+        self.assertEqual(len(calls), 2)
+        self.assertIn(f'/{start + 499}/', calls[1].args[0])
         self.assertEqual(len(raw['response']), 520)
 
     def test_only_done_operations_are_imported(self):
@@ -118,11 +127,12 @@ class TestMonoCorporate(TransactionCase):
         limited = _response(429, {'errorCode': 'TOO_MANY'},
                             headers={'x-rate-limit-retry-after-seconds': '17'})
         with patch(f'{MODULE}.sleep') as sleep, \
-                patch(f'{MODULE}.requests.get',
-                      side_effect=[limited, _response(json_data=[])]) as get:
+                patch(f'{MODULE}.requests.get', side_effect=[
+                    limited, _response(json_data=[]),
+                    _response(json_data=[])]) as get:
             self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         sleep.assert_called_once_with(17)
-        self.assertEqual(get.call_count, 2)
+        self.assertEqual(len(_statement_calls(get)), 2)
 
     def test_long_rate_limit_names_the_wait(self):
         with patch(f'{MODULE}.sleep') as sleep, \
@@ -179,7 +189,7 @@ class TestMonoCorporate(TransactionCase):
         with patch(f'{MODULE}.requests.get',
                    return_value=_response(json_data=[item])) as get:
             raw = self.config._fetch_from_bank(date(2026, 9, 8), date(2026, 9, 14))
-        query_from = int(get.call_args.args[0].split('/')[-2])
+        query_from = int(_statement_calls(get)[-1].args[0].split('/')[-2])
         self.assertLessEqual(query_from, created)
         self.assertEqual(
             [t['id'] for t in self.config._parse_transactions(raw)], ['op-1'])
@@ -209,8 +219,9 @@ class TestMonoCorporate(TransactionCase):
         with patch(f'{MODULE}.requests.get',
                    return_value=_response(json_data=[])) as get:
             self.config._fetch_from_bank(date(2026, 8, 1), date(2026, 8, 31))
-        self.assertEqual(get.call_count, 2)
-        for call in get.call_args_list:
+        calls = _statement_calls(get)
+        self.assertEqual(len(calls), 2)
+        for call in calls:
             low, high = map(int, call.args[0].split('/')[-2:])
             self.assertLessEqual(high - low, 31 * 86400)
 
@@ -221,3 +232,85 @@ class TestMonoCorporate(TransactionCase):
                 _response(json_data=page), _response(json_data=page)]):
             with self.assertRaisesRegex(UserError, 'one second'):
                 self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+
+    # --- balances, receipts, reversals (#352) ---------------------------------
+
+    def _balances(self, opening_final=True, closing_final=True):
+        """/ext/v1/accounts/{iban}/balances, shaped like the documented
+        sample: a balance in currency units for each date."""
+        return [
+            {'date': '2026-08-31', 'balance': 1000.0, 'isFinal': opening_final},
+            {'date': '2026-09-01', 'balance': 1100.0, 'isFinal': True},
+            {'date': '2026-09-07', 'balance': 1075.5, 'isFinal': closing_final},
+        ]
+
+    def test_balances_are_asked_for_the_day_before_to_the_period_end(self):
+        def fake_get(url, **kwargs):
+            if url.endswith('/balances'):
+                return _response(json_data=self._balances())
+            return _response(json_data=[])
+        with patch(f'{MODULE}.requests.get', side_effect=fake_get) as get:
+            raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        call = get.call_args_list[-1]
+        self.assertEqual(
+            call.args[0],
+            f'https://corp-api.monobank.ua/ext/v1/accounts/{OWN_IBAN}/balances')
+        self.assertEqual(call.kwargs['params'],
+                         {'dateFrom': '2026-08-31', 'dateTo': '2026-09-07'})
+        self.assertEqual(self.config._extract_balances(raw), (1000.0, 1075.5))
+
+    def test_balance_not_final_is_not_verified(self):
+        raw = {'api_type': 'corp_statement', 'response': [],
+               'date_from': '2026-09-01', 'date_to': '2026-09-07',
+               'balances': self._balances(closing_final=False)}
+        self.assertEqual(self.config._extract_balances(raw), (None, None))
+        raw['balances'] = self._balances(opening_final=False)
+        self.assertEqual(self.config._extract_balances(raw), (None, None))
+
+    def test_failed_balances_do_not_fail_the_statement(self):
+        def fake_get(url, **kwargs):
+            if url.endswith('/balances'):
+                return _response(404, {'errorCode': 'NOT_FOUND'})
+            return _response(json_data=[])
+        with patch(f'{MODULE}.requests.get', side_effect=fake_get):
+            raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertEqual(self.config._extract_balances(raw), (None, None))
+
+    def test_statement_with_final_balances_is_verified(self):
+        """Including an operation booked before the period that the
+        look-back brought in: it is already in the opening balance."""
+        early = int(datetime(2026, 8, 30, 15, tzinfo=KYIV).timestamp())
+        inside = int(datetime(2026, 9, 3, 10, tzinfo=KYIV).timestamp())
+        raw = {
+            'api_type': 'corp_statement',
+            'from_ts': int(datetime(2026, 9, 1, tzinfo=KYIV).timestamp()),
+            'to_ts': int(datetime(2026, 9, 7, 23, 59, 59, tzinfo=KYIV).timestamp()),
+            'date_from': '2026-09-01', 'date_to': '2026-09-07',
+            'balances': self._balances(),
+            'response': [
+                _item(1, early, amount=2500),
+                _item(2, inside, amount=7550, receiptId='XXXX-XXXX-XXXX-XXXX',
+                      externalReference='my-own-pretty-external-reference'),
+            ]}
+        opening, closing = self.config._extract_balances(raw)
+        self.assertEqual((opening, closing), (975.0, 1075.5))
+        job = self.env['l10n_ua.bank.sync.job'].create({
+            'config_id': self.config.id,
+            'date_from': '2026-09-01', 'date_to': '2026-09-07'})
+        statement = job._create_native_statement(
+            self.config._parse_transactions(raw), opening, closing)
+        self.assertTrue(statement.l10n_ua_balance_verified)
+        self.assertTrue(statement.l10n_ua_balance_ok)
+        line = statement.line_ids.filtered(lambda l: l.l10n_ua_import_uid == 'op-2')
+        self.assertEqual(line.l10n_ua_mono_receipt_id, 'XXXX-XXXX-XXXX-XXXX')
+        self.assertEqual(line.l10n_ua_mono_external_ref,
+                         'my-own-pretty-external-reference')
+
+    def test_reversal_is_marked_in_the_purpose(self):
+        ts = int(datetime(2026, 9, 2, 12, tzinfo=KYIV).timestamp())
+        raw = {'api_type': 'corp_statement', 'response': [
+            _item(1, ts, reverse=True), _item(2, ts, reverse=False)]}
+        first, second = self.config._parse_transactions(raw)
+        self.assertNotEqual(first['description'], 'Операція 1')
+        self.assertIn('Операція 1', first['description'])
+        self.assertEqual(second['description'], 'Операція 2')

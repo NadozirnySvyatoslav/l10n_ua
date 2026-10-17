@@ -230,6 +230,13 @@ class L10nUaBankSyncConfig(models.Model):
         """
         return (None, None)
 
+    def _statement_line_vals(self, trans):
+        """Додаткові значення рядка виписки з руху `trans` (dict з
+        `_parse_transactions`). Перевизначає провайдер, чиє джерело несе
+        більше, ніж базові поля (номер квитанції, зовнішній ідентифікатор).
+        """
+        return {}
+
     def _source_type(self):
         """Тип джерела імпорту (file / api / manual). Перевизначає провайдер."""
         self.ensure_one()

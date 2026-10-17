@@ -1,1 +1,1 @@
-from . import test_mono_corporate
+from . import test_mono_corporate, test_mono_personal

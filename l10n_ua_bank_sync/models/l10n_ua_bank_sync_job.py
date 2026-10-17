@@ -348,7 +348,7 @@ class L10nUaBankSyncJob(models.Model):
                 seen.add(uid)
             amount = self._trans_amount(trans)
             partner = self._match_partner(trans)
-            line_cmds.append((0, 0, {
+            line_vals = {
                 'journal_id': journal.id,
                 'date': self._trans_date(trans),
                 'payment_ref': (trans.get('description')
@@ -358,7 +358,9 @@ class L10nUaBankSyncJob(models.Model):
                 'partner_name': trans.get('partner_name') or '',
                 'account_number': trans.get('partner_iban') or '',
                 'l10n_ua_import_uid': uid or False,
-            }))
+            }
+            line_vals.update(self.config_id._statement_line_vals(trans))
+            line_cmds.append((0, 0, line_vals))
             total += amount
 
         if not line_cmds:

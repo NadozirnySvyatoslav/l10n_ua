@@ -273,3 +273,93 @@ msgid ""
 msgstr ""
 "%s — не IBAN. Корпоративний API читає рахунки за IBAN: вкажіть його або "
 "очистіть поле, щоб використати рахунок журналу."
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model,name:l10n_ua_bank_mono.model_account_bank_statement_line
+msgid "Bank Statement Line"
+msgstr "Рядок банківської виписки"
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid ""
+"Connected to monobank, but account %(iban)s is not among the %(count)d "
+"accounts of %(client)s."
+msgstr "Підключено до monobank, але рахунку %(iban)s немає серед %(count)d рахунків клієнта %(client)s."
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono.field_account_bank_statement_line__l10n_ua_mono_external_ref
+msgid "External Reference"
+msgstr "Зовнішній ідентифікатор"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_has_token
+msgid "Has API Token"
+msgstr "Є API токен"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,help:l10n_ua_bank_mono.field_l10n_ua_bank_sync_config__mono_account_id
+msgid ""
+"Personal API: monobank account ID (optional: found by the IBAN of the "
+"journal bank account). Corporate API: account IBAN (optional, the IBAN of "
+"the journal bank account is used by default)."
+msgstr "Персональний API: ID рахунку monobank (необов'язково: знаходиться за IBAN банківського рахунку журналу). Корпоративний API: IBAN рахунку (необов'язково, за замовчуванням — IBAN банківського рахунку журналу)."
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono.field_account_bank_statement_line__l10n_ua_mono_receipt_id
+msgid "Receipt No. (check.gov.ua)"
+msgstr "Номер квитанції (check.gov.ua)"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,help:l10n_ua_bank_mono.field_account_bank_statement_line__l10n_ua_mono_external_ref
+msgid ""
+"Reference of a payment prepared through the monobank corporate API, as set "
+"by the sender."
+msgstr "Ідентифікатор платежу, підготовленого через корпоративний API monobank, заданий відправником."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Reversal: %s"
+msgstr "Реверс: %s"
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid ""
+"Set a bank account (IBAN) on the journal, or the monobank account ID, to "
+"read the statement."
+msgstr "Щоб отримати виписку, вкажіть банківський рахунок (IBAN) у журналі або ID рахунку monobank."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid ""
+"monobank API rate limit: one request per %s seconds. Retry in %s seconds, or"
+" shorten the period."
+msgstr "Ліміт запитів API monobank: один запит на %s секунд. Повторіть через %s секунд або скоротіть період."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "monobank has no account %(iban)s for this token. Available: %(ibans)s"
+msgstr "У monobank немає рахунку %(iban)s для цього токена. Доступні: %(ibans)s"
+
+#. module: l10n_ua_bank_mono
+#: model:ir.model.fields,help:l10n_ua_bank_mono.field_account_bank_statement_line__l10n_ua_mono_receipt_id
+msgid "monobank receipt number of the operation, to check it on check.gov.ua."
+msgstr "Номер квитанції monobank для перевірки операції на check.gov.ua."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid ""
+"monobank statement for %(account)s has more than %(count)s operations in the"
+" period; shorten it."
+msgstr "Виписка monobank по рахунку %(account)s містить понад %(count)s операцій за період; скоротіть його."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "none"
+msgstr "немає"
