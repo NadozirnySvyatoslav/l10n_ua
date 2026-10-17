@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_l10n_ua_offbalance_move" model="ir.sequence">
+            <field name="name">Позабалансовий облік (клас 0)</field>
+            <field name="code">l10n_ua.offbalance.move</field>
+            <field name="prefix">ПБ/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

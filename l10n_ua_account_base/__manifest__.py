@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account Base Localization',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.3.1',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian localization base module with accounting',
     'description': """
@@ -24,6 +24,7 @@ Accounting features:
 * Document extensions (ua_doc_type, ua_doc_number)
 * Journal orders (Журнали-ордери №1-7)
 * Trial balance / OSV (Оборотно-сальдова відомість)
+* Off-balance register (class 0, simple single-entry system) with its own OSV
 
 This module is required for all other l10n_ua_* modules.
     """,
@@ -47,6 +48,7 @@ This module is required for all other l10n_ua_* modules.
         'data/l10n_ua_legal_form_data.xml',
         'data/account_chart_template_data.xml',
         'data/l10n_ua_subconto_data.xml',
+        'data/l10n_ua_offbalance_data.xml',
         'views/res_partner_views.xml',
         'views/l10n_ua_koatuu_views.xml',
         'views/l10n_ua_kved_views.xml',
@@ -60,6 +62,7 @@ This module is required for all other l10n_ua_* modules.
         'views/l10n_ua_general_ledger_views.xml',
         'views/l10n_ua_chess_sheet_views.xml',
         'views/l10n_ua_subconto_views.xml',
+        'views/l10n_ua_offbalance_views.xml',
         'views/menu_views.xml',
     ],
     'demo': [],

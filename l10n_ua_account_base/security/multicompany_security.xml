@@ -62,5 +62,27 @@
             </field>
         </record>
 
+        <!-- Позабалансовий облік, клас 0 (#256) -->
+        <record id="l10n_ua_offbalance_move_company_rule" model="ir.rule">
+            <field name="name">Позабалансовий облік: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_offbalance_move"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="l10n_ua_offbalance_move_line_company_rule" model="ir.rule">
+            <field name="name">Рядок позабалансового обліку: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_offbalance_move_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="l10n_ua_offbalance_osv_company_rule" model="ir.rule">
+            <field name="name">ОСВ клас 0: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_offbalance_osv"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
     </data>
 </odoo>

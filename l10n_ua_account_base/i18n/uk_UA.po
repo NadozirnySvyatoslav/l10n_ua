@@ -214,6 +214,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order_line__account_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__account_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__account_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__account_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__account_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__account_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_search
 msgid "Account"
 msgstr "Рахунок"
 
@@ -340,6 +344,7 @@ msgstr "Усі коди економічної діяльності"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_chess_sheet_line__amount
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__amount
 msgid "Amount"
 msgstr "Сума"
 
@@ -552,11 +557,13 @@ msgstr "Кінцевий Кт"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__closing_credit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__closing_credit
 msgid "Closing Credit"
 msgstr "Кінцевий кредит"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__closing_debit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__closing_debit
 msgid "Closing Debit"
 msgstr "Кінцевий дебет"
 
@@ -592,6 +599,9 @@ msgstr "Громада"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_general_ledger__company_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order__company_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__company_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__company_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__company_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__company_id
 msgid "Company"
 msgstr "Компанія"
 
@@ -608,6 +618,7 @@ msgstr "Повна назва"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_general_ledger_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_journal_order_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_form
 msgid "Compute"
 msgstr "Розрахувати"
 
@@ -699,6 +710,10 @@ msgstr "Створити податкову інспекцію"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__create_uid
 msgid "Created by"
 msgstr "Створено"
 
@@ -722,12 +737,17 @@ msgstr "Створено"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__create_date
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__create_date
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__create_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__create_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__create_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__create_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__create_date
 msgid "Created on"
 msgstr "Дата створення"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_account_card_line__credit
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order_line__credit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__credit
 msgid "Credit"
 msgstr "Кредит"
 
@@ -749,6 +769,10 @@ msgstr "Рахунок кредиту"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order_line__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__currency_id
 msgid "Currency"
 msgstr "Валюта"
 
@@ -770,12 +794,17 @@ msgstr "ДП (Державне підприємство)"
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_account_card_line__date
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order_line__date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_search
 msgid "Date"
 msgstr "Дата"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_account_card_line__debit
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order_line__debit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__debit
 msgid "Debit"
 msgstr "Дебет"
 
@@ -842,6 +871,10 @@ msgstr "Поле для відображення"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__display_name
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__display_name
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_res_partner__display_name
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__display_name
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__display_name
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__display_name
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__display_name
 msgid "Display Name"
 msgstr "Назва для відображення"
 
@@ -900,8 +933,10 @@ msgstr "Номер документа в українському форматі
 #: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_general_ledger__state__draft
 #: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_journal_order__state__draft
 #: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_osv__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_offbalance_move__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_search
 msgid "Draft"
-msgstr "Черновик"
+msgstr "Чернетка"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_res_partner__edrpou
@@ -1003,6 +1038,10 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_res_partner__id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__id
 msgid "ID"
 msgstr "ID"
 
@@ -1203,6 +1242,10 @@ msgstr "КВЕД-2010 — український класифікатор вид
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__write_uid
 msgid "Last Updated by"
 msgstr "Останнє оновлення"
 
@@ -1226,6 +1269,10 @@ msgstr "Останнє оновлення"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__write_date
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__write_date
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__write_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__write_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__write_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__write_date
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__write_date
 msgid "Last Updated on"
 msgstr "Дата оновлення"
 
@@ -1271,6 +1318,9 @@ msgstr "Рівень"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__line_ids
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_journal_order_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_view_form
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__line_ids
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
 msgid "Lines"
 msgstr "Рядки"
 
@@ -1308,6 +1358,7 @@ msgstr "Рух по рахунку"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__name
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__name
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_tax_office__name
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__name
 msgid "Name"
 msgstr "Назва"
 
@@ -1369,11 +1420,13 @@ msgstr "Початковий Кт"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__opening_credit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__opening_credit
 msgid "Opening Credit"
 msgstr "Початковий кредит"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__opening_debit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__opening_debit
 msgid "Opening Debit"
 msgstr "Початковий дебет"
 
@@ -1440,6 +1493,9 @@ msgstr "Головна ДПІ (для районних інспекцій)"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_account_card_line__partner_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order_line__partner_id
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__partner_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__partner_id
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__partner_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_search
 msgid "Partner"
 msgstr "Партнер"
 
@@ -1464,6 +1520,7 @@ msgstr "Контрагенти"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_chess_sheet__period_end
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order__period_end
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__period_end
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__period_end
 msgid "Period End"
 msgstr "Кінець періоду"
 
@@ -1473,12 +1530,14 @@ msgstr "Кінець періоду"
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_chess_sheet__period_start
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_journal_order__period_start
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__period_start
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__period_start
 msgid "Period Start"
 msgstr "Початок періоду"
 
 #. module: l10n_ua_account_base
 #. odoo-python
 #: code:addons/l10n_ua_account_base/models/l10n_ua_osv.py:0
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
 msgid "Period end cannot be earlier than period start."
 msgstr "Кінець періоду не може бути раніше за початок."
 
@@ -1589,6 +1648,7 @@ msgstr "Літера секції (A-U)"
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_legal_form__sequence
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_subconto_type__sequence
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__sequence
 msgid "Sequence"
 msgstr "Послідовність"
 
@@ -1753,6 +1813,9 @@ msgstr "Код податкової інспекції має бути унік�
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_chess_sheet_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_journal_order_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_form
 msgid "Total"
 msgstr "Разом"
 
@@ -1808,12 +1871,14 @@ msgstr "Оборот Кт"
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_account_analysis_line__turnover_credit
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__turnover_credit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__turnover_credit
 msgid "Turnover Credit"
 msgstr "Оборот кредит"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_account_analysis_line__turnover_debit
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__turnover_debit
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__turnover_debit
 msgid "Turnover Debit"
 msgstr "Оборот дебет"
 
@@ -7509,3 +7574,393 @@ msgstr "Юридична адреса (якщо відрізняється ві�
 #: code:addons/l10n_ua_account_base/models/l10n_ua_osv.py:72
 msgid "OSV %(type)s (%(start)s - %(end)s)"
 msgstr "ОСВ %(type)s (%(start)s - %(end)s)"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_search
+msgid "Account / Partner / Item"
+msgstr "Рахунок / контрагент / об'єкт"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_needaction
+msgid "Action Needed"
+msgstr "Потрібна дія"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_attachment_count
+msgid "Attachment Count"
+msgstr "Кількість вкладень"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__ref
+msgid "Basis Document"
+msgstr "Документ-підстава"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv__by_partner
+msgid "By Partner"
+msgstr "За контрагентами"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_offbalance_move__state__cancel
+msgid "Cancelled"
+msgstr "Скасовано"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__closing_qty
+msgid "Closing Qty"
+msgstr "Кількість на кінець"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__direction
+msgid "Direction"
+msgstr "Напрям"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_offbalance_move_line__direction__credit
+msgid "Disposal (Credit)"
+msgstr "Вибуття (Кт)"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__move_id
+msgid "Entry"
+msgstr "Запис"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_follower_ids
+msgid "Followers"
+msgstr "Підписники"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Підписники (партнери)"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__has_message
+msgid "Has Message"
+msgstr "Має повідомлення"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Якщо позначено, нові повідомлення потребують вашої уваги."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_has_error
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Якщо позначено, деякі повідомлення не доставлено."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_is_follower
+msgid "Is Follower"
+msgstr "Є підписником"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__name
+msgid "Item"
+msgstr "Об'єкт обліку"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_has_error
+msgid "Message Delivery error"
+msgstr "Помилка доставки повідомлення"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_ids
+msgid "Messages"
+msgstr "Повідомлення"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__narration
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
+msgid "Notes"
+msgstr "Примітки"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__name
+msgid "Number"
+msgstr "Номер"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Кількість дій"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_has_error_counter
+msgid "Number of errors"
+msgstr "Кількість помилок"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Кількість повідомлень, що потребують дії"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_account_base
+#: model:ir.ui.menu,name:l10n_ua_account_base.menu_l10n_ua_offbalance
+msgid "Off-Balance (Class 0)"
+msgstr "Позабалансовий облік (клас 0)"
+
+#. module: l10n_ua_account_base
+#: model:ir.ui.menu,name:l10n_ua_account_base.menu_l10n_ua_offbalance_move
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_search
+msgid "Off-Balance Entries"
+msgstr "Записи позабалансового обліку"
+
+#. module: l10n_ua_account_base
+#: model:ir.actions.act_window,name:l10n_ua_account_base.l10n_ua_offbalance_move_action
+msgid "Off-Balance Entries (Class 0)"
+msgstr "Записи позабалансового обліку (клас 0)"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
+msgid "Off-Balance Entry"
+msgstr "Запис позабалансового обліку"
+
+#. module: l10n_ua_account_base
+#: model:ir.model,name:l10n_ua_account_base.model_l10n_ua_offbalance_move
+msgid "Off-Balance Entry (Class 0)"
+msgstr "Запис позабалансового обліку (клас 0)"
+
+#. module: l10n_ua_account_base
+#: model:ir.model,name:l10n_ua_account_base.model_l10n_ua_offbalance_move_line
+msgid "Off-Balance Entry Line (Class 0)"
+msgstr "Рядок запису позабалансового обліку (клас 0)"
+
+#. module: l10n_ua_account_base
+#: model:ir.ui.menu,name:l10n_ua_account_base.menu_l10n_ua_offbalance_move_line
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_search
+msgid "Off-Balance Movements"
+msgstr "Рух по позабалансових рахунках"
+
+#. module: l10n_ua_account_base
+#: model:ir.actions.act_window,name:l10n_ua_account_base.l10n_ua_offbalance_move_line_action
+msgid "Off-Balance Movements (Class 0)"
+msgstr "Рух по позабалансових рахунках (клас 0)"
+
+#. module: l10n_ua_account_base
+#: model:ir.ui.menu,name:l10n_ua_account_base.menu_l10n_ua_offbalance_osv
+msgid "Off-Balance Trial Balance"
+msgstr "ОСВ по позабалансових рахунках"
+
+#. module: l10n_ua_account_base
+#: model:ir.actions.act_window,name:l10n_ua_account_base.l10n_ua_offbalance_osv_action
+#: model:ir.model,name:l10n_ua_account_base.model_l10n_ua_offbalance_osv
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_list
+msgid "Off-Balance Trial Balance (Class 0)"
+msgstr "ОСВ по позабалансових рахунках (клас 0)"
+
+#. module: l10n_ua_account_base
+#: model:ir.model,name:l10n_ua_account_base.model_l10n_ua_offbalance_osv_line
+msgid "Off-Balance Trial Balance Line"
+msgstr "Рядок ОСВ по позабалансових рахунках"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__opening_qty
+msgid "Opening Qty"
+msgstr "Кількість на початок"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__osv_id
+msgid "Osv"
+msgstr "ОСВ"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
+msgid "Post"
+msgstr "Провести"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_offbalance_move__state__posted
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_line_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_search
+msgid "Posted"
+msgstr "Проведено"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__quantity_in
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__quantity_in
+msgid "Qty In"
+msgstr "Надійшло, к-сть"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__quantity_out
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__quantity_out
+msgid "Qty Out"
+msgstr "Вибуло, к-сть"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__quantity
+msgid "Quantity"
+msgstr "Кількість"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields.selection,name:l10n_ua_account_base.selection__l10n_ua_offbalance_move_line__direction__debit
+msgid "Receipt (Debit)"
+msgstr "Надходження (Дт)"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_form
+msgid "Reset to Draft"
+msgstr "Повернути в чернетку"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Помилка доставки SMS"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__state
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__state
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_move_view_search
+msgid "Status"
+msgstr "Статус"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move__website_message_ids
+msgid "Website Messages"
+msgstr "Повідомлення з сайту"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__website_message_ids
+msgid "Website communication history"
+msgstr "Історія спілкування на сайті"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__partner_id
+msgid "Власник майна, орендодавець, поклажодавець чи гарант."
+msgstr "Власник майна, орендодавець, поклажодавець чи гарант."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid "Дата запису %(date)s потрапляє в закритий період компанії %(company)s."
+msgstr ""
+"Дата запису %(date)s потрапляє в закритий період компанії %(company)s."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move__ref
+msgid ""
+"Документ-підстава: договір оренди, акт приймання на зберігання, накладна на "
+"бланки тощо."
+msgstr ""
+"Документ-підстава: договір оренди, акт приймання на зберігання, накладна на "
+"бланки тощо."
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.actions.act_window,help:l10n_ua_account_base.l10n_ua_offbalance_move_action
+msgid "Запис позабалансового обліку"
+msgstr "Запис позабалансового обліку"
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid "Запис позабалансового обліку не має рядків."
+msgstr "Запис позабалансового обліку не має рядків."
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.actions.act_window,help:l10n_ua_account_base.l10n_ua_offbalance_move_action
+msgid ""
+"Клас 0 ведеться за простою системою (Інструкція, наказ Мінфіну № 291):\n"
+"               лише дебет (надходження) або лише кредит (вибуття), без\n"
+"               кореспондуючого рахунку. На баланс, ОСВ і Форму № 1 записи не впливають."
+msgstr ""
+"Клас 0 ведеться за простою системою (Інструкція, наказ Мінфіну № 291):\n"
+"               лише дебет (надходження) або лише кредит (вибуття), без\n"
+"               кореспондуючого рахунку. На баланс, ОСВ і Форму № 1 записи не впливають."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid "ОСВ клас 0 (%(start)s – %(end)s)"
+msgstr "ОСВ клас 0 (%(start)s – %(end)s)"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_osv__account_id
+msgid "Обмежити відомість одним рахунком класу 0 (опційно)."
+msgstr "Обмежити відомість одним рахунком класу 0 (опційно)."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid "Проведений запис позабалансового обліку видаляти не можна."
+msgstr "Проведений запис позабалансового обліку видаляти не можна."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid ""
+"Проведений запис позабалансового обліку змінювати не можна — спершу "
+"поверніть його в чернетку."
+msgstr ""
+"Проведений запис позабалансового обліку змінювати не можна — спершу "
+"поверніть його в чернетку."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid "Провести можна лише чернетку."
+msgstr "Провести можна лише чернетку."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__direction
+msgid ""
+"Проста система: запис лише за дебетом (надходження) або лише за кредитом "
+"(вибуття), без кореспондуючого рахунку."
+msgstr ""
+"Проста система: запис лише за дебетом (надходження) або лише за кредитом "
+"(вибуття), без кореспондуючого рахунку."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid ""
+"Рахунок %s не позабалансовий: у регістр класу 0 можна записувати лише "
+"рахунки типу «Позабалансовий»."
+msgstr ""
+"Рахунок %s не позабалансовий: у регістр класу 0 можна записувати лише "
+"рахунки типу «Позабалансовий»."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,help:l10n_ua_account_base.field_l10n_ua_offbalance_osv__by_partner
+msgid "Розгорнути рахунки за контрагентами (власник, орендодавець, гарант)."
+msgstr "Розгорнути рахунки за контрагентами (власник, орендодавець, гарант)."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid ""
+"Рядки проведеного запису позабалансового обліку змінювати не можна — спершу "
+"поверніть запис у чернетку."
+msgstr ""
+"Рядки проведеного запису позабалансового обліку змінювати не можна — спершу "
+"поверніть запис у чернетку."
+
+#. module: l10n_ua_account_base
+#. odoo-python
+#: code:addons/l10n_ua_account_base/models/l10n_ua_offbalance.py:0
+msgid "Рядок «%s» не має ні суми, ні кількості."
+msgstr "Рядок «%s» не має ні суми, ні кількості."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.constraint,message:l10n_ua_account_base.constraint_l10n_ua_offbalance_move_line_check_amount_positive
+msgid ""
+"Сума й кількість у записі позабалансового обліку не можуть бути від'ємними: "
+"напрям задає поле «Напрям»."
+msgstr ""
+"Сума й кількість у записі позабалансового обліку не можуть бути від'ємними: "
+"напрям задає поле «Напрям»."

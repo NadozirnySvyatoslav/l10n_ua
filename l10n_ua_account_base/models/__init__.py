@@ -14,4 +14,5 @@ from . import l10n_ua_account_analysis
 from . import l10n_ua_general_ledger
 from . import l10n_ua_chess_sheet
 from . import l10n_ua_subconto
+from . import l10n_ua_offbalance
 from . import template_ua_psbo

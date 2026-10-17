@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============ Записи позабалансового обліку (#256) ============ -->
+
+    <record id="l10n_ua_offbalance_move_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.move.form</field>
+        <field name="model">l10n_ua.offbalance.move</field>
+        <field name="arch" type="xml">
+            <form string="Off-Balance Entry">
+                <header>
+                    <button name="action_post" string="Post" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state == 'draft'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state == 'posted'"/>
+                            <field name="ref" readonly="state == 'posted'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state == 'posted'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines" name="lines">
+                            <field name="line_ids" readonly="state == 'posted'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="account_id"/>
+                                    <field name="direction"/>
+                                    <field name="partner_id"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="amount" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="narration"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_move_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.move.list</field>
+        <field name="model">l10n_ua.offbalance.move</field>
+        <field name="arch" type="xml">
+            <list string="Off-Balance Entries" decoration-muted="state == 'cancel'"
+                  decoration-info="state == 'draft'">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="ref"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'posted'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_move_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.move.search</field>
+        <field name="model">l10n_ua.offbalance.move</field>
+        <field name="arch" type="xml">
+            <search string="Off-Balance Entries">
+                <field name="name"/>
+                <field name="ref"/>
+                <field name="line_ids" string="Account / Partner / Item"
+                       filter_domain="['|', '|', ('line_ids.account_id', 'ilike', self), ('line_ids.partner_id', 'ilike', self), ('line_ids.name', 'ilike', self)]"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="filter_posted" domain="[('state', '=', 'posted')]"/>
+                <separator/>
+                <filter string="Date" name="filter_date" date="date"/>
+                <group>
+                    <filter string="Status" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_move_action" model="ir.actions.act_window">
+        <field name="name">Off-Balance Entries (Class 0)</field>
+        <field name="res_model">l10n_ua.offbalance.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Запис позабалансового обліку</p>
+            <p>Клас 0 ведеться за простою системою (Інструкція, наказ Мінфіну № 291):
+               лише дебет (надходження) або лише кредит (вибуття), без
+               кореспондуючого рахунку. На баланс, ОСВ і Форму № 1 записи не впливають.</p>
+        </field>
+    </record>
+
+    <!-- Рядки окремо: картка руху по рахунку класу 0 / контрагенту -->
+    <record id="l10n_ua_offbalance_move_line_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.move.line.list</field>
+        <field name="model">l10n_ua.offbalance.move.line</field>
+        <field name="arch" type="xml">
+            <list string="Off-Balance Movements" create="0" edit="0">
+                <field name="currency_id" column_invisible="True"/>
+                <field name="date"/>
+                <field name="move_id"/>
+                <field name="account_id"/>
+                <field name="partner_id"/>
+                <field name="name"/>
+                <field name="quantity_in" sum="Total" optional="show"/>
+                <field name="quantity_out" sum="Total" optional="show"/>
+                <field name="debit" sum="Total"/>
+                <field name="credit" sum="Total"/>
+                <field name="state" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_move_line_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.move.line.search</field>
+        <field name="model">l10n_ua.offbalance.move.line</field>
+        <field name="arch" type="xml">
+            <search string="Off-Balance Movements">
+                <field name="account_id"/>
+                <field name="partner_id"/>
+                <field name="name"/>
+                <filter string="Posted" name="filter_posted" domain="[('state', '=', 'posted')]"/>
+                <separator/>
+                <filter string="Date" name="filter_date" date="date"/>
+                <group>
+                    <filter string="Account" name="groupby_account" domain="[]" context="{'group_by': 'account_id'}"/>
+                    <filter string="Partner" name="groupby_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_move_line_action" model="ir.actions.act_window">
+        <field name="name">Off-Balance Movements (Class 0)</field>
+        <field name="res_model">l10n_ua.offbalance.move.line</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_filter_posted': 1, 'search_default_groupby_account': 1}</field>
+    </record>
+
+    <!-- ============ ОСВ по класу 0 ============ -->
+
+    <record id="l10n_ua_offbalance_osv_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.osv.form</field>
+        <field name="model">l10n_ua.offbalance.osv</field>
+        <field name="arch" type="xml">
+            <form string="Off-Balance Trial Balance (Class 0)">
+                <header>
+                    <button name="action_compute" string="Compute" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="account_id"/>
+                            <field name="by_partner"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="1">
+                        <list>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="account_id"/>
+                            <field name="partner_id" column_invisible="not parent.by_partner"/>
+                            <field name="opening_qty" optional="hide"/>
+                            <field name="opening_debit" sum="Total"/>
+                            <field name="opening_credit" sum="Total" optional="hide"/>
+                            <field name="quantity_in" optional="hide"/>
+                            <field name="turnover_debit" sum="Total"/>
+                            <field name="quantity_out" optional="hide"/>
+                            <field name="turnover_credit" sum="Total"/>
+                            <field name="closing_qty" optional="hide"/>
+                            <field name="closing_debit" sum="Total"/>
+                            <field name="closing_credit" sum="Total" optional="hide"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_osv_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.offbalance.osv.list</field>
+        <field name="model">l10n_ua.offbalance.osv</field>
+        <field name="arch" type="xml">
+            <list string="Off-Balance Trial Balance (Class 0)">
+                <field name="name"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_offbalance_osv_action" model="ir.actions.act_window">
+        <field name="name">Off-Balance Trial Balance (Class 0)</field>
+        <field name="res_model">l10n_ua.offbalance.osv</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -75,4 +75,30 @@
               action="l10n_ua_subconto_type_action"
               sequence="50"/>
 
+    <!-- Позабалансовий облік (клас 0, #256): документи — у робочому меню
+         «Бухгалтерія», а не в налаштуваннях, бо це щоденний облік. -->
+    <menuitem id="menu_l10n_ua_offbalance"
+              name="Off-Balance (Class 0)"
+              parent="account.menu_finance_entries"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="60"/>
+
+    <menuitem id="menu_l10n_ua_offbalance_move"
+              name="Off-Balance Entries"
+              parent="menu_l10n_ua_offbalance"
+              action="l10n_ua_offbalance_move_action"
+              sequence="10"/>
+
+    <menuitem id="menu_l10n_ua_offbalance_move_line"
+              name="Off-Balance Movements"
+              parent="menu_l10n_ua_offbalance"
+              action="l10n_ua_offbalance_move_line_action"
+              sequence="20"/>
+
+    <menuitem id="menu_l10n_ua_offbalance_osv"
+              name="Off-Balance Trial Balance"
+              parent="menu_l10n_ua_offbalance"
+              action="l10n_ua_offbalance_osv_action"
+              sequence="30"/>
+
 </odoo>
