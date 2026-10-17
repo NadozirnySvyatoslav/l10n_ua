@@ -1,8 +1,11 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
+from odoo.fields import Domain
 from dateutil.relativedelta import relativedelta
 from odoo.addons.hr_holidays.models.hr_leave import HOURS_PER_DAY
 from datetime import datetime, time as dt_time
+
+from pytz import timezone, utc
 
 
 class HrLeave(models.Model):
@@ -714,48 +717,54 @@ class HrLeave(models.Model):
 
     def _get_public_holidays_count(self):
         self.ensure_one()
+        return len(self._l10n_ua_public_holiday_dates())
+
+    def _l10n_ua_public_holiday_dates(self):
+        """The public holidays inside the leave, which do not count toward
+        its duration (art. 5 of the Law "On Leaves", art. 73 of the Labour
+        Code): those of the employee's company and those of none.
+
+        Read the way the payslip reads them (hr.payslip._public_holiday_dates):
+        a holiday is stored in UTC, and a day is a holiday when the holiday
+        covers its noon in the time zone of the company's working schedule —
+        so a holiday entered in local time, which starts the evening before
+        in UTC, still falls on its own day. An empty list is a valid setup:
+        under martial law the holidays of art. 73 are working days.
+        """
+        self.ensure_one()
         if not self.request_date_from or not self.request_date_to:
-            return 0
-        leave_from = self.request_date_from
-        leave_to = self.request_date_to
-        dt_from = datetime.combine(leave_from, dt_time.min)
-        dt_to = datetime.combine(leave_to, dt_time.max)
-        public_holidays = self.env['resource.calendar.leaves'].search([
+            return set()
+        leave_from, leave_to = self.request_date_from, self.request_date_to
+        company = self.employee_company_id or self.company_id or self.env.company
+        tz = timezone(company.resource_calendar_id.tz
+                      or self.env.user.tz or 'UTC')
+
+        def to_utc(day, moment):
+            return tz.localize(datetime.combine(day, moment)).astimezone(
+                utc).replace(tzinfo=None)
+
+        found = self.env['resource.calendar.leaves'].search([
             ('resource_id', '=', False),
-            ('date_from', '<=', dt_to),
-            ('date_to', '>=', dt_from),
+            ('company_id', 'in', (company.id, False)),
+            ('date_from', '<=', to_utc(leave_to, dt_time.max)),
+            ('date_to', '>=', to_utc(leave_from, dt_time.min)),
         ])
-        count = 0
-        for holiday in public_holidays:
-            h_from = max(holiday.date_from.date(), leave_from)
-            h_to = min(holiday.date_to.date(), leave_to)
-            if h_from <= h_to:
-                count += (h_to - h_from).days + 1
-        return count
+        dates, current = set(), leave_from
+        while found and current <= leave_to:
+            noon = to_utc(current, dt_time(12, 0))
+            if any(h.date_from <= noon <= h.date_to for h in found):
+                dates.add(current)
+            current += relativedelta(days=1)
+        return dates
 
     @api.depends('request_date_from', 'request_date_to')
     def _compute_working_days(self):
         for leave in self:
             if leave.request_date_from and leave.request_date_to:
-                leave_from = leave.request_date_from
-                leave_to = leave.request_date_to
-                dt_from = datetime.combine(leave_from, dt_time.min)
-                dt_to = datetime.combine(leave_to, dt_time.max)
-                public_holidays = self.env['resource.calendar.leaves'].search([
-                    ('resource_id', '=', False),
-                    ('date_from', '<=', dt_to),
-                    ('date_to', '>=', dt_from),
-                ])
-                holiday_dates = set()
-                for h in public_holidays:
-                    d = max(h.date_from.date(), leave_from)
-                    end_h = min(h.date_to.date(), leave_to)
-                    while d <= end_h:
-                        holiday_dates.add(d)
-                        d += relativedelta(days=1)
+                holiday_dates = leave._l10n_ua_public_holiday_dates()
                 count = 0
-                current = leave_from
-                while current <= leave_to:
+                current = leave.request_date_from
+                while current <= leave.request_date_to:
                     if current.weekday() < 5 and current not in holiday_dates:
                         count += 1
                     current += relativedelta(days=1)
@@ -952,6 +961,112 @@ class HrLeave(models.Model):
                 subsequent_leaves._compute_remaining_after()
                 # 2. Store data to the database
                 subsequent_leaves.flush_recordset(['remaining_days_before', 'remaining_days_after'])
+
+    # =================================================================================
+    # PUBLIC HOLIDAY LIST CHANGES
+    # =================================================================================
+
+    @api.model
+    def _l10n_ua_leaves_on_holidays(self, holidays):
+        """Leaves whose duration a change of these public holidays can move:
+        not refused or cancelled, overlapping a holiday's days, of the
+        holiday's company (of every company for a holiday of none).
+
+        `holidays` is a list of {'company_id', 'date_from', 'date_to'}, read
+        before a write or a deletion, so the leaves a holiday is moved away
+        from are found too. The dates are widened by a day on each side: a
+        holiday is stored in UTC and read on its day in the company's time
+        zone; a leave found in excess is recomputed to the same value."""
+        if not holidays:
+            return self.browse()
+        domains = []
+        for holiday in holidays:
+            if not holiday['date_from'] or not holiday['date_to']:
+                continue
+            domain = [
+                ('request_date_from', '<=',
+                 holiday['date_to'].date() + relativedelta(days=1)),
+                ('request_date_to', '>=',
+                 holiday['date_from'].date() - relativedelta(days=1)),
+            ]
+            if holiday['company_id']:
+                domain.append(('employee_company_id', '=', holiday['company_id']))
+            domains.append(Domain(domain))
+        if not domains:
+            return self.browse()
+        return self.sudo().with_context(active_test=False).search(
+            Domain.OR(domains) & Domain('state', 'not in', ['refuse', 'cancel']))
+
+    _HOLIDAY_DURATION_FIELDS = (
+        'number_of_days', 'calendar_days', 'working_days', 'vacation_pay_amount')
+
+    def _l10n_ua_upgrade_recount_reason(self):
+        return _('the module was updated and the leave was checked against '
+                 'the current list of public holidays (#344)')
+
+    def _l10n_ua_duration_snapshot(self):
+        return {leave.id: {f: leave[f] for f in self._HOLIDAY_DURATION_FIELDS}
+                for leave in self}
+
+    def _l10n_ua_refresh_holiday_durations(self, snapshot=None, reason=None):
+        """Recompute the duration of these leaves after the public holiday
+        list changed, and write every change into the leave's chatter.
+
+        Approved leaves are recomputed as well: their period is the same,
+        only the count of its holidays changed, and Odoo itself already
+        recounts number_of_days of approved leaves on such a change — leaving
+        the calendar days (which the vacation balance, the order and the
+        vacation pay read) behind would split one leave into two durations.
+        The chatter note on an approved leave says what moved and that the
+        order, the vacation pay and a payslip already done need review: the
+        recount does not touch documents already issued."""
+        leaves = self.exists()
+        if not leaves:
+            return leaves
+        snapshot = snapshot if snapshot is not None else leaves._l10n_ua_duration_snapshot()
+        fields_map = self._fields
+        calendar_type = leaves.filtered(
+            lambda l: l.holiday_status_id.is_calendar_days)
+        if calendar_type:
+            # Durations of other leave types are core's: hr_holidays itself
+            # recounts them through the working schedule.
+            self.env.add_to_compute(fields_map['number_of_days'], calendar_type)
+            self.env.add_to_compute(fields_map['number_of_hours'], calendar_type)
+        self.env.add_to_compute(fields_map['calendar_days'], leaves)
+        self.env.add_to_compute(fields_map['working_days'], leaves)
+        # Dependants (remaining after, vacation pay, the vacation schedule
+        # line) are marked to follow the new values.
+        leaves.modified(['calendar_days', 'working_days', 'number_of_days'])
+        leaves.flush_recordset()
+
+        changed = leaves.filtered(lambda l: any(
+            snapshot.get(l.id, {}).get(f, l[f]) != l[f]
+            for f in self._HOLIDAY_DURATION_FIELDS))
+        if not changed:
+            return changed
+        changed._recompute_subsequent_leaves()
+        changed._recompute_balances_for_keys(changed._balance_keys())
+        for leave in changed:
+            old = snapshot.get(leave.id, {})
+            body = _(
+                'The duration was recounted because %(reason)s: calendar days '
+                '%(old_cal)s → %(new_cal)s, working days %(old_work)s → '
+                '%(new_work)s, duration %(old_dur)s → %(new_dur)s day(s).',
+                reason=reason or _('the list of public holidays changed'),
+                old_cal=old.get('calendar_days'), new_cal=leave.calendar_days,
+                old_work=old.get('working_days'), new_work=leave.working_days,
+                old_dur=old.get('number_of_days'), new_dur=leave.number_of_days)
+            if old.get('vacation_pay_amount') != leave.vacation_pay_amount:
+                body += ' ' + _(
+                    'Vacation pay %(old)s → %(new)s.',
+                    old=old.get('vacation_pay_amount'),
+                    new=leave.vacation_pay_amount)
+            if leave.state == 'validate':
+                body += ' ' + _(
+                    'The leave is already approved: check its order, the '
+                    'vacation pay and any payslip already computed for it.')
+            leave.sudo().message_post(body=body, subtype_xmlid='mail.mt_note')
+        return changed
 
     def action_calculate_vacation_pay(self):
         """Calculate average daily salary and vacation pay"""

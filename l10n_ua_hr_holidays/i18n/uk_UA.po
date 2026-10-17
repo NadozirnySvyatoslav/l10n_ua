@@ -2228,3 +2228,52 @@ msgstr ""
 "День підтвердження листка непрацездатності. Допомогу за всі його дні "
 "нараховує розрахунковий лист місяця, на який припадає ця дата: листок часто "
 "надходить уже після місяця, в якому почалася хвороба."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
+#, python-format
+msgid ""
+"The duration was recounted because %(reason)s: calendar days %(old_cal)s → "
+"%(new_cal)s, working days %(old_work)s → %(new_work)s, duration "
+"%(old_dur)s → %(new_dur)s day(s)."
+msgstr ""
+"Тривалість перераховано, бо %(reason)s: календарні дні %(old_cal)s → "
+"%(new_cal)s, робочі дні %(old_work)s → %(new_work)s, тривалість "
+"%(old_dur)s → %(new_dur)s дн."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
+#: code:addons/l10n_ua_hr_holidays/models/resource_calendar_leaves.py:0
+#, python-format
+msgid "the list of public holidays changed"
+msgstr "змінився список святкових днів"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
+#, python-format
+msgid "Vacation pay %(old)s → %(new)s."
+msgstr "Відпускні %(old)s → %(new)s."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
+#, python-format
+msgid ""
+"The leave is already approved: check its order, the vacation pay and any "
+"payslip already computed for it."
+msgstr ""
+"Відпустку вже затверджено: перевірте наказ, відпускні та розрахункові "
+"листи, уже нараховані за неї."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
+#, python-format
+msgid ""
+"the module was updated and the leave was checked against the current list "
+"of public holidays (#344)"
+msgstr ""
+"модуль оновлено і відпустку звірено з чинним списком святкових днів (#344)"
