@@ -70,6 +70,9 @@ class HrTerminationReason(models.Model):
     description = fields.Text(string='Description')
     active = fields.Boolean(string='Active', default=True)
 
+    # Without the dependency the stored field was computed for nobody: every
+    # reason shipped with the module carried an empty «Full Reference» (#158).
+    @api.depends('article', 'paragraph')
     def _compute_full_reference(self):
         for rec in self:
             parts = []

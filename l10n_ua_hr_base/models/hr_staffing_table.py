@@ -19,17 +19,23 @@ class HrStaffingTable(models.Model):
     _order = 'date_from desc, department_id, job_id'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    # Audit trail (#158). A staffing line is changed by an owner's order, and
+    # 1С keeps every change as a document of its own. Here the line itself
+    # carries the trail: every field that defines the position, its size or
+    # its pay is tracked, so the chatter answers who changed what, when, and
+    # from which value. Computed occupancy (filled/vacant units, fund) is left
+    # out — it follows the employees, not a decision about the staffing table.
     company_id = fields.Many2one(
-        'res.company', string='Company',
+        'res.company', string='Company', tracking=True,
         required=True, default=lambda self: self.env.company)
     department_id = fields.Many2one(
-        'hr.department', string='Department',
+        'hr.department', string='Department', tracking=True,
         required=True, index=True)
     job_id = fields.Many2one(
-        'hr.job', string='Position',
+        'hr.job', string='Position', tracking=True,
         required=True, index=True)
     units = fields.Float(
-        string='Staff Units', default=1.0,
+        string='Staff Units', default=1.0, tracking=True,
         help='Number of staff units (e.g., 0.5, 1.0, 2.0)')
     filled_units = fields.Float(
         string='Filled Units', compute='_compute_filled_units', store=True)
@@ -37,13 +43,13 @@ class HrStaffingTable(models.Model):
         string='Vacant Units', compute='_compute_vacant_units', store=True)
     salary = fields.Monetary(
         string='Salary', currency_field='currency_id',
-        required=True,
+        required=True, tracking=True,
         help='Standard salary for this position')
     salary_min = fields.Monetary(
-        string='Minimum Salary', currency_field='currency_id',
+        string='Minimum Salary', currency_field='currency_id', tracking=True,
         help='Minimum salary for this position (salary range)')
     salary_max = fields.Monetary(
-        string='Maximum Salary', currency_field='currency_id',
+        string='Maximum Salary', currency_field='currency_id', tracking=True,
         help='Maximum salary for this position (salary range)')
     currency_id = fields.Many2one(
         'res.currency', string='Currency', tracking=True,
@@ -55,7 +61,7 @@ class HrStaffingTable(models.Model):
         string='Total Salary Fund', currency_field='currency_id',
         compute='_compute_total_salary_fund', store=True)
     date_from = fields.Date(
-        string='Effective From', required=True,
+        string='Effective From', required=True, tracking=True,
         default=fields.Date.context_today)
     # Not the end of this line's period — the end of the position itself. A
     # line runs until the next approved one for the same position starts, and
@@ -64,7 +70,7 @@ class HrStaffingTable(models.Model):
     # the other case, the one that cannot be inferred: an order abolishing the
     # position, after which no line follows.
     date_to = fields.Date(
-        string='Position Discontinued',
+        string='Position Discontinued', tracking=True,
         help='Set only when the position itself ends and no new line follows. '
              'A line is superseded by the next approved line of the same '
              'position on its own, and needs no end date for that.')
@@ -81,8 +87,8 @@ class HrStaffingTable(models.Model):
         ('approved', 'Approved'),
         ('archived', 'Archived'),
     ], string='Status', default='draft', tracking=True)
-    order_number = fields.Char(string='Order Number')
-    order_date = fields.Date(string='Order Date')
+    order_number = fields.Char(string='Order Number', tracking=True)
+    order_date = fields.Date(string='Order Date', tracking=True)
     name = fields.Char(string='Name', compute='_compute_name', store=True)
 
     # A position holds a history of approved lines, and only one of them may

@@ -953,3 +953,58 @@ class TestStaffingTableMultiCompany(TestHrUaBase):
         record._onchange_company_id()
         self.assertEqual(record.department_id, shared_dept,
             'Shared department must remain after company switch')
+
+
+@tagged('post_install', '-at_install')
+class TestStaffingTableAuditTrail(TestHrUaBase):
+    """#158: every change of a staffing line leaves a trace — who, when, what.
+
+    1С:ЗУП keeps the history of the staffing table as a chain of documents.
+    Here the chain is the chatter of the line, and it is only as good as the
+    list of tracked fields: a salary changed without a tracking value is a
+    salary nobody can account for later.
+    """
+
+    def test_position_size_and_pay_are_tracked(self):
+        model = self.env['hr.staffing.table']
+        for name in ('company_id', 'department_id', 'job_id', 'units',
+                     'salary', 'salary_min', 'salary_max', 'date_from',
+                     'date_to', 'order_number', 'order_date', 'state',
+                     'currency_id'):
+            self.assertTrue(getattr(model._fields[name], 'tracking', None),
+                            f'{name} must be tracked')
+
+    def test_change_records_author_and_values(self):
+        record = self.env['hr.staffing.table'].create({
+            'company_id': self.company.id,
+            'department_id': self.department.id,
+            'job_id': self.job.id,
+            'units': 1.0,
+            'salary': 15000.0,
+            'date_from': date.today(),
+        })
+        # Mail does not track a record in the transaction that created it;
+        # close that step the way a real request would.
+        self.env.flush_all()
+        self.env.cr.flush()
+        user = self.env.user
+        record.write({'units': 2.0, 'salary': 18000.0,
+                      'order_number': '12-ш'})
+        # Tracking values are written at commit time; run that step here.
+        self.env.flush_all()
+        self.env.cr.flush()
+        record.invalidate_recordset(['message_ids'])
+
+        values = record.message_ids.tracking_value_ids
+        by_field = {t.field_id.name: t for t in values}
+        self.assertIn('units', by_field)
+        self.assertIn('salary', by_field)
+        self.assertIn('order_number', by_field)
+        self.assertEqual(by_field['units'].old_value_float, 1.0)
+        self.assertEqual(by_field['units'].new_value_float, 2.0)
+        self.assertEqual(by_field['salary'].old_value_float, 15000.0)
+        self.assertEqual(by_field['salary'].new_value_float, 18000.0)
+        self.assertEqual(by_field['order_number'].new_value_char, '12-ш')
+        message = by_field['salary'].mail_message_id
+        self.assertEqual(message.author_id, user.partner_id)
+        self.assertTrue(message.date)
