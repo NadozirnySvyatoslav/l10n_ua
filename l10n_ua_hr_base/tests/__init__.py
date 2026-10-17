@@ -13,3 +13,4 @@ from . import test_military_citizenship
 from . import test_wage_currency
 from . import test_staffing_currency
 from . import test_tariff_grade
+from . import test_department_company
