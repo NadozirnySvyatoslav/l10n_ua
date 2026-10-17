@@ -1,10 +1,11 @@
 import logging
-import math
 from datetime import date, timedelta
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from psycopg2 import IntegrityError
+
+from ..tools import compensable_vacation_days
 
 _SYNC_EXC = (UserError, ValidationError, IntegrityError)
 _logger = logging.getLogger(__name__)
@@ -108,23 +109,21 @@ class HrOrder(models.Model):
                     and order.employee_id):
                 ref_date = (order.date_dismissal or order.date
                             or fields.Date.context_today(order))
-                balances = self.env['hr.vacation.balance'].search([
-                    ('employee_id', '=', order.employee_id.id),
-                    ('year', '=', ref_date.year),
-                ])
+                balances = self.env['hr.vacation.balance']._dismissal_balances(
+                    order.employee_id, ref_date)
                 days = sum(balances.mapped('remaining_days'))
             order.unused_vacation_days = max(0.0, days)
 
     def unused_vacation_days_phrase(self):
         """«N календарних днів» для наказу: ціле число з узгодженим іменником.
 
-        Дробові дні округлюються вгору, на користь працівника (роз'яснення
-        Мінсоцполітики), і одним округленням і для умови друку, і для числа.
-        Порожній рядок, коли компенсувати нічого.
+        Число — compensable_vacation_days(), те саме правило, за яким
+        hr.vacation.balance.calculate_compensation рахує гроші (#321), і одне
+        округлення і для умови друку, і для числа. Порожній рядок, коли
+        компенсувати нічого.
         """
         self.ensure_one()
-        # Допуск на похибку float: 12.000000001 — це 12, а не 13.
-        days = math.ceil(round(self.unused_vacation_days, 6))
+        days = compensable_vacation_days(self.unused_vacation_days)
         if days <= 0:
             return ''
         if days % 10 == 1 and days % 100 != 11:

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Documents',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.2.1',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR document templates and orders',
     'description': """

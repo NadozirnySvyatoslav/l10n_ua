@@ -40,8 +40,14 @@ class TestOrderLeaveHandover(TransactionCase):
             'name': 'Коваленко Марія Петрівна',
             'company_id': self.env.company.id,
         })
-        leave_type = self.env['hr.leave.type'].search(
-            [('company_id', 'in', (self.env.company.id, False))], limit=1)
+        # Own type instead of "whatever comes first": an unordered search
+        # sometimes picked one that requires an allocation, and the leave
+        # below then failed with "You do not have any allocation".
+        leave_type = self.env['hr.leave.type'].create({
+            'name': 'Handover test (no allocation)',
+            'requires_allocation': False,
+            'company_id': self.env.company.id,
+        })
         self.leave = self.env['hr.leave'].create({
             'employee_id': self.employee.id,
             'holiday_status_id': leave_type.id,

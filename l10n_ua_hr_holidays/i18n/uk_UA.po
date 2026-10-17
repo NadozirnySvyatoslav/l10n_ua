@@ -1812,6 +1812,12 @@ msgstr ""
 
 #. module: l10n_ua_hr_holidays
 #. odoo-python
+#: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
+msgid "Vacation compensation is calculated for one employee at a time."
+msgstr "Компенсація за невикористану відпустку розраховується для одного працівника за раз."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
 #: code:addons/l10n_ua_hr_holidays/models/hr_leave.py:0
 msgid "Vacation notice"
 msgstr "Зверніть увагу"
