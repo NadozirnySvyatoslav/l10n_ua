@@ -51,14 +51,11 @@ class CashBookWizard(models.TransientModel):
         if self.date_from > self.date_to:
             raise UserError(_('Date From must be before or equal to Date To.'))
 
-        data = {
-            'journal_id': self.journal_id.id,
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'company_id': self.company_id.id,
-        }
-
-        return self.env.ref('l10n_ua_accounting.action_report_cash_book').report_action(self, data=data)
+        # Без data=: інакше клієнт не передає docids і друкується порожня
+        # сторінка (#299). Шаблон бере дані через wizard._get_report_data().
+        return self.env.ref(
+            'l10n_ua_accounting.action_report_cash_book'
+        ).report_action(self)
 
     def _get_cash_book_data(self):
         """Get cash book data for the report."""

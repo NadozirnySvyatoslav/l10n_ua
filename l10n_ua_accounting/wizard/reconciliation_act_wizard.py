@@ -57,9 +57,12 @@ class ReconciliationActWizard(models.TransientModel):
         if self.date_from > self.date_to:
             raise UserError(_('Date From must be before or equal to Date To.'))
 
-        data = self._get_reconciliation_data()
-
-        return self.env.ref('l10n_ua_accounting.action_report_reconciliation_act').report_action(self, data=data)
+        # Без data=: клієнт (getReportUrl) з непорожнім data будує URL
+        # ?options=… без docids, і шаблон отримує порожні docs (#299).
+        # Дані шаблон бере сам через wizard._get_report_data().
+        return self.env.ref(
+            'l10n_ua_accounting.action_report_reconciliation_act'
+        ).report_action(self)
 
     def action_view_entries(self):
         """View journal entries for this partner and period."""
@@ -96,67 +99,6 @@ class ReconciliationActWizard(models.TransientModel):
             domain.append(('amount_residual', '!=', 0))
 
         return domain
-
-    def _get_reconciliation_data(self):
-        """Get data for the reconciliation act report."""
-        self.ensure_one()
-
-        # Get account types to include
-        if self.account_type == 'receivable':
-            account_types = ['asset_receivable']
-        elif self.account_type == 'payable':
-            account_types = ['liability_payable']
-        else:
-            account_types = ['asset_receivable', 'liability_payable']
-
-        # Calculate opening balance
-        opening_balance = self._get_opening_balance(account_types)
-
-        # Get all move lines for the period
-        domain = self._get_move_line_domain()
-        move_lines = self.env['account.move.line'].search(domain, order='date, id')
-
-        # Prepare lines data
-        lines = []
-        running_balance = opening_balance
-
-        for line in move_lines:
-            debit = line.debit
-            credit = line.credit
-            running_balance += debit - credit
-
-            lines.append({
-                'date': line.date,
-                'document': line.move_id.name,
-                'description': line.name or line.move_id.ref or '',
-                'debit': debit,
-                'credit': credit,
-                'balance': running_balance,
-            })
-
-        # Calculate totals
-        total_debit = sum(l['debit'] for l in lines)
-        total_credit = sum(l['credit'] for l in lines)
-        closing_balance = opening_balance + total_debit - total_credit
-
-        return {
-            'partner': {
-                'name': self.partner_id.name,
-                'edrpou': self.partner_id.edrpou or '',
-                'address': self.partner_id.contact_address or '',
-            },
-            'company': {
-                'name': self.company_id.name,
-                'edrpou': self.company_id.partner_id.edrpou or '',
-            },
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'opening_balance': opening_balance,
-            'closing_balance': closing_balance,
-            'total_debit': total_debit,
-            'total_credit': total_credit,
-            'lines': lines,
-        }
 
     def _get_opening_balance(self, account_types):
         """Calculate opening balance for partner accounts."""
