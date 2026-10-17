@@ -8,7 +8,10 @@ Tests cover:
 - Unique constraint
 """
 
+from psycopg2 import IntegrityError
+
 from odoo.tests import TransactionCase, tagged
+from odoo.tools import mute_logger
 
 
 @tagged('post_install', '-at_install')
@@ -47,8 +50,15 @@ class TestTimesheetCode(TransactionCase):
     def test_code_unique_constraint(self):
         """Code should be unique."""
         self._create_code(code='UNQ')
-        with self.assertRaises(Exception):
+        # A database constraint: it fires at flush and aborts the transaction.
+        # The savepoint keeps the transaction usable, the flush raises the
+        # error inside the block, and mute_logger silences the expected
+        # "bad query" line.
+        with self.assertRaises(IntegrityError), \
+                mute_logger('odoo.sql_db'), \
+                self.env.cr.savepoint():
             self._create_code(code='UNQ', name='Duplicate')
+            self.env.flush_all()
 
 
 @tagged('post_install', '-at_install')
@@ -109,8 +119,15 @@ class TestTimesheet(TransactionCase):
     def test_timesheet_unique_constraint(self):
         """Same year + month + department + company should fail."""
         self._create_timesheet()
-        with self.assertRaises(Exception):
+        # A database constraint: it fires at flush and aborts the transaction.
+        # The savepoint keeps the transaction usable, the flush raises the
+        # error inside the block, and mute_logger silences the expected
+        # "bad query" line.
+        with self.assertRaises(IntegrityError), \
+                mute_logger('odoo.sql_db'), \
+                self.env.cr.savepoint():
             self._create_timesheet()
+            self.env.flush_all()
 
     def test_timesheet_different_months(self):
         """Different months should be allowed."""

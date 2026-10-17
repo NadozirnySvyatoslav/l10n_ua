@@ -823,3 +823,40 @@ msgstr "Робочі години"
 #: model:ir.model.fields,field_description:l10n_ua_hr_attendance_sheet.field_hr_timesheet__year
 msgid "Year"
 msgstr "Рік"
+
+#. module: l10n_ua_hr_attendance_sheet
+#: model:ir.model.fields,field_description:l10n_ua_hr_attendance_sheet.field_hr_timesheet_day__norm_hours
+#: model:ir.model.fields,field_description:l10n_ua_hr_attendance_sheet.field_hr_timesheet_line__norm_hours
+msgid "Norm Hours"
+msgstr "Норма годин"
+
+#. module: l10n_ua_hr_attendance_sheet
+#: model:ir.model.fields,field_description:l10n_ua_hr_attendance_sheet.field_hr_timesheet_line__overtime_diff
+msgid "Hours Above Norm"
+msgstr "Понад норму"
+
+#. module: l10n_ua_hr_attendance_sheet
+#: model:ir.model.fields,help:l10n_ua_hr_attendance_sheet.field_hr_timesheet_day__norm_hours
+msgid ""
+"Hours the working schedule plans for this day. Set when the days are "
+"generated; the hours worked are entered separately."
+msgstr ""
+"Години, які графік роботи планує на цей день. Заповнюються під час "
+"генерації днів; відпрацьовані години вносяться окремо."
+
+#. module: l10n_ua_hr_attendance_sheet
+#: model:ir.model.fields,help:l10n_ua_hr_attendance_sheet.field_hr_timesheet_line__norm_hours
+msgid ""
+"Hours the working schedule plans for the month: the sum of the norm of its "
+"days."
+msgstr ""
+"Години, які графік роботи планує на місяць: сума норми його днів."
+
+#. module: l10n_ua_hr_attendance_sheet
+#: model:ir.model.fields,help:l10n_ua_hr_attendance_sheet.field_hr_timesheet_line__overtime_diff
+msgid ""
+"Hours worked minus the norm. Overtime is paid only by an order and is "
+"entered in the Overtime column by hand."
+msgstr ""
+"Відпрацьовані години мінус норма. Понаднормові оплачуються лише за наказом "
+"і вносяться в колонку «Понаднормові» вручну."

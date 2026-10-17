@@ -144,6 +144,16 @@ class TestAbsencePay(SalaryTestCase):
         self.assertEqual(slip.worked_days, 18)
         self.assertFalse(self._of_type(slip, 'SICK_EMP') | self._of_type(slip, 'SICK_FSS'))
 
+    def test_a_certificate_in_draft_leaves_its_days_worked(self):
+        # Not confirmed yet, the certificate is nobody's word: its days are
+        # worked, as the timesheet generator has them, until it is.
+        self._july_with_one_holiday()
+        self.version.wage = 23000
+        self._sickness(date(2025, 7, 21), date(2025, 7, 25))
+        slip = self._payslip(date(2025, 7, 1), date(2025, 7, 31))
+        self.assertEqual(slip.worked_days, 23)
+        self.assertAlmostEqual(self._of_type(slip, 'SALARY').amount, 23000.0, places=2)
+
     def test_a_certificate_confirmed_next_month_is_paid_there_for_all_its_days(self):
         # Sick from 28 July to 3 August; the certificate is confirmed on
         # 5 August. July pays nothing for the sickness, August pays all 7

@@ -54,6 +54,9 @@
                                     <field name="scheduled_days"/>
                                     <field name="worked_days"/>
                                     <field name="worked_hours" sum="Total"/>
+                                    <field name="norm_hours" sum="Total" optional="show"/>
+                                    <field name="overtime_diff" sum="Total" optional="show"
+                                           decoration-warning="overtime_diff &gt; 0"/>
                                     <field name="overtime_hours" sum="Total" optional="show"/>
                                     <field name="night_hours" sum="Total" optional="hide"/>
                                     <field name="vacation_days" optional="show"/>
@@ -107,6 +110,9 @@
                             <field name="scheduled_days"/>
                             <field name="worked_days"/>
                             <field name="worked_hours"/>
+                            <field name="norm_hours"/>
+                            <field name="overtime_diff"
+                                   decoration-warning="overtime_diff &gt; 0"/>
                             <field name="overtime_hours"/>
                             <field name="night_hours"/>
                         </group>
@@ -119,6 +125,7 @@
                                     <field name="date"/>
                                     <field name="code_id"/>
                                     <field name="hours"/>
+                                    <field name="norm_hours"/>
                                     <field name="overtime_hours"/>
                                     <field name="night_hours"/>
                                     <field name="notes"/>
