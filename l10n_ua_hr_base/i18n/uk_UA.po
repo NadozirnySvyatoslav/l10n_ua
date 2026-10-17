@@ -45,6 +45,9 @@ msgstr "Потрібна дія"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_rank__active
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__active
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__active
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__active
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__active
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__active
 msgid "Active"
 msgstr "Активний"
 
@@ -116,6 +119,7 @@ msgstr "Архівувати"
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_staffing_table__state__archived
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_staffing_table_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_pay_scheme_form
 msgid "Archived"
 msgstr "Архівовано"
 
@@ -343,6 +347,7 @@ msgstr "Код Класифікатора адміністративно-тер�
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__coefficient
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_template__coefficient
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__coefficient
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__coefficient
 msgid "Coefficient"
 msgstr "Коефіцієнт"
 
@@ -411,6 +416,9 @@ msgstr "Створіть перший запис штатного розпису
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__create_uid
 msgid "Created by"
 msgstr "Створено"
 
@@ -423,6 +431,9 @@ msgstr "Створено"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__create_date
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__create_date
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__create_date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__create_date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__create_date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__create_date
 msgid "Created on"
 msgstr "Дата створення"
 
@@ -430,6 +441,8 @@ msgstr "Дата створення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_job__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__currency_id
 msgid "Currency"
 msgstr "Валюта"
 
@@ -569,6 +582,9 @@ msgstr "Дитина з інвалідністю"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__display_name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__display_name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__display_name
 msgid "Display Name"
 msgstr "Назва для відображення"
 
@@ -884,6 +900,9 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__id
 msgid "ID"
 msgstr "ID"
 
@@ -1023,6 +1042,9 @@ msgstr "Ветеран праці"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__write_uid
 msgid "Last Updated by"
 msgstr "Останнє оновлення"
 
@@ -1035,6 +1057,9 @@ msgstr "Останнє оновлення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_tcc__write_date
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__write_date
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__write_date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__write_date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__write_date
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__write_date
 msgid "Last Updated on"
 msgstr "Дата останнього оновлення"
 
@@ -1268,6 +1293,7 @@ msgstr "Термін моєї активності"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_template__name
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade_new_period_line__name
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__name
 msgid "Name"
 msgstr "Назва"
 
@@ -1412,6 +1438,8 @@ msgstr "Телефон"
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__job_id
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_staffing_table_form
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__name
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_pay_scheme_line_search
 msgid "Position"
 msgstr "Посада"
 
@@ -1605,6 +1633,8 @@ msgstr "Відокремлений підрозділ"
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_education_level__sequence
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee_benefit__sequence
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_military_rank__sequence
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__sequence
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__sequence
 msgid "Sequence"
 msgstr "Послідовність"
 
@@ -2310,6 +2340,7 @@ msgstr ""
 
 #. module: l10n_ua_hr_base
 #: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_tariff_grade__date_from
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__date_from
 msgid "Valid From"
 msgstr "Діє з"
 
@@ -2681,3 +2712,261 @@ msgstr ""
 "менше за прожитковий мінімум %(minimum).2f — замало для місячного окладу: це "
 "погодинна ставка, внесена туди, і тепер вона стала погодинною ставкою розряду. "
 "Звірте її з колективним договором."
+
+#. module: l10n_ua_hr_base
+#: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
+msgid ""
+"%(what)s starts on %(date)s, before the scheme %(scheme)s applies "
+"(%(start)s). For that period the Unified Tariff Grid applies: open a new "
+"period from %(start)s for the scheme."
+msgstr ""
+"%(what)s починається %(date)s, тобто раніше, ніж застосовується схема "
+"%(scheme)s (%(start)s). Для цього періоду діє Єдина тарифна сітка: для схеми"
+" відкрийте новий період з %(start)s."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__amount
+msgid "Amount"
+msgstr "Сума"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__date_from
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__date_from
+msgid "Applies From"
+msgstr "Застосовується з"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__amount
+msgid "Base Value"
+msgstr "Базова величина"
+
+#. module: l10n_ua_hr_base
+#: model:ir.actions.act_window,name:l10n_ua_hr_base.action_hr_pay_base_value
+#: model:ir.ui.menu,name:l10n_ua_hr_base.menu_hr_pay_base_value
+msgid "Base Values"
+msgstr "Базові величини"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_staffing_table__pay_scheme_salary
+msgid "Base value in force on the start date × coefficient."
+msgstr "Базова величина, чинна на дату початку, × коефіцієнт."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__pay_scheme_salary
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_version__pay_scheme_salary
+msgid "Base value in force on the version date × coefficient."
+msgstr "Базова величина, чинна на дату версії, × коефіцієнт."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme_line__amount
+msgid ""
+"Base value in force today (or on the start of a scheme that applies later) ×"
+" coefficient, rounded to a whole hryvnia."
+msgstr ""
+"Базова величина, чинна сьогодні (або на початок схеми, що застосовується "
+"пізніше), × коефіцієнт, округлено до гривні."
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.actions.act_window,help:l10n_ua_hr_base.action_hr_pay_base_value
+msgid "Enter the base value for a period"
+msgstr "Внесіть базову величину на період"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_pay_scheme__kind__hourly
+msgid "Hourly Rates"
+msgstr "Ставки погодинної оплати"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__kind
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__kind
+msgid "Kind"
+msgstr "Вид"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_base_value__legal_basis
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__legal_basis
+msgid "Legal Basis"
+msgstr "Правова підстава"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields.selection,name:l10n_ua_hr_base.selection__hr_pay_scheme__kind__salary
+msgid "Monthly Salaries"
+msgstr "Посадові оклади"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme__kind
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme_line__kind
+msgid ""
+"Monthly salaries: base value × coefficient is the salary of a position. "
+"Hourly rates: base value × coefficient is the rate of one hour of teaching."
+msgstr ""
+"Посадові оклади: базова величина × коефіцієнт — посадовий оклад. Ставки "
+"погодинної оплати: базова величина × коефіцієнт — ставка за одну годину "
+"навчальних занять."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme_line__coefficient
+msgid ""
+"Multiplier of the base value. A rate the act gives in per cent of the base "
+"value is kept as a fraction: 1.2 % is 0.012."
+msgstr ""
+"Множник базової величини. Ставка, яку акт наводить у відсотках до базової "
+"величини, зберігається як частка: 1,2 % — це 0,012."
+
+#. module: l10n_ua_hr_base
+#: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
+msgid ""
+"No base value is in force on %(date)s. Enter it in Base Values before using "
+"the scheme %(scheme)s."
+msgstr ""
+"На %(date)s не діє жодна базова величина. Внесіть її в «Базові величини», "
+"перш ніж застосовувати схему %(scheme)s."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme__date_from
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme_line__date_from
+msgid ""
+"No position is paid by this scheme for a period before this date: until then"
+" the Unified Tariff Grid applies."
+msgstr ""
+"За період до цієї дати жодна посада не оплачується за цією схемою: до неї "
+"діє Єдина тарифна сітка."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model,name:l10n_ua_hr_base.model_hr_pay_base_value
+msgid "Pay Base Value"
+msgstr "Базова величина"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model,name:l10n_ua_hr_base.model_hr_pay_scheme
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_pay_scheme_form
+msgid "Pay Scheme"
+msgstr "Схема посадових окладів"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model,name:l10n_ua_hr_base.model_hr_pay_scheme_line
+msgid "Pay Scheme Position"
+msgstr "Посада схеми посадових окладів"
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_pay_scheme_line_search
+msgid "Pay Scheme Positions"
+msgstr "Посади схем посадових окладів"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__group_name
+msgid "Position Group"
+msgstr "Група посад"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme__line_ids
+msgid "Positions"
+msgstr "Посади"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__pay_scheme_line_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__pay_scheme_line_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_version__pay_scheme_line_id
+msgid "Salary Scheme Position"
+msgstr "Посада за схемою окладів"
+
+#. module: l10n_ua_hr_base
+#: model:ir.actions.act_window,name:l10n_ua_hr_base.action_hr_pay_scheme
+#: model:ir.ui.menu,name:l10n_ua_hr_base.menu_hr_pay_scheme
+msgid "Salary Schemes"
+msgstr "Схеми посадових окладів"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_pay_scheme_line__scheme_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_base.view_hr_pay_scheme_line_search
+msgid "Scheme"
+msgstr "Схема"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__pay_scheme_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__pay_scheme_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_version__pay_scheme_salary
+msgid "Scheme Salary"
+msgstr "Оклад за схемою"
+
+#. module: l10n_ua_hr_base
+#: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
+msgid "The base value from %(date)s must be positive."
+msgstr "Базова величина з %(date)s має бути додатною."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_pay_scheme_line__group_name
+msgid ""
+"The heading of the scheme the line stands under, when the coefficient "
+"depends on a category, a size of the institution or a length of service."
+msgstr ""
+"Заголовок схеми, під яким стоїть рядок, коли коефіцієнт залежить від "
+"кваліфікаційної категорії, розміру закладу чи стажу."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_staffing_table__pay_scheme_line_id
+msgid ""
+"The position in a scheme of salaries in coefficients (CMU Resolution No "
+"1078). The salary of the line is filled with the base value in force on its "
+"start date × the coefficient. A line before the scheme applies keeps the "
+"tariff-grid salary."
+msgstr ""
+"Посада у схемі посадових окладів у коефіцієнтах (постанова КМУ № 1078). "
+"Оклад рядка заповнюється як базова величина, чинна на дату початку рядка, × "
+"коефіцієнт. Рядок до початку застосування схеми зберігає оклад за ЄТС."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__pay_scheme_line_id
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_version__pay_scheme_line_id
+msgid ""
+"The position in a scheme of salaries in coefficients (CMU Resolution No "
+"1078): the wage of this version is filled with the base value in force on "
+"the version date × the coefficient. A version dated before the scheme "
+"applies keeps the tariff-grid wage."
+msgstr ""
+"Посада у схемі посадових окладів у коефіцієнтах (постанова КМУ № 1078): "
+"оклад цієї версії заповнюється як базова величина, чинна на дату версії, × "
+"коефіцієнт. Версія, датована раніше початку застосування схеми, зберігає "
+"оклад за ЄТС."
+
+#. module: l10n_ua_hr_base
+#: model_terms:ir.actions.act_window,help:l10n_ua_hr_base.action_hr_pay_base_value
+msgid ""
+"The salary of a position in a scheme in coefficients is this\n"
+"               value times the coefficient. A new value is a new row from its\n"
+"               start date; the previous one stays for the periods before it."
+msgstr ""
+"Посадовий оклад за схемою в коефіцієнтах — це ця величина, помножена на "
+"коефіцієнт. Нова величина — новий рядок з дати її початку; попередня "
+"лишається для періодів до неї."
+
+#. module: l10n_ua_hr_base
+#: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
+msgid "The version of %(employee)s"
+msgstr "Версія договору %(employee)s"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_pay_base_value_date_from_active_uniq
+msgid "There is already a base value starting on this date."
+msgstr "Базова величина з цієї дати вже існує."
+
+#. module: l10n_ua_hr_base
+#: model:hr.pay.scheme,name:l10n_ua_hr_base.pay_scheme_1078_hourly
+msgid ""
+"Ставки погодинної оплати праці за проведення навчальних занять (ПКМУ № 1078)"
+msgstr ""
+"Ставки погодинної оплати праці за проведення навчальних занять (ПКМУ № 1078)"
+
+#. module: l10n_ua_hr_base
+#: model:hr.pay.scheme,name:l10n_ua_hr_base.pay_scheme_1078_higher_ed
+msgid ""
+"Схема посадових окладів науково-педагогічних і педагогічних працівників "
+"закладів вищої освіти (ПКМУ № 1078)"
+msgstr ""
+"Схема посадових окладів науково-педагогічних і педагогічних працівників "
+"закладів вищої освіти (ПКМУ № 1078)"
+
+#. module: l10n_ua_hr_base
+#: model:hr.pay.scheme,name:l10n_ua_hr_base.pay_scheme_1078_pedagogical
+msgid "Схема посадових окладів педагогічних працівників (ПКМУ № 1078)"
+msgstr "Схема посадових окладів педагогічних працівників (ПКМУ № 1078)"

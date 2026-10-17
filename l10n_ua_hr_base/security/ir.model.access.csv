@@ -37,3 +37,9 @@ access_military_op_report_line_user,hr.employee.military.operational.report.line
 access_military_op_report_line_officer,hr.employee.military.operational.report.line.officer,model_hr_employee_military_operational_report_line,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,1
 access_hr_tariff_grade_new_period,hr.tariff.grade.new.period,model_hr_tariff_grade_new_period,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
 access_hr_tariff_grade_new_period_line,hr.tariff.grade.new.period.line,model_hr_tariff_grade_new_period_line,l10n_ua_hr_base.group_hr_ua_manager,1,1,1,1
+access_hr_pay_base_value_user,hr.pay.base.value.user,model_hr_pay_base_value,hr.group_hr_user,1,0,0,0
+access_hr_pay_base_value_manager,hr.pay.base.value.manager,model_hr_pay_base_value,hr.group_hr_manager,1,1,1,1
+access_hr_pay_scheme_user,hr.pay.scheme.user,model_hr_pay_scheme,hr.group_hr_user,1,0,0,0
+access_hr_pay_scheme_manager,hr.pay.scheme.manager,model_hr_pay_scheme,hr.group_hr_manager,1,1,1,1
+access_hr_pay_scheme_line_user,hr.pay.scheme.line.user,model_hr_pay_scheme_line,hr.group_hr_user,1,0,0,0
+access_hr_pay_scheme_line_manager,hr.pay.scheme.line.manager,model_hr_pay_scheme_line,hr.group_hr_manager,1,1,1,1

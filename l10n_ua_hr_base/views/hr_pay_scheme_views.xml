@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Base values -->
+    <record id="view_hr_pay_base_value_list" model="ir.ui.view">
+        <field name="name">hr.pay.base.value.list</field>
+        <field name="model">hr.pay.base.value</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="date_from"/>
+                <field name="amount"/>
+                <field name="currency_id" options="{'no_create': True}"/>
+                <field name="legal_basis"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_hr_pay_base_value" model="ir.actions.act_window">
+        <field name="name">Base Values</field>
+        <field name="res_model">hr.pay.base.value</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Enter the base value for a period</p>
+            <p>The salary of a position in a scheme in coefficients is this
+               value times the coefficient. A new value is a new row from its
+               start date; the previous one stays for the periods before it.</p>
+        </field>
+    </record>
+
+    <!-- Schemes -->
+    <record id="view_hr_pay_scheme_list" model="ir.ui.view">
+        <field name="name">hr.pay.scheme.list</field>
+        <field name="model">hr.pay.scheme</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="date_from"/>
+                <field name="legal_basis" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_pay_scheme_form" model="ir.ui.view">
+        <field name="name">hr.pay.scheme.form</field>
+        <field name="model">hr.pay.scheme</field>
+        <field name="arch" type="xml">
+            <form string="Pay Scheme">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="kind"/>
+                            <field name="date_from"/>
+                        </group>
+                        <group>
+                            <field name="legal_basis"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="group_name"/>
+                            <field name="name"/>
+                            <field name="coefficient"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="amount"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hr_pay_scheme_line_search" model="ir.ui.view">
+        <field name="name">hr.pay.scheme.line.search</field>
+        <field name="model">hr.pay.scheme.line</field>
+        <field name="arch" type="xml">
+            <search string="Pay Scheme Positions">
+                <field name="name" string="Position"
+                       filter_domain="['|', ('name', 'ilike', self), ('group_name', 'ilike', self)]"/>
+                <field name="scheme_id"/>
+                <group>
+                    <filter string="Scheme" name="groupby_scheme" domain="[]"
+                            context="{'group_by': 'scheme_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_pay_scheme" model="ir.actions.act_window">
+        <field name="name">Salary Schemes</field>
+        <field name="res_model">hr.pay.scheme</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Staffing table: the scheme position next to the salary it fills. -->
+    <record id="view_hr_staffing_table_form_pay_scheme" model="ir.ui.view">
+        <field name="name">hr.staffing.table.form.pay.scheme</field>
+        <field name="model">hr.staffing.table</field>
+        <field name="inherit_id" ref="view_hr_staffing_table_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='salary']" position="before">
+                <field name="pay_scheme_line_id" options="{'no_create': True}"/>
+                <field name="pay_scheme_salary" invisible="not pay_scheme_line_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Employee: the scheme position right under the wage it fills. -->
+    <record id="view_employee_form_pay_scheme" model="ir.ui.view">
+        <field name="name">hr.employee.form.pay.scheme</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='wage']" position="after">
+                <field name="pay_scheme_line_id" options="{'no_create': True}"
+                       groups="hr.group_hr_manager"/>
+                <field name="pay_scheme_salary" groups="hr.group_hr_manager"
+                       invisible="not pay_scheme_line_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

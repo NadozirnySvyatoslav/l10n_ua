@@ -75,6 +75,18 @@
               parent="menu_hr_ua_classifiers"
               sequence="30"/>
 
+    <menuitem id="menu_hr_pay_scheme"
+              name="Salary Schemes"
+              action="action_hr_pay_scheme"
+              parent="menu_hr_ua_classifiers"
+              sequence="32"/>
+
+    <menuitem id="menu_hr_pay_base_value"
+              name="Base Values"
+              action="action_hr_pay_base_value"
+              parent="menu_hr_ua_classifiers"
+              sequence="34"/>
+
     <menuitem id="menu_hr_employee_benefit"
               name="Employee Benefits"
               action="action_hr_employee_benefit"

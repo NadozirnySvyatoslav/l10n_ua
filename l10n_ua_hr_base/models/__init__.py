@@ -10,5 +10,6 @@ from . import hr_version
 from . import hr_department
 from . import hr_job
 from . import hr_staffing_table
+from . import hr_pay_scheme
 from . import hr_employee_reports
 from . import res_company

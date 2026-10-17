@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Постанова КМУ від 31.08.2026 № 1078 «Про умови оплати праці
+         педагогічних і науково-педагогічних працівників»,
+         https://zakon.rada.gov.ua/laws/show/1078-2026-п (редакція від 01.09.2026).
+         Коефіцієнти перенесено зі схем, затверджених постановою, без змін.
+         noupdate: базову величину та схеми замінюють новим періодом, а не
+         правкою; оновлення модуля не повинно затирати внесене вручну. -->
+    <data noupdate="1">
+
+        <record id="pay_base_value_2026_09" model="hr.pay.base.value">
+            <field name="date_from">2026-09-01</field>
+            <field name="amount">28885</field>
+            <field name="legal_basis">Постанова КМУ від 31.08.2026 № 1078, примітка 1 до схем посадових окладів</field>
+        </record>
+
+        <record id="pay_scheme_1078_pedagogical" model="hr.pay.scheme">
+            <field name="name">Схема посадових окладів педагогічних працівників (ПКМУ № 1078)</field>
+            <field name="sequence">10</field>
+            <field name="kind">salary</field>
+            <field name="date_from">2026-09-01</field>
+            <field name="legal_basis">Постанова КМУ від 31.08.2026 № 1078, схема посадових окладів педагогічних працівників</field>
+        </record>
+
+        <record id="pay_scheme_1078_higher_ed" model="hr.pay.scheme">
+            <field name="name">Схема посадових окладів науково-педагогічних і педагогічних працівників закладів вищої освіти (ПКМУ № 1078)</field>
+            <field name="sequence">20</field>
+            <field name="kind">salary</field>
+            <field name="date_from">2026-09-01</field>
+            <field name="legal_basis">Постанова КМУ від 31.08.2026 № 1078, схема посадових окладів науково-педагогічних і педагогічних працівників закладів вищої освіти</field>
+        </record>
+
+        <record id="pay_scheme_1078_hourly" model="hr.pay.scheme">
+            <field name="name">Ставки погодинної оплати праці за проведення навчальних занять (ПКМУ № 1078)</field>
+            <field name="sequence">30</field>
+            <field name="kind">hourly</field>
+            <field name="date_from">2027-01-01</field>
+            <field name="legal_basis">Постанова КМУ від 31.08.2026 № 1078, ставки погодинної оплати праці; пп. 4 п. 2 — з 01.01.2027</field>
+        </record>
+
+        <record id="pay_scheme_1078_ped_01" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">10</field>
+            <field name="group_name">Керівник (директор, начальник): закладу фахової передвищої освіти (у тому числі у структурі закладів вищої освіти), міжшкільних ресурсних центрів (міжшкільних навчально-виробничих комбінатів), закладів професійної освіти та інших закладів, що надають робітничу професію, їх філій з кількістю здобувачів освіти</field>
+            <field name="name">до 300</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_02" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">20</field>
+            <field name="group_name">Керівник (директор, начальник): закладу фахової передвищої освіти (у тому числі у структурі закладів вищої освіти), міжшкільних ресурсних центрів (міжшкільних навчально-виробничих комбінатів), закладів професійної освіти та інших закладів, що надають робітничу професію, їх філій з кількістю здобувачів освіти</field>
+            <field name="name">від 300 до 800</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_ped_03" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">30</field>
+            <field name="group_name">Керівник (директор, начальник): закладу фахової передвищої освіти (у тому числі у структурі закладів вищої освіти), міжшкільних ресурсних центрів (міжшкільних навчально-виробничих комбінатів), закладів професійної освіти та інших закладів, що надають робітничу професію, їх філій з кількістю здобувачів освіти</field>
+            <field name="name">понад 800</field>
+            <field name="coefficient">0.69</field>
+        </record>
+        <record id="pay_scheme_1078_ped_04" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">40</field>
+            <field name="group_name">Керівник (директор, начальник) закладів загальної середньої освіти усіх типів (у тому числі опорних, спеціалізованої освіти) незалежно від підпорядкування, крім ліцеїв, які забезпечують здобуття виключно профільної середньої освіти академічного спрямування, з кількістю здобувачів освіти</field>
+            <field name="name">до 300</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_05" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">50</field>
+            <field name="group_name">Керівник (директор, начальник) закладів загальної середньої освіти усіх типів (у тому числі опорних, спеціалізованої освіти) незалежно від підпорядкування, крім ліцеїв, які забезпечують здобуття виключно профільної середньої освіти академічного спрямування, з кількістю здобувачів освіти</field>
+            <field name="name">від 300 до 1000</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_ped_06" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">60</field>
+            <field name="group_name">Керівник (директор, начальник) закладів загальної середньої освіти усіх типів (у тому числі опорних, спеціалізованої освіти) незалежно від підпорядкування, крім ліцеїв, які забезпечують здобуття виключно профільної середньої освіти академічного спрямування, з кількістю здобувачів освіти</field>
+            <field name="name">понад 1000</field>
+            <field name="coefficient">0.69</field>
+        </record>
+        <record id="pay_scheme_1078_ped_07" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">70</field>
+            <field name="name">Керівник (директор, начальник) ліцею, який забезпечує здобуття виключно профільної середньої освіти академічного спрямування (у тому числі спеціалізованої освіти), незалежно від кількості здобувачів освіти</field>
+            <field name="coefficient">0.69</field>
+        </record>
+        <record id="pay_scheme_1078_ped_08" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">80</field>
+            <field name="name">Керівник (завідувач) філії опорного закладу загальної середньої освіти</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_09" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">90</field>
+            <field name="group_name">Керівник (директор): спеціальних закладів загальної середньої освіти, закладів освіти для осіб, які потребують соціальної допомоги та реабілітації, приймальників-розподільників для дітей, дитячих будинків усіх типів з кількістю здобувачів освіти (дітей, вихованців)</field>
+            <field name="name">до 150</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_10" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">100</field>
+            <field name="group_name">Керівник (директор): спеціальних закладів загальної середньої освіти, закладів освіти для осіб, які потребують соціальної допомоги та реабілітації, приймальників-розподільників для дітей, дитячих будинків усіх типів з кількістю здобувачів освіти (дітей, вихованців)</field>
+            <field name="name">від 150 до 300</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_ped_11" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">110</field>
+            <field name="group_name">Керівник (директор): спеціальних закладів загальної середньої освіти, закладів освіти для осіб, які потребують соціальної допомоги та реабілітації, приймальників-розподільників для дітей, дитячих будинків усіх типів з кількістю здобувачів освіти (дітей, вихованців)</field>
+            <field name="name">понад 300</field>
+            <field name="coefficient">0.69</field>
+        </record>
+        <record id="pay_scheme_1078_ped_12" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">120</field>
+            <field name="group_name">Керівник (директор) закладів позашкільної освіти усіх типів, у тому числі мистецьких шкіл, з кількістю здобувачів освіти</field>
+            <field name="name">до 300</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_ped_13" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">130</field>
+            <field name="group_name">Керівник (директор) закладів позашкільної освіти усіх типів, у тому числі мистецьких шкіл, з кількістю здобувачів освіти</field>
+            <field name="name">від 300 до 600</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_14" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">140</field>
+            <field name="group_name">Керівник (директор) закладів позашкільної освіти усіх типів, у тому числі мистецьких шкіл, з кількістю здобувачів освіти</field>
+            <field name="name">понад 600</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_ped_15" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">150</field>
+            <field name="group_name">Керівник (директор) закладу дошкільної освіти, завідувач філії з кількістю груп вихованців</field>
+            <field name="name">до п’яти груп</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_ped_16" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">160</field>
+            <field name="group_name">Керівник (директор) закладу дошкільної освіти, завідувач філії з кількістю груп вихованців</field>
+            <field name="name">від п’яти до дев’яти груп</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_17" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">170</field>
+            <field name="group_name">Керівник (директор) закладу дошкільної освіти, завідувач філії з кількістю груп вихованців</field>
+            <field name="name">понад дев’ять груп</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_ped_18" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">180</field>
+            <field name="name">Керівник (директор) центрів перепідготовки та підвищення кваліфікації працівників органів державної влади, органів місцевого самоврядування, державних підприємств, установ та організацій</field>
+            <field name="coefficient">0.75</field>
+        </record>
+        <record id="pay_scheme_1078_ped_19" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">190</field>
+            <field name="name">Керівник (директор, завідувач) інститутів (центрів) післядипломної освіти, підвищення кваліфікації, посади яких віднесено до педагогічних працівників</field>
+            <field name="coefficient">0.69</field>
+        </record>
+        <record id="pay_scheme_1078_ped_20" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">200</field>
+            <field name="group_name">Керівник (директор, завідувач) навчально-методичних (методичних) кабінетів (центрів)</field>
+            <field name="name">центральних</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_ped_21" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">210</field>
+            <field name="group_name">Керівник (директор, завідувач) навчально-методичних (методичних) кабінетів (центрів)</field>
+            <field name="name">обласних</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_ped_22" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">220</field>
+            <field name="group_name">Керівник (директор, завідувач) навчально-методичних (методичних) кабінетів (центрів)</field>
+            <field name="name">міських, районних</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_ped_23" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">230</field>
+            <field name="name">Керівник (директор) інклюзивно-ресурсного центру, завідувач філії інклюзивно-ресурсного центру</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_ped_24" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">240</field>
+            <field name="name">Завідувач ресурсного центру підтримки інклюзивної освіти</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_25" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">250</field>
+            <field name="name">Завідувач лабораторії (кабінету) інститутів (центрів) післядипломної освіти, підвищення кваліфікації, навчально-методичних (методичних) кабінетів (центрів)</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_26" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">260</field>
+            <field name="name">Керівник (завідувач) логопедичного пункту</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_27" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">270</field>
+            <field name="name">Керівник (директор) центру професійного розвитку педагогічних працівників</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_ped_28" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">280</field>
+            <field name="name">Завідувач відділення, навчально-практичного центру, голова циклової комісії</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_29" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">290</field>
+            <field name="name">Завідувач: навчально-виробничої (навчальної) майстерні (господарства, центру), навчально-методичного кабінету, лабораторії; навчальної, виробничої практики</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_30" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">300</field>
+            <field name="name">Керівник фізичного виховання</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_31" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">310</field>
+            <field name="name">Завідувач: відділу, відділення, лабораторії, кабінету закладів позашкільної освіти, у тому числі мистецьких шкіл</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_32" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">320</field>
+            <field name="name">Завідувач навчально-консультаційного пункту; завідувач заочного відділення закладу загальної середньої освіти</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_33" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">330</field>
+            <field name="name">Завідувач: внутрішнього структурного підрозділу закладу загальної середньої освіти (дошкільного, позашкільного підрозділу, пансіону, інтернату та інших з основного виду діяльності); дошкільного, позашкільного підрозділу інших закладів освіти</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_34" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">340</field>
+            <field name="name">Старший майстер у закладах професійної освіти, старший викладач у закладах фахової передвищої освіти</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_ped_35" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">350</field>
+            <field name="name">Старший вихователь</field>
+            <field name="coefficient">0.54</field>
+        </record>
+        <record id="pay_scheme_1078_ped_36" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">360</field>
+            <field name="group_name">Вчителі всіх спеціальностей (у тому числі вчитель-дефектолог, вчитель-логопед), викладачі всіх спеціальностей, педагог професійного навчання, майстер виробничого навчання, вихователь, вихователь-методист, логопед, методист, педагог-організатор, концертмейстер, музичний керівник, інструктор з фізичної культури (фізкультури), соціальний педагог, практичний психолог залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст (без категорії)</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_37" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">370</field>
+            <field name="group_name">Вчителі всіх спеціальностей (у тому числі вчитель-дефектолог, вчитель-логопед), викладачі всіх спеціальностей, педагог професійного навчання, майстер виробничого навчання, вихователь, вихователь-методист, логопед, методист, педагог-організатор, концертмейстер, музичний керівник, інструктор з фізичної культури (фізкультури), соціальний педагог, практичний психолог залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст другої категорії</field>
+            <field name="coefficient">0.49</field>
+        </record>
+        <record id="pay_scheme_1078_ped_38" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">380</field>
+            <field name="group_name">Вчителі всіх спеціальностей (у тому числі вчитель-дефектолог, вчитель-логопед), викладачі всіх спеціальностей, педагог професійного навчання, майстер виробничого навчання, вихователь, вихователь-методист, логопед, методист, педагог-організатор, концертмейстер, музичний керівник, інструктор з фізичної культури (фізкультури), соціальний педагог, практичний психолог залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст першої категорії</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_39" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">390</field>
+            <field name="group_name">Вчителі всіх спеціальностей (у тому числі вчитель-дефектолог, вчитель-логопед), викладачі всіх спеціальностей, педагог професійного навчання, майстер виробничого навчання, вихователь, вихователь-методист, логопед, методист, педагог-організатор, концертмейстер, музичний керівник, інструктор з фізичної культури (фізкультури), соціальний педагог, практичний психолог залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст вищої категорії</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_40" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">400</field>
+            <field name="name">Консультант, психолог центру професійного розвитку педагогічних працівників</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_41" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">410</field>
+            <field name="name">Фахівець (консультант) інклюзивно-ресурсного центру</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_42" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">420</field>
+            <field name="group_name">Асистент вчителя-реабілітолога, асистент вчителя, асистент вихователя, асистент майстра виробничого навчання, асистент викладача, які мають стаж педагогічної роботи</field>
+            <field name="name">до п’яти років</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_43" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">430</field>
+            <field name="group_name">Асистент вчителя-реабілітолога, асистент вчителя, асистент вихователя, асистент майстра виробничого навчання, асистент викладача, які мають стаж педагогічної роботи</field>
+            <field name="name">понад п’ять років</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_44" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">440</field>
+            <field name="name">Старший керівник туристських груп (походів, експедицій, екскурсій)</field>
+            <field name="coefficient">0.54</field>
+        </record>
+        <record id="pay_scheme_1078_ped_45" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">450</field>
+            <field name="name">Керівник туристських груп (походів, експедицій, екскурсій)</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_ped_46" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">460</field>
+            <field name="group_name">Керівники гуртків, секцій, студій та інших форм гурткової роботи, екскурсовод, інструктор з туризму, культорганізатор, акомпаніатор, які мають стаж педагогічної роботи</field>
+            <field name="name">до п’яти років</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_47" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">470</field>
+            <field name="group_name">Керівники гуртків, секцій, студій та інших форм гурткової роботи, екскурсовод, інструктор з туризму, культорганізатор, акомпаніатор, які мають стаж педагогічної роботи</field>
+            <field name="name">понад п’ять років</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_48" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">480</field>
+            <field name="name">Перекладач-дактилолог</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_49" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">490</field>
+            <field name="group_name">Художній керівник, інструктори: з праці, слухових кабінетів залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст (без категорії)</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_50" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">500</field>
+            <field name="group_name">Художній керівник, інструктори: з праці, слухових кабінетів залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст другої категорії</field>
+            <field name="coefficient">0.49</field>
+        </record>
+        <record id="pay_scheme_1078_ped_51" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">510</field>
+            <field name="group_name">Художній керівник, інструктори: з праці, слухових кабінетів залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст першої категорії</field>
+            <field name="coefficient">0.5</field>
+        </record>
+        <record id="pay_scheme_1078_ped_52" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">520</field>
+            <field name="group_name">Художній керівник, інструктори: з праці, слухових кабінетів залежно від кваліфікаційної категорії</field>
+            <field name="name">спеціаліст вищої категорії</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_ped_53" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">530</field>
+            <field name="group_name">У закладах освіти для осіб, які потребують соціальної допомоги і реабілітації</field>
+            <field name="name">черговий з режиму</field>
+            <field name="coefficient">0.48</field>
+        </record>
+        <record id="pay_scheme_1078_ped_54" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">540</field>
+            <field name="group_name">У закладах освіти для осіб, які потребують соціальної допомоги і реабілітації</field>
+            <field name="name">старший черговий з режиму</field>
+            <field name="coefficient">0.49</field>
+        </record>
+        <record id="pay_scheme_1078_ped_55" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_pedagogical"/>
+            <field name="sequence">550</field>
+            <field name="group_name">У закладах освіти для осіб, які потребують соціальної допомоги і реабілітації</field>
+            <field name="name">помічник директора з режиму</field>
+            <field name="coefficient">0.51</field>
+        </record>
+
+        <record id="pay_scheme_1078_he_01" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">10</field>
+            <field name="name">Керівник (ректор, президент, начальник) закладу вищої освіти</field>
+            <field name="coefficient">0.99</field>
+        </record>
+        <record id="pay_scheme_1078_he_02" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">20</field>
+            <field name="name">Декан</field>
+            <field name="coefficient">0.81</field>
+        </record>
+        <record id="pay_scheme_1078_he_03" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">30</field>
+            <field name="name">Керівник (директор) навчально-наукового інституту у складі закладу вищої освіти</field>
+            <field name="coefficient">0.81</field>
+        </record>
+        <record id="pay_scheme_1078_he_04" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">40</field>
+            <field name="name">Керівник (директор) інституту (центру) післядипломної освіти у складі закладу вищої освіти</field>
+            <field name="coefficient">0.75</field>
+        </record>
+        <record id="pay_scheme_1078_he_05" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">50</field>
+            <field name="name">Керівник (директор) філії закладу вищої освіти</field>
+            <field name="coefficient">0.75</field>
+        </record>
+        <record id="pay_scheme_1078_he_06" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">60</field>
+            <field name="name">Керівник (директор) закладу післядипломної освіти, посаду якого віднесено до науково-педагогічних працівників</field>
+            <field name="coefficient">0.81</field>
+        </record>
+        <record id="pay_scheme_1078_he_07" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">70</field>
+            <field name="name">Завідувач кафедри (професор)</field>
+            <field name="coefficient">0.81</field>
+        </record>
+        <record id="pay_scheme_1078_he_08" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">80</field>
+            <field name="name">Завідувач кафедри</field>
+            <field name="coefficient">0.75</field>
+        </record>
+        <record id="pay_scheme_1078_he_09" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">90</field>
+            <field name="name">Професор</field>
+            <field name="coefficient">0.75</field>
+        </record>
+        <record id="pay_scheme_1078_he_10" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">100</field>
+            <field name="name">Доцент</field>
+            <field name="coefficient">0.69</field>
+        </record>
+        <record id="pay_scheme_1078_he_11" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">110</field>
+            <field name="name">Старший викладач; провідний концертмейстер закладів вищої освіти (факультетів) з підготовки працівників мистецтв, учителів та викладачів музичного мистецтва</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_he_12" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">120</field>
+            <field name="name">Викладач, асистент; концертмейстер закладів вищої освіти (факультетів) з підготовки працівників мистецтв, учителів та викладачів музичного мистецтва</field>
+            <field name="coefficient">0.63</field>
+        </record>
+        <record id="pay_scheme_1078_he_13" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">130</field>
+            <field name="name">Викладач-стажист</field>
+            <field name="coefficient">0.6</field>
+        </record>
+        <record id="pay_scheme_1078_he_14" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">140</field>
+            <field name="name">Учений секретар</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_he_15" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">150</field>
+            <field name="name">Завідувач: докторантури, аспірантури, лікарської резидентури, інтернатури, підготовчого відділення</field>
+            <field name="coefficient">0.66</field>
+        </record>
+        <record id="pay_scheme_1078_he_16" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">160</field>
+            <field name="name">Завідувач навчального, навчально-методичного відділу (управління)</field>
+            <field name="coefficient">0.54</field>
+        </record>
+        <record id="pay_scheme_1078_he_17" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">170</field>
+            <field name="name">Завідувач навчально-наукового, навчально-виробничого, навчально-практичного центру</field>
+            <field name="coefficient">0.54</field>
+        </record>
+        <record id="pay_scheme_1078_he_18" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">180</field>
+            <field name="name">Завідувач: навчально-виробничої (навчальної) майстерні, навчальної лабораторії, відділу (лабораторії, кабінету, частини) з основного виду (напряму) діяльності</field>
+            <field name="coefficient">0.52</field>
+        </record>
+        <record id="pay_scheme_1078_he_19" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">190</field>
+            <field name="name">Завідувач (керівник) практики (виробничої, навчальної)</field>
+            <field name="coefficient">0.51</field>
+        </record>
+        <record id="pay_scheme_1078_he_20" model="hr.pay.scheme.line">
+            <field name="scheme_id" ref="pay_scheme_1078_higher_ed"/>
+            <field name="sequence">200</field>
+            <field name="name">Методист навчального (навчально-методичного) відділу закладу вищої освіти</field>
+            <field name="coefficient">0.5</field>
+        </record>
+
+        <record id="pay_scheme_1078_hourly_01" model="hr.pay.scheme.line">
+            <!-- 1.2 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">10</field>
+            <field name="group_name">Здобувачі загальної середньої, професійної, фахової передвищої освіти, робітники, працівники, слухачі курсів, які займають посади, що вимагають освітнього (освітньо-професійного) ступеня молодшого бакалавра, фахового молодшого бакалавра</field>
+            <field name="name">професор</field>
+            <field name="coefficient">0.012</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_02" model="hr.pay.scheme.line">
+            <!-- 1 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">20</field>
+            <field name="group_name">Здобувачі загальної середньої, професійної, фахової передвищої освіти, робітники, працівники, слухачі курсів, які займають посади, що вимагають освітнього (освітньо-професійного) ступеня молодшого бакалавра, фахового молодшого бакалавра</field>
+            <field name="name">доктор наук</field>
+            <field name="coefficient">0.01</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_03" model="hr.pay.scheme.line">
+            <!-- 0.8 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">30</field>
+            <field name="group_name">Здобувачі загальної середньої, професійної, фахової передвищої освіти, робітники, працівники, слухачі курсів, які займають посади, що вимагають освітнього (освітньо-професійного) ступеня молодшого бакалавра, фахового молодшого бакалавра</field>
+            <field name="name">доцент або доктор філософії (кандидат наук), доктор мистецтва</field>
+            <field name="coefficient">0.008</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_04" model="hr.pay.scheme.line">
+            <!-- 0.7 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">40</field>
+            <field name="group_name">Здобувачі загальної середньої, професійної, фахової передвищої освіти, робітники, працівники, слухачі курсів, які займають посади, що вимагають освітнього (освітньо-професійного) ступеня молодшого бакалавра, фахового молодшого бакалавра</field>
+            <field name="name">особи, які не мають наукового ступеня</field>
+            <field name="coefficient">0.007</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_05" model="hr.pay.scheme.line">
+            <!-- 2.2 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">50</field>
+            <field name="group_name">Здобувачі першого (бакалаврського) та другого (магістерського) рівнів вищої освіти</field>
+            <field name="name">професор</field>
+            <field name="coefficient">0.022</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_06" model="hr.pay.scheme.line">
+            <!-- 1.8 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">60</field>
+            <field name="group_name">Здобувачі першого (бакалаврського) та другого (магістерського) рівнів вищої освіти</field>
+            <field name="name">доктор наук</field>
+            <field name="coefficient">0.018</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_07" model="hr.pay.scheme.line">
+            <!-- 1.4 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">70</field>
+            <field name="group_name">Здобувачі першого (бакалаврського) та другого (магістерського) рівнів вищої освіти</field>
+            <field name="name">доцент або доктор філософії (кандидат наук), доктор мистецтва</field>
+            <field name="coefficient">0.014</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_08" model="hr.pay.scheme.line">
+            <!-- 1.1 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">80</field>
+            <field name="group_name">Здобувачі першого (бакалаврського) та другого (магістерського) рівнів вищої освіти</field>
+            <field name="name">особи, які не мають наукового ступеня</field>
+            <field name="coefficient">0.011</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_09" model="hr.pay.scheme.line">
+            <!-- 2.6 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">90</field>
+            <field name="group_name">Здобувачі третього (освітньо-наукового, освітньо-творчого) рівня вищої освіти, слухачі курсів, які займають посади, що вимагають освітнього ступеня бакалавра, магістра</field>
+            <field name="name">професор</field>
+            <field name="coefficient">0.026</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_10" model="hr.pay.scheme.line">
+            <!-- 2.1 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">100</field>
+            <field name="group_name">Здобувачі третього (освітньо-наукового, освітньо-творчого) рівня вищої освіти, слухачі курсів, які займають посади, що вимагають освітнього ступеня бакалавра, магістра</field>
+            <field name="name">доктор наук</field>
+            <field name="coefficient">0.021</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_11" model="hr.pay.scheme.line">
+            <!-- 1.7 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">110</field>
+            <field name="group_name">Здобувачі третього (освітньо-наукового, освітньо-творчого) рівня вищої освіти, слухачі курсів, які займають посади, що вимагають освітнього ступеня бакалавра, магістра</field>
+            <field name="name">доцент або доктор філософії (кандидат наук), доктор мистецтва</field>
+            <field name="coefficient">0.017</field>
+        </record>
+        <record id="pay_scheme_1078_hourly_12" model="hr.pay.scheme.line">
+            <!-- 1.4 % базової величини -->
+            <field name="scheme_id" ref="pay_scheme_1078_hourly"/>
+            <field name="sequence">120</field>
+            <field name="group_name">Здобувачі третього (освітньо-наукового, освітньо-творчого) рівня вищої освіти, слухачі курсів, які займають посади, що вимагають освітнього ступеня бакалавра, магістра</field>
+            <field name="name">особи, які не мають наукового ступеня</field>
+            <field name="coefficient">0.014</field>
+        </record>
+
+    </data>
+</odoo>
