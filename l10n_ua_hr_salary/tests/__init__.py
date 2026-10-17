@@ -13,6 +13,7 @@ from . import test_multicompany
 from . import test_time_surcharges
 from . import test_indexation
 from . import test_in_kind
+from . import test_accrual_type_basis
 from . import test_retro
 from . import test_bank_export
 from . import test_deposit

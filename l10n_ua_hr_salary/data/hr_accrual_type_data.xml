@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data noupdate="1">
-        
+        <!-- is_basic_salary: the vacation average of Порядок № 100 (КМУ,
+             08.02.1995). True for wage, bonuses and extra pay (п. 3); False
+             for the payments of п. 4 (одноразові, соціальні, натуральні).
+             Vacation pay and sickness benefits stay False: the vacation
+             average takes them by category (п. 3, last paragraph). The
+             sick-leave average reads is_esv_base instead (Порядок № 1266).
+             A change here needs a migration: the records are noupdate. -->
+
         <record id="accrual_type_salary" model="hr.accrual.type">
             <field name="name">Оклад</field>
             <field name="code">SALARY</field>
@@ -33,7 +40,7 @@
             <field name="code">BONUS</field>
             <field name="category">bonus</field>
             <field name="calculation_method">fixed</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>
@@ -100,7 +107,7 @@
             <field name="code">OVERTIME</field>
             <field name="category">wage</field>
             <field name="calculation_method">hourly</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>
@@ -113,7 +120,7 @@
             <field name="code">NIGHT</field>
             <field name="category">allowance</field>
             <field name="calculation_method">hourly</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>
@@ -126,7 +133,7 @@
             <field name="code">HOLIDAY</field>
             <field name="category">allowance</field>
             <field name="calculation_method">daily</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>
@@ -178,7 +185,7 @@
             <field name="code">RETRO</field>
             <field name="category">other</field>
             <field name="calculation_method">fixed</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>
@@ -218,7 +225,7 @@
             <field name="code">SENIORITY</field>
             <field name="category">allowance</field>
             <field name="calculation_method">percent</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>

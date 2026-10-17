@@ -29,9 +29,19 @@ class HrAccrualType(models.Model):
         ('percent', 'Percent of Base'),
     ], string='Calculation Method', default='monthly')
     
+    # Порядок № 100, п. 3: every accrued wage counts unless п. 4 names it,
+    # so a new type is in the base until it is marked otherwise.
     is_basic_salary = fields.Boolean(
         string='Basic Salary Component',
-        help='Include in average salary calculation'
+        default=True,
+        help='Include in the average salary for vacations and their '
+             'compensation (Порядок № 100, п. 3). Clear it for the payments '
+             'of п. 4: one-off payments (compensation for unused vacation, '
+             'material aid, severance pay), social payments, payments in kind. '
+             'Vacation pay and sickness benefits are counted for a vacation '
+             'by their category. The sick-leave average does not read this '
+             'flag: it takes the pay in the contribution base (ESV Base), '
+             'per Порядок № 1266.'
     )
     is_taxable_pdfo = fields.Boolean(
         string='Taxable (PDFO)',

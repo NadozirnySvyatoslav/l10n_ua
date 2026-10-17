@@ -83,6 +83,16 @@ class TestAverageBenefits(TransactionCase):
             ('SALARY', 11000, 1), ('MATERNITY', 20000, 20)])
         self.assertAlmostEqual(self._sick_average(), 1000.0, places=2)
 
+    def test_sick_average_takes_the_contribution_base(self):
+        # Порядок № 1266, п. 3: the material aid is outside the contribution
+        # base and stays out; the compensation for unused vacation and the
+        # bonus are in it and count.
+        self._payslip(date(2026, 3, 1), [
+            ('SALARY', 20000, 1), ('BONUS', 4800, 1),
+            ('COMP_VAC', 6200, 1), ('MAT_AID', 5000, 1)])
+        self.assertAlmostEqual(self._sick_average(),
+                               round(31000 / 31, 2), places=2)
+
     # Vacation
 
     def _vacation(self):
@@ -131,3 +141,39 @@ class TestAverageBenefits(TransactionCase):
         self.assertAlmostEqual(
             leave._calculate_average_salary(),
             round(20000 / (self._vacation_days(leave) - 30), 2), places=2)
+
+    def test_vacation_average_takes_basic_salary_only(self):
+        # Порядок № 100: the bonus and the extra pay count (п. 3); the
+        # compensation for unused vacation, the material aid, the severance
+        # pay and the income in kind do not (п. 4).
+        self._payslip(date(2026, 3, 1), [
+            ('SALARY', 20000, 1), ('BONUS', 3000, 1), ('NIGHT', 700, 1),
+            ('SENIORITY', 2000, 1), ('COMP_VAC', 6000, 1),
+            ('MAT_AID', 5000, 1), ('SEVERANCE', 9000, 1), ('INKIND', 400, 1)])
+        leave = self._vacation()
+        self.assertAlmostEqual(
+            leave._calculate_average_salary(),
+            round(25700 / self._vacation_days(leave), 2), places=2)
+
+    def test_vacation_average_keeps_earlier_vacation_pay(self):
+        # The pay of an earlier vacation counts for the next one (п. 3, the
+        # last paragraph), though its type is not marked basic salary.
+        self._payslip(date(2026, 3, 1), [
+            ('SALARY', 15000, 1), ('VACATION', 5000, 7)])
+        leave = self._vacation()
+        self.assertAlmostEqual(
+            leave._calculate_average_salary(),
+            round(20000 / self._vacation_days(leave), 2), places=2)
+
+    def test_vacation_average_leaves_out_a_type_not_marked(self):
+        kind = self.env['hr.accrual.type'].create({
+            'name': 'Разова винагорода', 'code': 'TEST290_ONEOFF',
+            'category': 'other', 'is_basic_salary': False,
+        })
+        self.assertTrue(kind)
+        self._payslip(date(2026, 3, 1), [
+            ('SALARY', 20000, 1), ('TEST290_ONEOFF', 3000, 1)])
+        leave = self._vacation()
+        self.assertAlmostEqual(
+            leave._calculate_average_salary(),
+            round(20000 / self._vacation_days(leave), 2), places=2)

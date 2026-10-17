@@ -970,9 +970,8 @@ class HrLeave(models.Model):
         Formula: Total earnings / Calendar days in period
 
         Include:
-        - Base salary
-        - Bonuses marked as is_basic_salary
-        - Allowances marked as is_basic_salary
+        - Accrual types marked as is_basic_salary (п. 3, less п. 4)
+        - Vacation pay and sickness benefits (п. 3, last paragraph)
 
         Exclude periods:
         - Sick leave
@@ -1005,15 +1004,21 @@ class HrLeave(models.Model):
         excluded_days = 0
 
         for payslip in payslips:
-            # Everything accrued counts: the selection by `is_basic_salary`
-            # has never been applied here (see the twin note in
-            # `hr_sick_leave.py`). The sickness benefits stay in with their
-            # days: the vacation average counts them as earnings. The
-            # maternity benefit does not count, and its days are days without
-            # pay, so both go.
+            # The earnings are the lines of the types marked
+            # `is_basic_salary` — the wage of п. 3 of Порядок № 100, less the
+            # payments of п. 4 (одноразові виплати, матеріальна допомога,
+            # соціальні виплати...). For a vacation or its compensation п. 3
+            # also counts the pay of the days the average was kept (an
+            # earlier vacation, a business trip) and the sickness benefit:
+            # those types go in by their category, with their days. The
+            # maternity benefit is a social payment (п. 4 «е»), and its days
+            # are days without pay (п. 2), so both go.
+            earnings = payslip.accrual_ids.filtered(
+                lambda line: line.accrual_type_id.is_basic_salary
+                or line.accrual_type_id.category in ('vacation', 'sick'))
+            total_earnings += sum(earnings.mapped('amount'))
             maternity = payslip.accrual_ids.filtered(
                 lambda line: line.accrual_type_id.category == 'maternity')
-            total_earnings += (payslip.gross_salary or 0) - sum(maternity.mapped('amount'))
             excluded_days += sum(maternity.mapped('quantity'))
 
         # Days of unpaid leave in the period: no pay was kept for them. Sick

@@ -247,8 +247,8 @@ class HrSickLeave(models.Model):
     def _calculate_average_salary(self):
         """Calculate average daily salary for sick leave.
 
-        Based on earnings in billing period (12 months before sick leave).
-        According to the Law of Ukraine on Compulsory Social Insurance.
+        Based on earnings in billing period (12 months before sick leave),
+        per Порядок № 1266 of 26.09.2001: the pay in the contribution base.
         """
         self.ensure_one()
 
@@ -285,15 +285,20 @@ class HrSickLeave(models.Model):
             # Calculate calendar days in payslip period
             payslip_days = (payslip.date_to - payslip.date_from).days + 1
 
-            # Everything accrued counts except the sickness and maternity
-            # benefits paid in the payslip, left out together with their days:
-            # a benefit is averaged from the pay of the days worked, not from
-            # earlier benefits. Selecting by `is_basic_salary` is a question of
-            # its own and has never been done here.
+            # Порядок № 1266, п. 3: the earnings are the pay the unified
+            # social contribution was charged on — the lines of the types in
+            # the contribution base, not those marked `is_basic_salary`, which
+            # is the list of Порядок № 100 for vacations. The sickness and
+            # maternity benefits paid in the payslip are left out together
+            # with their days: those days are not worked for a good reason,
+            # and a benefit is averaged from the pay of the days worked, not
+            # from earlier benefits.
             benefits = payslip.accrual_ids.filtered(
                 lambda line: line.accrual_type_id.category in ('sick', 'maternity'))
+            earnings = payslip.accrual_ids.filtered(
+                lambda line: line.accrual_type_id.is_esv_base) - benefits
             total_calendar_days += payslip_days - sum(benefits.mapped('quantity'))
-            total_earnings += (payslip.gross_salary or 0) - sum(benefits.mapped('amount'))
+            total_earnings += sum(earnings.mapped('amount'))
 
         if total_calendar_days > 0:
             return round(total_earnings / total_calendar_days, 2)
