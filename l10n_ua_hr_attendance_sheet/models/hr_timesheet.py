@@ -1,7 +1,8 @@
+from datetime import date
+
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from dateutil.relativedelta import relativedelta
-import calendar
 
 
 class HrTimesheet(models.Model):
@@ -217,8 +218,23 @@ class HrTimesheetLine(models.Model):
         compute='_compute_totals',
         store=True
     )
+    norm_hours = fields.Float(
+        string='Norm Hours',
+        compute='_compute_totals',
+        store=True,
+        help='Hours the working schedule plans for the month: the sum of the '
+             'norm of its days.'
+    )
+    overtime_diff = fields.Float(
+        string='Hours Above Norm',
+        compute='_compute_totals',
+        store=True,
+        help='Hours worked minus the norm. Overtime is paid only by an order '
+             'and is entered in the Overtime column by hand.'
+    )
 
-    @api.depends('day_ids.code_id', 'day_ids.hours', 'day_ids.overtime_hours', 'day_ids.night_hours')
+    @api.depends('day_ids.code_id', 'day_ids.hours', 'day_ids.overtime_hours',
+                 'day_ids.night_hours', 'day_ids.norm_hours')
     def _compute_totals(self):
         for line in self:
             days = line.day_ids
@@ -232,132 +248,100 @@ class HrTimesheetLine(models.Model):
             line.absence_days = len(days.filtered(lambda d: d.code_id.code_type == 'absence'))
             line.vacation_days = len(days.filtered(lambda d: d.code_id.code_type == 'leave'))
             line.sick_days = len(days.filtered(lambda d: d.code_id.code_type == 'sick'))
+            line.norm_hours = sum(days.mapped('norm_hours'))
+            line.overtime_diff = line.worked_hours - line.norm_hours
 
     def action_generate_days(self):
         """Generate day entries for the month"""
         self.ensure_one()
         self.day_ids.unlink()
-
-        year = self.timesheet_id.year
-        month = int(self.timesheet_id.month)
-
-        _, last_day = calendar.monthrange(year, month)
-
-        # Get codes
-        work_code = self.env['hr.timesheet.code'].search([('code', '=', 'Я')], limit=1)
-        weekend_code = self.env['hr.timesheet.code'].search([('code', '=', 'В')], limit=1)
-        holiday_code = self.env['hr.timesheet.code'].search([('code', '=', 'СВ')], limit=1)
-        vacation_code = self.env['hr.timesheet.code'].search([('code', '=', 'ВД')], limit=1)
-        sick_code = self.env['hr.timesheet.code'].search([('code', '=', 'ТН')], limit=1)
-        # Code for days before contract start or after contract end
-        not_employed_code = self.env['hr.timesheet.code'].search([('code', '=', 'НР')], limit=1)
-        if not not_employed_code:
-            not_employed_code = self.env['hr.timesheet.code'].search([('code', '=', 'ІН')], limit=1)
-
-        # Get employee version (contract) info
-        version = self.employee_id.current_version_id
-        contract_start = version.contract_date_start if version else None
-        contract_end = version.contract_date_end if version else None
-        # `work_rate` додає l10n_ua_hr_contract, якого цей модуль не вимагає.
-        work_rate = (version.work_rate
-                     if version and 'work_rate' in version._fields else 1.0)
-
-        # Calculate standard hours based on work_rate
-        standard_hours = 8.0 * work_rate
-
-        # Get production calendar
-        prod_calendar = self.env['hr.production.calendar'].search([
-            ('year', '=', year),
-            ('company_id', '=', self.timesheet_id.company_id.id),
-        ], limit=1)
-
-        # Get employee leaves for the month
-        date_from = fields.Date.from_string(f'{year}-{month:02d}-01')
-        date_to = fields.Date.from_string(f'{year}-{month:02d}-{last_day}')
-
-        leaves = self.env['hr.leave'].search([
-            ('employee_id', '=', self.employee_id.id),
-            ('state', '=', 'validate'),
-            ('date_from', '<=', date_to),
-            ('date_to', '>=', date_from),
+        self.env['hr.timesheet.day'].create([
+            dict(day, line_id=self.id, norm_hours=day['hours'])
+            for day in self._l10n_ua_plan_days()
         ])
+        return True
 
+    def _l10n_ua_plan_days(self):
+        """The days of the month as the working schedule plans them: a list
+        of {date, day_number, code_id, hours, is_scheduled}.
+
+        Each day is read by the rules the payslip counts a month without a
+        timesheet by — the working days of the company, the version in force
+        that day, the contract periods, the public holidays — so a timesheet
+        left as generated pays what the payslip would pay without one.
+
+        A public holiday inside a time off is not part of it: the time off is
+        shortened by it. It is read like any day outside the time off — a
+        holiday where the production calendar has it as one, a working day
+        where there is no calendar to say so.
+
+        On a shift or summarized schedule the hours are not a roster: the
+        days the shifts fall on are unknown, and the plan spreads the norm
+        over the working days of the company.
+        """
+        self.ensure_one()
+        company = self.timesheet_id.company_id
+        employee = self.employee_id
+        date_from = date(self.timesheet_id.year, int(self.timesheet_id.month), 1)
+        date_to = date_from + relativedelta(months=1, days=-1)
+
+        Code = self.env['hr.timesheet.code']
+        work_code = Code.search([('code', '=', 'Я')], limit=1)
+        weekend_code = Code.search([('code', '=', 'В')], limit=1)
+        holiday_code = Code.search([('code', '=', 'СВ')], limit=1)
+        vacation_code = Code.search([('code', '=', 'ВД')], limit=1)
+        sick_code = Code.search([('code', '=', 'ТН')], limit=1)
+        # Code for days before contract start or after contract end
+        not_employed_code = Code.search([('code', '=', 'НР')], limit=1) \
+            or Code.search([('code', '=', 'ІН')], limit=1) or weekend_code
+
+        working = company._l10n_ua_working_dates(date_from, date_to)
+        public_holidays = company._l10n_ua_public_holiday_dates(date_from, date_to)
+        calendar_days = company._l10n_ua_production_calendar_days(date_from, date_to)
+        # By the dates of the request, as the payslip reads them: the moments
+        # of the time off are in UTC and would put its first or last day on
+        # the day before, or miss a time off starting on the last day.
+        leaves = self.env['hr.leave'].search([
+            ('employee_id', '=', employee.id),
+            ('state', '=', 'validate'),
+            ('request_date_from', '<=', date_to),
+            ('request_date_to', '>=', date_from),
+        ])
         sick_leaves = self.env['hr.sick.leave'].search([
-            ('employee_id', '=', self.employee_id.id),
+            ('employee_id', '=', employee.id),
             ('state', 'in', ['confirmed', 'paid']),
             ('date_from', '<=', date_to),
             ('date_to', '>=', date_from),
         ])
 
-        days = []
-        for day in range(1, last_day + 1):
-            date = fields.Date.from_string(f'{year}-{month:02d}-{day:02d}')
-
-            # Check production calendar
-            cal_line = prod_calendar.line_ids.filtered(lambda l: l.date == date) if prod_calendar else False
-
-            # Determine code and hours
-            code = work_code
-            hours = standard_hours
-            is_scheduled = True
-
-            # Check if employee was employed on this date
-            is_employed = True
-            if contract_start and date < contract_start:
-                is_employed = False
-            if contract_end and date > contract_end:
-                is_employed = False
-
-            if not is_employed:
-                # Employee not yet hired or already terminated
-                code = not_employed_code or weekend_code
-                hours = 0
-                is_scheduled = False
-            else:
-                # Check if it's a leave day
-                leave_day = leaves.filtered(
-                    lambda l: l.date_from.date() <= date <= l.date_to.date()
-                )
-                sick_day = sick_leaves.filtered(
-                    lambda s: s.date_from <= date <= s.date_to
-                )
-
-                if sick_day:
-                    code = sick_code
-                    hours = 0
-                    is_scheduled = False
-                elif leave_day:
-                    code = vacation_code
-                    hours = 0
-                    is_scheduled = False
-                elif cal_line:
-                    if cal_line.day_type == 'holiday':
-                        code = holiday_code
-                        hours = 0
-                        is_scheduled = False
-                    elif cal_line.day_type == 'weekend':
-                        code = weekend_code
-                        hours = 0
-                        is_scheduled = False
-                    else:
-                        # Apply work_rate to calendar hours
-                        hours = cal_line.working_hours * work_rate
-                elif date.weekday() >= 5:
-                    code = weekend_code
-                    hours = 0
-                    is_scheduled = False
-
+        days, current = [], date_from
+        while current <= date_to:
+            code, hours = weekend_code, 0.0
+            if not employee._l10n_ua_employed_on(current):
+                code = not_employed_code
+            elif any(s.date_from <= current <= s.date_to for s in sick_leaves):
+                code = sick_code
+            elif current not in public_holidays and any(
+                    l.request_date_from <= current <= l.request_date_to for l in leaves):
+                code = vacation_code
+            elif current in working:
+                code = work_code
+                version = employee._l10n_ua_version_on(current) \
+                    or employee.current_version_id
+                hours = version._l10n_ua_scheduled_hours(company, working[current]) \
+                    if version else working[current]
+            elif current in calendar_days \
+                    and calendar_days[current].day_type == 'holiday':
+                code = holiday_code
             days.append({
-                'line_id': self.id,
-                'date': date,
-                'day_number': day,
+                'date': current,
+                'day_number': current.day,
                 'code_id': code.id if code else False,
                 'hours': hours,
-                'is_scheduled': is_scheduled,
+                'is_scheduled': code == work_code,
             })
-
-        self.env['hr.timesheet.day'].create(days)
-        return True
+            current += relativedelta(days=1)
+        return days
 
 
 class HrTimesheetDay(models.Model):
@@ -380,6 +364,12 @@ class HrTimesheetDay(models.Model):
         required=True
     )
     hours = fields.Float(string='Hours', default=0)
+    norm_hours = fields.Float(
+        string='Norm Hours',
+        readonly=True,
+        help='Hours the working schedule plans for this day. Set when the days '
+             'are generated; the hours worked are entered separately.'
+    )
     overtime_hours = fields.Float(string='Overtime')
     night_hours = fields.Float(string='Night Hours')
     

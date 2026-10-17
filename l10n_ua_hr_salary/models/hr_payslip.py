@@ -1,8 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import format_date, float_compare
-from datetime import datetime, time
-from pytz import timezone, utc
 from dateutil.relativedelta import relativedelta
 import calendar
 from collections import defaultdict
@@ -589,46 +587,6 @@ class HrPayslip(models.Model):
         
         return True
 
-    def _norm_hours_of(self, day, company_hours):
-        """The hours a working day adds to the norm of the month.
-
-        A full day of the company, or the day of the version's schedule when
-        that schedule is a reduced working time: there the shorter day is the
-        whole norm of the employee, and the salary is paid in full for it. A
-        part-time employee — a work rate below one, or a shorter schedule
-        that is not a reduced working time — is measured against the full
-        day and paid in proportion to the hours worked.
-        """
-        self.ensure_one()
-        calendar = self._version_on(day).resource_calendar_id
-        if calendar.ua_reduced_hours and calendar.hours_per_day:
-            return calendar.hours_per_day
-        return company_hours
-
-    def _scheduled_hours_of(self, day, company_hours):
-        """The hours the employee is taken to have worked on a working day
-        when there is no timesheet to say.
-
-        The part-time is taken from one source only: the work rate and a
-        shorter schedule both describe it, and applying both would shorten
-        the day twice. A schedule shorter than the company's full week says
-        it itself — its weekly hours over five days, whatever the rate; on a
-        full or reduced schedule the day of the norm is shortened by the
-        work rate. A shift or summarized schedule runs to the norm over the
-        month rather than week by week, and its long shifts are not every
-        day, so it is taken at the day of the norm too.
-        """
-        self.ensure_one()
-        version = self._version_on(day)
-        calendar = version.resource_calendar_id
-        rate = version.work_rate or 1.0
-        full_week = self.company_id.resource_calendar_id.hours_per_week or 40.0
-        if calendar and calendar.ua_schedule_type not in ('shift', 'summarized') \
-                and not calendar.ua_reduced_hours \
-                and 0 < calendar.hours_per_week < full_week:
-            return calendar.hours_per_week / 5.0
-        return self._norm_hours_of(day, company_hours) * rate
-
     def _compute_working_days(self):
         """Calculate scheduled and worked days"""
         self.ensure_one()
@@ -668,12 +626,14 @@ class HrPayslip(models.Model):
         # line, and a day before the hire or after the dismissal by nothing.
         worked, worked_hours = 0, 0.0
         away = self._absence_dates()
-        working = self._working_dates(self.date_from, self.date_to)
+        working = self.company_id._l10n_ua_working_dates(self.date_from, self.date_to)
         curr = self.date_from
         while curr <= self.date_to:
-            if curr in working and curr not in away and self._employed_on(curr):
+            if curr in working and curr not in away \
+                    and self.employee_id._l10n_ua_employed_on(curr):
                 worked += 1
-                worked_hours += self._scheduled_hours_of(curr, working[curr])
+                worked_hours += self._version_on(curr)._l10n_ua_scheduled_hours(
+                    self.company_id, working[curr])
             curr += relativedelta(days=1)
         self.worked_days = worked
         self.worked_hours = worked_hours
@@ -696,43 +656,11 @@ class HrPayslip(models.Model):
         """
         self.ensure_one()
         month_start = self.date_to.replace(day=1)
-        working = self._working_dates(
+        working = self.company_id._l10n_ua_working_dates(
             month_start, month_start + relativedelta(months=1, days=-1))
         return len(working), sum(
-            self._norm_hours_of(day, hours) for day, hours in working.items())
-
-    def _working_dates(self, date_from, date_to):
-        """{date: full-time hours} of the working days between the two dates.
-
-        From the production calendar when the company keeps one for the year
-        and has the day in it, read by the type of the day as the timesheet
-        generator reads it; otherwise Monday to Friday at the full-time day
-        of the company's working schedule.
-        """
-        self.ensure_one()
-        day_hours = self.company_id.resource_calendar_id.hours_per_day or 8.0
-        calendar_days = {}
-        # The production calendar comes with the attendance sheet module,
-        # which this one does not depend on.
-        if 'hr.production.calendar' in self.env:
-            productions = self.env['hr.production.calendar'].search([
-                ('year', 'in', list(range(date_from.year, date_to.year + 1))),
-                ('company_id', '=', self.company_id.id),
-            ])
-            calendar_days = {
-                line.date: line for line in productions.line_ids
-                if date_from <= line.date <= date_to
-            }
-        working, current = {}, date_from
-        while current <= date_to:
-            line = calendar_days.get(current)
-            if line is not None:
-                if line.day_type not in ('holiday', 'weekend'):
-                    working[current] = line.working_hours or day_hours
-            elif current.weekday() < 5:
-                working[current] = day_hours
-            current += relativedelta(days=1)
-        return working
+            self._version_on(day)._l10n_ua_norm_hours(hours)
+            for day, hours in working.items())
 
     def _timesheet_line(self):
         """The confirmed timesheet line of this employee for the month.
@@ -768,16 +696,12 @@ class HrPayslip(models.Model):
     def _version_on(self, day):
         """The version in force on that day, by the rule of the payslip.
 
-        The same filter `_compute_version_id` uses to pick the version of the
-        payslip, only asked about a day instead of the start of the period —
-        so the payslip and the day-by-day reading never disagree about what a
-        version is. Falls back to the version of the payslip.
+        The rule the timesheet generator reads a day by too, so a timesheet
+        and the payslip never disagree about what a version is. Falls back to
+        the version of the payslip.
         """
         self.ensure_one()
-        versions = self.employee_id.version_ids.filtered(
-            lambda v: v.date_version <= day and v.contract_date_start
-        ).sorted('date_version', reverse=True)
-        return versions[0] if versions else self.version_id
+        return self.employee_id._l10n_ua_version_on(day) or self.version_id
 
     def _attendance(self, worked_hours, version):
         """The part of the month the employee was at work, at most whole.
@@ -823,11 +747,12 @@ class HrPayslip(models.Model):
         start = self.date_to.replace(day=1)
         end = start + relativedelta(months=1, days=-1)
         days = [start + relativedelta(days=n) for n in range((end - start).days + 1)]
-        if all(self._employed_on(day) for day in days):
+        employee = self.employee_id
+        if all(employee._l10n_ua_employed_on(day) for day in days):
             return True
         away = self._absence_dates()
-        return all(self._employed_on(day) and day not in away
-                   for day in self._working_dates(start, end))
+        return all(employee._l10n_ua_employed_on(day) and day not in away
+                   for day in self.company_id._l10n_ua_working_dates(start, end))
 
     def _correct_closed_periods(self, certificates):
         """Take back the salary closed payslips paid for days of sickness.
@@ -914,29 +839,6 @@ class HrPayslip(models.Model):
         """How the version is paid: 'salary', 'hourly' or 'piece'."""
         return getattr(version, 'salary_form', False) or 'salary'
 
-    def _employed_on(self, day):
-        """Whether the employee was under contract on that day.
-
-        A contract runs from the start date its versions carry to the end
-        date of the latest of them: every version of a contract repeats its
-        start, and only the last one is sure to know its end. A day inside no
-        contract is before the hire, after the dismissal or between two
-        contracts. An employee whose versions carry no contract period at all
-        — data imported without one — is taken to be under contract.
-        """
-        self.ensure_one()
-        latest = {}
-        for version in self.employee_id.version_ids.filtered('contract_date_start'):
-            known = latest.get(version.contract_date_start)
-            if not known or version.date_version > known.date_version:
-                latest[version.contract_date_start] = version
-        if not latest:
-            return True
-        return any(
-            start <= day and (not version.contract_date_end
-                              or version.contract_date_end >= day)
-            for start, version in latest.items())
-
     def _version_periods(self):
         """[(version, date_from, date_to)] over the period of the payslip.
 
@@ -1018,13 +920,13 @@ class HrPayslip(models.Model):
             return [day for day in days if any(day[1:])]
         days, current = [], self.date_from
         away = self._absence_dates()
-        working = self._working_dates(self.date_from, self.date_to) \
+        working = self.company_id._l10n_ua_working_dates(self.date_from, self.date_to) \
             if self.date_from and self.date_to else {}
         while current and self.date_to and current <= self.date_to:
             if current in working and current not in away \
-                    and self._employed_on(current):
-                days.append((current, self._scheduled_hours_of(
-                    current, working[current]), 0.0, 0.0, 0.0, 1))
+                    and self.employee_id._l10n_ua_employed_on(current):
+                days.append((current, self._version_on(current)._l10n_ua_scheduled_hours(
+                    self.company_id, working[current]), 0.0, 0.0, 0.0, 1))
             current += relativedelta(days=1)
         return days
 
@@ -1653,7 +1555,7 @@ class HrPayslip(models.Model):
 
     def _absence_dates(self):
         """The days of the period the employee was away on a validated time off
-        counted in days, or on a sick-leave certificate not cancelled.
+        counted in days, or on a sick-leave certificate confirmed or paid.
 
         A public holiday inside a time off is not part of it — the time off is
         shortened by it and does not pay it — so it is not a day away either.
@@ -1684,11 +1586,12 @@ class HrPayslip(models.Model):
             ('request_date_from', '<=', self.date_to),
             ('request_date_to', '>=', self.date_from),
         ])
-        # A certificate still in draft is a sickness all the same: its days
-        # are not worked, whenever its benefit comes.
+        # A certificate in draft is nobody's word yet: its days are worked
+        # until it is confirmed, as the timesheet generator has them, and a
+        # closed month is corrected when it is.
         certificates = self.env['hr.sick.leave'].search([
             ('employee_id', '=', self.employee_id.id),
-            ('state', 'in', ('draft', 'confirmed', 'paid')),
+            ('state', 'in', ('confirmed', 'paid')),
             ('date_from', '<=', self.date_to),
             ('date_to', '>=', self.date_from),
         ])
@@ -1698,35 +1601,10 @@ class HrPayslip(models.Model):
 
     def _public_holiday_dates(self):
         """The public holidays of the period, from the list time off is
-        shortened by: those of the payslip's company and those of none.
-
-        A holiday is stored in UTC, and a day of the period is a holiday when
-        the holiday covers its noon in the time zone of the company's working
-        schedule. A holiday entered in local time starts the evening before
-        in UTC, and one shipped as a UTC day ends early the next morning in
-        local time; read by noon, both fall on their own day.
-        """
+        shortened by: those of the payslip's company and those of none."""
         self.ensure_one()
-        tz = timezone(self.company_id.resource_calendar_id.tz
-                      or self.env.user.tz or 'UTC')
-
-        def to_utc(day, moment):
-            return tz.localize(datetime.combine(day, moment)).astimezone(
-                utc).replace(tzinfo=None)
-
-        found = self.env['resource.calendar.leaves'].search([
-            ('resource_id', '=', False),
-            ('company_id', 'in', (self.company_id.id, False)),
-            ('date_from', '<=', to_utc(self.date_to, time.max)),
-            ('date_to', '>=', to_utc(self.date_from, time.min)),
-        ])
-        dates, current = set(), self.date_from
-        while current <= self.date_to:
-            noon = to_utc(current, time(12, 0))
-            if any(holiday.date_from <= noon <= holiday.date_to for holiday in found):
-                dates.add(current)
-            current += relativedelta(days=1)
-        return dates
+        return self.company_id._l10n_ua_public_holiday_dates(
+            self.date_from, self.date_to)
 
     def _generate_allowances(self, segments, several, versions):
         """The allowances of each version, shared out by the days of its segment.

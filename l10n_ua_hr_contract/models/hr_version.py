@@ -259,6 +259,48 @@ class HrVersion(models.Model):
             version.scheduled_hours_week = week * rate
             version.scheduled_hours_day = day * rate
 
+    def _l10n_ua_norm_hours(self, day_hours):
+        """The hours a working day adds to the norm of the month.
+
+        `day_hours` is a full day of the company on that date. A schedule of
+        reduced working time gives its own shorter day instead: there the
+        shorter day is the whole norm of the employee, and the salary is paid
+        in full for it. A part-time employee — a work rate below one, or a
+        shorter schedule that is not a reduced working time — is measured
+        against the full day and paid in proportion to the hours worked.
+        """
+        self.ensure_one()
+        calendar = self.resource_calendar_id
+        if calendar.ua_reduced_hours and calendar.hours_per_day:
+            return calendar.hours_per_day
+        return day_hours
+
+    def _l10n_ua_scheduled_hours(self, company, day_hours):
+        """The hours the employee is planned to work on a working day.
+
+        What the timesheet generator puts on the day, and what the payslip
+        counts as worked when there is no timesheet to say. `day_hours` is a
+        full day of `company` on that date.
+
+        The part-time is taken from one source only: the work rate and a
+        shorter schedule both describe it, and applying both would shorten
+        the day twice. A schedule shorter than the company's full week says
+        it itself — its weekly hours over five days, whatever the rate; on a
+        full or reduced schedule the day of the norm is shortened by the
+        work rate. A shift or summarized schedule runs to the norm over the
+        month rather than week by week, and its long shifts are not every
+        day, so it is taken at the day of the norm too.
+        """
+        self.ensure_one()
+        calendar = self.resource_calendar_id
+        rate = self.work_rate or 1.0
+        full_week = company.resource_calendar_id.hours_per_week or 40.0
+        if calendar and calendar.ua_schedule_type not in ('shift', 'summarized') \
+                and not calendar.ua_reduced_hours \
+                and 0 < calendar.hours_per_week < full_week:
+            return calendar.hours_per_week / 5.0
+        return self._l10n_ua_norm_hours(day_hours) * rate
+
     @api.depends('work_conditions', 'work_conditions_class')
     def _compute_additional_vacation_days(self):
         for version in self:

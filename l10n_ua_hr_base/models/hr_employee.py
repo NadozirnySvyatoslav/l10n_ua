@@ -1193,3 +1193,46 @@ class HrEmployee(models.Model):
         """Clears the job position field if it does not belong to the newly selected department"""
         if self.job_id and self.job_id not in self.allowed_job_ids:
             self.job_id = False
+
+    # === Version and contract on a day ===
+    # The contract dates are restricted to HR managers, and a timesheet
+    # officer asks about a day too: the versions are read with superuser
+    # rights, and only dates are taken from them.
+
+    def _l10n_ua_version_on(self, day):
+        """The version in force on that day: the latest one dated on or
+        before it among those that carry a contract period.
+
+        A version without a contract period — the one Odoo creates with the
+        employee card, for one — is passed over, even when it is dated later.
+        Empty when no version qualifies; the caller decides what stands in
+        for it. The version is handed back under the caller's rights.
+        """
+        self.ensure_one()
+        versions = self.sudo().version_ids.filtered(
+            lambda v: v.date_version <= day and v.contract_date_start
+        ).sorted('date_version', reverse=True)
+        return versions[:1].sudo(False)
+
+    def _l10n_ua_employed_on(self, day):
+        """Whether the employee was under contract on that day.
+
+        A contract runs from the start date its versions carry to the end
+        date of the latest of them: every version of a contract repeats its
+        start, and only the last one is sure to know its end. A day inside no
+        contract is before the hire, after the dismissal or between two
+        contracts. An employee whose versions carry no contract period at all
+        — data imported without one — is taken to be under contract.
+        """
+        self.ensure_one()
+        latest = {}
+        for version in self.sudo().version_ids.filtered('contract_date_start'):
+            known = latest.get(version.contract_date_start)
+            if not known or version.date_version > known.date_version:
+                latest[version.contract_date_start] = version
+        if not latest:
+            return True
+        return any(
+            start <= day and (not version.contract_date_end
+                              or version.contract_date_end >= day)
+            for start, version in latest.items())

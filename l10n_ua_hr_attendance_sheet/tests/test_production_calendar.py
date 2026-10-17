@@ -8,7 +8,10 @@ Tests cover:
 - Pre-holiday shortened days
 """
 
+from psycopg2 import IntegrityError
+
 from odoo.tests import TransactionCase, tagged
+from odoo.tools import mute_logger
 
 
 @tagged('post_install', '-at_install')
@@ -82,8 +85,15 @@ class TestProductionCalendar(TransactionCase):
     def test_calendar_unique_constraint(self):
         """Same year + company should fail."""
         self._create_calendar(2025)
-        with self.assertRaises(Exception):
+        # A database constraint: it fires at flush and aborts the transaction.
+        # The savepoint keeps the transaction usable, the flush raises the
+        # error inside the block, and mute_logger silences the expected
+        # "bad query" line.
+        with self.assertRaises(IntegrityError), \
+                mute_logger('odoo.sql_db'), \
+                self.env.cr.savepoint():
             self._create_calendar(2025)
+            self.env.flush_all()
 
     def test_calendar_line_day_type(self):
         """Lines should have correct day types."""
