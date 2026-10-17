@@ -12,8 +12,13 @@ class HrJob(models.Model):
         string='KP Name',
         compute='_compute_kp_fields', store=True,
         help='Name according to Classifier of Professions')
+    # Розділ, підрозділ і клас — вузли дерева класифікатора, а не професії:
+    # посада з кодом «2» ламає будь-який звіт за КП (#265). Домен не
+    # перевіряється на запис, тож посади, що вже стоять на рівні, лишаються
+    # валідними й відкриваються як були — лише нового такого вибору немає.
     kp_id = fields.Many2one(
         'hr.kp2010', string='Profession (KP)',
+        domain=[('level', '=', '4')],
         help='Profession from Classifier of Professions 2010')
     work_conditions = fields.Selection([
         ('normal', 'Normal'),

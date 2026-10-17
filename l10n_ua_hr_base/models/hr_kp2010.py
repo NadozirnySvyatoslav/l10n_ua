@@ -1,8 +1,26 @@
+import csv
+import json
 import logging
 
 from odoo import models, fields, api
+from odoo.tools import file_open
 
 _logger = logging.getLogger(__name__)
+
+# Офіційні назви розділів, підрозділів і класів ДК 003:2010 — розділ 5
+# «Класифікація професій» тексту класифікатора (Додаток А, редакція на
+# zakon.rada.gov.ua, va327609-10). Професій тут немає, вони в
+# hr_kp2010_data.xml.
+LEVELS_FILE = 'l10n_ua_hr_base/data/hr_kp2010_levels.csv'
+
+# Так рівні називались, поки офіційних назв у модулі не було. Запис із такою
+# назвою — заглушка, яку можна замінити; будь-яку іншу назву вписала людина.
+PLACEHOLDER_PREFIX = {1: 'Розділ', 2: 'Підрозділ', 3: 'Клас'}
+
+
+def _placeholder_name(code):
+    prefix = PLACEHOLDER_PREFIX.get(len(code or ''))
+    return prefix and f'{prefix} {code}'
 
 
 class HrKp2010(models.Model):
@@ -104,10 +122,13 @@ class HrKp2010(models.Model):
                     needed.add(digits[:length])
         missing = sorted(needed - set(by_code), key=lambda c: (len(c), c))
 
-        level_names = {1: 'Розділ', 2: 'Підрозділ', 3: 'Клас'}
+        # Назва — офіційна, де ДК 003:2010 її дає. Кілька класів із даних
+        # модуля (619, 799, 899 та підрозділи 79, 89) в опублікованому тексті
+        # не названі — вони лишаються з номером, а не з вигаданою назвою.
+        official = self._l10n_ua_level_names()
         for created in self.create([
             {'code': code,
-             'name': f'{level_names[len(code)]} {code}',
+             'name': official.get(code) or _placeholder_name(code),
              'group_code': code[0]}
             for code in missing
         ]):
@@ -148,6 +169,54 @@ class HrKp2010(models.Model):
                 'КП-2010: %s запис(ів) перепідпорядковано за кодом — '
                 'попереднього батька, зокрема виставленого вручну, замінено',
                 reparented)
+
+        self._l10n_ua_name_levels()
+
+    @api.model
+    def _l10n_ua_level_names(self):
+        """Код рівня → офіційна назва за ДК 003:2010."""
+        with file_open(LEVELS_FILE) as levels:
+            return {row['code']: row['name'] for row in csv.DictReader(levels)}
+
+    @api.model
+    def _l10n_ua_name_levels(self):
+        """Дати офіційні назви рівням, що досі звуться «Розділ 2».
+
+        Бази, де ієрархію побудовано до появи назв, мають ~180 заглушок —
+        хуком або міграцією 19.0.1.0.5, яка писала заглушку і в en_US, і в
+        uk_UA. Замінюється лише та мова, де лежить саме заглушка: назву, яку
+        кадровик виправив руками, не чіпаємо. Викликається з даних модуля,
+        тож спрацьовує на кожному оновленні, і нічого не пише, коли
+        заглушок уже немає.
+        """
+        official = self._l10n_ua_level_names()
+        self.flush_model(['code', 'name', 'level'])
+        self.env.cr.execute(
+            "SELECT id, code, name FROM hr_kp2010 WHERE level IN ('1', '2', '3')")
+        renamed = []
+        for record_id, code, names in self.env.cr.fetchall():
+            if code not in official or not names:
+                continue
+            placeholder = _placeholder_name(code)
+            if not placeholder:
+                continue
+            update = {lang: official[code] for lang, value in names.items()
+                      if value == placeholder}
+            if not update:
+                continue
+            self.env.cr.execute(
+                'UPDATE hr_kp2010 SET name = name || %s::jsonb WHERE id = %s',
+                (json.dumps(update), record_id))
+            renamed.append(record_id)
+        if renamed:
+            self.invalidate_model(['name'])
+            # Посади, що вже стоять на рівні, тримають його назву в
+            # збереженому kp_name — інакше там лишився б «Розділ 2».
+            self.env['hr.job'].sudo().with_context(active_test=False).search(
+                [('kp_id', 'in', renamed)])._compute_kp_fields()
+            _logger.info('КП-2010: %s рівн(ів) отримали офіційні назви '
+                         'ДК 003:2010 замість номерів', len(renamed))
+        return len(renamed)
 
     @api.depends('code', 'name')
     def _compute_display_name(self):
