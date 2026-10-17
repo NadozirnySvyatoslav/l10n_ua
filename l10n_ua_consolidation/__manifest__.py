@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Consolidated Financial Statements (1-к, 2-к)',
-    'version': '19.0.1.0.2',
+    'version': '19.0.1.0.3',
     'category': 'Accounting/Localization',
     'summary': 'Консолідований баланс (ф. 1-к) і звіт про фінансові результати (ф. 2-к) '
                'групи компаній за НП(С)БО 2',

@@ -1,4 +1,5 @@
-"""Форма 1 (баланс): суми зі знаком і розгорнуте сальдо розрахунків — issue #386.
+"""Форма 1 (баланс): суми зі знаком і розгорнуте сальдо розрахунків — issue #386;
+рядки і рахунки за Додатком 1 до НП(С)БО 1 — issue #422.
 
 Рахунки створюються тут, тож тест не залежить від плану рахунків бази.
 """
@@ -7,11 +8,28 @@ from datetime import date
 
 from odoo.tests import tagged
 
+from odoo.addons.l10n_ua_accounting.models.l10n_ua_balance_report import (
+    BALANCE_ADDITIONAL_CODES,
+)
+
 from .common import AccountingTestCase
 
 
 @tagged('post_install', '-at_install', 'l10n_ua_accounting')
 class TestBalanceForm(AccountingTestCase):
+
+    # Codes of Додаток 1 to НП(С)БО 1, in the order of the form
+    OFFICIAL_CODES = [
+        '1000', '1001', '1002', '1005', '1010', '1011', '1012', '1015', '1020',
+        '1030', '1035', '1040', '1045', '1090', '1095',
+        '1100', '1110', '1125', '1130', '1135', '1136', '1155', '1160', '1165',
+        '1170', '1190', '1195', '1200', '1300',
+        '1400', '1405', '1410', '1415', '1420', '1425', '1430', '1495',
+        '1500', '1510', '1515', '1520', '1525', '1595',
+        '1600', '1610', '1615', '1620', '1621', '1625', '1630', '1660', '1665',
+        '1690', '1695', '1700', '1900',
+    ]
+    SUB_CODES = ['1001', '1002', '1011', '1012', '1136', '1621']
 
     @classmethod
     def setUpClass(cls):
@@ -31,6 +49,26 @@ class TestBalanceForm(AccountingTestCase):
         cls.acc_702 = acc('702', 'Дохід від реалізації товарів', 'income')
         cls.acc_92 = acc('92', 'Адміністративні витрати', 'expense')
         cls.acc_499 = acc('499', 'Рахунок без рядка форми', 'equity')
+        # #422
+        cls.acc_41 = acc('41', 'Капітал у дооцінках', 'equity')
+        cls.acc_42 = acc('42', 'Додатковий капітал', 'equity')
+        cls.acc_54 = acc('54', "Відстрочені податкові зобов'язання", 'liability_non_current')
+        cls.acc_55 = acc('55', "Інші довгострокові зобов'язання", 'liability_non_current')
+        cls.acc_501 = acc('501', 'Довгострокові кредити банків', 'liability_non_current')
+        cls.acc_505 = acc('505', 'Інші довгострокові позики', 'liability_non_current')
+        cls.acc_12 = acc('12', 'Нематеріальні активи', 'asset_non_current')
+        cls.acc_133 = acc('133', 'Накопичена амортизація НМА', 'asset_non_current')
+        cls.acc_141 = acc('141', 'Інвестиції за методом участі в капіталі', 'asset_non_current')
+        cls.acc_143 = acc('143', "Інвестиції непов'язаним сторонам", 'asset_non_current')
+        cls.acc_183 = acc('183', 'Інша дебіторська заборгованість', 'asset_non_current')
+        cls.acc_184 = acc('184', 'Інші необоротні активи', 'asset_non_current')
+        cls.acc_211 = acc('211', 'Поточні біологічні активи рослинництва', 'asset_current')
+        cls.acc_286 = acc('286', 'Необоротні активи, утримувані для продажу', 'asset_current')
+        cls.acc_621 = acc('621', 'Короткострокові векселі видані', 'liability_current')
+        cls.acc_680 = acc('680', 'Розрахунки, пов’язані з необоротними активами для продажу',
+                          'liability_current')
+        cls.acc_6413 = acc('6413', 'Розрахунки за податком на прибуток', 'liability_current')
+        cls.acc_981 = acc('981', 'Податок на прибуток від звичайної діяльності', 'expense')
         Partner = cls.env['res.partner']
         cls.supplier_a = Partner.create({'name': 'Постачальник А'})
         cls.supplier_b = Partner.create({'name': 'Постачальник Б'})
@@ -164,3 +202,111 @@ class TestBalanceForm(AccountingTestCase):
         lines_1635 = drill('1635')
         self.assertIn(advance_line, lines_1635)
         self.assertNotIn(sale_line, lines_1635)
+
+    # ── Рядки форми за Додатком 1 до НП(С)БО 1 (ред. від 23.12.2025), #422 ──
+
+    def _line(self, report, code):
+        return report.line_ids.filtered(lambda l: l.code == code)
+
+    def _assert_balanced(self, report):
+        self.assertAlmostEqual(self._row(report, '1300'), self._row(report, '1900'), places=2)
+
+    def test_rows_of_official_form(self):
+        report = self._report(date(2044, 3, 31))
+        codes = [c for c in report.line_ids.sorted('sequence').mapped('code')
+                 if c and c not in BALANCE_ADDITIONAL_CODES]
+        self.assertEqual(codes, self.OFFICIAL_CODES)
+        for code in self.SUB_CODES:
+            self.assertEqual(self._line(report, code).line_type, 'sub', code)
+        for code in ('1030', '1035', '1090', '1110', '1405', '1500', '1520'):
+            self.assertEqual(self._line(report, code).line_type, 'detail', code)
+
+    def test_additional_article_shown_with_amount(self):
+        """1605 «Векселі видані» (додаток 3) is in the total and printed only
+        when it holds an amount."""
+        d = date(2045, 3, 15)
+        self._entry(d, (self.acc_281, None, 400, 0), (self.acc_621, None, 0, 400))
+        report = self._report(date(2045, 3, 31))
+        self.assertAlmostEqual(self._row(report, '1605'), 400.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1695'), 400.0, places=2)
+        self.assertNotIn('1120', report.line_ids.mapped('code'))
+        self._assert_balanced(report)
+
+    def test_revaluation_and_deferred_tax(self):
+        d = date(2046, 3, 15)
+        self._entry(d, (self.acc_301, None, 5000, 0), (self.acc_40, None, 0, 4000),
+                    (self.acc_42, None, 0, 1000))
+        # Revaluation of a fixed asset and the deferred tax on it
+        self._entry(d, (self.acc_104, None, 1000, 0), (self.acc_41, None, 0, 1000))
+        self._entry(d, (self.acc_41, None, 180, 0), (self.acc_54, None, 0, 180))
+        report = self._report(date(2046, 3, 31))
+        self.assertAlmostEqual(self._row(report, '1405'), 820.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1410'), 1000.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1500'), 180.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1515'), 0.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1495'), 5820.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1595'), 180.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1300'), 6000.0, places=2)
+        self._assert_balanced(report)
+
+    def test_components_not_double_counted(self):
+        d = date(2047, 3, 15)
+        self._entry(d, (self.acc_12, None, 1000, 0), (self.acc_104, None, 2000, 0),
+                    (self.acc_301, None, 50, 0), (self.acc_40, None, 0, 3050))
+        self._entry(d, (self.acc_92, None, 800, 0), (self.acc_133, None, 0, 300),
+                    (self.acc_131, None, 0, 500))
+        # Income tax overpaid
+        self._entry(d, (self.acc_6413, None, 50, 0), (self.acc_301, None, 0, 50))
+        report = self._report(date(2047, 3, 31))
+        self.assertAlmostEqual(self._row(report, '1001'), 1000.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1002'), -300.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1000'), 700.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1011'), 2000.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1012'), -500.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1010'), 1500.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1095'), 2200.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1135'), 50.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1136'), 50.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1621'), 0.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1195'), 50.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1300'), 2250.0, places=2)
+        self._assert_balanced(report)
+        # Drill-down of a component shows only its own accounts
+        action = self._line(report, '1012').action_view_move_lines()
+        accounts = self.env['account.move.line'].search(action['domain']).account_id
+        self.assertIn(self.acc_131, accounts)
+        self.assertNotIn(self.acc_104, accounts)
+        self.assertNotIn(self.acc_133, accounts)
+
+    def test_profit_tax_payable_including_row(self):
+        d = date(2048, 3, 15)
+        self._entry(d, (self.acc_301, None, 1000, 0), (self.acc_40, None, 0, 1000))
+        self._entry(d, (self.acc_981, None, 80, 0), (self.acc_6413, None, 0, 80))
+        self._entry(d, (self.acc_92, None, 20, 0), (self.acc_641, None, 0, 20))
+        report = self._report(date(2048, 3, 31))
+        self.assertAlmostEqual(self._row(report, '1620'), 100.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1621'), 80.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1136'), 0.0, places=2)
+        self.assertAlmostEqual(self._row(report, '1695'), 100.0, places=2)
+        self._assert_balanced(report)
+
+    def test_accounts_of_new_rows(self):
+        d = date(2049, 3, 15)
+        self._entry(d, (self.acc_141, None, 100, 0), (self.acc_143, None, 200, 0),
+                    (self.acc_183, None, 300, 0), (self.acc_184, None, 400, 0),
+                    (self.acc_211, None, 500, 0), (self.acc_281, None, 600, 0),
+                    (self.acc_286, None, 700, 0),
+                    (self.acc_40, None, 0, 1800), (self.acc_501, None, 0, 300),
+                    (self.acc_505, None, 0, 200), (self.acc_55, None, 0, 100),
+                    (self.acc_680, None, 0, 400))
+        report = self._report(date(2049, 3, 31))
+        expected = {
+            '1030': 100, '1035': 200, '1040': 300, '1090': 400, '1095': 1000,
+            '1110': 500, '1100': 600, '1195': 1100, '1200': 700, '1300': 2800,
+            '1510': 300, '1515': 300, '1595': 600, '1700': 400, '1695': 0,
+            '1900': 2800,
+        }
+        for code, amount in expected.items():
+            self.assertAlmostEqual(self._row(report, code), amount, places=2, msg=code)
+        for code in ('141', '143', '183', '184', '211', '286', '505', '680'):
+            self.assertNotIn(code, report.unmapped_accounts or '')

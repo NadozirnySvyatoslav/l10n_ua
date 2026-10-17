@@ -85,6 +85,13 @@
                                         <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
                                         <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
                                     </tr>
+                                    <!-- Row «у тому числі»: not in the totals -->
+                                    <tr t-if="line.line_type == 'sub'">
+                                        <td style="padding-left: 2em;" t-esc="line.name"/>
+                                        <td class="text-center" t-esc="line.code"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
+                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
+                                    </tr>
                                     <!-- Subtotal -->
                                     <tr t-if="line.line_type == 'subtotal'">
                                         <td class="bold" t-esc="line.name"/>

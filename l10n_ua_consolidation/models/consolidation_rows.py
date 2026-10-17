@@ -10,8 +10,11 @@ from ``BALANCE_LINES`` (Form 1) and ``PNL_LINES`` (Form 2) of
 * 2-к: 2470/2475 «Чистий прибуток, що належить власникам материнської
   компанії / неконтрольованій частці».
 
-Form 1 itself carries 1030 (рах. 14), 1425/1430 (46/45), the contra accounts
-131–135 and 38, and classes 7–9 in 1420 (#386).
+Form 1 itself carries 1030/1035 (рах. 141 / інші 14), 1425/1430 (46/45), the
+contra accounts 131–135 and 38, classes 7–9 in 1420 (#386), and the
+single-row sections 1200 and 1700 (#422). Its rows «у тому числі»
+(``BALANCE_SUB_LINES``: 1001/1002, 1011/1012, 1136, 1621) are not carried
+into 1-к.
 
 Balance amounts are signed (assets = debit balance, equity and liabilities =
 credit balance) and every account is assigned to exactly one row (the
@@ -25,11 +28,10 @@ P&L amounts use exactly the Form 2 rule (credit turnover for income rows,
 debit turnover for expense rows).
 """
 
-from odoo.addons.l10n_ua_accounting.models.l10n_ua_balance_report import BALANCE_LINES
+from odoo.addons.l10n_ua_accounting.models.l10n_ua_balance_report import (
+    ASSET_SECTIONS, BALANCE_LINES, LIABILITY_SECTIONS,
+)
 from odoo.addons.l10n_ua_accounting.models.l10n_ua_pnl_report import PNL_LINES
-
-ASSET_SECTIONS = ('asset_noncurrent', 'asset_current')
-LIABILITY_SECTIONS = ('equity', 'liability_longterm', 'liability_current')
 
 # Rows of form 1-к that Form 1 of l10n_ua_accounting does not have.
 # (sequence, key, name, code, section, prefixes)

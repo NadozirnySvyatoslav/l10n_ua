@@ -1941,6 +1941,16 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
 
 #. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__line_type__sub
+msgid "Including (not in totals)"
+msgstr "У тому числі (не входить до підсумку)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__section__liability_held_for_sale
+msgid "Liabilities of Disposal Groups Held for Sale"
+msgstr "Зобов'язання, пов'язані з необоротними активами, утримуваними для продажу, та групами вибуття"
+
+#. module: l10n_ua_accounting
 #: model:ir.actions.act_window,name:l10n_ua_accounting.action_account_payment_pko
 #: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_cash_pko
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_account_payment_pko_list
@@ -2384,6 +2394,11 @@ msgstr "Немає платіжних доручень для створення
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__section__asset_noncurrent
 msgid "Non-current Assets"
 msgstr "Необоротні активи"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_balance_report_line__section__asset_held_for_sale
+msgid "Non-current Assets Held for Sale"
+msgstr "Необоротні активи, утримувані для продажу, та групи вибуття"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__note
