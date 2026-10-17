@@ -49,6 +49,7 @@
                             <field name="line_ids" readonly="1">
                                 <list decoration-bf="line_type in ('subtotal', 'total')"
                                       decoration-info="line_type == 'section'"
+                                      decoration-it="line_type == 'sub'"
                                       editable="bottom" no_open="1">
                                     <field name="sequence" column_invisible="1"/>
                                     <field name="name"/>
