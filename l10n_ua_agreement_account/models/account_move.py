@@ -4,27 +4,27 @@ from odoo import fields, models
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    agreement_id = fields.Many2one(
-        'agreement',
-        string='Договір',
+    l10n_ua_agreement_id = fields.Many2one(
+        'l10n_ua.agreement',
+        string='Agreement',
         ondelete='restrict',
         tracking=True,
         index=True,
         copy=False,
-        help='Договір, у розрізі якого ведуться взаєморозрахунки за цим '
-             'документом. Успадковується із замовлення на продаж.',
+        help='The agreement this document is settled under. Taken over from '
+             'the sales order.',
     )
 
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    agreement_id = fields.Many2one(
-        'agreement',
-        string='Договір',
-        related='move_id.agreement_id',
+    l10n_ua_agreement_id = fields.Many2one(
+        'l10n_ua.agreement',
+        string='Agreement',
+        related='move_id.l10n_ua_agreement_id',
         store=True,
         index=True,
-        help='Договір проводки (з документа) — для ОСВ 361/631 та '
-             'взаєморозрахунків у розрізі договорів.',
+        help='The agreement of the journal entry, for the 361/631 trial balance '
+             'and settlements by agreement.',
     )

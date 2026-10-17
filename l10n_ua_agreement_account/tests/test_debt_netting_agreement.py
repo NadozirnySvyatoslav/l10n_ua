@@ -14,10 +14,10 @@ class TestDebtNettingAgreement(AccountTestInvoicingCommon):
     def setUpClass(cls):
         super().setUpClass()
         cls.partner = cls.partner_a
-        cls.agreement = cls.env['agreement'].sudo().create({
+        cls.agreement = cls.env['l10n_ua.agreement'].sudo().create({
             'code': 'AGR-N1', 'name': 'Договір №1',
             'partner_id': cls.partner.id, 'company_id': cls.env.company.id})
-        cls.other_agreement = cls.env['agreement'].sudo().create({
+        cls.other_agreement = cls.env['l10n_ua.agreement'].sudo().create({
             'code': 'AGR-N2', 'name': 'Договір №2',
             'partner_id': cls.partner.id, 'company_id': cls.env.company.id})
 
@@ -26,7 +26,7 @@ class TestDebtNettingAgreement(AccountTestInvoicingCommon):
             'move_type': move_type,
             'partner_id': self.partner.id,
             'invoice_date': '2025-03-01',
-            'agreement_id': agreement.id,
+            'l10n_ua_agreement_id': agreement.id,
             'invoice_line_ids': [Command.create({
                 'name': 'послуга', 'quantity': 1, 'price_unit': amount,
                 'tax_ids': []})],
@@ -39,7 +39,7 @@ class TestDebtNettingAgreement(AccountTestInvoicingCommon):
             'partner_id': self.partner.id,
             'journal_id': self.company_data['default_journal_misc'].id,
             'date': '2025-03-31',
-            'agreement_id': agreement.id if agreement else False,
+            'l10n_ua_agreement_id': agreement.id if agreement else False,
         })
         netting.action_fill_lines()
         return netting
@@ -50,10 +50,10 @@ class TestDebtNettingAgreement(AccountTestInvoicingCommon):
         self._doc('in_invoice', 700.0, self.other_agreement)
         netting = self._netting(self.agreement)
         self.assertEqual(netting.line_ids.move_id, inv | bill)
-        self.assertEqual(netting.line_ids.agreement_id, self.agreement)
+        self.assertEqual(netting.line_ids.l10n_ua_agreement_id, self.agreement)
         netting.action_post()
-        self.assertEqual(netting.move_id.agreement_id, self.agreement)
-        self.assertEqual(netting.move_id.line_ids.agreement_id, self.agreement)
+        self.assertEqual(netting.move_id.l10n_ua_agreement_id, self.agreement)
+        self.assertEqual(netting.move_id.line_ids.l10n_ua_agreement_id, self.agreement)
 
     def test_foreign_agreement_line_rejected(self):
         self._doc('out_invoice', 1000.0, self.agreement)
@@ -69,14 +69,14 @@ class TestDebtNettingAgreement(AccountTestInvoicingCommon):
         self._doc('in_invoice', 400.0, self.agreement)
         netting = self._netting()
         netting.action_post()
-        self.assertEqual(netting.move_id.agreement_id, self.agreement)
+        self.assertEqual(netting.move_id.l10n_ua_agreement_id, self.agreement)
 
     def test_mixed_agreements_left_empty(self):
         self._doc('out_invoice', 1000.0, self.agreement)
         self._doc('in_invoice', 400.0, self.other_agreement)
         netting = self._netting()
         netting.action_post()
-        self.assertFalse(netting.move_id.agreement_id)
+        self.assertFalse(netting.move_id.l10n_ua_agreement_id)
         html, _fmt = self.env['ir.actions.report']._render_qweb_html(
             'l10n_ua_accounting.action_report_debt_netting', netting.ids)
         self.assertIn('Договір №1', html.decode())

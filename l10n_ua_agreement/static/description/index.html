@@ -1,8 +1,8 @@
 <section style="font-family: 'Segoe UI', Roboto, sans-serif; color: #2c3e50;">
     <div style="background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%); color: #fff; padding: 48px 32px; text-align: center; border-radius: 8px;">
-        <h1 style="margin: 0; font-size: 34px;">Договори з клієнтами</h1>
+        <h1 style="margin: 0; font-size: 34px;">Договори з покупцями та постачальниками</h1>
         <p style="font-size: 18px; opacity: .9; margin-top: 12px;">
-            Шаблони · електронний підпис · додаткові угоди · акти · періодичні рахунки
+            Нумерація · підпис КЕП · додаткові угоди · акти · взаєморозрахунки
         </p>
         <p style="opacity: .8; margin-top: 8px;">Українська локалізація Odoo 19 · 1c-to-odoo.many2one.online</p>
     </div>
@@ -10,22 +10,24 @@
     <div style="padding: 32px 0;">
         <h2 style="color: #1a5276;">Що робить модуль</h2>
         <p style="font-size: 16px; line-height: 1.6;">
-            Повний життєвий цикл договору з клієнтом — від генерації з шаблону до
-            підписання та виставлення рахунків. Призначено для ФОП і підприємств,
-            що надають послуги за договором.
+            Повний життєвий цикл договору — від чернетки за типом договору до
+            підписання КЕП, продажів і рахунків. Без залежностей від OCA: лише
+            модулі Odoo та українська локалізація.
         </p>
     </div>
 
     <div style="display: flex; flex-wrap: wrap; gap: 16px; padding-bottom: 24px;">
         <div style="flex: 1 1 280px; background: #f4f8fb; border-left: 4px solid #2980b9; padding: 20px; border-radius: 6px;">
-            <h3 style="margin-top: 0; color: #1a5276;">📄 Договір з шаблону</h3>
-            <p>Об'єкт «Договір» зі станами (Чернетка → На підписанні → Підписаний)
-               та друкованою формою для конкретного замовника.</p>
+            <h3 style="margin-top: 0; color: #1a5276;">📄 Договір</h3>
+            <p>Номер із послідовності, сторона (покупець / постачальник), сума,
+               строк дії, відповідальний. Стани: Чернетка → На підписанні →
+               Підписаний → Завершений (автоматично після дати завершення).</p>
         </div>
         <div style="flex: 1 1 280px; background: #f4f8fb; border-left: 4px solid #2980b9; padding: 20px; border-radius: 6px;">
-            <h3 style="margin-top: 0; color: #1a5276;">✍️ Електронний підпис</h3>
-            <p>Інтеграція з <b>sign_oca</b>: надсилання на підпис, авто-перехід у
-               «Підписаний» і збереження підписаного PDF.</p>
+            <h3 style="margin-top: 0; color: #1a5276;">✍️ Підпис КЕП</h3>
+            <p>Кваліфікований електронний підпис у браузері (<b>l10n_ua_sign</b>):
+               ключ не залишає комп'ютера, підписаний <code>.p7s</code> зберігається
+               в договорі. Документ, підписаний обома сторонами, — окремим файлом.</p>
         </div>
         <div style="flex: 1 1 280px; background: #f4f8fb; border-left: 4px solid #2980b9; padding: 20px; border-radius: 6px;">
             <h3 style="margin-top: 0; color: #1a5276;">📑 Додаткові угоди</h3>
@@ -37,20 +39,24 @@
         </div>
         <div style="flex: 1 1 280px; background: #f4f8fb; border-left: 4px solid #2980b9; padding: 20px; border-radius: 6px;">
             <h3 style="margin-top: 0; color: #1a5276;">💳 Рахунки та продажі</h3>
-            <p>Разові рахунки через продажі (agreement_sale) та періодичні
-               (абонентські) рахунки через contract.</p>
+            <p>Договір у замовленні на продаж, рахунках і платежах, акт звірки та
+               взаємозалік у розрізі договорів (<b>l10n_ua_agreement_account</b>).
+               Періодичні рахунки — міст до OCA <code>contract</code>
+               (<b>l10n_ua_agreement_contract</b>), за бажанням.</p>
         </div>
         <div style="flex: 1 1 280px; background: #f4f8fb; border-left: 4px solid #2980b9; padding: 20px; border-radius: 6px;">
             <h3 style="margin-top: 0; color: #1a5276;">📊 Типи та аналітика</h3>
-            <p>Типи договорів і аналіз (pivot/graph) сум за типом і станом.</p>
+            <p>Типи договорів із шаблоном предмета договору; аналіз (pivot/graph)
+               сум за типом і станом.</p>
         </div>
     </div>
 
     <div style="background: #eef6ec; border: 1px solid #cce5c8; padding: 20px; border-radius: 6px;">
-        <h3 style="margin-top: 0; color: #1e7e34;">Залежності (OCA, гілка 19.0)</h3>
+        <h3 style="margin-top: 0; color: #1e7e34;">Залежності</h3>
         <p style="margin: 0;">
-            <code>agreement</code>, <code>agreement_sale</code>,
-            <code>sign_oca</code>, <code>contract</code> — мають бути в addons_path.
+            <code>sale</code> і <code>l10n_ua_sign</code>. Бази з попередньою
+            версією на OCA <code>agreement</code> переносяться автоматично під час
+            оновлення.
         </p>
     </div>
 

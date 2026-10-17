@@ -9,7 +9,7 @@
                ref="l10n_ua_accounting.view_reconciliation_act_wizard_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="agreement_id" options="{'no_create': True}"/>
+                <field name="l10n_ua_agreement_id" options="{'no_create': True}"/>
             </xpath>
         </field>
     </record>
