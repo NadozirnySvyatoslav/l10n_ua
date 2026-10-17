@@ -1532,6 +1532,12 @@ msgid "PSP Amounts (Computed)"
 msgstr "Суми ПСП (розраховані)"
 
 #. module: l10n_ua_hr_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_employee__psp_application
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_version__psp_application
+msgid "PSP Application"
+msgstr "Заява про застосування ПСП"
+
+#. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip__psp_eligible
 msgid "PSP Eligible"
 msgstr "Право на ПСП"
@@ -3584,3 +3590,18 @@ msgstr ""
 "розрахункового листа: допомога по тимчасовій непрацездатності, нарахована в "
 "місяці підтвердження листка, може стосуватися днів попереднього місяця. "
 "Порожнє поле означає місяць розрахункового листа."
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_employee__psp_application
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_version__psp_application
+msgid ""
+"The employee has filed the application for the tax social benefit (ПКУ п. "
+"169.2.2) for this employment. The benefit applies at one place of income "
+"only: by default the primary job has it and a secondary job does not. Civil-"
+"law, gig and author contracts never get the benefit."
+msgstr ""
+"Працівник подав заяву про застосування податкової соціальної пільги (ПКУ п. "
+"169.2.2) за цим місцем роботи. Пільга застосовується лише за одним місцем "
+"нарахування доходу: типово — за основним місцем роботи, а на сумісництві — "
+"ні. За цивільно-правовими, гіг- та авторськими договорами пільга не "
+"застосовується ніколи."

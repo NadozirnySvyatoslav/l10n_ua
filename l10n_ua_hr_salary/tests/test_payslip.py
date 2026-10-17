@@ -243,6 +243,65 @@ class TestPayslipPSPIntegration(TestPayslip):
 
 
 @tagged('post_install', '-at_install')
+class TestPayslipPSPPlaceOfApplication(TestPayslip):
+    """#322 — ПСП лише за одним місцем роботи, за заявою (ПК п. 169.2.1-169.2.2).
+
+    Дохід 3000 грн — нижче граничного (4240 грн у 2025), тож на основному
+    місці ПСП стандартна 1514 грн; різниця між випадками лише у версії.
+    """
+
+    def _assert_no_psp(self, payslip, gross=3000):
+        self.assertEqual(payslip.psp_type, 'none')
+        self.assertEqual(payslip.psp_amount, 0)
+        self.assertEqual(payslip.pdfo_base, gross)
+
+    def test_primary_job_keeps_psp(self):
+        self.assertTrue(self.version.psp_application)
+        payslip = self._create_payslip_with_accrual(3000)
+        self.assertEqual(payslip.psp_type, 'standard')
+        self.assertEqual(payslip.psp_amount, 1514)
+
+    def test_external_secondary_job_has_no_psp(self):
+        self.version.employment_type_ua = 'external'
+        self.assertFalse(self.version.psp_application)
+        self._assert_no_psp(self._create_payslip_with_accrual(3000))
+
+    def test_internal_secondary_job_has_no_psp(self):
+        self.version.employment_type_ua = 'internal'
+        self._assert_no_psp(self._create_payslip_with_accrual(3000))
+
+    def test_secondary_job_disabled_employee_has_no_psp(self):
+        """Підвищена пільга теж лише за місцем заяви."""
+        self.employee.disability_group = '1'
+        self.version.employment_type_ua = 'external'
+        self._assert_no_psp(self._create_payslip_with_accrual(3000))
+
+    def test_application_filed_at_secondary_job(self):
+        """Заяву подано за сумісництвом — пільга застосовується тут."""
+        self.version.employment_type_ua = 'external'
+        self.version.psp_application = True
+        payslip = self._create_payslip_with_accrual(3000)
+        self.assertEqual(payslip.psp_type, 'standard')
+        self.assertEqual(payslip.psp_amount, 1514)
+
+    def test_application_withdrawn_at_primary_job(self):
+        """Заяву подано іншому роботодавцю — на основному місці пільги немає."""
+        self.version.psp_application = False
+        self._assert_no_psp(self._create_payslip_with_accrual(3000))
+
+    def test_civil_contract_never_has_psp(self):
+        """ЦПХ — не заробітна плата (ПК п. 169.1.1), навіть з позначкою заяви."""
+        for contract_type in ('civil', 'gig', 'author'):
+            with self.subTest(contract_type=contract_type):
+                self.version.contract_type_ua = contract_type
+                self.assertFalse(self.version.psp_application)
+                self.version.psp_application = True
+                payslip = self._create_payslip_with_accrual(3000)
+                self.assertEqual(payslip.psp_type, 'none')
+                self.assertEqual(payslip.psp_amount, 0)
+
+
+@tagged('post_install', '-at_install')
 class TestPayslipMultiCompany(SalaryTestCase):
     """Multi-company isolation для hr.payslip."""
 

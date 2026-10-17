@@ -14,6 +14,8 @@
                 <field name="salary_currency_id"/>
                 <field name="seniority_enabled"/>
                 <field name="seniority_scale_id" invisible="not seniority_enabled"/>
+                <field name="psp_application"
+                       invisible="contract_type_ua in ('civil', 'gig', 'author')"/>
             </xpath>
             <!-- The salary form decides how the version is paid; the tariff
                  grade only gives the rate of the hourly form, so it stands

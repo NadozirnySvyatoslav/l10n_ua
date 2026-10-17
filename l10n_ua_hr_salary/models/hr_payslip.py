@@ -318,7 +318,9 @@ class HrPayslip(models.Model):
                  'employee_id.veteran_status',
                  'employee_id.is_single_parent',
                  'employee_id.dependents_count',
-                 'employee_id.benefit_ids')
+                 'employee_id.benefit_ids',
+                 'version_id.psp_application',
+                 'version_id.contract_type_ua')
     def _compute_psp_type(self):
         """Determine PSP type per ПК ст. 169.
 
@@ -339,11 +341,26 @@ class HrPayslip(models.Model):
 
         Final PSP type is the maximum of all applicable rules + any benefit's
         own psp_type setting.
+
+        None at all, before any of these (#322):
+        - the version is not the place the employee applied for the benefit
+          (ПК п. 169.2.1-169.2.2: one place of income, by the application;
+          a secondary job has no application by default);
+        - the contract is civil-law, gig or author's: its pay is not a salary
+          (ПК п. 169.1.1).
         """
+        from .hr_version import PSP_NON_SALARY_CONTRACT_TYPES
         psp_priority = {'none': 0, 'standard': 1, '150': 2, '200': 3}
         for payslip in self:
             employee = payslip.employee_id
             if not employee:
+                payslip.psp_type = 'none'
+                continue
+
+            version = payslip.version_id or employee.current_version_id
+            if version and (
+                    version.contract_type_ua in PSP_NON_SALARY_CONTRACT_TYPES
+                    or not version.psp_application):
                 payslip.psp_type = 'none'
                 continue
 
