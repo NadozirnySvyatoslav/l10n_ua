@@ -16,12 +16,15 @@
             </xpath>
             <xpath expr="//group[@name='account_group']" position="after">
                 <group string="PrivatBank API (Autoclient)" invisible="provider != 'privat'">
-                    <field name="privat_api_token" password="True"/>
+                    <field name="privat_api_token" password="True"
+                           groups="l10n_ua_account_base.group_ua_manager"/>
                     <field name="privat_account_iban" placeholder="UA000000000000000000000000000"/>
+                    <field name="privat_group_client_id"/>
                 </group>
                 <group string="PrivatBank Legacy (Merchant)" invisible="provider != 'privat'">
                     <field name="privat_merchant_id"/>
-                    <field name="privat_merchant_password" password="True"/>
+                    <field name="privat_merchant_password" password="True"
+                           groups="l10n_ua_account_base.group_ua_manager"/>
                     <field name="privat_card_number" placeholder="0000000000000000"/>
                 </group>
             </xpath>

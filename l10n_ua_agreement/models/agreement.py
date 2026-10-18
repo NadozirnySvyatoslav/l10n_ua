@@ -1,143 +1,175 @@
 import base64
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+from odoo.tools import format_date
+
+from .agreement_type import DIRECTIONS
 
 
-class Agreement(models.Model):
-    _inherit = 'agreement'
+class L10nUaAgreement(models.Model):
+    _name = 'l10n_ua.agreement'
+    _description = 'Agreement'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'l10n_ua.sign.mixin']
+    _order = 'start_date desc, id desc'
+    _rec_names_search = ['code', 'name']
 
-    # --- Українізація міток базових полів OCA-модуля agreement ---
-    code = fields.Char(string='Номер договору')
-    name = fields.Char(string='Назва договору')
-    partner_id = fields.Many2one(string='Клієнт')
-    agreement_type_id = fields.Many2one(string='Тип договору')
-    is_template = fields.Boolean(string='Шаблон')
-    signature_date = fields.Date(string='Дата підпису')
-    start_date = fields.Date(string='Дата початку')
-    end_date = fields.Date(string='Дата завершення')
-    domain = fields.Selection(
-        selection=[('sale', 'Продаж'), ('purchase', 'Закупівля')],
-        string='Сфера',
+    _code_uniq = models.Constraint(
+        'UNIQUE(code, commercial_partner_id, company_id)',
+        'This agreement number already exists for this partner.',
     )
 
+    code = fields.Char(
+        string='Number', required=True, copy=False, tracking=True, index='trigram',
+        default='/',
+        help='Taken from the agreement sequence when left as "/".',
+    )
+    name = fields.Char(string='Title', required=True, tracking=True)
+    direction = fields.Selection(
+        DIRECTIONS, required=True, tracking=True,
+        compute='_compute_direction', store=True, readonly=False, precompute=True,
+    )
+    agreement_type_id = fields.Many2one(
+        'l10n_ua.agreement.type', string='Type', tracking=True,
+        domain="[('direction', '=', direction)]",
+    )
+    partner_id = fields.Many2one(
+        'res.partner', string='Partner', required=True, tracking=True,
+        ondelete='restrict', index=True,
+    )
+    commercial_partner_id = fields.Many2one(
+        'res.partner', compute='_compute_commercial_partner_id',
+        store=True, precompute=True, index=True,
+    )
+    company_id = fields.Many2one(
+        'res.company', required=True, index=True,
+        default=lambda self: self.env.company,
+    )
+    user_id = fields.Many2one(
+        'res.users', string='Responsible', tracking=True,
+        default=lambda self: self.env.user,
+    )
     state = fields.Selection(
-        selection=[
-            ('draft', 'Чернетка'),
-            ('to_sign', 'На підписанні'),
-            ('signed', 'Підписаний'),
-            ('expired', 'Завершений'),
-            ('cancelled', 'Скасований'),
+        [
+            ('draft', 'Draft'),
+            ('to_sign', 'To Sign'),
+            ('signed', 'Signed'),
+            ('expired', 'Expired'),
+            ('cancelled', 'Cancelled'),
         ],
-        string='Стан',
-        default='draft',
-        required=True,
-        tracking=True,
-        copy=False,
+        string='Status', required=True, default='draft', tracking=True, copy=False,
     )
-    parent_agreement_id = fields.Many2one(
-        'agreement',
-        string='Основний договір',
-        ondelete='cascade',
-        copy=False,
-        help='Заповнюється для додаткових угод — посилання на основний договір.',
+    active = fields.Boolean(default=True)
+    start_date = fields.Date(
+        string='Start Date', tracking=True, default=fields.Date.context_today)
+    end_date = fields.Date(
+        string='End Date', tracking=True,
+        help='Leave empty for an agreement valid until the obligations are fulfilled.',
     )
-    child_agreement_ids = fields.One2many(
-        'agreement',
-        'parent_agreement_id',
-        string='Додаткові угоди',
+    signature_date = fields.Date(string='Signature Date', tracking=True, copy=False)
+    parent_id = fields.Many2one(
+        'l10n_ua.agreement', string='Main Agreement', index=True,
+        ondelete='cascade', copy=False,
+        help='Set on amendments: the agreement they amend.',
     )
-    child_agreement_count = fields.Integer(
-        compute='_compute_child_agreement_count',
-    )
-    is_amendment = fields.Boolean(
-        string='Додаткова угода',
-        compute='_compute_is_amendment',
-        store=True,
-    )
+    amendment_ids = fields.One2many('l10n_ua.agreement', 'parent_id', string='Amendments')
+    amendment_count = fields.Integer(compute='_compute_amendment_count')
+    is_amendment = fields.Boolean(compute='_compute_is_amendment', store=True)
     subject = fields.Html(
-        string='Предмет договору',
-    )
+        compute='_compute_subject', store=True, readonly=False, precompute=True)
     currency_id = fields.Many2one(
-        'res.currency',
-        string='Валюта',
+        'res.currency', required=True,
         default=lambda self: self.env.company.currency_id,
     )
-    amount_total = fields.Monetary(
-        string='Сума договору',
-        currency_field='currency_id',
-    )
+    amount_total = fields.Monetary(string='Amount', tracking=True)
+    note = fields.Html(string='Internal Note')
+
+    # КЕП: підпис нашої сторони (CAdES із вбудованим PDF) і підписаний
+    # контрагентом документ (скан або його .p7s).
+    kep_signature = fields.Binary(string='Our КЕП Signature', attachment=True, copy=False)
+    kep_signature_filename = fields.Char(copy=False)
+    kep_signed_by_id = fields.Many2one('res.users', string='Signed by', copy=False, readonly=True)
+    kep_signed_on = fields.Datetime(string='Signed on', copy=False, readonly=True)
     signed_document = fields.Binary(
-        string='Підписаний документ',
-        copy=False,
-        attachment=True,
+        string='Signed Document', attachment=True, copy=False,
+        help='The agreement signed by both parties: a scan or a signed file.',
     )
-    signed_filename = fields.Char(
-        string="Ім'я файлу",
-        copy=False,
-    )
-    sign_request_count = fields.Integer(
-        compute='_compute_sign_request_count',
-        string='Запити на підпис',
-    )
-    contract_ids = fields.One2many(
-        'contract.contract',
-        'agreement_id',
-        string='Періодичні договори',
-    )
-    contract_count = fields.Integer(
-        compute='_compute_contract_count',
-    )
+    signed_filename = fields.Char(copy=False)
 
-    # ------------------------------------------------------------------
-    # Меню
-    # ------------------------------------------------------------------
-    @api.model
-    def _l10n_ua_deactivate_legacy_type_menus(self):
-        """Приховати меню «Типи договорів» зі старих знімків OCA/agreement.
+    sale_order_ids = fields.One2many('sale.order', 'l10n_ua_agreement_id', string='Sales Orders')
+    sale_order_count = fields.Integer(compute='_compute_sale_order_count')
 
-        XML-id цього меню в OCA/agreement@19.0 змінювався між знімками
-        (``agreement_type_menu_main`` / ``agreement_type_menu`` → ``agreement_type``),
-        а в поточному його немає взагалі. Ми оголошуємо власний menuitem під
-        «Налаштуваннями», тож будь-яке успадковане меню OCA дало б дубль у
-        оновленій БД. Відсутність id — нормальний випадок (чиста інсталяція),
-        тому резолвимо толерантно.
-        """
-        for xmlid in (
-            'agreement.agreement_type_menu_main',
-            'agreement.agreement_type_menu',
-            'agreement.agreement_type',
-        ):
-            menu = self.env.ref(xmlid, raise_if_not_found=False)
-            if menu and menu._name == 'ir.ui.menu':
-                menu.active = False
+    @api.depends('agreement_type_id')
+    def _compute_direction(self):
+        for rec in self:
+            if rec.agreement_type_id:
+                rec.direction = rec.agreement_type_id.direction
+            elif not rec.direction:
+                rec.direction = rec.parent_id.direction or 'sale'
 
-    @api.depends('parent_agreement_id')
+    @api.depends('partner_id')
+    def _compute_commercial_partner_id(self):
+        for rec in self:
+            rec.commercial_partner_id = rec.partner_id.commercial_partner_id
+
+    @api.depends('agreement_type_id')
+    def _compute_subject(self):
+        for rec in self:
+            if rec.agreement_type_id.subject_template and not rec.subject:
+                rec.subject = rec.agreement_type_id.subject_template
+
+    @api.depends('parent_id')
     def _compute_is_amendment(self):
         for rec in self:
-            rec.is_amendment = bool(rec.parent_agreement_id)
+            rec.is_amendment = bool(rec.parent_id)
 
-    @api.depends('child_agreement_ids')
-    def _compute_child_agreement_count(self):
+    @api.depends('amendment_ids')
+    def _compute_amendment_count(self):
         for rec in self:
-            rec.child_agreement_count = len(rec.child_agreement_ids)
+            rec.amendment_count = len(rec.amendment_ids)
 
-    @api.depends('contract_ids')
-    def _compute_contract_count(self):
+    @api.depends('sale_order_ids')
+    def _compute_sale_order_count(self):
         for rec in self:
-            rec.contract_count = len(rec.contract_ids)
+            rec.sale_order_count = len(rec.sale_order_ids)
 
-    def _compute_sign_request_count(self):
-        SignRequest = self.env['sign.oca.request']
+    @api.depends('code', 'name', 'start_date')
+    def _compute_display_name(self):
         for rec in self:
-            rec.sign_request_count = SignRequest.search_count(
-                [('record_ref', '=', '%s,%s' % (rec._name, rec.id))]
-            ) if rec.id else 0
+            label = _('No. %s', rec.code) if rec.code else ''
+            if rec.start_date:
+                label = _('%(number)s of %(date)s', number=label,
+                          date=format_date(self.env, rec.start_date))
+            rec.display_name = f'{label} {rec.name or ""}'.strip()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('code', '/') in ('/', False, ''):
+                company = self.env['res.company'].browse(
+                    vals.get('company_id')) or self.env.company
+                vals['code'] = self.env['ir.sequence'].with_company(company).next_by_code(
+                    'l10n_ua.agreement', sequence_date=vals.get('start_date')) or '/'
+        return super().create(vals_list)
+
+    def copy_data(self, default=None):
+        vals_list = super().copy_data(default)
+        for rec, vals in zip(self, vals_list):
+            vals.setdefault('name', _('%s (copy)', rec.name))
+        return vals_list
 
     # ------------------------------------------------------------------
-    # Дії стану
+    # Стани
     # ------------------------------------------------------------------
-    def action_confirm(self):
+    def action_to_sign(self):
         self.write({'state': 'to_sign'})
+
+    def action_mark_signed(self):
+        for rec in self:
+            rec.write({
+                'state': 'signed',
+                'signature_date': rec.signature_date or fields.Date.context_today(rec),
+            })
 
     def action_draft(self):
         self.write({'state': 'draft'})
@@ -145,107 +177,111 @@ class Agreement(models.Model):
     def action_cancel(self):
         self.write({'state': 'cancelled'})
 
+    @api.model
+    def _cron_expire(self):
+        """Підписані договори з минулою датою завершення — у «Завершені»."""
+        self.search([
+            ('state', '=', 'signed'),
+            ('end_date', '!=', False),
+            ('end_date', '<', fields.Date.context_today(self)),
+        ]).write({'state': 'expired'})
+
     # ------------------------------------------------------------------
-    # Підпис через sign_oca
+    # КЕП (l10n_ua_sign): підпис нашої сторони в браузері
     # ------------------------------------------------------------------
-    def action_request_signature(self):
+    def _agreement_pdf(self):
         self.ensure_one()
-        pdf_content, _dummy = self.env['ir.actions.report']._render_qweb_pdf(
-            'l10n_ua_agreement.action_report_agreement', res_ids=self.ids
-        )
-        request = self.env['sign.oca.request'].create({
-            'name': _('Договір %s') % (self.code or self.name),
-            'data': base64.b64encode(pdf_content),
-            'filename': '%s.pdf' % (self.code or 'agreement'),
-            'record_ref': '%s,%s' % (self._name, self.id),
-        })
-        if self.state == 'draft':
-            self.state = 'to_sign'
+        pdf, _dummy = self.env['ir.actions.report']._render_qweb_pdf(
+            'l10n_ua_agreement.action_report_agreement', res_ids=self.ids)
+        return pdf
+
+    def _agreement_filename(self):
+        self.ensure_one()
+        safe = ''.join(c if c.isalnum() or c in '-_' else '_' for c in self.code or 'agreement')
+        return f'{safe}.pdf'
+
+    def action_sign_kep(self):
+        self.ensure_one()
+        if self.state not in ('draft', 'to_sign'):
+            raise UserError(_('Only a draft agreement or one to sign can be signed.'))
+        return self.action_kep_sign()
+
+    def kep_prepare_signing(self):
+        self.ensure_one()
         return {
-            'type': 'ir.actions.act_window',
-            'name': _('Запит на підпис'),
-            'res_model': 'sign.oca.request',
-            'res_id': request.id,
-            'view_mode': 'form',
-            'target': 'current',
+            'auth_subject': None,
+            'submit_label': _('Sign the agreement'),
+            'documents': [{
+                'name': 'agreement',
+                'data_b64': base64.b64encode(self._agreement_pdf()).decode(),
+                'format': 'cades',
+                'filename': self._agreement_filename(),
+            }],
         }
 
+    def kep_submit_signed(self, signed, auth_signature=None):
+        self.ensure_one()
+        signature = signed.get('agreement')
+        if not signature:
+            raise UserError(_('No signature was received for the agreement.'))
+        filename = f'{self._agreement_filename()}.p7s'
+        self.write({
+            'kep_signature': signature,
+            'kep_signature_filename': filename,
+            'kep_signed_by_id': self.env.user.id,
+            'kep_signed_on': fields.Datetime.now(),
+            'state': 'to_sign' if self.state == 'draft' else self.state,
+        })
+        self.message_post(
+            body=_('Signed with КЕП by %s.', self.env.user.name),
+            attachments=[(filename, base64.b64decode(signature))],
+        )
+        return {'receipt': _('The agreement is signed with КЕП.')}
+
+    # ------------------------------------------------------------------
+    # Друк, додаткові угоди, продажі
+    # ------------------------------------------------------------------
     def action_print_act(self):
         self.ensure_one()
-        return self.env.ref(
-            'l10n_ua_agreement.action_report_agreement_act'
-        ).report_action(self)
+        return self.env.ref('l10n_ua_agreement.action_report_agreement_act').report_action(self)
 
-    def action_view_sign_requests(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Запити на підпис'),
-            'res_model': 'sign.oca.request',
-            'view_mode': 'list,form',
-            'domain': [('record_ref', '=', '%s,%s' % (self._name, self.id))],
-        }
-
-    # ------------------------------------------------------------------
-    # Додаткові угоди
-    # ------------------------------------------------------------------
     def action_add_amendment(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Додаткова угода'),
-            'res_model': 'agreement',
+            'name': _('Amendment'),
+            'res_model': 'l10n_ua.agreement',
             'view_mode': 'form',
             'target': 'current',
             'context': {
-                'default_parent_agreement_id': self.id,
+                'default_parent_id': self.id,
                 'default_partner_id': self.partner_id.id,
+                'default_direction': self.direction,
                 'default_agreement_type_id': self.agreement_type_id.id,
+                'default_currency_id': self.currency_id.id,
+                'default_name': self.name,
             },
         }
 
-    def action_view_child_agreements(self):
+    def action_view_amendments(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Додаткові угоди'),
-            'res_model': 'agreement',
+            'name': _('Amendments'),
+            'res_model': 'l10n_ua.agreement',
             'view_mode': 'list,form',
-            'domain': [('parent_agreement_id', '=', self.id)],
+            'domain': [('parent_id', '=', self.id)],
+            'context': {'default_parent_id': self.id, 'default_partner_id': self.partner_id.id},
+        }
+
+    def action_view_sale_orders(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('sale.action_quotations_with_onboarding')
+        action.update({
+            'domain': [('l10n_ua_agreement_id', '=', self.id)],
             'context': {
-                'default_parent_agreement_id': self.id,
+                'default_l10n_ua_agreement_id': self.id,
                 'default_partner_id': self.partner_id.id,
             },
-        }
-
-    # ------------------------------------------------------------------
-    # Періодичні рахунки (contract)
-    # ------------------------------------------------------------------
-    def action_create_contract(self):
-        self.ensure_one()
-        contract = self.env['contract.contract'].create({
-            'name': self.name,
-            'partner_id': self.partner_id.id,
-            'agreement_id': self.id,
-            'contract_type': 'sale',
-            'company_id': self.company_id.id,
         })
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Періодичний договір'),
-            'res_model': 'contract.contract',
-            'res_id': contract.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }
-
-    def action_view_contracts(self):
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Періодичні договори'),
-            'res_model': 'contract.contract',
-            'view_mode': 'list,form',
-            'domain': [('agreement_id', '=', self.id)],
-            'context': {'default_agreement_id': self.id},
-        }
+        return action

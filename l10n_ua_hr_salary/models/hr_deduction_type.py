@@ -47,15 +47,6 @@ class HrDeductionType(models.Model):
         help='Automatically applied to all payslips'
     )
     
-    account_debit_id = fields.Many2one(
-        'account.account',
-        string='Debit Account'
-    )
-    account_credit_id = fields.Many2one(
-        'account.account',
-        string='Credit Account'
-    )
-    
     description = fields.Text(string='Description')
     active = fields.Boolean(string='Active', default=True)
 

@@ -9,16 +9,16 @@
                ref="l10n_ua_accounting.l10n_ua_debt_netting_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="agreement_id" options="{'no_create': True}"
+                <field name="l10n_ua_agreement_id" options="{'no_create': True}"
                        readonly="state != 'draft'"/>
             </xpath>
             <xpath expr="//field[@name='receivable_line_ids']/list/field[@name='account_id']"
                    position="after">
-                <field name="agreement_id" optional="show"/>
+                <field name="l10n_ua_agreement_id" optional="show"/>
             </xpath>
             <xpath expr="//field[@name='payable_line_ids']/list/field[@name='account_id']"
                    position="after">
-                <field name="agreement_id" optional="show"/>
+                <field name="l10n_ua_agreement_id" optional="show"/>
             </xpath>
         </field>
     </record>
@@ -30,7 +30,7 @@
                ref="l10n_ua_accounting.l10n_ua_debt_netting_view_search"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="agreement_id"/>
+                <field name="l10n_ua_agreement_id"/>
             </xpath>
         </field>
     </record>
@@ -39,8 +39,8 @@
     <template id="report_debt_netting_lines_agreement"
               inherit_id="l10n_ua_accounting.report_debt_netting_lines">
         <xpath expr="//span[@t-esc='line.move_id.name']/.." position="inside">
-            <t t-if="line.agreement_id">
-                <br/><span class="small">Договір: <t t-esc="line.agreement_id.display_name"/></span>
+            <t t-if="line.l10n_ua_agreement_id">
+                <br/><span class="small">Договір: <t t-esc="line.l10n_ua_agreement_id.display_name"/></span>
             </t>
         </xpath>
     </template>

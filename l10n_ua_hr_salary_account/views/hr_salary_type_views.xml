@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_accrual_type_view_form_accounts" model="ir.ui.view">
+        <field name="name">hr.accrual.type.form.accounts</field>
+        <field name="model">hr.accrual.type</field>
+        <field name="inherit_id" ref="l10n_ua_hr_salary.hr_accrual_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='description']/.." position="before">
+                <group string="Accounting" groups="account.group_account_user">
+                    <field name="account_debit_id"/>
+                    <field name="account_credit_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_deduction_type_view_form_accounts" model="ir.ui.view">
+        <field name="name">hr.deduction.type.form.accounts</field>
+        <field name="model">hr.deduction.type</field>
+        <field name="inherit_id" ref="l10n_ua_hr_salary.hr_deduction_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='description']/.." position="before">
+                <group string="Accounting" groups="account.group_account_user">
+                    <field name="account_debit_id"/>
+                    <field name="account_credit_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

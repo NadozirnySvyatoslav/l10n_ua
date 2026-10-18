@@ -1,0 +1,172 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_payment_liqpay
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-17 10:48+0000\n"
+"PO-Revision-Date: 2026-10-17 10:48+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_ua_payment_liqpay
+#: model_terms:payment.provider,auth_msg:l10n_ua_payment_liqpay.payment_provider_liqpay
+msgid "<span>Your payment has been authorized.</span>"
+msgstr "<span>Ваш платіж авторизовано.</span>"
+
+#. module: l10n_ua_payment_liqpay
+#: model_terms:payment.provider,cancel_msg:l10n_ua_payment_liqpay.payment_provider_liqpay
+msgid "<span>Your payment has been cancelled.</span>"
+msgstr "<span>Ваш платіж скасовано.</span>"
+
+#. module: l10n_ua_payment_liqpay
+#: model_terms:payment.provider,pending_msg:l10n_ua_payment_liqpay.payment_provider_liqpay
+msgid ""
+"<span>Your payment has been processed but is waiting for approval.</span>"
+msgstr "<span>Ваш платіж оброблено, але він очікує підтвердження.</span>"
+
+#. module: l10n_ua_payment_liqpay
+#: model_terms:payment.provider,done_msg:l10n_ua_payment_liqpay.payment_provider_liqpay
+msgid "<span>Your payment has been processed.</span>"
+msgstr "<span>Ваш платіж оброблено.</span>"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_provider__code
+msgid "Code"
+msgstr "Код"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_provider__display_name
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_transaction__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_provider__id
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_transaction__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_provider.py:0
+msgid ""
+"In test mode LiqPay needs the sandbox keys (starting with \"sandbox_\"); "
+"live keys would charge real cards."
+msgstr ""
+"У тестовому режимі LiqPay потрібні тестові ключі (починаються з "
+"\"sandbox_\"); бойові ключі списували б кошти з реальних карток."
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields.selection,name:l10n_ua_payment_liqpay.selection__payment_provider__code__liqpay
+#: model:payment.provider,name:l10n_ua_payment_liqpay.payment_provider_liqpay
+msgid "LiqPay"
+msgstr "LiqPay"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_provider__liqpay_private_key
+msgid "LiqPay Private Key"
+msgstr "Приватний ключ LiqPay"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,field_description:l10n_ua_payment_liqpay.field_payment_provider__liqpay_public_key
+msgid "LiqPay Public Key"
+msgstr "Публічний ключ LiqPay"
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_transaction.py:0
+msgid "LiqPay payment status: %s"
+msgstr "Статус платежу LiqPay: %s"
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_transaction.py:0
+msgid "LiqPay refused the refund: %s"
+msgstr "LiqPay відхилив повернення: %s"
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_transaction.py:0
+msgid "LiqPay reported a sandbox (test) payment for a live transaction."
+msgstr ""
+"LiqPay повідомив про тестовий (sandbox) платіж для бойової транзакції."
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_provider.py:0
+msgid ""
+"LiqPay sandbox keys (starting with \"sandbox_\") can only be used in test "
+"mode. Enter the live keys or switch the provider to Test Mode."
+msgstr ""
+"Тестові ключі LiqPay (починаються з \"sandbox_\") можна використовувати лише"
+" в тестовому режимі. Введіть бойові ключі або переведіть провайдера в "
+"тестовий режим."
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model,name:l10n_ua_payment_liqpay.model_payment_provider
+msgid "Payment Provider"
+msgstr "Платіжний провайдер"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model,name:l10n_ua_payment_liqpay.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "Платіжна транзакція"
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_transaction.py:0
+msgid "Payment for order %s"
+msgstr "Оплата замовлення %s"
+
+#. module: l10n_ua_payment_liqpay
+#: model_terms:ir.ui.view,arch_db:l10n_ua_payment_liqpay.payment_provider_form
+msgid "Private Key"
+msgstr "Приватний ключ"
+
+#. module: l10n_ua_payment_liqpay
+#: model_terms:ir.ui.view,arch_db:l10n_ua_payment_liqpay.payment_provider_form
+msgid "Public Key"
+msgstr "Публічний ключ"
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_transaction.py:0
+msgid "Received data with invalid payment status: %s."
+msgstr "Отримано дані з недійсним статусом платежу: %s."
+
+#. module: l10n_ua_payment_liqpay
+#. odoo-python
+#: code:addons/l10n_ua_payment_liqpay/models/payment_transaction.py:0
+msgid "The payment was declined: %s"
+msgstr "Платіж відхилено: %s"
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,help:l10n_ua_payment_liqpay.field_payment_provider__code
+msgid "The technical code of this payment provider."
+msgstr "Технічний код цього платіжного провайдера."
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,help:l10n_ua_payment_liqpay.field_payment_provider__liqpay_private_key
+msgid ""
+"private_key of the LiqPay shop. It signs the requests and verifies the "
+"callbacks."
+msgstr ""
+"private_key магазину LiqPay. Ним підписуються запити й перевіряються "
+"callback-повідомлення."
+
+#. module: l10n_ua_payment_liqpay
+#: model:ir.model.fields,help:l10n_ua_payment_liqpay.field_payment_provider__liqpay_public_key
+msgid ""
+"public_key of the LiqPay shop: the sandbox_ key in test mode, the live one "
+"otherwise."
+msgstr ""
+"public_key магазину LiqPay: ключ sandbox_ у тестовому режимі, бойовий — в "
+"іншому разі."

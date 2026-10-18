@@ -8,8 +8,8 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_origin']" position="after">
-                <field name="agreement_id"
-                       domain="[('partner_id', '=', partner_id)]"/>
+                <field name="l10n_ua_agreement_id"
+                       domain="[('commercial_partner_id', '=', commercial_partner_id)]"/>
             </xpath>
         </field>
     </record>
@@ -21,11 +21,11 @@
         <field name="inherit_id" ref="account.view_account_move_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="agreement_id"/>
+                <field name="l10n_ua_agreement_id"/>
             </xpath>
             <xpath expr="//filter[@name='partner']" position="after">
-                <filter string="Договір" name="groupby_agreement" domain="[]"
-                        context="{'group_by': 'agreement_id'}"/>
+                <filter string="Agreement" name="groupby_agreement" domain="[]"
+                        context="{'group_by': 'l10n_ua_agreement_id'}"/>
             </xpath>
         </field>
     </record>

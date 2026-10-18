@@ -1,45 +1,49 @@
 {
     'name': 'Ukraine - Agreements (Договори)',
-    'version': '19.0.1.1.0',
+    'version': '19.0.2.0.0',
     'category': 'Sales/Localization',
-    'summary': 'Договори з клієнтами: шаблони, додаткові угоди, підпис (sign_oca), '
-               'продажі та періодичні рахунки',
+    'summary': 'Agreements with customers and vendors: numbering, amendments, '
+               'КЕП signature, printed agreement and service act',
     'description': """
 Ukraine Agreements (Договори)
 =============================
 
-Облік договорів з клієнтами поверх OCA-модулів ``agreement``, ``sign_oca`` та
-``contract``:
+Облік договорів з покупцями та постачальниками, без залежностей від OCA:
 
-* Договір зберігається як окремий об'єкт, генерується з шаблону для конкретного
-  замовника (друкована форма QWeb);
-* Стан договору: Чернетка → На підписанні → Підписаний;
-* Електронний підпис через ``sign_oca`` з автоматичним переведенням договору у
-  стан «Підписаний» та збереженням підписаного PDF;
-* Додаткові угоди як дочірні договори (``parent_agreement_id``);
-* Продажі та разові рахунки з договору (через ``agreement_sale``);
-* Періодичні (абонентські) рахунки через ``contract.contract``.
+* Договір як окремий документ: номер із послідовності, тип, сторона (покупець /
+  постачальник), сума, строк дії, відповідальний, історія змін;
+* Стан: Чернетка → На підписанні → Підписаний → Завершений (автоматично після
+  дати завершення) / Скасований;
+* Підпис нашої сторони КЕП у браузері (``l10n_ua_sign``): підписаний файл
+  ``.p7s`` зберігається в договорі; документ, підписаний обома сторонами, —
+  окремим вкладенням;
+* Додаткові угоди як дочірні договори;
+* Типи договорів із шаблоном предмета договору;
+* Друкована форма договору та акта наданих послуг;
+* Договір у замовленні на продаж, лічильник договорів у контрагента.
 
-Призначено для ФОП та підприємств, що надають послуги за договором.
+Взаєморозрахунки в розрізі договорів — ``l10n_ua_agreement_account``;
+періодичні рахунки (OCA ``contract``) — ``l10n_ua_agreement_contract``.
     """,
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': [
-        'agreement',
-        'agreement_sale',
-        'sign_oca',
-        'contract',
+        'sale',
+        'l10n_ua_sign',
     ],
     'data': [
+        'security/ir.model.access.csv',
+        'security/l10n_ua_agreement_security.xml',
+        'data/ir_sequence_data.xml',
         'data/agreement_type_data.xml',
         'report/agreement_report.xml',
         'report/agreement_report_templates.xml',
         'views/agreement_views.xml',
-        'views/agreement_i18n.xml',
+        'views/sale_partner_views.xml',
+        'data/ir_cron_data.xml',
     ],
-    'demo': [],
     'installable': True,
-    'application': False,
+    'application': True,
     'auto_install': False,
 }

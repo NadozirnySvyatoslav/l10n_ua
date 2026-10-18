@@ -50,9 +50,13 @@
 >
 > Що потрібно отримати заздалегідь:
 >
-> - **ПриватБанк (Автоклієнт):** у кабінеті **Privat24 for Business → «Автоклієнт»** увімкнути
->   доступ, згенерувати **токен** і скопіювати **IBAN рахунку**. Для старих інтеграцій — merchant id
->   + пароль + номер картки (legacy Merchant API).
+> - **ПриватБанк (Автоклієнт):** у «Приват24 для бізнесу» знайти сервіс **«Інтеграція
+>   (Автоклієнт)»** → **«Підключити API»** → назва застосунку (і, за бажанням, IP-адреса сервера
+>   Odoo) → погодитися з умовами → **«Підключити»**; у налаштуваннях створеного застосунку
+>   (значок шестерні) прийняти умови й скопіювати **token**. На вкладці **«Обмеження по
+>   сервісам»** рекомендовано лишити тільки «Отримання балансів і транзакцій за рахунками» —
+>   тоді токеном неможливо створити платіж. Скопіюйте також **IBAN рахунку**. Для старих
+>   інтеграцій — merchant id + пароль + номер картки (legacy Merchant API).
 > - **monobank:** персональний **токен** на [api.monobank.ua](https://api.monobank.ua) (кнопка
 >   «Отримати токен» через застосунок). Токен дає доступ до `personal/statement`.
 > - **NovaPay:** у кабінеті [business.novapay.ua](https://business.novapay.ua) відкрити
@@ -133,8 +137,9 @@
 |------|----------|
 | Провайдер (`provider`) | **PrivatBank** (`privat`) |
 | Банківський журнал (`journal_id`) | банківський журнал ПриватБанку (тип `bank`) |
-| **API Token** (`privat_api_token`) | токен з Privat24 Business → Автоклієнт |
-| **Account IBAN** (`privat_account_iban`) | UA + 27 цифр |
+| **API Token** (`privat_api_token`) | token застосунку API з «Інтеграція (Автоклієнт)»; поле бачить і змінює лише **UA Chief Accountant** |
+| **Account IBAN** (`privat_account_iban`) | UA + 27 цифр; якщо порожньо — береться IBAN банківського рахунку журналу. Без рахунку синхронізація не запускається (банк віддав би рухи всіх рахунків разом) |
+| Client ID in group (`privat_group_client_id`) | лише якщо API підключено для **групи ФОП** — ID підприємця в групі; інакше порожньо |
 | _(legacy)_ Merchant ID / Password / Card (`privat_merchant_*`) | лише для старого Merchant API |
 
 > Гілка отримання виписок обирається **за наявними даними**: якщо є `privat_api_token` — сучасний
@@ -153,9 +158,16 @@
 `draft → fetching → fetched → processing → done` / `error`):
 
 1. Створіть завдання від конфігурації, вкажіть **період** (`date_from` / `date_to`).
-2. **`Завантажити`** — `_fetch_from_bank()` → `_privat_fetch_autoclient()`:
-   `GET https://acp.privatbank.ua/api/statements/transactions` із заголовком **`token`** і
-   параметрами `startDate` / `endDate` / `acc`. Сирий payload зберігається (`payload_fetched_at`).
+2. **`Завантажити`** — `_fetch_from_bank()` → `_privat_fetch_autoclient()`: спершу
+   `GET /api/statements/settings` (якщо банк повідомляє `work_balance = Y` — регламент, запит не
+   робиться), далі `GET https://acp.privatbank.ua/api/statements/transactions` і
+   `/api/statements/balance` із заголовками `User-Agent`, `token`, `Content-Type` та параметрами
+   `acc` / `startDate` / `endDate` (ДД-ММ-РРРР) / `limit=100`. Усі пачки читаються через
+   `followId = next_page_id`, поки `exist_next_page = true`; між запитами — не частіше
+   1 запиту/с, як рекомендує банк. У виписку йдуть лише проведені рухи (`PR_PR = r`), ключ
+   дедуплікації — `REF/REFN`; знак — з `TRANTYPE` (D — списання, C — надходження). Вхідний і
+   вихідний залишок беруться з `balance`, якщо вони сходяться з оборотами. Сирий payload
+   зберігається (`payload_fetched_at`).
    _(Legacy-гілка `_privat_fetch_merchant()` → `https://api.privatbank.ua/p24api/rest_fiz`,
    XML-запит `cmt`.)_
 3. **`Обробити`** (`action_process`) — `_parse_transactions()` розбирає payload у виписку

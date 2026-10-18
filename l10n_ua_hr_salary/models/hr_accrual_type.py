@@ -56,17 +56,6 @@ class HrAccrualType(models.Model):
         help='Income type code for 4DF report'
     )
     
-    account_debit_id = fields.Many2one(
-        'account.account',
-        string='Debit Account',
-        help='Expense account'
-    )
-    account_credit_id = fields.Many2one(
-        'account.account',
-        string='Credit Account',
-        help='Liability account'
-    )
-    
     description = fields.Text(string='Description')
     active = fields.Boolean(string='Active', default=True)
 

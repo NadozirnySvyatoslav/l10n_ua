@@ -34,8 +34,12 @@ msgstr "IBAN рахунку"
 
 #. module: l10n_ua_bank_privat
 #: model:ir.model.fields,help:l10n_ua_bank_privat.field_l10n_ua_bank_sync_config__privat_account_iban
-msgid "Account IBAN (UA + 27 digits)"
-msgstr "IBAN рахунку (UA + 27 цифр)"
+msgid ""
+"Account IBAN (UA + 27 digits). Leave empty to use the IBAN of the bank "
+"account of the journal."
+msgstr ""
+"IBAN рахунку (UA + 27 цифр). Якщо порожньо — береться IBAN банківського "
+"рахунку журналу."
 
 #. module: l10n_ua_bank_privat
 #: model:ir.model,name:l10n_ua_bank_privat.model_l10n_ua_bank_sync_config
@@ -183,3 +187,26 @@ msgstr "UA000000000000000000000000000"
 #: model:ir.model,name:l10n_ua_bank_privat.model_l10n_ua_bank_statement
 msgid "Ukrainian Bank Statement"
 msgstr "Українська банківська виписка"
+
+#. module: l10n_ua_bank_privat
+#: model:ir.model.fields,field_description:l10n_ua_bank_privat.field_l10n_ua_bank_sync_config__privat_group_client_id
+msgid "Client ID in group"
+msgstr "ID клієнта в групі"
+
+#. module: l10n_ua_bank_privat
+#: model:ir.model.fields,help:l10n_ua_bank_privat.field_l10n_ua_bank_sync_config__privat_group_client_id
+msgid ""
+"Only for an Autoclient connected for a group of individual entrepreneurs "
+"(група ФОП): ID of the entrepreneur in the group, sent as the \"id\" "
+"parameter. Leave empty otherwise - the bank rejects the parameter outside "
+"group mode."
+msgstr ""
+"Лише для «Автоклієнта», підключеного для групи ФОП: ID підприємця в групі, "
+"передається параметром «id». В інших випадках залиште порожнім — поза "
+"режимом групи банк відхиляє цей параметр."
+
+#. module: l10n_ua_bank_privat
+#. odoo-python
+#: code:addons/l10n_ua_bank_privat/models/l10n_ua_bank_privat_config.py:0
+msgid "Warning"
+msgstr "Попередження"

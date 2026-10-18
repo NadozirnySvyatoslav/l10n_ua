@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="redirect_form">
+        <!-- https://www.liqpay.ua/doc/api/internet_acquiring/checkout — Client-Server -->
+        <form t-att-action="api_url" method="post" accept-charset="utf-8">
+            <input type="hidden" name="data" t-att-value="data"/>
+            <input type="hidden" name="signature" t-att-value="signature"/>
+        </form>
+    </template>
+</odoo>

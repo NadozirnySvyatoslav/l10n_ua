@@ -101,10 +101,12 @@ odoo-bin -d <db> -i l10n_ua_delivery_novaposhta,l10n_ua_marketplace_rozetka,l10n
 odoo-bin -d <db> -i l10n_ua_supplier_prices_base,l10n_ua_supplier_prices_csv,l10n_ua_supplier_prices_xlsx --stop-after-init
 ```
 
-### Договори з клієнтами
+### Договори
 ```bash
-# Потребує OCA: agreement, agreement_sale, sign_oca, contract (гілка 19.0) в addons_path
+# Без залежностей від OCA; взаєморозрахунки за договорами — l10n_ua_agreement_account
 odoo-bin -d <db> -i l10n_ua_agreement --stop-after-init
+# Періодичні рахунки за договором — міст до OCA contract (гілка 19.0, у addons_path)
+odoo-bin -d <db> -i l10n_ua_agreement_contract --stop-after-init
 ```
 
 ### Галузеві збірки

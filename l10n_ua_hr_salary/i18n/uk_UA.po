@@ -80,12 +80,6 @@ msgid "<strong>Табельний №:</strong>"
 msgstr "<strong>Табельний №:</strong>"
 
 #. module: l10n_ua_hr_salary
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary.hr_accrual_type_view_form
-#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary.hr_deduction_type_view_form
-msgid "Accounting"
-msgstr "Бухгалтерія"
-
-#. module: l10n_ua_hr_salary
 #: model:ir.model,name:l10n_ua_hr_salary.model_hr_accrual_type
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_accrual__accrual_type_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_bank_export__accrual_name
@@ -533,12 +527,6 @@ msgid "Created on"
 msgstr "Створено"
 
 #. module: l10n_ua_hr_salary
-#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_accrual_type__account_credit_id
-#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_deduction_type__account_credit_id
-msgid "Credit Account"
-msgstr "Кредитовий рахунок"
-
-#. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_accrual__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_deduction__currency_id
@@ -597,12 +585,6 @@ msgstr "Дата по"
 #: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_payslip_accrual__quantity
 msgid "Days, hours, or units"
 msgstr "Дні, години або одиниці"
-
-#. module: l10n_ua_hr_salary
-#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_accrual_type__account_debit_id
-#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_deduction_type__account_debit_id
-msgid "Debit Account"
-msgstr "Дебетовий рахунок"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_execution_document__deduction_priority
@@ -851,11 +833,6 @@ msgid ""
 msgstr ""
 "Виконавчі документи використовуються для автоматичних утримань, таких як\n"
 "аліменти, рішення суду та інші обов'язкові платежі."
-
-#. module: l10n_ua_hr_salary
-#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_accrual_type__account_debit_id
-msgid "Expense account"
-msgstr "Рахунок витрат"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_ifobs_employee_export__file_data
@@ -1135,11 +1112,6 @@ msgstr "Оновив"
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_seniority_scale_line__write_date
 msgid "Last Updated on"
 msgstr "Оновлено"
-
-#. module: l10n_ua_hr_salary
-#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_accrual_type__account_credit_id
-msgid "Liability account"
-msgstr "Рахунок зобов'язань"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields.selection,name:l10n_ua_hr_salary.selection__hr_deduction_type__category__loan

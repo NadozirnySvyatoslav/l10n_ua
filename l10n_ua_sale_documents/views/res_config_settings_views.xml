@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.l10n_ua_sale_documents</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='invoicing_settings']" position="after">
+                <block title="Ukrainian Documents" id="l10n_ua_sale_documents_settings">
+                    <setting id="l10n_ua_sale_rahunok_in_mail" company_dependent="1"
+                             string="Рахунок-фактура in Order E-mails"
+                             help="Quotation, order confirmation and payment e-mails attach the Рахунок-фактура instead of the Odoo order PDF.">
+                        <field name="l10n_ua_sale_rahunok_in_mail"/>
+                    </setting>
+                    <setting id="l10n_ua_invoice_primary_doc" company_dependent="1"
+                             string="Primary Document in Invoice E-mails"
+                             help="Attached to customer invoice e-mails next to the invoice PDF. By invoice content: services only - service act, goods only - delivery note, both - both documents.">
+                        <field name="l10n_ua_invoice_primary_doc" class="o_light_label" widget="radio"/>
+                    </setting>
+                    <setting id="l10n_ua_automatic_invoice"
+                             string="Invoice Automatically after Online Payment"
+                             help="After a successful payment on the website or in the portal the order is confirmed, a customer invoice is created and posted, and the invoice e-mail with the primary document is sent. Payments of providers in test mode never create invoices."
+                             info="This setting is common to all companies and websites.">
+                        <field name="automatic_invoice"/>
+                        <field name="default_invoice_policy" invisible="1"/>
+                        <div class="text-warning mt-2" invisible="default_invoice_policy != 'delivery'">
+                            Requires the invoicing policy "Ordered quantities" (Sales settings): with "Delivered quantities" Odoo switches automatic invoicing off when the settings are saved.
+                        </div>
+                        <div class="mt-2" invisible="not automatic_invoice">
+                            <label for="invoice_mail_template_id" class="o_light_label me-2"/>
+                            <field name="invoice_mail_template_id" class="oe_inline"/>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

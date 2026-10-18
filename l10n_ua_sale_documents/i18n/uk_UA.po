@@ -1,0 +1,127 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_sale_documents
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-17 11:43+0000\n"
+"PO-Revision-Date: 2026-10-17 11:43+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_ua_sale_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid ""
+"After a successful payment on the website or in the portal the order is "
+"confirmed, a customer invoice is created and posted, and the invoice e-mail "
+"with the primary document is sent. Payments of providers in test mode never "
+"create invoices."
+msgstr ""
+"Після успішної оплати на сайті або в порталі замовлення підтверджується, "
+"створюється й проводиться рахунок клієнту і надсилається лист із рахунком та "
+"первинним документом. Оплати через платіжні системи в тестовому режимі "
+"рахунків не створюють."
+
+#. module: l10n_ua_sale_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid ""
+"Attached to customer invoice e-mails next to the invoice PDF. By invoice "
+"content: services only - service act, goods only - delivery note, both - "
+"both documents."
+msgstr ""
+"Додається до листа з рахунком клієнту поруч із PDF рахунку. За складом "
+"рахунку: лише послуги — акт, лише товари — видаткова накладна, послуги й "
+"товари — обидва документи."
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields.selection,name:l10n_ua_sale_documents.selection__res_company__l10n_ua_invoice_primary_doc__auto
+msgid "By Invoice Content"
+msgstr "За складом рахунку"
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields.selection,name:l10n_ua_sale_documents.selection__res_company__l10n_ua_invoice_primary_doc__vydatkova
+msgid "Delivery Note (Видаткова накладна)"
+msgstr "Видаткова накладна"
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields.selection,name:l10n_ua_sale_documents.selection__res_company__l10n_ua_invoice_primary_doc__none
+msgid "Do Not Attach"
+msgstr "Не додавати"
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields,help:l10n_ua_sale_documents.field_res_company__l10n_ua_invoice_primary_doc
+#: model:ir.model.fields,help:l10n_ua_sale_documents.field_res_config_settings__l10n_ua_invoice_primary_doc
+msgid ""
+"Document attached to customer invoice e-mails next to the Odoo invoice PDF. "
+"By invoice content: services only - service act, goods only - delivery note,"
+" services and goods - both documents."
+msgstr ""
+"Документ, що додається до листа з рахунком клієнту поруч із PDF рахунку "
+"Odoo. За складом рахунку: лише послуги — акт, лише товари — видаткова "
+"накладна, послуги й товари — обидва документи."
+
+#. module: l10n_ua_sale_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid "Invoice Automatically after Online Payment"
+msgstr "Рахунок автоматично після онлайн-оплати"
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields,field_description:l10n_ua_sale_documents.field_res_company__l10n_ua_invoice_primary_doc
+#: model:ir.model.fields,field_description:l10n_ua_sale_documents.field_res_config_settings__l10n_ua_invoice_primary_doc
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid "Primary Document in Invoice E-mails"
+msgstr "Первинний документ у листі з рахунком"
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields,help:l10n_ua_sale_documents.field_res_company__l10n_ua_sale_rahunok_in_mail
+#: model:ir.model.fields,help:l10n_ua_sale_documents.field_res_config_settings__l10n_ua_sale_rahunok_in_mail
+msgid ""
+"Quotation, order confirmation and payment e-mails attach the Ukrainian "
+"Рахунок-фактура instead of the standard Odoo order PDF."
+msgstr ""
+"Листи з комерційною пропозицією, підтвердженням замовлення та про оплату "
+"містять Рахунок-фактуру замість стандартного PDF замовлення Odoo."
+
+#. module: l10n_ua_sale_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid ""
+"Quotation, order confirmation and payment e-mails attach the Рахунок-фактура"
+" instead of the Odoo order PDF."
+msgstr ""
+"Комерційна пропозиція, підтвердження замовлення й лист про оплату містять "
+"Рахунок-фактуру замість PDF замовлення Odoo."
+
+#. module: l10n_ua_sale_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid ""
+"Requires the invoicing policy \"Ordered quantities\" (Sales settings): with "
+"\"Delivered quantities\" Odoo switches automatic invoicing off when the "
+"settings are saved."
+msgstr ""
+"Працює лише з політикою виставлення рахунків «За замовленою кількістю» "
+"(налаштування Продажів): з політикою «За доставленою кількістю» Odoo вимикає "
+"автоматичні рахунки під час збереження налаштувань."
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields.selection,name:l10n_ua_sale_documents.selection__res_company__l10n_ua_invoice_primary_doc__act
+msgid "Service Act (Акт)"
+msgstr "Акт виконаних робіт"
+
+#. module: l10n_ua_sale_documents
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid "Ukrainian Documents"
+msgstr "Українські документи"
+
+#. module: l10n_ua_sale_documents
+#: model:ir.model.fields,field_description:l10n_ua_sale_documents.field_res_company__l10n_ua_sale_rahunok_in_mail
+#: model:ir.model.fields,field_description:l10n_ua_sale_documents.field_res_config_settings__l10n_ua_sale_rahunok_in_mail
+#: model_terms:ir.ui.view,arch_db:l10n_ua_sale_documents.res_config_settings_view_form
+msgid "Рахунок-фактура in Order E-mails"
+msgstr "Рахунок-фактура в листах замовлень"

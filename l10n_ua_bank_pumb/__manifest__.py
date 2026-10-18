@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - PUMB Integration',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Accounting/Localization',
     'summary': 'PUMB Open Banking API (NextGenPSD2): consents and bank statements',
     'description': """

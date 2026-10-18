@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - NovaPay Integration',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Accounting/Localization',
     'summary': 'NovaPay Business API integration for bank statements',
     'description': """

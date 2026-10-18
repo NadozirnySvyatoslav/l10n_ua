@@ -30,10 +30,6 @@
                             <field name="d4_income_type"/>
                         </group>
                     </group>
-                    <group string="Accounting" groups="account.group_account_user">
-                        <field name="account_debit_id"/>
-                        <field name="account_credit_id"/>
-                    </group>
                     <group>
                         <field name="description"/>
                     </group>

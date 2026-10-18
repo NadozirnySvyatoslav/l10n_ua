@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 0 auto; color: #333;">
+
+    <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #005BBB 0%, #FFD500 100%); border-radius: 8px; margin-bottom: 30px;">
+        <h1 style="color: white; margin: 0; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Ukraine - Sale Documents in E-mails</h1>
+        <p style="color: white; font-size: 1.2em; margin-top: 10px;">Ukrainian invoice, service act and delivery note in the e-mails of Sales and Invoicing for Odoo 19</p>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 25px;">
+        <h2 style="color: #005BBB; margin-top: 0;">About</h2>
+        <p>Closes the document flow of an online shop or a service company in Ukraine: <strong>order → payment → posted customer invoice → primary document</strong>. The customer receives the documents a Ukrainian accountant expects, without printing and attaching them by hand.</p>
+        <p>The forms themselves come from <code>l10n_ua_doc_reports</code> (Рахунок-фактура, Акт виконаних робіт, Видаткова накладна). This module only decides which of them go into which e-mail.</p>
+    </div>
+
+    <div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h3 style="color: #005BBB; margin-top: 0;">Features</h3>
+        <ul>
+            <li><strong>Order e-mails</strong> (quotation, order confirmation, payment executed) attach the <strong>Рахунок-фактура</strong> instead of the standard Odoo quotation / order PDF</li>
+            <li><strong>Invoice e-mails</strong> attach the primary document next to the Odoo invoice PDF: service act, delivery note, or chosen per invoice from its lines (services only → act, goods → delivery note, both → both documents)</li>
+            <li>The Odoo invoice PDF and electronic invoicing keep working unchanged; the extra documents appear in the Send wizard and can be removed there before sending</li>
+            <li><strong>Automatic invoicing after an online payment</strong> exposed in the same settings block: a paid web order is confirmed, invoiced, the invoice is posted and e-mailed with the act</li>
+            <li>Payments through a payment provider in <strong>test mode</strong> never create invoices, so no test income reaches the books; the order is still confirmed</li>
+            <li>Settings per company; the mail templates of Odoo are not modified, uninstalling the module restores the standard behaviour</li>
+        </ul>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h3 style="color: #005BBB; margin-top: 0;">Configuration</h3>
+        <ol>
+            <li>Open <strong>Settings → Invoicing → Ukrainian Documents</strong>.</li>
+            <li>Keep <strong>Рахунок-фактура in Order E-mails</strong> enabled (default).</li>
+            <li>Choose the <strong>Primary Document in Invoice E-mails</strong>: service act (default), delivery note, by invoice content, or none.</li>
+            <li>For an online shop enable <strong>Invoice Automatically after Online Payment</strong> and optionally choose the invoice e-mail template. The invoicing policy must be "Ordered quantities".</li>
+            <li>Fill in the company requisites (ЄДРПОУ, legal address, bank account, director) used by the printed forms.</li>
+        </ol>
+    </div>
+
+    <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h3 style="color: #856404; margin-top: 0;">Requirements</h3>
+        <ul>
+            <li>Ukraine - Accounting Document Reports (<code>l10n_ua_doc_reports</code>), Sales, Invoicing</li>
+            <li>Any Odoo payment provider for online payments, e.g. Ukraine - LiqPay Payment Provider</li>
+            <li>Automatic invoicing is a setting of Odoo shared by all companies and websites of the database</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; padding: 20px; background: #005BBB; border-radius: 8px; color: white;">
+        <p style="margin: 0;">Developed for Odoo 19 Community Edition.</p>
+    </div>
+
+</div>
+</body>
+</html>

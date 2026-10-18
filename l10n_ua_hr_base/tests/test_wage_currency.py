@@ -5,6 +5,7 @@
 лише «правильне число», а й кожен спосіб не отримати його непомітно.
 """
 from datetime import date
+from unittest import SkipTest
 
 from odoo.exceptions import UserError
 from odoo.tests import tagged
@@ -18,6 +19,10 @@ class TestWageInCompanyCurrency(TestHrUaBase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        # Валюту окладу додає l10n_ua_hr_salary, від якого цей модуль не
+        # залежить: без нього перевіряти нічого.
+        if 'salary_currency_id' not in cls.env['hr.version']._fields:
+            raise SkipTest('salary_currency_id comes with l10n_ua_hr_salary')
         cls.uah = cls.env.ref('base.UAH')
         cls.usd = cls.env.ref('base.USD')
         cls.company.currency_id = cls.uah

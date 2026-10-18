@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Rozetka Marketplace',
-    'version': '19.0.1.6.0',
+    'version': '19.0.1.6.1',
     'category': 'Sales/Sales',
     'summary': 'Rozetka marketplace integration',
     'description': """

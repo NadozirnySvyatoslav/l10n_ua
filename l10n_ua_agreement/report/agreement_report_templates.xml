@@ -5,6 +5,9 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-set="company" t-value="doc.company_id or env.company"/>
                 <t t-set="partner" t-value="doc.partner_id"/>
+                <!-- Договір з постачальником: виконавець — контрагент, замовник — ми -->
+                <t t-set="contractor" t-value="company.partner_id if doc.direction == 'sale' else partner"/>
+                <t t-set="customer" t-value="partner if doc.direction == 'sale' else company.partner_id"/>
                 <div class="page">
                     <div class="text-center mb-4">
                         <h3 class="mt-0">
@@ -12,8 +15,8 @@
                             <t t-else="">Договір</t>
                             <span t-if="doc.code"> № <span t-field="doc.code"/></span>
                         </h3>
-                        <t t-if="doc.is_amendment and doc.parent_agreement_id">
-                            <div>до Договору № <span t-field="doc.parent_agreement_id.code"/></div>
+                        <t t-if="doc.is_amendment and doc.parent_id">
+                            <div>до Договору № <span t-field="doc.parent_id.code"/></div>
                         </t>
                     </div>
 
@@ -27,9 +30,9 @@
                     </div>
 
                     <p>
-                        <strong t-field="company.name"/>, надалі «Виконавець», з однієї
+                        <strong t-out="contractor.name"/>, надалі «Виконавець», з однієї
                         сторони, та
-                        <strong t-field="partner.name"/>, надалі «Замовник», з іншої
+                        <strong t-out="customer.name"/>, надалі «Замовник», з іншої
                         сторони, уклали цей <t t-if="doc.is_amendment">Договір (додаткову угоду)</t><t t-else="">Договір</t>
                         про наступне:
                     </p>
@@ -63,18 +66,18 @@
                     <div class="row mt-3">
                         <div class="col-6">
                             <strong>ВИКОНАВЕЦЬ</strong>
-                            <div t-field="company.name"/>
-                            <div t-if="company.vat">ЄДРПОУ/ІПН: <span t-field="company.vat"/></div>
-                            <div t-field="company.partner_id"
+                            <div t-out="contractor.name"/>
+                            <div t-if="contractor.vat">ЄДРПОУ/ІПН: <span t-out="contractor.vat"/></div>
+                            <div t-out="contractor"
                                  t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
                             <div class="mt-4">_______________________</div>
                             <div class="text-muted">(підпис)</div>
                         </div>
                         <div class="col-6">
                             <strong>ЗАМОВНИК</strong>
-                            <div t-field="partner.name"/>
-                            <div t-if="partner.vat">ЄДРПОУ/ІПН: <span t-field="partner.vat"/></div>
-                            <div t-field="doc.partner_id"
+                            <div t-out="customer.name"/>
+                            <div t-if="customer.vat">ЄДРПОУ/ІПН: <span t-out="customer.vat"/></div>
+                            <div t-out="customer"
                                  t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": true}'/>
                             <div class="mt-4">_______________________</div>
                             <div class="text-muted">(підпис)</div>

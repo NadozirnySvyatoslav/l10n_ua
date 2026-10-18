@@ -328,3 +328,31 @@ msgstr ""
 #: model:account.journal,name:l10n_ua_hr_salary_account.salary_journal
 msgid "Зарплата"
 msgstr "Зарплата"
+
+#. module: l10n_ua_hr_salary_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary_account.hr_accrual_type_view_form_accounts
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary_account.hr_deduction_type_view_form_accounts
+msgid "Accounting"
+msgstr "Бухгалтерія"
+
+#. module: l10n_ua_hr_salary_account
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary_account.field_hr_accrual_type__account_credit_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary_account.field_hr_deduction_type__account_credit_id
+msgid "Credit Account"
+msgstr "Кредитовий рахунок"
+
+#. module: l10n_ua_hr_salary_account
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary_account.field_hr_accrual_type__account_debit_id
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary_account.field_hr_deduction_type__account_debit_id
+msgid "Debit Account"
+msgstr "Дебетовий рахунок"
+
+#. module: l10n_ua_hr_salary_account
+#: model:ir.model.fields,help:l10n_ua_hr_salary_account.field_hr_accrual_type__account_debit_id
+msgid "Expense account"
+msgstr "Рахунок витрат"
+
+#. module: l10n_ua_hr_salary_account
+#: model:ir.model.fields,help:l10n_ua_hr_salary_account.field_hr_accrual_type__account_credit_id
+msgid "Liability account"
+msgstr "Рахунок зобов'язань"

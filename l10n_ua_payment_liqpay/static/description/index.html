@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 0 auto; color: #333;">
+
+    <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #005BBB 0%, #FFD500 100%); border-radius: 8px; margin-bottom: 30px;">
+        <h1 style="color: white; margin: 0; font-size: 2.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Ukraine - LiqPay Payment Provider</h1>
+        <p style="color: white; font-size: 1.2em; margin-top: 10px;">Card payments on your website and customer portal through LiqPay (PrivatBank) for Odoo 19</p>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 25px;">
+        <h2 style="color: #005BBB; margin-top: 0;">About</h2>
+        <p>A standard Odoo payment provider (<code>payment.provider</code>) for the LiqPay internet acquiring of PrivatBank. It works wherever Odoo takes online payments: the eCommerce checkout, the customer portal (invoices, quotations) and payment links.</p>
+        <p>The customer is redirected to the LiqPay Checkout page (<code>https://www.liqpay.ua/api/3/checkout</code>), pays there and comes back to the Odoo payment status page. The module follows the official LiqPay API documentation (API version 7).</p>
+    </div>
+
+    <div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h3 style="color: #005BBB; margin-top: 0;">Features</h3>
+        <ul>
+            <li>Checkout form built from signed <code>data</code> + <code>signature</code> (SHA3-256), with the order reference as <code>order_id</code></li>
+            <li>The payment state is set only from a LiqPay callback whose signature matches your private key (constant-time comparison), or from the LiqPay payment status API queried with your own keys</li>
+            <li>The amount and currency of every callback are checked against the transaction: a mismatch never confirms an order</li>
+            <li>Full mapping of LiqPay statuses: paid, waiting for confirmation (3DS, OTP, Privat24...), declined, reversed</li>
+            <li>Full and partial refunds from Odoo through the LiqPay API; refunds made in the LiqPay cabinet are recorded from the callback</li>
+            <li>Currencies: UAH, USD, EUR</li>
+            <li>Test mode with LiqPay sandbox keys; sandbox keys are refused in live mode and sandbox payments never confirm a live order</li>
+            <li>The private key is visible to administrators only and is cleared when a database is neutralized</li>
+        </ul>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h3 style="color: #005BBB; margin-top: 0;">Configuration</h3>
+        <ol>
+            <li>In the LiqPay cabinet (<strong>Settings → API</strong> of your shop) copy the <strong>public_key</strong> and <strong>private_key</strong>. Test keys start with <code>sandbox_</code>.</li>
+            <li>In Odoo open <strong>Website / Invoicing → Configuration → Payment Providers → LiqPay</strong>, paste the keys and set the state to <strong>Test Mode</strong> (sandbox keys) or <strong>Enabled</strong> (live keys).</li>
+            <li>Make sure the <strong>web.base.url</strong> of the database is the public HTTPS address of the website: LiqPay sends the callback to <code>/payment/liqpay/webhook</code> and returns the customer to <code>/payment/liqpay/return</code> on that address. Both are sent with each payment, nothing has to be entered in the cabinet.</li>
+            <li>Test card for sandbox payments: <code>4242 4242 4242 4242</code>, any future expiry date, any CVV.</li>
+        </ol>
+    </div>
+
+    <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+        <h3 style="color: #856404; margin-top: 0;">Requirements</h3>
+        <ul>
+            <li>A LiqPay merchant (shop) account</li>
+            <li>The Odoo server must be reachable from the Internet over HTTPS for the callbacks</li>
+            <li>Other currencies than UAH, USD and EUR must be enabled by LiqPay on request and are not offered by the module</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; padding: 20px; background: #005BBB; border-radius: 8px; color: white;">
+        <p style="margin: 0;">Developed for Odoo 19 Community Edition. LiqPay is a trademark of its owner; this module is not affiliated with PrivatBank.</p>
+    </div>
+
+</div>
+</body>
+</html>
