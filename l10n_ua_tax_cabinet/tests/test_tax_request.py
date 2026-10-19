@@ -86,7 +86,7 @@ class TestTaxRequest(TransactionCase):
         self.assertEqual(len(data['documents']), 1)
         doc = data['documents'][0]
         self.assertEqual(doc['name'], 'doc')
-        self.assertEqual(doc['format'], 'envelope')
+        self.assertEqual(doc['format'], 'dps_transport')
         self.assertTrue(doc['data_b64'])
 
     def test_on_submitted_sets_state(self):

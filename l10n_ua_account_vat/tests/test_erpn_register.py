@@ -99,7 +99,7 @@ class TestErpnRegister(TransactionCase):
         self.assertEqual(len(data['documents']), 1)
         doc = data['documents'][0]
         self.assertEqual(doc['name'], 'doc')
-        self.assertEqual(doc['format'], 'envelope')
+        self.assertEqual(doc['format'], 'dps_transport')
         self.assertTrue(doc['data_b64'])
         self.assertTrue(doc['recipient_cert_b64'])
         self.assertTrue(doc['filename'].endswith('.xml'))
