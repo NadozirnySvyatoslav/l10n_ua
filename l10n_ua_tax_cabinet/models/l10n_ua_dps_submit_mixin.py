@@ -32,8 +32,10 @@ def dps_standard_filename(xml_bytes):
     head = re.search(rb'<DECLARHEAD>(.*?)</DECLARHEAD>', xml_bytes or b'', re.S)
     if not head:
         return None
+    # Реквізити пов'язаних документів (LINKED_DOCS/DOC) мають ті самі теги C_DOC…
+    own = re.sub(rb'<LINKED_DOCS\b.*?(</LINKED_DOCS>|/>)', b'', head.group(1), flags=re.S)
     fields = {k.decode(): v.decode('ascii', 'ignore').strip()
-              for k, v in re.findall(rb'<([A-Z_]+)>([^<]*)</\1>', head.group(1))}
+              for k, v in re.findall(rb'<([A-Z_]+)>([^<]*)</\1>', own)}
     try:
         return '%s%s%s%s%s%s%s%s%s%s%s%s%s.xml' % (
             fields['C_REG'].zfill(2), fields['C_RAJ'].zfill(2), fields['TIN'].zfill(10),

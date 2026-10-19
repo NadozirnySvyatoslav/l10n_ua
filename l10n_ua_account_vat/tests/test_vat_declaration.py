@@ -60,7 +60,7 @@ class TestVatDeclaration(TransactionCase):
         decl = self._create_declaration()
         decl.action_calculate()
         self.assertEqual(decl.state, 'calculated')
-        decl.action_submit()
+        decl._dps_on_submitted('OK')  # подання — через КЕП у браузері
         self.assertEqual(decl.state, 'submitted')
         decl.action_accept()
         self.assertEqual(decl.state, 'accepted')
@@ -85,7 +85,7 @@ class TestVatDeclaration(TransactionCase):
         self.assertEqual(decl.line_9_vat, 20000, 'Total tax liabilities should be 20000')
         self.assertEqual(decl.line_17_vat, 10000, 'Total tax credit should be 10000')
         self.assertEqual(decl.line_18_vat, 10000, 'VAT payable should be 10000')
-        self.assertEqual(decl.line_20_vat, 0, 'VAT refundable should be 0')
+        self.assertEqual(decl.line_19_vat, 0, 'Negative value should be 0')
 
     def test_vat_refundable_calculation(self):
         """When credit > liabilities, VAT should be refundable."""
@@ -97,4 +97,5 @@ class TestVatDeclaration(TransactionCase):
             'line_10_1_vat': 20000,
         })
         self.assertEqual(decl.line_18_vat, 0, 'VAT payable should be 0')
-        self.assertEqual(decl.line_20_vat, 10000, 'VAT refundable should be 10000')
+        self.assertEqual(decl.line_19_vat, 10000, 'Negative value should be 10000')
+        self.assertEqual(decl.line_21_vat, 10000, 'Carried to the next period')

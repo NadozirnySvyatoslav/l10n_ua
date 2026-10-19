@@ -12,7 +12,9 @@
                             class="btn-primary" invisible="state not in ('draft', 'calculated')"/>
                     <button name="action_export_xlsx" string="Експорт XLSX" type="object"
                             invisible="state == 'draft'"/>
-                    <button name="action_submit" string="Подати" type="object"
+                    <button name="action_generate_xml" string="Сформувати XML" type="object"
+                            invisible="state != 'calculated'"/>
+                    <button name="action_submit" string="Підписати і подати" type="object"
                             class="btn-primary" invisible="state != 'calculated'"/>
                     <button name="action_accept" string="Прийнято" type="object"
                             class="btn-success" invisible="state != 'submitted'"/>
@@ -47,31 +49,37 @@
                         <!-- Section I — Tax Liabilities -->
                         <page string="I. Зобов'язання" name="liabilities">
                             <group>
-                                <group string="Ставка 20%">
+                                <group string="Основна ставка (р.1.1)">
                                     <field name="line_1_1_base"/>
                                     <field name="line_1_1_vat"/>
                                 </group>
-                                <group string="Ставка 14%">
+                                <group string="Ставка 7% (р.1.2)">
                                     <field name="line_1_2_base"/>
                                     <field name="line_1_2_vat"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Ставка 7%">
+                                <group string="Ставка 14% (р.1.3)">
                                     <field name="line_1_3_base"/>
                                     <field name="line_1_3_vat"/>
                                 </group>
-                                <group string="Нульова ставка">
+                                <group string="Вивезення, нульова ставка">
                                     <field name="line_2_base"/>
+                                    <field name="line_2_2_base"/>
                                     <field name="line_3_base"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Інші">
-                                    <field name="line_4_base"/>
+                                <group string="Не об'єкт / звільнені">
                                     <field name="line_5_base"/>
-                                    <field name="line_6_base"/>
+                                    <field name="line_5_1_base"/>
                                 </group>
+                                <group string="Коригування (р.7.1)">
+                                    <field name="line_7_1_base"/>
+                                    <field name="line_7_1_vat"/>
+                                </group>
+                            </group>
+                            <group>
                                 <group string="Разом">
                                     <field name="line_9_vat" class="oe_subtotal_footer_separator"/>
                                 </group>
@@ -81,39 +89,47 @@
                         <!-- Section II — Tax Credit -->
                         <page string="II. Кредит" name="credit">
                             <group>
-                                <group string="Придбання 20%">
+                                <group string="Придбання, основна ставка (р.10.1)">
                                     <field name="line_10_1_base"/>
                                     <field name="line_10_1_vat"/>
                                 </group>
-                                <group string="Придбання 14%">
+                                <group string="Придбання 7% (р.10.2)">
                                     <field name="line_10_2_base"/>
                                     <field name="line_10_2_vat"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="Придбання 7%">
+                                <group string="Придбання 14% (р.10.3)">
                                     <field name="line_10_3_base"/>
                                     <field name="line_10_3_vat"/>
                                 </group>
-                                <group string="Імпорт 20%">
+                                <group string="Без ПДВ">
+                                    <field name="line_10_4_base"/>
+                                    <field name="line_11_4_base"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Імпорт, основна ставка (р.11.1)">
                                     <field name="line_11_1_base"/>
                                     <field name="line_11_1_vat"/>
                                 </group>
-                            </group>
-                            <group>
-                                <group string="Імпорт 14%">
+                                <group string="Імпорт 7% (р.11.2)">
                                     <field name="line_11_2_base"/>
                                     <field name="line_11_2_vat"/>
                                 </group>
-                                <group string="Імпорт 7%">
+                            </group>
+                            <group>
+                                <group string="Імпорт 14% (р.11.3)">
                                     <field name="line_11_3_base"/>
                                     <field name="line_11_3_vat"/>
                                 </group>
+                                <group string="Коригування та від'ємне значення">
+                                    <field name="line_14_vat"/>
+                                    <field name="line_15_vat"/>
+                                    <field name="line_16_1_vat"/>
+                                </group>
                             </group>
                             <group>
-                                <group string="Коригування">
-                                    <field name="line_14_vat"/>
-                                </group>
                                 <group string="Разом">
                                     <field name="line_17_vat" class="oe_subtotal_footer_separator"/>
                                 </group>
@@ -121,7 +137,7 @@
                         </page>
 
                         <!-- Section III — Result -->
-                        <page string="III. Результат" name="result">
+                        <page string="III. Розрахунки" name="result">
                             <group>
                                 <group>
                                     <field name="line_9_vat" string="Усього зобов'язань (р.9)" readonly="True"/>
@@ -129,8 +145,28 @@
                                 </group>
                                 <group>
                                     <field name="line_18_vat"/>
-                                    <field name="line_20_vat"/>
-                                    <field name="line_20_2_vat"/>
+                                    <field name="line_19_vat"/>
+                                    <field name="line_21_vat"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- Подання до ДПС -->
+                        <page string="Подання" name="submission">
+                            <group>
+                                <group string="Підписанти">
+                                    <field name="signatory_name"/>
+                                    <field name="signatory_rnokpp"/>
+                                    <field name="accountant_name"/>
+                                    <field name="accountant_rnokpp"/>
+                                </group>
+                                <group string="Файли">
+                                    <field name="xml_file" filename="xml_filename" readonly="True"/>
+                                    <field name="xml_filename" invisible="1"/>
+                                    <field name="d1_xml_file" filename="d1_xml_filename" readonly="True"
+                                           invisible="not d1_xml_file"/>
+                                    <field name="d1_xml_filename" invisible="1"/>
+                                    <field name="submission_date" readonly="True"/>
                                 </group>
                             </group>
                         </page>
@@ -152,7 +188,7 @@
                 <field name="line_9_vat" string="Зобов'язання"/>
                 <field name="line_17_vat" string="Кредит"/>
                 <field name="line_18_vat" string="До сплати"/>
-                <field name="line_20_vat" string="До відшкодування"/>
+                <field name="line_19_vat" string="Від'ємне значення"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'accepted'"
                        decoration-info="state in ('calculated', 'submitted')"
