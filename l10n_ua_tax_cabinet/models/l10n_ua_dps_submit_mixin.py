@@ -1,7 +1,8 @@
 import base64
+import json
 import logging
 
-from odoo import models, _
+from odoo import api, models, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -121,6 +122,22 @@ class L10nUaDpsSubmitMixin(models.AbstractModel):
             raise UserError(_('Не отримано підпис документа.'))
         result = config._api_submit_document_presigned(
             envelope, self._dps_filename(), auth_signature)
-        receipt = result.get('message') if isinstance(result, dict) else str(result)
+        receipt = self._dps_receipt_text(result)
         self._dps_on_submitted(receipt)
         return {'receipt': receipt}
+
+    @api.model
+    def _dps_receipt_text(self, result):
+        """Відповідь кабінету на подання — у текст квитанції.
+
+        Кабінет повертає масив результатів (по одному на поданий файл) або об'єкт.
+        """
+        items = result if isinstance(result, list) else [result]
+        parts = []
+        for item in items:
+            if isinstance(item, dict):
+                text = item.get('message') or item.get('status') or item.get('result')
+                parts.append(str(text) if text else json.dumps(item, ensure_ascii=False))
+            elif item not in (None, ''):
+                parts.append(str(item))
+        return '; '.join(parts) or _('Подано')
