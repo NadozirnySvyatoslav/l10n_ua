@@ -69,6 +69,20 @@ class HrOrder(models.Model):
         for order in self:
             order.is_locked = bool(order.leave_id)
 
+    @api.depends('order_type', 'employee_id', 'date_dismissal', 'date')
+    def _compute_unused_vacation_days(self):
+        """Days of unused vacation as of the dismissal date, from the
+        vacation entitlement shared with the remaining vacation certificate:
+        every leave type paid out on dismissal, each rounded on its own."""
+        Entitlement = self.env['hr.vacation.entitlement']
+        for order in self:
+            days = 0.0
+            if order.order_type == 'dismissal' and order.employee_id:
+                ref_date = (order.date_dismissal or order.date
+                            or fields.Date.context_today(order))
+                days = Entitlement._compensated_days(order.employee_id, ref_date)
+            order.unused_vacation_days = days
+
     @api.depends('order_type', 'leave_id', 'employee_id', 'holiday_status_id',
                  'vacation_date_from', 'vacation_date_to')
     def _compute_can_create_leave(self):

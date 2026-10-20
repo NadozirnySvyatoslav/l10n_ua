@@ -33,6 +33,10 @@
                             <group>
                                 <field name="certificate_type_id"/>
                                 <field name="employee_id"/>
+                                <field name="is_vacation_remaining" invisible="1"/>
+                                <field name="vacation_as_of"
+                                       invisible="not is_vacation_remaining"
+                                       required="is_vacation_remaining"/>
                                 <field name="destination" invisible="not requires_destination"/>
                             </group>
                             <group>

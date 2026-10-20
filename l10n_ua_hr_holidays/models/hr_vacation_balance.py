@@ -73,8 +73,12 @@ class HrVacationBalance(models.Model):
         store=True,
         readonly=False,
         precompute=True,
-        help='Days entitled for the year. Defaults to leave type annual_days; '
-             'can be overridden manually (e.g. proportional for mid-year hires).'
+        help='The employee\'s full yearly norm for the period. Defaults to the '
+             'leave type\'s days per year; change it when the employee\'s '
+             'norm differs (set by the employment or collective agreement). '
+             'Enter the full norm, not a pro-rated figure: the unused '
+             'vacation on dismissal and on the remaining vacation '
+             'certificate is pro-rated to the time worked by itself.'
     )
     carried_over = fields.Float(
         string='Carried Over',

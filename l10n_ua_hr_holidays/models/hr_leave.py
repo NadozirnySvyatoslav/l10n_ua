@@ -7,6 +7,8 @@ from datetime import datetime, time as dt_time
 
 from pytz import timezone, utc
 
+from .hr_leave_type import UNPAID_LEAVE_CATEGORIES
+
 
 class HrLeave(models.Model):
     _inherit = 'hr.leave'
@@ -1139,7 +1141,7 @@ class HrLeave(models.Model):
         # Days of unpaid leave in the period: no pay was kept for them. Sick
         # days are not among them, since their benefit is in the earnings.
         unpaid_leave_type = self.env['hr.leave.type'].search([
-            ('ua_leave_category', '=', 'unpaid')
+            ('ua_leave_category', 'in', UNPAID_LEAVE_CATEGORIES)
         ])
 
         excluded_leave_types = unpaid_leave_type.ids

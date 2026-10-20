@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Holidays',
-    'version': '19.0.1.1.3',
+    'version': '19.0.1.2.1',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian holidays and sick leave management',
     'description': """

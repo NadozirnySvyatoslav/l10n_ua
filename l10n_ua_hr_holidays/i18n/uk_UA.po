@@ -525,6 +525,7 @@ msgstr "Код діагнозу (МКХ-10)"
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_balance__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_entitlement__display_name
 msgid "Display Name"
 msgstr "Назва для відображення"
 
@@ -690,6 +691,7 @@ msgstr "Є повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule_line__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_entitlement__id
 msgid "ID"
 msgstr "ID"
 
@@ -2283,3 +2285,34 @@ msgid ""
 "of public holidays (#344)"
 msgstr ""
 "модуль оновлено і відпустку звірено з чинним списком святкових днів (#344)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__ua_leave_category__unpaid_abroad
+msgid "Unpaid Leave (Abroad or Internally Displaced)"
+msgstr "Відпустка без збереження зарплати (виїзд за кордон або ВПО)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__ua_leave_category__unpaid_childcare
+msgid "Unpaid Leave (Childcare)"
+msgstr "Відпустка без збереження зарплати (догляд за дитиною)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_vacation_balance__entitled_days
+msgid ""
+"The employee's full yearly norm for the period. Defaults to the leave "
+"type's days per year; change it when the employee's norm differs (set "
+"by the employment or collective agreement). Enter the full norm, not a "
+"pro-rated figure: the unused vacation on dismissal and on the "
+"remaining vacation certificate is pro-rated to the time worked by "
+"itself."
+msgstr ""
+"Повна річна норма працівника за період. За замовчуванням — кількість "
+"днів на рік із типу відпустки; змініть, якщо норма працівника інша "
+"(встановлена трудовим або колективним договором). Вносьте повну норму, "
+"а не пропорційну: невикористана відпустка при звільненні та в довідці "
+"про залишки рахується пропорційно відпрацьованому часу автоматично."
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model,name:l10n_ua_hr_holidays.model_hr_vacation_entitlement
+msgid "Vacation Entitlement"
+msgstr "Право на відпустку"

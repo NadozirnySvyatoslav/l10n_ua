@@ -832,3 +832,23 @@ msgstr "Історія комунікації веб-сайту"
 #: model:ir.model.fields,help:l10n_ua_hr_documents_certificates.field_hr_certificate__destination
 msgid "Where the certificate will be presented"
 msgstr "Куди буде подано довідку"
+
+#. module: l10n_ua_hr_documents_certificates
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents_certificates.field_hr_certificate__vacation_as_of
+msgid "Vacation As of"
+msgstr "Залишки відпусток станом на"
+
+#. module: l10n_ua_hr_documents_certificates
+#: model:ir.model.fields,help:l10n_ua_hr_documents_certificates.field_hr_certificate__vacation_as_of
+msgid "The vacation is counted up to and including this date."
+msgstr "Відпустку враховано по цю дату включно."
+
+#. module: l10n_ua_hr_documents_certificates
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents_certificates.field_hr_certificate__is_vacation_remaining
+msgid "Is Vacation Remaining"
+msgstr "Довідка про залишки відпусток"
+
+#. module: l10n_ua_hr_documents_certificates
+#: model:ir.model.fields,help:l10n_ua_hr_documents_certificates.field_hr_certificate__is_vacation_remaining
+msgid "Technical: the certificate is a remaining vacation certificate."
+msgstr "Технічне: довідка про залишки відпусток."

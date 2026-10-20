@@ -693,5 +693,172 @@
             ]]></field>
         </record>
 
+
+        <!-- Remaining vacation certificate. The figures come from the
+             vacation entitlement of Ukraine - HR Holidays as of the
+             certificate's "Vacation As of" date; see
+             hr.certificate._vacation_remaining_context for the values.
+             Without that module it lists no leave. -->
+        <record id="certificate_type_vacation_remaining" model="hr.certificate.type">
+            <field name="name">Довідка про залишки відпусток</field>
+            <field name="code">vacation_remaining</field>
+            <field name="sequence">90</field>
+            <field name="sequence_id" ref="seq_hr_certificate_vacation_remaining"/>
+            <field name="requires_salary_info">False</field>
+            <field name="requires_period">False</field>
+            <field name="requires_destination">False</field>
+            <field name="validity_days">30</field>
+            <!-- Shared by all companies: without it the type gets the
+                 installing user's company and other companies never see it. -->
+            <field name="company_id" eval="False"/>
+            <field name="template_body"><![CDATA[
+<t t-set="cell" t-value="'border: 1px solid #000; padding: 3px 4px;'"/>
+<t t-set="num" t-value="'border: 1px solid #000; padding: 3px 4px; text-align: right;'"/>
+<div style="font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.5;">
+
+    <!-- Header, laid out like the orders: the company, the
+         document's name, then its number, place and date. The
+         layout tables below keep their cells apart (separate
+         borders), so the PDF renderer draws no row lines. -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <strong t-out="company.name or '_______________'"/><br/>
+        <span style="font-size: 10pt;">(найменування підприємства, організації)</span><br/>
+        <span style="font-size: 12pt;">Ідентифікаційний код ЄДРПОУ
+            <t t-out="company.company_registry or '__________'"/></span>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">ДОВІДКА</h2>
+        <h3 style="margin: 5px 0;">про залишки відпусток</h3>
+    </div>
+
+    <table class="o_ignore_layout_styling" style="border: none; border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 20px;">
+        <tr>
+            <td style="border: none; width: 20%; white-space: nowrap;">№ <t t-out="certificate.name if certificate.name and certificate.name != 'New' else '_________'"/></td>
+            <td style="border: none; width: 45%; text-align: center;">
+                <t t-out="place"/>
+            </td>
+            <td style="border: none; width: 35%; text-align: right; white-space: nowrap;">
+                від <t t-out="format_date_long(certificate.issue_date or certificate.request_date)"/>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Employee -->
+    <table class="o_ignore_layout_styling" style="border: none; border-collapse: separate; border-spacing: 0; width: 100%; margin-bottom: 12px;">
+        <tr>
+            <td style="border: none; width: 35%;"><strong>Працівник:</strong></td>
+            <td style="border: none;" t-out="employee.name"/>
+        </tr>
+        <tr>
+            <td style="border: none;"><strong>Посада:</strong></td>
+            <td style="border: none;" t-out="employee.job_id.name or employee.job_title or ''"/>
+        </tr>
+        <tr>
+            <td style="border: none;"><strong>Структурний підрозділ:</strong></td>
+            <td style="border: none;" t-out="employee.department_id.name or ''"/>
+        </tr>
+        <tr>
+            <td style="border: none;"><strong>Дата прийняття на роботу:</strong></td>
+            <td style="border: none;" t-out="format_date(vacation_hire_date)"/>
+        </tr>
+    </table>
+
+    <p>Розрахунок залишків відпусток станом на
+        <strong t-out="format_date(vacation_as_of)"/> (календарні дні).</p>
+
+    <t t-if="not vacation_lines">
+        <p>Відпусток, за якими є залишок, не знайдено.</p>
+    </t>
+
+    <t t-foreach="vacation_lines" t-as="line">
+        <p style="margin: 14px 0 4px 0;"><strong t-out="line['leave_type'].name"/></p>
+        <table class="o_ignore_layout_styling" style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+            <thead>
+                <tr style="background-color: #f0f0f0;">
+                    <th style="border: 1px solid #000; padding: 3px 4px; width: 28%;">Період</th>
+                    <th t-att-style="cell">Право за період</th>
+                    <th t-att-style="cell">Набуто на дату</th>
+                    <th t-att-style="cell">Використано</th>
+                    <th t-att-style="cell">Залишок на дату</th>
+                    <th t-att-style="cell">Можна використати</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="line['rows']" t-as="row">
+                    <td t-att-style="cell">
+                        <t t-if="row['is_carried']">Перенесено на початок періоду</t>
+                        <t t-else="">
+                            <span t-out="format_date(row['date_from'])"/> –
+                            <span t-out="format_date(row['date_to'])"/>
+                            <t t-if="row['is_current']"><br/><i>поточний період</i></t>
+                        </t>
+                    </td>
+                    <td t-att-style="num" t-out="format_days(row['entitled'])"/>
+                    <td t-att-style="num" t-out="format_days(row['accrued'])"/>
+                    <td t-att-style="num" t-out="format_days(row['used'])"/>
+                    <td t-att-style="num" t-out="format_days(row['remaining'])"/>
+                    <td t-att-style="num" t-out="format_days(row['usable'])"/>
+                </tr>
+                <tr style="font-weight: bold;">
+                    <td t-att-style="cell">Разом, днів</td>
+                    <td t-att-style="num"/>
+                    <td t-att-style="num" t-out="format_days(line['accrued'])"/>
+                    <td t-att-style="num" t-out="format_days(line['used'])"/>
+                    <td t-att-style="num" t-out="format_days(line['remaining'])"/>
+                    <td t-att-style="num" t-out="format_days(line['usable'])"/>
+                </tr>
+            </tbody>
+        </table>
+    </t>
+
+    <!-- Summary: the days the employee may still take, and the
+         days earned in proportion to the time worked. -->
+    <p style="margin: 16px 0 0 0;">
+        Усього днів відпусток, які можуть бути використані станом на
+        <span t-out="format_date(vacation_as_of)"/>:
+        <strong t-out="usable_days"/>
+    </p>
+    <p style="margin: 0;">
+        Усього днів відпусток, набутих пропорційно відпрацьованому часу, станом на
+        <span t-out="format_date(vacation_as_of)"/>:
+        <strong t-out="remaining_days"/>
+    </p>
+
+    <div style="font-size: 9pt; margin-top: 8px;">
+        <p style="margin: 2px 0;">«Набуто на дату» — дні, набуті пропорційно часу, що зараховується до стажу для відпустки.
+            «Можна використати» враховує повне право за поточний період.</p>
+        <p style="margin: 2px 0;">Використані дні зараховано в рахунок найдавніших періодів.</p>
+        <p t-if="has_pro_rated_first_year" style="margin: 2px 0;">
+            До закінчення шести місяців безперервної роботи в перший робочий рік щорічні відпустки
+            надаються пропорційно відпрацьованому часу. Окремим категоріям працівників вони можуть
+            бути надані повної тривалості за їхнім бажанням.</p>
+        <p t-if="has_split_period" style="margin: 2px 0;">
+            Період, що включає <span t-out="format_date(split_date)"/>,
+            показано двома рядками: до цієї дати та з неї.</p>
+    </div>
+
+    <!-- Signatures -->
+    <table class="o_ignore_layout_styling" style="border: none; border-collapse: separate; border-spacing: 0; width: 100%; margin-top: 36px;">
+        <tr>
+            <td style="border: none; width: 40%;" t-out="company.hr_manager_id.job_id.name or 'Керівник кадрової служби'"/>
+            <td style="border: none; width: 25%; border-bottom: 1px solid #000;"/>
+            <td style="border: none; width: 35%; padding-left: 10px; white-space: nowrap;" t-out="company.hr_manager_id.name or '____________________'"/>
+        </tr>
+        <tr>
+            <td style="border: none; padding-top: 24px;" t-out="company.accountant_id.job_id.name or 'Головний бухгалтер'"/>
+            <td style="border: none; border-bottom: 1px solid #000;"/>
+            <td style="border: none; padding-left: 10px; padding-top: 24px; white-space: nowrap;" t-out="company.accountant_id.name or '____________________'"/>
+        </tr>
+        <tr>
+            <td style="border: none; padding-top: 24px;">М.П.</td>
+            <td style="border: none;"/>
+            <td style="border: none;"/>
+        </tr>
+    </table>
+</div>
+            ]]></field>
+        </record>
+
     </data>
 </odoo>

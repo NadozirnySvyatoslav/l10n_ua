@@ -158,10 +158,10 @@ msgstr "Відрядження"
 #: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__unused_vacation_days
 msgid ""
 "Calendar days of unused vacation to compensate on dismissal. Auto-filled "
-"from the vacation balance; editable."
+"from the vacation balances; editable."
 msgstr ""
 "Календарні дні невикористаної відпустки для компенсації при звільненні. "
-"Заповнюється автоматично із залишку відпусток; можна редагувати."
+"Заповнюється автоматично з балансів відпусток; можна редагувати."
 
 #. module: l10n_ua_hr_documents
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_documents.view_hr_order_form

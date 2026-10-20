@@ -6,6 +6,13 @@ from dateutil.relativedelta import relativedelta
 
 _logger = logging.getLogger(__name__)
 
+# Code of the remaining vacation certificate type.
+VACATION_REMAINING_CODE = 'vacation_remaining'
+
+# The kind of settlement a company's city may already start with; "м." is
+# put in front of the city only when it starts with none of them.
+SETTLEMENT_PREFIXES = ('м.', 'м ', 'місто', 'с.', 'село', 'смт', 'селище', 'с-ще')
+
 
 class HrCertificate(models.Model):
     _name = 'hr.certificate'
@@ -169,6 +176,27 @@ class HrCertificate(models.Model):
         string='Number of Copies',
         default=1
     )
+
+    # Remaining vacation certificate
+    vacation_as_of = fields.Date(
+        string='Vacation As of',
+        default=fields.Date.context_today,
+        help='The vacation is counted up to and including this date.',
+    )
+    is_vacation_remaining = fields.Boolean(
+        compute='_compute_is_vacation_remaining',
+        help='Technical: the certificate is a remaining vacation certificate.',
+    )
+
+    @api.depends('certificate_type_id')
+    def _compute_is_vacation_remaining(self):
+        for record in self:
+            record.is_vacation_remaining = (
+                record.certificate_type_id.code == VACATION_REMAINING_CODE)
+
+    @api.onchange('vacation_as_of')
+    def _onchange_vacation_as_of(self):
+        self._onchange_render_body()
 
     @api.depends('employee_id', 'certificate_type_id', 'name')
     def _compute_display_name(self):
@@ -349,7 +377,7 @@ class HrCertificate(models.Model):
         ).get(version.contract_type_ua, '') if version and 'contract_type_ua' in version._fields else ''
         is_fixed_term = bool(version.contract_date_end) if version else False
 
-        return {
+        context = {
             'o': self,
             'certificate': self,
             'employee': employee,
@@ -376,6 +404,71 @@ class HrCertificate(models.Model):
             'rnokpp': employee.rnokpp if employee else '',
             'today': fields.Date.context_today(self),
         }
+        if self.certificate_type_id.code == VACATION_REMAINING_CODE:
+            context.update(self._vacation_remaining_context())
+        return context
+
+    def _vacation_remaining_context(self):
+        """Values the remaining vacation template renders from.
+
+        The vacation comes from Ukraine - HR Holidays, which this module does
+        not depend on: without it the certificate lists no leave, the same
+        way the salary certificates print no payslips without the payroll
+        module.
+        """
+        self.ensure_one()
+        as_of = self.vacation_as_of or self.request_date or fields.Date.context_today(self)
+        context = {
+            'vacation_as_of': as_of,
+            'vacation_lines': [],
+            'vacation_hire_date': self._get_hire_date(),
+            'usable_days': 0,
+            'remaining_days': 0,
+            'has_split_period': False,
+            'has_pro_rated_first_year': False,
+            'split_date': False,
+            'place': self._vacation_certificate_place(),
+            'format_days': self._format_vacation_days,
+            'format_date_long': self._format_date,
+        }
+        if 'hr.vacation.entitlement' not in self.env or not self.employee_id:
+            return context
+        # Ukraine - HR Holidays is installed, and with it Ukraine - HR
+        # Documents it depends on: their code can be imported here.
+        from odoo.addons.l10n_ua_hr_documents.tools import compensable_vacation_days
+        from odoo.addons.l10n_ua_hr_holidays.models.hr_vacation_entitlement import SPLIT_DATE
+        lines = self.env['hr.vacation.entitlement']._unused_vacation(self.employee_id, as_of)
+        context.update({
+            'vacation_lines': lines,
+            'vacation_hire_date': self.employee_id._get_vacation_anchor_date(),
+            # Both totals are rounded once, over all leave types together.
+            'usable_days': compensable_vacation_days(sum(line['usable'] for line in lines)),
+            'remaining_days': compensable_vacation_days(sum(line['remaining'] for line in lines)),
+            'has_split_period': any(row['is_split'] for line in lines for row in line['rows']),
+            'has_pro_rated_first_year': any(line['pro_rated_first_year'] for line in lines),
+            'split_date': SPLIT_DATE,
+            'format_date_long': self.env['hr.order.template.wizard']._format_date_ua,
+        })
+        return context
+
+    def _vacation_certificate_place(self):
+        """The place the certificate is issued in, from the company's city.
+
+        The city is printed as entered, without a trailing comma; "м." is
+        put in front only when the city does not already start with the
+        kind of settlement, so it never reads "м. м. Миргород"."""
+        self.ensure_one()
+        city = (self.company_id.city or '').strip().rstrip(',').strip()
+        if not city:
+            return ''
+        if city.lower().startswith(SETTLEMENT_PREFIXES):
+            return city
+        return 'м. ' + city
+
+    @api.model
+    def _format_vacation_days(self, days):
+        """Days with two decimals and a decimal comma."""
+        return ('%.2f' % (days or 0.0)).replace('.', ',')
 
     def _calculate_work_experience(self, hire_date):
         """Format work experience as 'X р. Y міс. Z дн.'"""
@@ -530,4 +623,7 @@ class HrCertificate(models.Model):
         # Use custom report if defined, otherwise use default
         if self.certificate_type_id.report_id:
             return self.certificate_type_id.report_id.report_action(self)
-        return self.env.ref('l10n_ua_hr_documents_certificates.action_report_hr_certificate').report_action(self)
+        # The default report prints without the company's document layout,
+        # so there is no layout to configure first.
+        return self.env.ref('l10n_ua_hr_documents_certificates.action_report_hr_certificate').report_action(
+            self, config=False)

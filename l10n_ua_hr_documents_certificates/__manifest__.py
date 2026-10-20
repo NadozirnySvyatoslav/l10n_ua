@@ -16,6 +16,7 @@ This module provides standard HR certificates and references commonly issued by 
 * Character reference (Характеристика)
 * Bank certificate (Довідка для банку)
 * Vacation certificate (Довідка про відпустку)
+* Remaining vacation certificate (Довідка про залишки відпусток)
 * Custom certificates with templates
 
 Features:
