@@ -623,7 +623,4 @@ class HrCertificate(models.Model):
         # Use custom report if defined, otherwise use default
         if self.certificate_type_id.report_id:
             return self.certificate_type_id.report_id.report_action(self)
-        # The default report prints without the company's document layout,
-        # so there is no layout to configure first.
-        return self.env.ref('l10n_ua_hr_documents_certificates.action_report_hr_certificate').report_action(
-            self, config=False)
+        return self.env.ref('l10n_ua_hr_documents_certificates.action_report_hr_certificate').report_action(self)

@@ -22,6 +22,15 @@ BASIC_EXCLUDED_CATEGORIES = ('childcare', 'unpaid_abroad', 'unpaid_childcare')
 WORKED_TIME_CATEGORIES = ('annual_hazardous', 'annual_special', 'annual_irregular')
 WORKED_TIME_COUNTED_CATEGORIES = ('annual_basic',) + WORKED_TIME_CATEGORIES
 
+# Until martial law lifted the limit, unpaid leave agreed with the employer
+# lasted at most this many calendar days a year, and only those days count
+# towards the seniority for the annual basic leave; the limit applies to the
+# unpaid leave dated before UNPAID_LIMIT_UNTIL. The generic unpaid category
+# does not tell that leave from the other unpaid leave counted in full, so the
+# limit applies to the whole category.
+UNPAID_LIMIT_DAYS = 15
+UNPAID_LIMIT_UNTIL = date(2022, 3, 24)
+
 # Absences that do not count as a day of seniority for the additional leave of
 # workers with children.
 CHILDREN_EXCLUDED_CATEGORIES = ('maternity', 'childcare')
@@ -295,7 +304,21 @@ class HrVacationEntitlement(models.AbstractModel):
         dates = set()
         for c in excluded:
             dates |= absences.get(c, set())
+        if category not in WORKED_TIME_CATEGORIES and category != 'social_children':
+            dates |= self._unpaid_over_limit(absences.get('unpaid', set()))
         return dates
+
+    @api.model
+    def _unpaid_over_limit(self, unpaid_dates):
+        """Days of unpaid leave before UNPAID_LIMIT_UNTIL beyond the first
+        UNPAID_LIMIT_DAYS of their calendar year: they do not count towards
+        the seniority for the annual basic leave."""
+        over, per_year = set(), {}
+        for day in sorted(d for d in unpaid_dates if d < UNPAID_LIMIT_UNTIL):
+            per_year[day.year] = per_year.get(day.year, 0) + 1
+            if per_year[day.year] > UNPAID_LIMIT_DAYS:
+                over.add(day)
+        return over
 
     # ------------------------------------------------------------------
     # Settlement

@@ -106,15 +106,9 @@ class TestVacationCertificate(TransactionCase):
                 company.city = city
                 self.assertEqual(certificate._vacation_certificate_place(), place)
 
-    def test_certificate_prints_with_one_header(self):
-        """The printed certificate carries the body's own header only: the
-        company name appears once, with no company document layout."""
+    def test_certificate_prints(self):
         certificate = self._certificate(date(2026, 4, 15))
-        action = certificate.action_print()
-        self.assertEqual(action['type'], 'ir.actions.report')
         html = self.env['ir.actions.report']._render_qweb_html(
             'l10n_ua_hr_documents_certificates.report_hr_certificate', certificate.ids)[0]
         html = html.decode() if isinstance(html, bytes) else html
         self.assertIn('<strong>72</strong>', html)
-        self.assertEqual(html.count(certificate.company_id.name), 1)
-        self.assertNotIn('o_report_layout', html)

@@ -10,17 +10,12 @@
         <field name="report_file">l10n_ua_hr_documents_certificates.report_hr_certificate</field>
         <field name="binding_model_id" ref="model_hr_certificate"/>
         <field name="binding_type">report</field>
-        <!-- The page format of the orders: no room kept for a company header. -->
-        <field name="paperformat_id" ref="l10n_ua_hr_base.paperformat_a4_ua"/>
     </record>
 
-    <!-- Every certificate body carries its own header (company, code,
-         document title), so the company's document layout would print a
-         second one: the plain layout keeps a single header. -->
     <template id="report_hr_certificate">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="web.basic_layout">
+                <t t-call="web.external_layout">
                     <div class="page">
                         <t t-raw="doc.body"/>
                     </div>

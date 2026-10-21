@@ -128,6 +128,17 @@ class TestVacationEntitlement(TransactionCase):
         line = self._line(employee, date(2026, 2, 28), self.basic)
         self.assertEqual(days(line['remaining']), 48)
 
+    def test_unpaid_leave_before_martial_law_counts_up_to_fifteen_days(self):
+        """Before the limit was lifted only 15 days of unpaid leave a calendar
+        year count as seniority: of 30 days in 2021, 15 are left out of the
+        work year 01.03.2021 – 28.02.2022, 24 / 365 × 350 = 23.01."""
+        employee = self._employee(date(2020, 3, 1))
+        self._balance(employee, self.basic, date(2021, 3, 1), date(2022, 2, 28), 24)
+        self._leave(employee, self.unpaid, date(2021, 6, 1), date(2021, 6, 30))
+        line = self._line(employee, date(2022, 2, 28), self.basic)
+        second = [row for row in line['rows'] if row['date_from'] == date(2021, 3, 1)][0]
+        self.assertAlmostEqual(second['accrued'], 24 * 350 / 365, places=4)
+
     def test_childcare_leave_is_left_out_of_seniority(self):
         """The partly paid childcare leave does not count towards the basic
         leave, while sick leave does: a work year spent on childcare leave
