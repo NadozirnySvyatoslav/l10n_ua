@@ -2316,3 +2316,15 @@ msgstr ""
 #: model:ir.model,name:l10n_ua_hr_holidays.model_hr_vacation_entitlement
 msgid "Vacation Entitlement"
 msgstr "Право на відпустку"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/migrations/19.0.1.2.2/post-migration.py:0
+msgid ""
+"The days of unused vacation to compensate were recounted by the new rule: "
+"%(old)s → %(new)s. If the order text was already loaded from a template, "
+"load the template again."
+msgstr ""
+"Кількість днів невикористаної відпустки до компенсації перераховано за "
+"новим правилом: %(old)s → %(new)s. Якщо текст наказу вже завантажено з "
+"шаблону, завантажте шаблон повторно."

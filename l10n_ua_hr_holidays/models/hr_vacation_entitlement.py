@@ -122,8 +122,8 @@ class HrVacationEntitlement(models.AbstractModel):
         result = []
         for leave_type in sorted(periods_by_type, key=lambda t: (
                 order.get(t.ua_leave_category, len(order)), t.name or '', t.id)):
-            used = sum(leaves.filtered(
-                lambda l: l.holiday_status_id == leave_type).mapped('calendar_days'))
+            used = sum(self._days_used(leave, as_of, holidays) for leave in leaves.filtered(
+                lambda l: l.holiday_status_id == leave_type))
             result.append(self._settle(
                 leave_type, periods_by_type[leave_type], used,
                 hire, as_of, holidays, absences))
@@ -249,6 +249,23 @@ class HrVacationEntitlement(models.AbstractModel):
                 dates.add(day)
             day += timedelta(days=1)
         return dates
+
+    @api.model
+    def _days_used(self, leave, as_of, holidays):
+        """Calendar days of the time off taken up to and including as_of.
+
+        A time off running past the date counts only its days up to it: the
+        rest is not used yet (or never will be, on a dismissal during the
+        leave). The public holidays inside it are not counted, the same as
+        in its own length."""
+        if not leave.request_date_to or leave.request_date_to <= as_of:
+            return leave.calendar_days
+        days, day = 0, leave.request_date_from
+        while day <= as_of:
+            if day not in holidays:
+                days += 1
+            day += timedelta(days=1)
+        return days
 
     @api.model
     def _absence_dates(self, leaves):

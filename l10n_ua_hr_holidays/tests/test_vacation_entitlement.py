@@ -138,6 +138,15 @@ class TestVacationEntitlement(TransactionCase):
         line = self._line(employee, date(2026, 2, 28), self.basic)
         self.assertEqual(days(line['remaining']), 24)
 
+    def test_leave_past_the_date_counts_only_its_days_up_to_it(self):
+        """A leave running past the date counts as used only up to it: 10
+        of the 14 days by 10.06.2025, so 24 + 24 - 10 = 38 remain."""
+        employee = self._employee(date(2024, 3, 1))
+        self._balance(employee, self.basic, date(2025, 3, 1), date(2026, 2, 28), 24)
+        self._leave(employee, self.basic, date(2025, 6, 1), date(2025, 6, 14))
+        line = self._line(employee, date(2025, 6, 10), self.basic)
+        self.assertEqual(line['used'], 10)
+
     def test_public_holidays_are_left_out_of_the_proportion(self):
         """With a holiday on the calendar, the year and the days worked are
         both counted without it."""
@@ -375,15 +384,18 @@ class TestLeaveTypeImportCategories(TransactionCase):
         self.assertIn('unpaid_abroad', by_name.values())
         self.assertIn('unpaid_childcare', by_name.values())
 
-    def test_migration_moves_only_untouched_imported_types(self):
+    def _migration(self):
         path = os.path.join(
-            os.path.dirname(__file__), '..', 'migrations', '19.0.1.2.0',
+            os.path.dirname(__file__), '..', 'migrations', '19.0.1.2.2',
             'post-migration.py')
         spec = importlib.util.spec_from_file_location(
-            'l10n_ua_hr_holidays_19_1_2_0_post', path)
+            'l10n_ua_hr_holidays_19_1_2_2_post', path)
         script = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(script)
+        return script
 
+    def test_migration_moves_only_untouched_imported_types(self):
+        script = self._migration()
         company = self.env.company
         LeaveType = self.env['hr.leave.type']
         imported = LeaveType.create({
@@ -402,8 +414,62 @@ class TestLeaveTypeImportCategories(TransactionCase):
             'company_id': company.id,
         })
         self.env.flush_all()
-        script.migrate(self.env.cr, '19.0.1.1.1')
+        script.migrate(self.env.cr, '19.0.1.1.2')
         (imported | renamed | recategorised).invalidate_recordset(['ua_leave_category'])
         self.assertEqual(imported.ua_leave_category, 'social_children')
         self.assertEqual(renamed.ua_leave_category, 'social')
         self.assertEqual(recategorised.ua_leave_category, 'other')
+
+    def test_migration_moves_the_shared_types(self):
+        """The module's shared types carried the generic categories before
+        their data file was corrected; the data file is never reloaded, so
+        the migration moves them by external id."""
+        script = self._migration()
+        children = self.env.ref('l10n_ua_hr_holidays.leave_type_social_children')
+        hazard = self.env.ref('l10n_ua_hr_holidays.leave_type_additional_hazard')
+        children.ua_leave_category = 'social'
+        hazard.ua_leave_category = 'annual_additional'
+        self.env.flush_all()
+        script.migrate(self.env.cr, '19.0.1.1.2')
+        (children | hazard).invalidate_recordset(['ua_leave_category'])
+        self.assertEqual(children.ua_leave_category, 'social_children')
+        self.assertEqual(hazard.ua_leave_category, 'annual_hazardous')
+
+    def test_migration_recounts_draft_dismissal_orders(self):
+        """A draft dismissal order gets its days recounted by the new rule,
+        with a note in its history; a confirmed one keeps its figure."""
+        script = self._migration()
+        # Public holidays are working days under martial law.
+        self.env['resource.calendar.leaves'].search([('resource_id', '=', False)]).unlink()
+        employee = self.env['hr.employee'].create({
+            'name': 'Migration Recount Employee',
+            'hire_date': date(2024, 3, 1),
+        })
+        self.env['hr.vacation.balance'].create({
+            'employee_id': employee.id,
+            'leave_type_id': self.env.ref('l10n_ua_hr_holidays.leave_type_annual_basic').id,
+            'period_start': date(2026, 3, 1),
+            'period_end': date(2027, 2, 28),
+            'entitled_days': 24,
+        })
+        Order = self.env['hr.order']
+        vals = {
+            'order_type': 'dismissal',
+            'date': date(2026, 10, 16),
+            'date_dismissal': date(2026, 10, 16),
+            'employee_id': employee.id,
+            'subject': 'Dismissal',
+        }
+        draft = Order.create(vals)
+        confirmed = Order.create(vals)
+        # The figure the old rule left on both.
+        draft.unused_vacation_days = 72
+        confirmed.unused_vacation_days = 72
+        confirmed.state = 'confirmed'
+        messages = len(draft.message_ids)
+        self.env.flush_all()
+        script.migrate(self.env.cr, '19.0.1.1.2')
+        self.env.invalidate_all()
+        self.assertAlmostEqual(draft.unused_vacation_days, 24 + 24 + 24 * 230 / 365, places=4)
+        self.assertEqual(len(draft.message_ids), messages + 1)
+        self.assertEqual(confirmed.unused_vacation_days, 72)

@@ -73,7 +73,8 @@ class HrOrder(models.Model):
     def _compute_unused_vacation_days(self):
         """Days of unused vacation as of the dismissal date, from the
         vacation entitlement shared with the remaining vacation certificate:
-        every leave type paid out on dismissal, each rounded on its own."""
+        the unrounded total of every leave type paid out on dismissal. The
+        order's phrase rounds it once (compensable_vacation_days)."""
         Entitlement = self.env['hr.vacation.entitlement']
         for order in self:
             days = 0.0
