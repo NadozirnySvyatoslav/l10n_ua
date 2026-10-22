@@ -493,12 +493,21 @@ msgstr "Днів перенесено з минулого року"
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_vacation_balance__entitled_days
 msgid ""
-"Days entitled for the year. Defaults to leave type annual_days; can be "
-"overridden manually (e.g. proportional for mid-year hires)."
+"The employee's norm for the period. For a full year it is the whole "
+"yearly norm: the leave type's days per year by default, changed when "
+"the employee's norm differs (set by the employment or collective "
+"agreement); do not enter a figure pro-rated to the time worked, the "
+"unused vacation is pro-rated by itself. For a period shorter than a "
+"year the system proposes the part of the yearly norm that falls on the "
+"period: keep it, do not replace it with the whole yearly norm."
 msgstr ""
-"Кількість днів, належних за рік. Типово береться з типу відпустки "
-"(annual_days); можна змінити вручну (наприклад, пропорційно для прийнятих "
-"усередині року)."
+"Норма працівника за період. Для повного року — повна річна норма: за "
+"замовчуванням кількість днів на рік із типу відпустки; змініть, якщо "
+"норма працівника інша (встановлена трудовим або колективним "
+"договором); не вносьте значення, пропорційне відпрацьованому часу, — "
+"невикористана відпустка рахується пропорційно автоматично. Для "
+"періоду, коротшого за рік, система пропонує частину річної норми, що "
+"припадає на період: залиште її, не замінюйте повною річною нормою."
 
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_leave_type__annual_days
@@ -2295,22 +2304,6 @@ msgstr "Відпустка без збереження зарплати (виї�
 #: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__ua_leave_category__unpaid_childcare
 msgid "Unpaid Leave (Childcare)"
 msgstr "Відпустка без збереження зарплати (догляд за дитиною)"
-
-#. module: l10n_ua_hr_holidays
-#: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_vacation_balance__entitled_days
-msgid ""
-"The employee's full yearly norm for the period. Defaults to the leave "
-"type's days per year; change it when the employee's norm differs (set "
-"by the employment or collective agreement). Enter the full norm, not a "
-"pro-rated figure: the unused vacation on dismissal and on the "
-"remaining vacation certificate is pro-rated to the time worked by "
-"itself."
-msgstr ""
-"Повна річна норма працівника за період. За замовчуванням — кількість "
-"днів на рік із типу відпустки; змініть, якщо норма працівника інша "
-"(встановлена трудовим або колективним договором). Вносьте повну норму, "
-"а не пропорційну: невикористана відпустка при звільненні та в довідці "
-"про залишки рахується пропорційно відпрацьованому часу автоматично."
 
 #. module: l10n_ua_hr_holidays
 #: model:ir.model,name:l10n_ua_hr_holidays.model_hr_vacation_entitlement

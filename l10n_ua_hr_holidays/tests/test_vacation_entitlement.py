@@ -99,6 +99,22 @@ class TestVacationEntitlement(TransactionCase):
         self.assertEqual(len(current), 1)
         self.assertAlmostEqual(current[0]['entitled'], 24, places=4)
 
+    def test_short_period_proposed_norm_is_not_reduced_twice(self):
+        """A balance shorter than a year gets the part of the yearly norm
+        that falls on it (24 x 197 / 365 = 12.95 for 18.06 - 31.12), and the
+        days earned in it are still those of the yearly norm: by 30.09,
+        24 x 105 / 365 = 6.90, not reduced a second time."""
+        employee = self._employee(date(2026, 6, 18))
+        balance = self.env['hr.vacation.balance'].create({
+            'employee_id': employee.id,
+            'leave_type_id': self.basic.id,
+            'period_start': date(2026, 6, 18),
+            'period_end': date(2026, 12, 31),
+        })
+        self.assertAlmostEqual(balance.entitled_days, round(24 * 197 / 365, 2), places=2)
+        line = self._line(employee, date(2026, 9, 30), self.basic)
+        self.assertAlmostEqual(line['accrued'], 24 * 105 / 365, places=2)
+
     def test_transfer_limits_do_not_forfeit_days(self):
         """Unused days of every past period are due, whatever the type
         carries over between periods."""

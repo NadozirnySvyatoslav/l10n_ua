@@ -73,12 +73,14 @@ class HrVacationBalance(models.Model):
         store=True,
         readonly=False,
         precompute=True,
-        help='The employee\'s full yearly norm for the period. Defaults to the '
-             'leave type\'s days per year; change it when the employee\'s '
-             'norm differs (set by the employment or collective agreement). '
-             'Enter the full norm, not a pro-rated figure: the unused '
-             'vacation on dismissal and on the remaining vacation '
-             'certificate is pro-rated to the time worked by itself.'
+        help='The employee\'s norm for the period. For a full year it is the '
+             'whole yearly norm: the leave type\'s days per year by default, '
+             'changed when the employee\'s norm differs (set by the employment '
+             'or collective agreement); do not enter a figure pro-rated to the '
+             'time worked, the unused vacation is pro-rated by itself. For a '
+             'period shorter than a year the system proposes the part of the '
+             'yearly norm that falls on the period: keep it, do not replace it '
+             'with the whole yearly norm.'
     )
     carried_over = fields.Float(
         string='Carried Over',
