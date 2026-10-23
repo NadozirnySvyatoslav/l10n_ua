@@ -97,7 +97,9 @@ class ResCompany(models.Model):
             ('date_to', '>=', to_utc(date_from, time.min)),
         ])
         dates, current = set(), date_from
-        while current <= date_to:
+        # No holiday in the range (an empty list under martial law): nothing
+        # to walk through.
+        while found and current <= date_to:
             noon = to_utc(current, time(12, 0))
             if any(holiday.date_from <= noon <= holiday.date_to for holiday in found):
                 dates.add(current)
