@@ -385,8 +385,12 @@ msgstr "Компанія"
 #. module: l10n_ua_hr_holidays
 #. odoo-python
 #: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
-msgid "Compensation for %(days)s unused days: %(amount).2f UAH"
-msgstr "Компенсація за %(days)s невикористаних днів: %(amount).2f грн"
+msgid ""
+"Compensation on dismissal as of %(date)s for all leave types of the "
+"employee: %(days)s days, %(amount).2f %(currency)s"
+msgstr ""
+"Компенсація при звільненні станом на %(date)s за всі види відпусток "
+"працівника: %(days)s дн., %(amount).2f %(currency)s"
 
 #. module: l10n_ua_hr_holidays
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_sick_leave_view_form
@@ -2321,3 +2325,13 @@ msgstr ""
 "Кількість днів невикористаної відпустки до компенсації перераховано за "
 "новим правилом: %(old)s → %(new)s. Якщо текст наказу вже завантажено з "
 "шаблону, завантажте шаблон повторно."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/migrations/19.0.1.2.2/post-migration.py:0
+msgid ""
+"The days of unused vacation to compensate were entered by hand and are "
+"kept: %(old)s. By the new rule they are %(new)s; check the figure."
+msgstr ""
+"Кількість днів невикористаної відпустки до компенсації введено вручну, її "
+"збережено: %(old)s. За новим правилом — %(new)s; перевірте значення."

@@ -463,8 +463,10 @@ class TestLeaveTypeImportCategories(TransactionCase):
         self.assertEqual(hazard.ua_leave_category, 'annual_hazardous')
 
     def test_migration_recounts_draft_dismissal_orders(self):
-        """A draft dismissal order gets its days recounted by the new rule,
-        with a note in its history; a confirmed one keeps its figure."""
+        """A draft dismissal order still holding the old rule's figure (the
+        remaining days of the dismissal year's balances, 24 here) gets the
+        new one, with a note; a figure typed in by hand is kept, with a note
+        of what the new rule gives; a confirmed order is left as issued."""
         script = self._migration()
         # Public holidays are working days under martial law.
         self.env['resource.calendar.leaves'].search([('resource_id', '=', False)]).unlink()
@@ -487,16 +489,17 @@ class TestLeaveTypeImportCategories(TransactionCase):
             'employee_id': employee.id,
             'subject': 'Dismissal',
         }
-        draft = Order.create(vals)
-        confirmed = Order.create(vals)
-        # The figure the old rule left on both.
-        draft.unused_vacation_days = 72
-        confirmed.unused_vacation_days = 72
+        computed, typed, confirmed = Order.create(vals), Order.create(vals), Order.create(vals)
+        computed.unused_vacation_days = 24
+        typed.unused_vacation_days = 30
+        confirmed.unused_vacation_days = 24
         confirmed.state = 'confirmed'
-        messages = len(draft.message_ids)
+        notes = {order: len(order.message_ids) for order in (computed, typed)}
         self.env.flush_all()
         script.migrate(self.env.cr, '19.0.1.1.2')
         self.env.invalidate_all()
-        self.assertAlmostEqual(draft.unused_vacation_days, 24 + 24 + 24 * 230 / 365, places=4)
-        self.assertEqual(len(draft.message_ids), messages + 1)
-        self.assertEqual(confirmed.unused_vacation_days, 72)
+        self.assertAlmostEqual(computed.unused_vacation_days, 24 + 24 + 24 * 230 / 365, places=4)
+        self.assertEqual(typed.unused_vacation_days, 30)
+        for order in (computed, typed):
+            self.assertEqual(len(order.message_ids), notes[order] + 1)
+        self.assertEqual(confirmed.unused_vacation_days, 24)

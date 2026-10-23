@@ -667,15 +667,16 @@ class HrVacationBalance(models.Model):
 
     def _raw_compensable_days(self, is_termination=True):
         """Unrounded compensable days of one balance when the employee stays:
-        only the days above the annual minimum, and only once the minimum
-        itself has been used. On termination the days come from the vacation
+        the remaining days, once the annual minimum itself has been used. On termination the days come from the vacation
         entitlement instead (_compensable_days).
         """
         self.ensure_one()
         min_annual_days = self.leave_type_id.annual_days or 24
         if self.used_days < min_annual_days:
             return 0.0
-        return max(0.0, self.remaining_days - min_annual_days)
+        # Once the minimum has been used, the rest of the leave may be paid
+        # out: the minimum is not taken off the remaining days a second time.
+        return max(0.0, self.remaining_days)
 
     def _compensable_days(self, is_termination=True, termination_date=None):
         """Whole calendar days to compensate.
@@ -684,8 +685,8 @@ class HrVacationBalance(models.Model):
         termination date from hr.vacation.entitlement, the same total the
         dismissal order quotes (#321): every leave type paid out on
         dismissal, pro-rated to the time worked, whatever balances self
-        holds. Without termination they are the days above the annual
-        minimum of the balances in self.
+        holds. Without termination they are the remaining days of the
+        balances in self, once the annual minimum has been used.
 
         Either way the total is rounded once, by the rule the dismissal order
         prints (compensable_vacation_days): rounding each part separately
@@ -708,7 +709,7 @@ class HrVacationBalance(models.Model):
         Args:
             termination_date: Date of termination/calculation (defaults to today)
             is_termination: If True, compensate all unused days (on termination).
-                           If False, only compensate days over 24 (without termination).
+                           If False, compensate the remaining days once 24 have been used (without termination).
 
         Returns:
             float: compensation for the whole days of _compensable_days at
@@ -723,7 +724,7 @@ class HrVacationBalance(models.Model):
 
         Per Ukrainian law:
         - On termination: all unused days are compensated
-        - Without termination: only days over 24 can be compensated,
+        - Without termination: the remaining days can be compensated,
           and employee must have used at least 24 days in current year
         """
         if not self:
@@ -764,9 +765,15 @@ class HrVacationBalance(models.Model):
             'tag': 'display_notification',
             'params': {
                 'title': _('Vacation Compensation'),
-                'message': _('Compensation for %(days)s unused days: %(amount).2f UAH',
-                             days=self._compensable_days(termination_date=fields.Date.today()),
-                             amount=compensation),
+                # On dismissal the days are the employee's, over every leave
+                # type, whichever balance the button is pressed on.
+                'message': _(
+                    'Compensation on dismissal as of %(date)s for all leave '
+                    'types of the employee: %(days)s days, %(amount).2f %(currency)s',
+                    date=fields.Date.today().strftime('%d.%m.%Y'),
+                    days=self._compensable_days(termination_date=fields.Date.today()),
+                    amount=compensation,
+                    currency=self.employee_id.company_id.currency_id.name or ''),
                 'type': 'success',
                 'sticky': False,
             }

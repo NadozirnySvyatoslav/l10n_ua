@@ -106,14 +106,21 @@ class TestVacationCompensationRounding(TransactionCase):
         self.assertEqual(compensable_vacation_days(11.3), 12)
         self.assertEqual(compensable_vacation_days(0.4), 1)
 
-    def test_without_termination_rounds_the_excess_the_same_way(self):
-        """Без звільнення компенсуються лише дні понад 24 — і вони
-        округлюються тим самим правилом: 27.3 − 24 = 3.3 → 4 дні."""
+    def test_without_termination_pays_the_rest_once_the_minimum_is_used(self):
+        """Without dismissal, once 24 days have been used, the rest of the
+        leave is paid out, rounded by the same rule: 51.3 − 24 used = 27.3
+        remaining -> 28 days. The 24 days are not taken off a second time."""
         balance = self._balance(51.3)
         balance.used_days = 24
         self.assertAlmostEqual(balance.remaining_days, 27.3)
         self.assertEqual(self._compensation(balance, is_termination=False),
-                         4 * AVG_DAILY)
+                         28 * AVG_DAILY)
+
+    def test_without_termination_pays_nothing_before_the_minimum_is_used(self):
+        """Without dismissal nothing is paid out until 24 days are used."""
+        balance = self._balance(31)
+        balance.used_days = 20
+        self.assertEqual(self._compensation(balance, is_termination=False), 0)
 
     def test_several_leave_types_round_the_total_once(self):
         """Fractional days of several leave types are rounded once in total:

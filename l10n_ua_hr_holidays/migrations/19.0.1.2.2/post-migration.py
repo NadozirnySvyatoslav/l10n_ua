@@ -19,8 +19,10 @@ count by the new rule.
 2. Draft dismissal orders. The day count of the unused vacation is stored on
    the order and recomputed only when the employee or the dismissal date
    changes, so a draft written before this update keeps the figure of the
-   old rule. Drafts get it recounted, with a note in their history; confirmed
-   orders are left as issued.
+   old rule. A draft still holding the old rule's figure (the remaining days
+   of the employee's balances of the dismissal year) gets it recounted; a
+   figure typed in by hand is kept. Either way the history says what the new
+   rule gives. Confirmed orders are left as issued.
 """
 
 import logging
@@ -96,8 +98,30 @@ def _recount_draft_dismissals(cr):
     ])
     for order in orders:
         old = order.unused_vacation_days
+        ref_date = order.date_dismissal or order.date
+        # The old rule: the remaining days of the employee's balances of the
+        # dismissal year, never below zero. Read before anything recomputes
+        # the balances.
+        cr.execute("""
+            SELECT COALESCE(SUM(remaining_days), 0)
+              FROM hr_vacation_balance
+             WHERE employee_id = %s AND year = %s
+        """, (order.employee_id.id, ref_date.year if ref_date else 0))
+        old_rule = max(0.0, cr.fetchone()[0] or 0.0)
+        computed = round(old, 2) == round(old_rule, 2)
         order._compute_unused_vacation_days()
         new = order.unused_vacation_days
+        if not computed:
+            # Typed in by hand: keep it, say what the new rule gives.
+            order.unused_vacation_days = old
+            order.message_post(body=env._(
+                'The days of unused vacation to compensate were entered by '
+                'hand and are kept: %(old)s. By the new rule they are '
+                '%(new)s; check the figure.',
+                old='%.2f' % old, new='%.2f' % new))
+            _logger.info('Dismissal order %s: hand-entered %.2f kept (new rule %.2f)',
+                         order.id, old, new)
+            continue
         if round(old, 2) == round(new, 2):
             continue
         order.message_post(body=env._(
@@ -107,7 +131,6 @@ def _recount_draft_dismissals(cr):
             old='%.2f' % old, new='%.2f' % new))
         _logger.info('Dismissal order %s: unused vacation days %.2f -> %.2f',
                      order.id, old, new)
-
 
 def migrate(cr, version):
     if not version:
