@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Certificates',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.1.1',
     'category': 'Human Resources/Localization',
     'summary': 'Standard HR certificates and references for Ukrainian companies',
     'description': """
@@ -16,6 +16,7 @@ This module provides standard HR certificates and references commonly issued by 
 * Character reference (Характеристика)
 * Bank certificate (Довідка для банку)
 * Vacation certificate (Довідка про відпустку)
+* Remaining vacation certificate (Довідка про залишки відпусток)
 * Custom certificates with templates
 
 Features:

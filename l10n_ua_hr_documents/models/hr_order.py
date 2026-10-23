@@ -97,22 +97,14 @@ class HrOrder(models.Model):
         store=True,
         readonly=False,
         help='Calendar days of unused vacation to compensate on dismissal. '
-             'Auto-filled from the vacation balance; editable.',
+             'Auto-filled from the vacation balances; editable.',
     )
 
     @api.depends('order_type', 'employee_id', 'date_dismissal', 'date')
     def _compute_unused_vacation_days(self):
-        has_balance = 'hr.vacation.balance' in self.env
-        for order in self:
-            days = 0.0
-            if (has_balance and order.order_type == 'dismissal'
-                    and order.employee_id):
-                ref_date = (order.date_dismissal or order.date
-                            or fields.Date.context_today(order))
-                balances = self.env['hr.vacation.balance']._dismissal_balances(
-                    order.employee_id, ref_date)
-                days = sum(balances.mapped('remaining_days'))
-            order.unused_vacation_days = max(0.0, days)
+        # Vacation balances live in Ukraine - HR Holidays, which overrides
+        # this method; without it there is nothing to count.
+        self.unused_vacation_days = 0.0
 
     def unused_vacation_days_phrase(self):
         """«N календарних днів» для наказу: ціле число з узгодженим іменником.

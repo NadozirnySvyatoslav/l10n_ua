@@ -84,5 +84,14 @@
             <field name="company_id" eval="False"/>
         </record>
 
+
+        <record id="seq_hr_certificate_vacation_remaining" model="ir.sequence">
+            <field name="name">Довідка: залишки відпусток</field>
+            <field name="code">hr.certificate.vacation_remaining</field>
+            <field name="prefix">ДВ-%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
     </data>
 </odoo>

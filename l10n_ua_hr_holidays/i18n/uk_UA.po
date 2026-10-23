@@ -385,8 +385,12 @@ msgstr "Компанія"
 #. module: l10n_ua_hr_holidays
 #. odoo-python
 #: code:addons/l10n_ua_hr_holidays/models/hr_vacation_balance.py:0
-msgid "Compensation for %(days)s unused days: %(amount).2f UAH"
-msgstr "Компенсація за %(days)s невикористаних днів: %(amount).2f грн"
+msgid ""
+"Compensation on dismissal as of %(date)s for all leave types of the "
+"employee: %(days)s days, %(amount).2f %(currency)s"
+msgstr ""
+"Компенсація при звільненні станом на %(date)s за всі види відпусток "
+"працівника: %(days)s дн., %(amount).2f %(currency)s"
 
 #. module: l10n_ua_hr_holidays
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.hr_sick_leave_view_form
@@ -493,12 +497,21 @@ msgstr "Днів перенесено з минулого року"
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,help:l10n_ua_hr_holidays.field_hr_vacation_balance__entitled_days
 msgid ""
-"Days entitled for the year. Defaults to leave type annual_days; can be "
-"overridden manually (e.g. proportional for mid-year hires)."
+"The employee's norm for the period. For a full year it is the whole "
+"yearly norm: the leave type's days per year by default, changed when "
+"the employee's norm differs (set by the employment or collective "
+"agreement); do not enter a figure pro-rated to the time worked, the "
+"unused vacation is pro-rated by itself. For a period shorter than a "
+"year the system proposes the part of the yearly norm that falls on the "
+"period: keep it, do not replace it with the whole yearly norm."
 msgstr ""
-"Кількість днів, належних за рік. Типово береться з типу відпустки "
-"(annual_days); можна змінити вручну (наприклад, пропорційно для прийнятих "
-"усередині року)."
+"Норма працівника за період. Для повного року — повна річна норма: за "
+"замовчуванням кількість днів на рік із типу відпустки; змініть, якщо "
+"норма працівника інша (встановлена трудовим або колективним "
+"договором); не вносьте значення, пропорційне відпрацьованому часу, — "
+"невикористана відпустка рахується пропорційно автоматично. Для "
+"періоду, коротшого за рік, система пропонує частину річної норми, що "
+"припадає на період: залиште її, не замінюйте повною річною нормою."
 
 #. module: l10n_ua_hr_holidays
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_leave_type__annual_days
@@ -525,6 +538,7 @@ msgstr "Код діагнозу (МКХ-10)"
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_balance__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__display_name
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_entitlement__display_name
 msgid "Display Name"
 msgstr "Назва для відображення"
 
@@ -690,6 +704,7 @@ msgstr "Є повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_schedule_line__id
 #: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_vacation_entitlement__id
 msgid "ID"
 msgstr "ID"
 
@@ -2283,3 +2298,40 @@ msgid ""
 "of public holidays (#344)"
 msgstr ""
 "модуль оновлено і відпустку звірено з чинним списком святкових днів (#344)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__ua_leave_category__unpaid_abroad
+msgid "Unpaid Leave (Abroad or Internally Displaced)"
+msgstr "Відпустка без збереження зарплати (виїзд за кордон або ВПО)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields.selection,name:l10n_ua_hr_holidays.selection__hr_leave_type__ua_leave_category__unpaid_childcare
+msgid "Unpaid Leave (Childcare)"
+msgstr "Відпустка без збереження зарплати (догляд за дитиною)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model,name:l10n_ua_hr_holidays.model_hr_vacation_entitlement
+msgid "Vacation Entitlement"
+msgstr "Право на відпустку"
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/migrations/19.0.1.2.2/post-migration.py:0
+msgid ""
+"The days of unused vacation to compensate were recounted by the new rule: "
+"%(old)s → %(new)s. If the order text was already loaded from a template, "
+"load the template again."
+msgstr ""
+"Кількість днів невикористаної відпустки до компенсації перераховано за "
+"новим правилом: %(old)s → %(new)s. Якщо текст наказу вже завантажено з "
+"шаблону, завантажте шаблон повторно."
+
+#. module: l10n_ua_hr_holidays
+#. odoo-python
+#: code:addons/l10n_ua_hr_holidays/migrations/19.0.1.2.2/post-migration.py:0
+msgid ""
+"The days of unused vacation to compensate were entered by hand and are "
+"kept: %(old)s. By the new rule they are %(new)s; check the figure."
+msgstr ""
+"Кількість днів невикористаної відпустки до компенсації введено вручну, її "
+"збережено: %(old)s. За новим правилом — %(new)s; перевірте значення."

@@ -99,6 +99,31 @@
             <field name="requires_allocation" eval="False"/>
         </record>
         
+        <record id="leave_type_unpaid_abroad" model="hr.leave.type">
+            <field name="name">Відпустка без збереження зарплати (виїзд за кордон або ВПО)</field>
+            <field name="ua_leave_category">unpaid_abroad</field>
+            <field name="annual_days">90</field>
+            <field name="is_calendar_days">True</field>
+            <field name="period_type">calendar</field>
+            <field name="is_transferable">False</field>
+            <field name="is_paid">False</field>
+            <field name="request_unit">day</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="requires_allocation" eval="False"/>
+        </record>
+
+        <record id="leave_type_unpaid_childcare" model="hr.leave.type">
+            <field name="name">Відпустка без збереження зарплати (догляд за дитиною до 6 років)</field>
+            <field name="ua_leave_category">unpaid_childcare</field>
+            <field name="is_calendar_days">True</field>
+            <field name="period_type">calendar</field>
+            <field name="is_transferable">False</field>
+            <field name="is_paid">False</field>
+            <field name="request_unit">day</field>
+            <field name="leave_validation_type">hr</field>
+            <field name="requires_allocation" eval="False"/>
+        </record>
+
         <record id="leave_type_maternity" model="hr.leave.type">
             <field name="name">Відпустка у зв'язку з вагітністю та пологами</field>
             <field name="ua_leave_category">maternity</field>

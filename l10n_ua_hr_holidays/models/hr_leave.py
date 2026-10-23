@@ -3,9 +3,8 @@ from odoo.exceptions import ValidationError, UserError
 from odoo.fields import Domain
 from dateutil.relativedelta import relativedelta
 from odoo.addons.hr_holidays.models.hr_leave import HOURS_PER_DAY
-from datetime import datetime, time as dt_time
 
-from pytz import timezone, utc
+from .hr_leave_type import UNPAID_LEAVE_CATEGORIES
 
 
 class HrLeave(models.Model):
@@ -724,7 +723,8 @@ class HrLeave(models.Model):
         its duration (art. 5 of the Law "On Leaves", art. 73 of the Labour
         Code): those of the employee's company and those of none.
 
-        Read the way the payslip reads them (hr.payslip._public_holiday_dates):
+        Read by the company's own list (res.company._l10n_ua_public_holiday_dates),
+        the one the payslip, the timesheet and the unused vacation read too:
         a holiday is stored in UTC, and a day is a holiday when the holiday
         covers its noon in the time zone of the company's working schedule —
         so a holiday entered in local time, which starts the evening before
@@ -734,28 +734,9 @@ class HrLeave(models.Model):
         self.ensure_one()
         if not self.request_date_from or not self.request_date_to:
             return set()
-        leave_from, leave_to = self.request_date_from, self.request_date_to
         company = self.employee_company_id or self.company_id or self.env.company
-        tz = timezone(company.resource_calendar_id.tz
-                      or self.env.user.tz or 'UTC')
-
-        def to_utc(day, moment):
-            return tz.localize(datetime.combine(day, moment)).astimezone(
-                utc).replace(tzinfo=None)
-
-        found = self.env['resource.calendar.leaves'].search([
-            ('resource_id', '=', False),
-            ('company_id', 'in', (company.id, False)),
-            ('date_from', '<=', to_utc(leave_to, dt_time.max)),
-            ('date_to', '>=', to_utc(leave_from, dt_time.min)),
-        ])
-        dates, current = set(), leave_from
-        while found and current <= leave_to:
-            noon = to_utc(current, dt_time(12, 0))
-            if any(h.date_from <= noon <= h.date_to for h in found):
-                dates.add(current)
-            current += relativedelta(days=1)
-        return dates
+        return company._l10n_ua_public_holiday_dates(
+            self.request_date_from, self.request_date_to)
 
     @api.depends('request_date_from', 'request_date_to')
     def _compute_working_days(self):
@@ -1139,7 +1120,7 @@ class HrLeave(models.Model):
         # Days of unpaid leave in the period: no pay was kept for them. Sick
         # days are not among them, since their benefit is in the earnings.
         unpaid_leave_type = self.env['hr.leave.type'].search([
-            ('ua_leave_category', '=', 'unpaid')
+            ('ua_leave_category', 'in', UNPAID_LEAVE_CATEGORIES)
         ])
 
         excluded_leave_types = unpaid_leave_type.ids

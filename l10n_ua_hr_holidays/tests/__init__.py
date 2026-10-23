@@ -13,3 +13,4 @@ from . import test_fallback_wage
 from . import test_average_benefits
 from . import test_vacation_compensation_rounding
 from . import test_holiday_recount
+from . import test_vacation_entitlement

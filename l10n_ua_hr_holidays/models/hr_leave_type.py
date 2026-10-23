@@ -1,5 +1,18 @@
 from odoo import models, fields, api, _
 
+# Unpaid leave of any kind: no pay is kept for these days.
+UNPAID_LEAVE_CATEGORIES = ('unpaid', 'unpaid_abroad', 'unpaid_childcare')
+
+# Annual leave, basic and additional.
+ANNUAL_LEAVE_CATEGORIES = (
+    'annual_basic', 'annual_additional', 'annual_hazardous',
+    'annual_special', 'annual_irregular',
+)
+
+# Leave whose unused days are paid out on dismissal: every annual leave and
+# the additional leave of workers with children.
+COMPENSATED_LEAVE_CATEGORIES = ANNUAL_LEAVE_CATEGORIES + ('social_children',)
+
 
 class HrLeaveType(models.Model):
     _inherit = 'hr.leave.type'
@@ -17,6 +30,8 @@ class HrLeaveType(models.Model):
         ('chornobyl', 'Additional Leave for Chornobyl Victims'),
         ('veteran', 'Additional Leave for War Veterans'),
         ('unpaid', 'Unpaid Leave'),
+        ('unpaid_abroad', 'Unpaid Leave (Abroad or Internally Displaced)'),
+        ('unpaid_childcare', 'Unpaid Leave (Childcare)'),
         ('maternity', 'Maternity Leave'),
         ('childcare', 'Childcare Leave'),
         ('sick', 'Sick Leave'),
