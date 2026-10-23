@@ -1,8 +1,7 @@
 from collections import Counter
-from datetime import date, datetime, time, timedelta
+from datetime import date, timedelta
 
 from dateutil.relativedelta import relativedelta
-from pytz import timezone, utc
 
 from odoo import api, models
 
@@ -118,7 +117,8 @@ class HrVacationEntitlement(models.AbstractModel):
 
         first_day = min(p['date_from'] for ps in periods_by_type.values() for p in ps)
         last_day = max(p['date_to'] for ps in periods_by_type.values() for p in ps)
-        holidays = self._public_holiday_dates(employee, first_day, last_day)
+        # The same public holidays the leaves' own length is counted without.
+        holidays = employee.company_id._l10n_ua_public_holiday_dates(first_day, last_day)
         leaves = self.env['hr.leave'].search([
             ('employee_id', '=', employee.id),
             ('state', '=', 'validate'),
@@ -230,34 +230,6 @@ class HrVacationEntitlement(models.AbstractModel):
     # ------------------------------------------------------------------
     # Calendar
     # ------------------------------------------------------------------
-
-    @api.model
-    def _public_holiday_dates(self, employee, date_from, date_to):
-        """The public holidays between the two dates, from the employee's
-        company and working schedule or shared ones.
-
-        A day is a holiday when a holiday covers its noon in the schedule's
-        time zone, so a holiday stored in UTC falls on its own local day."""
-        calendar = employee.resource_calendar_id or employee.company_id.resource_calendar_id
-        tz = timezone(calendar.tz or self.env.user.tz or 'UTC')
-
-        def to_utc(day, moment):
-            return tz.localize(datetime.combine(day, moment)).astimezone(utc).replace(tzinfo=None)
-
-        found = self.env['resource.calendar.leaves'].search([
-            ('resource_id', '=', False),
-            ('company_id', 'in', [employee.company_id.id, False]),
-            ('calendar_id', 'in', [calendar.id, False]),
-            ('date_from', '<=', to_utc(date_to, time.max)),
-            ('date_to', '>=', to_utc(date_from, time.min)),
-        ])
-        dates, day = set(), date_from
-        while found and day <= date_to:
-            noon = to_utc(day, time(12))
-            if any(h.date_from <= noon <= h.date_to for h in found):
-                dates.add(day)
-            day += timedelta(days=1)
-        return dates
 
     @api.model
     def _days_used(self, leave, as_of, holidays):
