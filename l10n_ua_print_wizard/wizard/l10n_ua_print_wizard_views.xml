@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="l10n_ua_print_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_ua.print.wizard.form</field>
+        <field name="model">l10n_ua.print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Print">
+                <field name="move_ids" invisible="1"/>
+                <field name="available_report_ids" invisible="1"/>
+                <group>
+                    <field name="report_id" widget="radio" required="1"/>
+                </group>
+                <footer>
+                    <button name="action_print" type="object" string="Print"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary" data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
