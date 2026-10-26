@@ -102,13 +102,20 @@ class HrVacationEntitlement(models.AbstractModel):
             ('period_start', '<=', as_of),
         ], order='period_start, id')
         basic_type = self._basic_leave_type(employee, balances)
-        leave_types = balances.leave_type_id | basic_type
+        # The annual basic leave is one right, whichever of the basic types
+        # (the shared one or the company's own) a balance or a leave is on.
+        leave_types = balances.leave_type_id.filtered(
+            lambda t: t.ua_leave_category != 'annual_basic') | basic_type
+
+        def same_right(leave_type, other):
+            return other == leave_type or (
+                leave_type == basic_type and other.ua_leave_category == 'annual_basic')
 
         periods_by_type = {}
         for leave_type in leave_types:
             periods = self._periods(
                 employee, leave_type,
-                balances.filtered(lambda b: b.leave_type_id == leave_type),
+                balances.filtered(lambda b: same_right(leave_type, b.leave_type_id)),
                 hire, as_of, backfill=leave_type == basic_type)
             if periods:
                 periods_by_type[leave_type] = periods
@@ -131,8 +138,12 @@ class HrVacationEntitlement(models.AbstractModel):
         result = []
         for leave_type in sorted(periods_by_type, key=lambda t: (
                 order.get(t.ua_leave_category, len(order)), t.name or '', t.id)):
-            used = sum(self._days_used(leave, as_of, holidays) for leave in leaves.filtered(
-                lambda l: l.holiday_status_id == leave_type))
+            # The leaves before the type's first period are not charged: no
+            # right is counted for that time, or the days carried into the
+            # first balance already have them deducted.
+            since = periods_by_type[leave_type][0]['date_from']
+            used = sum(self._days_used(leave, as_of, holidays, since) for leave in leaves.filtered(
+                lambda l: same_right(leave_type, l.holiday_status_id)))
             result.append(self._settle(
                 leave_type, periods_by_type[leave_type], used,
                 hire, as_of, holidays, absences))
@@ -172,11 +183,17 @@ class HrVacationEntitlement(models.AbstractModel):
         without creating any record. The days carried into the earliest
         balance (from another company, or entered by hand) are kept, unless
         that balance is a duplicate left out; the ones the later balances
-        show are left out, since every period is counted here on its own."""
+        show are left out, since every period is counted here on its own.
+
+        Days carried into the earliest balance stand for every period before
+        it, so no period is added before that balance then: only the gaps
+        after it are. Days carried below zero were taken in advance; they are
+        returned as the period's `carried` all the same, and charged as used."""
         # Only the earliest balance holds days carried in by hand or from
         # another company; the later ones show what the chain carried over.
         first = balances.sorted(lambda b: (b.period_start, b.id))[:1]
         balances = self._distinct_balances(employee, leave_type, balances)
+        carried = (first.carried_over or 0.0) if first in balances else 0.0
         periods = [{
             'date_from': balance.period_start,
             'date_to': balance.period_end,
@@ -184,7 +201,7 @@ class HrVacationEntitlement(models.AbstractModel):
         } for balance in balances]
         if backfill:
             Balance = self.env['hr.vacation.balance']
-            cursor, guard = hire, 0
+            cursor, guard = (first.period_start if carried else hire), 0
             while cursor <= as_of and guard < 200:
                 guard += 1
                 start, end, _index = Balance._get_period_for(employee, leave_type, cursor)
@@ -198,7 +215,6 @@ class HrVacationEntitlement(models.AbstractModel):
                     })
                 cursor = end + timedelta(days=1)
         periods.sort(key=lambda p: p['date_from'])
-        carried = (first.carried_over or 0.0) if first in balances else 0.0
         if carried:
             next(p for p in periods if p['date_from'] == first.period_start)['carried'] = carried
         return periods
@@ -232,17 +248,23 @@ class HrVacationEntitlement(models.AbstractModel):
     # ------------------------------------------------------------------
 
     @api.model
-    def _days_used(self, leave, as_of, holidays):
-        """Calendar days of the time off taken up to and including as_of.
+    def _days_used(self, leave, as_of, holidays, since=None):
+        """Calendar days of the time off taken from `since` up to and
+        including as_of.
 
         A time off running past the date counts only its days up to it: the
         rest is not used yet (or never will be, on a dismissal during the
-        leave). The public holidays inside it are not counted, the same as
-        in its own length."""
-        if not leave.request_date_to or leave.request_date_to <= as_of:
+        leave). One starting before `since` counts only its days from it.
+        The public holidays inside it are not counted, the same as in its
+        own length."""
+        if not leave.request_date_from or not leave.request_date_to:
             return leave.calendar_days
-        days, day = 0, leave.request_date_from
-        while day <= as_of:
+        start = max(leave.request_date_from, since) if since else leave.request_date_from
+        end = min(leave.request_date_to, as_of)
+        if start == leave.request_date_from and end == leave.request_date_to:
+            return leave.calendar_days
+        days, day = 0, start
+        while day <= end:
             if day not in holidays:
                 days += 1
             day += timedelta(days=1)
@@ -311,10 +333,14 @@ class HrVacationEntitlement(models.AbstractModel):
                 day += timedelta(days=1)
             return count
 
+        # Days carried below zero were taken in advance of the right: they
+        # are used days, not a period with a negative right.
+        used += sum(-period['carried'] for period in periods
+                    if period.get('carried', 0.0) < 0)
         rows = []
         pro_rated_first_year = False
         for period in periods:
-            if period.get('carried'):
+            if period.get('carried', 0.0) > 0:
                 rows.append({
                     'date_from': period['date_from'],
                     'date_to': period['date_to'],

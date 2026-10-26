@@ -242,6 +242,78 @@ class TestVacationEntitlement(TransactionCase):
         self.assertEqual(days(later['usable']), 24)
         self.assertFalse(later['pro_rated_first_year'])
 
+    def test_days_carried_into_the_first_balance_stand_for_the_years_before(self):
+        """Days carried into the earliest balance (a start from another
+        system) are the whole unused leave of the years before it: those
+        years are not added again with the full norm, 30 + 24 and not
+        9 × 24 + 30 + 24."""
+        employee = self._employee(date(2015, 3, 1))
+        self._balance(employee, self.basic, date(2024, 3, 1), date(2025, 2, 28), 24,
+                      carried_over=30)
+        line = self._line(employee, date(2025, 2, 28), self.basic)
+        self.assertEqual(days(line['remaining']), 54)
+        self.assertTrue(all(row['date_from'] >= date(2024, 3, 1) for row in line['rows']))
+
+    def test_without_carried_days_the_years_from_the_hire_date_are_added(self):
+        """With nothing carried into the earliest balance, the years from
+        the hire date without a balance are counted with the full norm."""
+        employee = self._employee(date(2015, 3, 1))
+        self._balance(employee, self.basic, date(2024, 3, 1), date(2025, 2, 28), 24)
+        line = self._line(employee, date(2025, 2, 28), self.basic)
+        self.assertEqual(days(line['remaining']), 10 * 24)
+
+    def test_days_carried_below_zero_are_used_days(self):
+        """Days carried below zero were taken in advance: they reduce what is
+        left, and no period shows a negative right."""
+        employee = self._employee(date(2015, 3, 1))
+        self._balance(employee, self.basic, date(2025, 3, 1), date(2026, 2, 28), 24,
+                      carried_over=-5)
+        line = self._line(employee, date(2026, 2, 28), self.basic)
+        self.assertEqual(days(line['remaining']), 19)
+        self.assertEqual(line['used'], 5)
+        self.assertTrue(all(row['accrued'] >= 0 for row in line['rows']))
+
+    def test_days_used_count_only_from_the_given_day(self):
+        """A leave starting before the first period of its type is charged
+        only for its days from that period on."""
+        employee = self._employee(date(2024, 1, 1))
+        leave = self._leave(employee, self.basic, date(2024, 2, 26), date(2024, 3, 5))
+        self.assertEqual(self.Entitlement._days_used(
+            leave, date(2024, 12, 31), set(), date(2024, 3, 1)), 5)
+        self.assertEqual(self.Entitlement._days_used(
+            leave, date(2024, 12, 31), set()), leave.calendar_days)
+
+    def _company_basic_type(self, company):
+        return self.basic.copy({
+            'name': 'Company Annual Basic Leave',
+            'company_id': company.id,
+        })
+
+    def test_leave_on_another_basic_type_is_used(self):
+        """A leave on the company's own basic leave type is charged against
+        the basic leave recorded on the shared type."""
+        employee = self._employee(date(2026, 3, 1))
+        own_basic = self._company_basic_type(employee.company_id)
+        self._balance(employee, self.basic, date(2026, 3, 1), date(2027, 2, 28), 24)
+        self._leave(employee, own_basic, date(2026, 4, 1), date(2026, 4, 10))
+        lines = [line for line in self.Entitlement._unused_vacation(employee, date(2027, 2, 28))
+                 if line['leave_type'].ua_leave_category == 'annual_basic']
+        self.assertEqual(len(lines), 1)
+        self.assertEqual(lines[0]['used'], 10)
+        self.assertEqual(days(lines[0]['remaining']), 14)
+
+    def test_balances_on_two_basic_types_are_one_right(self):
+        """Balances of the basic leave on the shared and on the company's
+        own type make one sequence of work years."""
+        employee = self._employee(date(2025, 3, 1))
+        own_basic = self._company_basic_type(employee.company_id)
+        self._balance(employee, self.basic, date(2025, 3, 1), date(2026, 2, 28), 24)
+        self._balance(employee, own_basic, date(2026, 3, 1), date(2027, 2, 28), 24)
+        lines = [line for line in self.Entitlement._unused_vacation(employee, date(2027, 2, 28))
+                 if line['leave_type'].ua_leave_category == 'annual_basic']
+        self.assertEqual(len(lines), 1)
+        self.assertEqual(days(lines[0]['remaining']), 48)
+
     # ------------------------------------------------------------------
     # Additional leave
     # ------------------------------------------------------------------
@@ -463,10 +535,9 @@ class TestLeaveTypeImportCategories(TransactionCase):
         self.assertEqual(hazard.ua_leave_category, 'annual_hazardous')
 
     def test_migration_recounts_draft_dismissal_orders(self):
-        """A draft dismissal order still holding the old rule's figure (the
-        remaining days of the dismissal year's balances, 24 here) gets the
-        new one, with a note; a figure typed in by hand is kept, with a note
-        of what the new rule gives; a confirmed order is left as issued."""
+        """Every draft dismissal order gets the new rule's figure, whether it
+        held the old rule's (24 here) or one typed in by hand, with a note
+        keeping the old figure; a confirmed order is left as issued."""
         script = self._migration()
         # Public holidays are working days under martial law.
         self.env['resource.calendar.leaves'].search([('resource_id', '=', False)]).unlink()
@@ -498,8 +569,8 @@ class TestLeaveTypeImportCategories(TransactionCase):
         self.env.flush_all()
         script.migrate(self.env.cr, '19.0.1.1.2')
         self.env.invalidate_all()
-        self.assertAlmostEqual(computed.unused_vacation_days, 24 + 24 + 24 * 230 / 365, places=4)
-        self.assertEqual(typed.unused_vacation_days, 30)
         for order in (computed, typed):
+            self.assertAlmostEqual(order.unused_vacation_days, 24 + 24 + 24 * 230 / 365, places=4)
             self.assertEqual(len(order.message_ids), notes[order] + 1)
+        self.assertIn('30.00', typed.message_ids[:1].body)
         self.assertEqual(confirmed.unused_vacation_days, 24)
