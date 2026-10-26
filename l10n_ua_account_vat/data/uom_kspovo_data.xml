@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Коди ДК 011-96 (КСПОВО) для стандартних одиниць Odoo: заповнюються лише
+         порожні, тож оновлення модуля не затирає правок користувача. -->
+    <function model="uom.uom" name="_l10n_ua_fill_kspovo_codes"/>
+</odoo>

@@ -14,6 +14,8 @@ from unittest.mock import patch
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
+from .common_pn import set_pn_requisites
+
 CONFIG = 'l10n_ua.tax.cabinet.config'
 CONFIG_PATH = 'odoo.addons.l10n_ua_tax_cabinet.models.l10n_ua_tax_cabinet_config.L10nUaTaxCabinetConfig'
 
@@ -26,11 +28,12 @@ class TestErpnRegister(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
-            'name': 'ТОВ Покупець ЄРПН'})
+            'name': 'ТОВ Покупець ЄРПН', 'ipn': '987654321098'})
         cls.company.write({
             'l10n_ua_is_vat_payer': True,
             'l10n_ua_vat_ipn': '123456789012',
         })
+        set_pn_requisites(cls.env, cls.company)
         # Прибрати сторонні активні конфіги кабінету цієї компанії — детермінізм.
         cls.env[CONFIG].search([('company_id', '=', cls.company.id)]).write(
             {'active': False})

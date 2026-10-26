@@ -2,12 +2,30 @@ import base64
 import calendar
 import io
 import logging
+import re
 from datetime import timedelta
+from xml.sax.saxutils import escape as xml_escape
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+from odoo.addons.l10n_ua_tax_cabinet.models.l10n_ua_dps_submit_mixin import dps_standard_filename
+
 _logger = logging.getLogger(__name__)
+
+# Покупець у ПН, що не надається покупцю (Порядок 1307 п. 16).
+NON_PAYER_IPN = '100000000000'
+NON_PAYER_NAME = 'Неплатник'
+# Умовний ІПН покупця за типом причини: 02 — неплатник, 07 — нерезидент
+# (вивезення товарів), у ПН на експорт покупцем лишається сам нерезидент.
+CONDITIONAL_IPN = {'02': NON_PAYER_IPN, '07': '300000000000'}
+
+# Податкова накладна J1201016 (Порядок 1307 у редакції наказу № 400 від
+# 09.08.2024); структура — XSD пакета СКЗ 1.34.0.0 (tests/schemas).
+PN_FORM = ('J12', '010', '16')
+SOFTWARE = 'Odoo l10n_ua'
+# Номер митної декларації в ПН на експорт (тип DGNUM_MD)
+CUSTOMS_NUMBER_RE = r'[0-9]{2}UA[0-9]{3}[K0-9][0-9]{2}[A-Z0-9]{7}.'
 
 VAT_RATE_SELECTION = [
     ('20', '20%'),
@@ -111,6 +129,30 @@ class L10nUaTaxInvoice(models.Model):
         string='Імпортна операція',
         default=False,
     )
+    # ПН, що не надається покупцю (Порядок 1307 п. 16): покупець —
+    # «Неплатник» з ІПН 100000000000, у ПН — тип причини.
+    non_payer_reason = fields.Selection(
+        selection=[
+            ('02', '02 — постачання неплатнику податку'),
+            ('07', '07 — вивезення товарів за межі митної території'),
+        ],
+        string='Не підлягає наданню покупцю',
+        tracking=True,
+        help='Тип причини, з якої ПН не видається покупцю. Покупцем у документі '
+             'зазначається «Неплатник», ІПН — 100000000000.',
+    )
+    # З 01.07.2024 обов'язкові в ПН на експорт: реквізити контракту й МД.
+    contract_number = fields.Char(string='Номер договору (контракту)')
+    contract_date = fields.Date(string='Дата договору (контракту)')
+    customs_number = fields.Char(
+        string='Номер митної декларації',
+        help='У форматі ЄАІС, напр. 26UA500020000123U4 — для ПН на експорт (тип причини 07).')
+    customs_date = fields.Date(string='Дата митної декларації')
+    signer_name = fields.Char(
+        string='Склав', compute='_compute_signer', store=True, readonly=False,
+        help='Ініціали та прізвище особи, яка склала ПН.')
+    signer_rnokpp = fields.Char(
+        string='РНОКПП особи, що склала', compute='_compute_signer', store=True, readonly=False)
     # Lines
     line_ids = fields.One2many(
         'l10n_ua.tax.invoice.line',
@@ -318,7 +360,7 @@ class L10nUaTaxInvoice(models.Model):
         return self.file_xml.to_base64() if self.file_xml else ''
 
     def _dps_filename(self):
-        return self._generate_xml_filename()
+        return self.file_xml_name or self._generate_xml_filename()
 
     def _dps_submit_label(self):
         return _('Зареєструвати в ЄРПН')
@@ -337,6 +379,13 @@ class L10nUaTaxInvoice(models.Model):
 
     def action_draft(self):
         self.write({'state': 'draft'})
+
+    @api.depends('company_id')
+    def _compute_signer(self):
+        for rec in self:
+            if not rec.signer_name:
+                rec.signer_name = rec.company_id.l10n_ua_vat_signer_name
+                rec.signer_rnokpp = rec.company_id.l10n_ua_vat_signer_rnokpp
 
     def action_generate_xml(self):
         """Generate XML for tax invoice per Наказ Мінфіну №1307."""
@@ -359,11 +408,16 @@ class L10nUaTaxInvoice(models.Model):
                 lines='\n'.join('— %s' % (line.name or '?') for line in uncoded),
             ))
 
-        xml = self._build_xml()
-        xml_bytes = xml.encode('windows-1251')
+        if self.doc_type == 'pn':
+            xml_bytes = self._render_j1201016()
+            filename = dps_standard_filename(xml_bytes) or self._generate_xml_filename()
+        else:
+            # РК — ще у спрощеному форматі (J1201216 — окремий крок)
+            xml_bytes = self._build_xml().encode('windows-1251')
+            filename = self._generate_xml_filename()
         self.write({
             'file_xml': base64.b64encode(xml_bytes).decode(),
-            'file_xml_name': self._generate_xml_filename(),
+            'file_xml_name': filename,
         })
 
     def _generate_xml_filename(self):
@@ -375,6 +429,156 @@ class L10nUaTaxInvoice(models.Model):
         entity = 'J' if company.edrpou else 'F'
         date_str = (self.date or fields.Date.today()).strftime('%Y%m%d%H%M%S')
         return f'{entity}1201011_{edrpou}_{date_str}_1.xml'
+
+    # ----------------------------------------------------- J1201016
+
+    def _pn_rate_code(self, line):
+        """Код ставки графи 8: 20 / 7 / 14, 901 — 0 % експорт, 902 — 0 % на
+        митній території, 903 — звільнено."""
+        if line.vat_rate == '0':
+            export = self.non_payer_reason == '07' or (
+                self.partner_id.country_id and self.partner_id.country_id.code != 'UA')
+            return '901' if export else '902'
+        return {'exempt': '903'}.get(line.vat_rate, line.vat_rate)
+
+    def _pn_office_code(self):
+        # довідник ДПІ доступний лише групам UA — бухгалтеру без них теж треба XML
+        company = self.company_id.sudo()
+        office = company.l10n_ua_tax_office_id
+        return re.sub(r'\D', '', (office.code if office else '') or company.tax_office_code or '')
+
+    def _pn_number(self):
+        digits = re.findall(r'\d+', self.number or '')
+        return int(digits[-1]) if digits else 0
+
+    def _pn_buyer(self):
+        """(назва, ІПН, ЄДРПОУ) покупця для ПН."""
+        partner = self.partner_id.commercial_partner_id
+        if self.non_payer_reason:
+            name = NON_PAYER_NAME if self.non_payer_reason == '02' else partner.name
+            return name, CONDITIONAL_IPN.get(self.non_payer_reason, NON_PAYER_IPN), ''
+        ipn = re.sub(r'\D', '', partner.vat or partner.ipn or '')
+        return partner.name, ipn, re.sub(r'\D', '', partner.edrpou or '')
+
+    def _check_j1201016_ready(self):
+        self.ensure_one()
+        company = self.company_id
+        problems = []
+        if not re.fullmatch(r'\d{12}', company.l10n_ua_vat_ipn or ''):
+            problems.append(_('ІПН платника ПДВ компанії (12 цифр)'))
+        if not re.fullmatch(r'\d{4}', self._pn_office_code()):
+            problems.append(_('контролюючий орган компанії (код ДПІ)'))
+        if not re.fullmatch(r'\d{8,10}', re.sub(r'\D', '', company.edrpou or '')):
+            problems.append(_('код ЄДРПОУ компанії'))
+        if not self._pn_number():
+            problems.append(_('номер ПН'))
+        if not self.signer_name or not re.fullmatch(r'\d{10}', self.signer_rnokpp or ''):
+            problems.append(_('особа, що складає ПН, і її РНОКПП (налаштування ПДВ компанії)'))
+        _name, ipn, _tin = self._pn_buyer()
+        if not re.fullmatch(r'\d{12}', ipn):
+            problems.append(_('ІПН покупця-платника ПДВ (12 цифр) — або позначте ПН як таку, що не '
+                              'надається покупцю'))
+        if self.non_payer_reason == '07':
+            if not (self.contract_number and self.contract_date):
+                problems.append(_('номер і дата контракту (обов\'язкові в ПН на експорт)'))
+            if not (self.customs_date and re.fullmatch(CUSTOMS_NUMBER_RE, self.customs_number or '')):
+                problems.append(_('дата й номер митної декларації у форматі ЄАІС, напр. 26UA500020000123U4'))
+        if problems:
+            raise UserError(_('Неможливо сформувати XML податкової накладної:\n• %s') % '\n• '.join(problems))
+
+    def _render_j1201016(self):
+        """XML податкової накладної J1201016 за XSD ДПС, windows-1251."""
+        self.ensure_one()
+        self._check_j1201016_ready()
+        company = self.company_id
+        office = self._pn_office_code()
+        tin = re.sub(r'\D', '', company.edrpou or '')
+        number = self._pn_number()
+        esc = lambda v: xml_escape(str(v or ''))
+        dec = lambda v, d=2: ('%.' + str(d) + 'f') % (v or 0.0)
+
+        def plain(v):
+            # Decimal…_R: до 12 / 6 знаків, без хвостових нулів
+            text = ('%.12f' % v).rstrip('0').rstrip('.')
+            return text or '0'
+
+        head = (
+            '<DECLARHEAD>'
+            f'<TIN>{tin}</TIN><C_DOC>{PN_FORM[0]}</C_DOC><C_DOC_SUB>{PN_FORM[1]}</C_DOC_SUB>'
+            f'<C_DOC_VER>{PN_FORM[2]}</C_DOC_VER><C_DOC_TYPE>0</C_DOC_TYPE><C_DOC_CNT>{number}</C_DOC_CNT>'
+            f'<C_REG>{office[:2]}</C_REG><C_RAJ>{office[2:4]}</C_RAJ>'
+            f'<PERIOD_MONTH>{self.date.month}</PERIOD_MONTH><PERIOD_TYPE>1</PERIOD_TYPE>'
+            f'<PERIOD_YEAR>{self.date.year}</PERIOD_YEAR><C_STI_ORIG>{office}</C_STI_ORIG>'
+            '<C_DOC_STAN>1</C_DOC_STAN><LINKED_DOCS xsi:nil="true"/>'
+            f'<D_FILL>{fields.Date.context_today(self):%d%m%Y}</D_FILL><SOFTWARE>{SOFTWARE}</SOFTWARE>'
+            '</DECLARHEAD>')
+
+        body = []
+        if self.non_payer_reason:
+            body.append(f'<HORIG1>1</HORIG1><HTYPR>{self.non_payer_reason}</HTYPR>')
+        if self.contract_number and self.contract_date:
+            body.append(f'<R001G1D>{self.contract_date:%d%m%Y}</R001G1D>'
+                        f'<R001G2S>{esc(self.contract_number)}</R001G2S>')
+        if self.customs_number and self.customs_date:
+            body.append(f'<R002G1D>{self.customs_date:%d%m%Y}</R002G1D>'
+                        f'<R002G2S>{esc(self.customs_number)}</R002G2S>')
+        buyer_name, buyer_ipn, buyer_tin = self._pn_buyer()
+        body.append(f'<HFILL>{self.date:%d%m%Y}</HFILL><HNUM>{number}</HNUM>')
+        body.append(f'<HNAMESEL>{esc(company._l10n_ua_dps_name())}</HNAMESEL>'
+                    f'<HNAMEBUY>{esc(buyer_name)}</HNAMEBUY>'
+                    f'<HKSEL>{company.l10n_ua_vat_ipn}</HKSEL>'
+                    f'<HTINSEL>{tin}</HTINSEL><HKS>1</HKS>'
+                    f'<HKBUY>{buyer_ipn}</HKBUY>')
+        if buyer_tin and re.fullmatch(r'\d{5,10}', buyer_tin):
+            body.append(f'<HTINBUY>{buyer_tin}</HTINBUY><HKB>1</HKB>')
+
+        # підсумки за кодами ставок
+        base = {}
+        vat = {}
+        for line in self.line_ids:
+            code = self._pn_rate_code(line)
+            base[code] = base.get(code, 0.0) + line.base_amount
+            vat[code] = vat.get(code, 0.0) + line.vat_amount
+        vat_total = sum(vat.get(c, 0.0) for c in ('20', '7', '14'))
+        body.append(f'<R04G11>{dec(sum(base.values()) + vat_total)}</R04G11>')
+        body.append(f'<R03G11>{dec(vat_total)}</R03G11>')
+        for tag, code in (('R03G7', '20'), ('R03G109', '7'), ('R03G14', '14')):
+            if code in vat:
+                body.append(f'<{tag}>{dec(vat[code])}</{tag}>')
+        for tag, code in (('R01G7', '20'), ('R01G109', '7'), ('R01G14', '14'), ('R01G9', '901'),
+                          ('R01G8', '902'), ('R01G10', '903')):
+            if code in base:
+                body.append(f'<{tag}>{dec(base[code])}</{tag}>')
+
+        # таблиця — стовпцями, як вимагає послідовність XSD
+        lines = list(self.line_ids)
+        columns = [
+            ('G3S', lambda l: esc(l.name)),
+            ('G4', lambda l: l.uktzed_code),
+            ('G32', lambda l: '1' if l.is_import else None),
+            ('G33', lambda l: l.dkpp_code),
+            ('G4S', lambda l: esc(l.uom_id.name) if l.uom_id else None),
+            ('G105_2S', lambda l: l.uom_id.l10n_ua_kspovo_code if l.uom_id else None),
+            ('G5', lambda l: plain(l.quantity)),
+            ('G6', lambda l: plain(l.price_unit)),
+            ('G008', lambda l: self._pn_rate_code(l)),
+            ('G009', lambda l: l.benefit_code),
+            ('G010', lambda l: dec(l.base_amount)),
+            ('G11_10', lambda l: plain(l.vat_amount)),
+        ]
+        for col, get in columns:
+            for num, line in enumerate(lines, 1):
+                value = get(line)
+                if value in (None, False, ''):
+                    continue
+                body.append(f'<RXXXX{col} ROWNUM="{num}">{value}</RXXXX{col}>')
+        body.append(f'<HBOS>{esc(self.signer_name)}</HBOS><HKBOS>{self.signer_rnokpp}</HKBOS>')
+
+        xml = ('<?xml version="1.0" encoding="windows-1251"?>'
+               '<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+               f'xsi:noNamespaceSchemaLocation="{"".join(PN_FORM)}.xsd">'
+               f'{head}<DECLARBODY>{"".join(body)}</DECLARBODY></DECLAR>')
+        return xml.encode('windows-1251', errors='xmlcharrefreplace')
 
     def _build_xml(self):
         """Build basic XML structure for tax invoice."""

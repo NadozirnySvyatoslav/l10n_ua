@@ -6,3 +6,4 @@ from . import l10n_ua_vat_declaration_xml
 from . import l10n_ua_vat_erpn_limit
 from . import account_move
 from . import res_partner
+from . import uom_uom

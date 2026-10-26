@@ -4,6 +4,8 @@ from odoo.tests import tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
+from .common_pn import set_pn_requisites
+
 
 @tagged('post_install', '-at_install', 'l10n_ua_account_vat')
 class TestTaxInvoiceProductCodes(AccountTestInvoicingCommon):
@@ -11,8 +13,10 @@ class TestTaxInvoiceProductCodes(AccountTestInvoicingCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env.company.l10n_ua_is_vat_payer = True
-        cls.customer = cls.env['res.partner'].create({'name': 'Покупець кодів'})
+        cls.env.company.write({'l10n_ua_is_vat_payer': True, 'l10n_ua_vat_ipn': '123456789012'})
+        set_pn_requisites(cls.env, cls.env.company)
+        cls.customer = cls.env['res.partner'].create({'name': 'Покупець кодів', 'ipn': '987654321098',
+                                                      'is_company': True})
         cls.vat_20 = cls.env['account.tax'].create({
             'name': 'ПДВ 20% (коди)', 'amount': 20.0, 'amount_type': 'percent',
             'type_tax_use': 'sale', 'company_id': cls.env.company.id,
@@ -73,6 +77,6 @@ class TestTaxInvoiceProductCodes(AccountTestInvoicingCommon):
 
     def test_xml_carries_the_codes(self):
         tax_invoice = self._tax_invoice(self.goods + self.service)
-        xml = tax_invoice._build_xml()
-        self.assertIn('<KODU>8471300000</KODU>', xml)
-        self.assertIn('<KODP>62.01.11-00.00</KODP>', xml)
+        xml = tax_invoice._render_j1201016().decode('windows-1251')
+        self.assertIn('<RXXXXG4 ROWNUM="1">8471300000</RXXXXG4>', xml)
+        self.assertIn('<RXXXXG33 ROWNUM="2">62.01.11-00.00</RXXXXG33>', xml)

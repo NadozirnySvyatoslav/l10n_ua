@@ -7,3 +7,4 @@ from . import test_tax_invoice_lines
 from . import test_vat_cash_method
 from . import test_tax_invoice_product_codes
 from . import test_vat_declaration_xml
+from . import test_tax_invoice_j1201016
