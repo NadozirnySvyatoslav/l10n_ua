@@ -97,6 +97,16 @@ class TestTaxInvoiceJ1201016(TransactionCase):
         self.assertEqual(body.findtext('R01G9'), '3124800.00')
         self.assertEqual(body.findtext('R002G2S'), '26UA101020004517U1')
 
+    def test_signer_from_company_settings(self):
+        """ПН, створена до заповнення особи, що складає ПН, бере її з компанії."""
+        self.company.write({'l10n_ua_vat_signer_name': False, 'l10n_ua_vat_signer_rnokpp': False})
+        pn = self._pn(self.buyer, [{'name': 'Товар', 'uktzed_code': '1001990000', 'quantity': 1,
+                                    'price_unit': 10, 'vat_rate': '20'}])
+        self.assertFalse(pn.signer_name)
+        set_pn_requisites(self.env, self.company)
+        root, _data = self._xml(pn)
+        self.assertEqual(root.findtext('DECLARBODY/HKBOS'), '3124567896')
+
     def test_missing_requisites(self):
         self.company.l10n_ua_vat_signer_rnokpp = False
         pn = self._pn(self.buyer, [{'name': 'Товар', 'uktzed_code': '1001990000', 'quantity': 1,

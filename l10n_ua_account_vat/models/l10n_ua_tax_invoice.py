@@ -441,6 +441,14 @@ class L10nUaTaxInvoice(models.Model):
             return '901' if export else '902'
         return {'exempt': '903'}.get(line.vat_rate, line.vat_rate)
 
+    def _pn_signer(self):
+        """(ім'я, РНОКПП) особи, що склала ПН: з ПН, інакше з налаштувань компанії —
+        ПН, створені до заповнення налаштувань, теж мають формуватися."""
+        company = self.company_id
+        if self.signer_name and self.signer_rnokpp:
+            return self.signer_name, self.signer_rnokpp
+        return company.l10n_ua_vat_signer_name, company.l10n_ua_vat_signer_rnokpp
+
     def _pn_office_code(self):
         # довідник ДПІ доступний лише групам UA — бухгалтеру без них теж треба XML
         company = self.company_id.sudo()
@@ -472,7 +480,8 @@ class L10nUaTaxInvoice(models.Model):
             problems.append(_('код ЄДРПОУ компанії'))
         if not self._pn_number():
             problems.append(_('номер ПН'))
-        if not self.signer_name or not re.fullmatch(r'\d{10}', self.signer_rnokpp or ''):
+        signer_name, signer_rnokpp = self._pn_signer()
+        if not signer_name or not re.fullmatch(r'\d{10}', signer_rnokpp or ''):
             problems.append(_('особа, що складає ПН, і її РНОКПП (налаштування ПДВ компанії)'))
         _name, ipn, _tin = self._pn_buyer()
         if not re.fullmatch(r'\d{12}', ipn):
@@ -572,7 +581,8 @@ class L10nUaTaxInvoice(models.Model):
                 if value in (None, False, ''):
                     continue
                 body.append(f'<RXXXX{col} ROWNUM="{num}">{value}</RXXXX{col}>')
-        body.append(f'<HBOS>{esc(self.signer_name)}</HBOS><HKBOS>{self.signer_rnokpp}</HKBOS>')
+        signer_name, signer_rnokpp = self._pn_signer()
+        body.append(f'<HBOS>{esc(signer_name)}</HBOS><HKBOS>{signer_rnokpp}</HKBOS>')
 
         xml = ('<?xml version="1.0" encoding="windows-1251"?>'
                '<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
