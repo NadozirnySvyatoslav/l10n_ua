@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Print Wizard for Invoices',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'category': 'Accounting/Localization',
     'summary': 'The "Print" button on invoices asks which report to print',
     'description': """

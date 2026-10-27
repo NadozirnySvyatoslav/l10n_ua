@@ -27,16 +27,23 @@ class TestPrintWizard(AccountTestInvoicingCommon):
         """The Print button reads the list before the selection."""
         default = self.env['account.move.send']._get_default_pdf_report_id(self.invoice)
         action = self.invoice.action_print_pdf()
-        if action.get('res_model') == 'l10n_ua.print.wizard':
-            wizard = self.env['l10n_ua.print.wizard'].browse(action['res_id'])
-            self.assertEqual(wizard.report_id, default)
+        self.assertEqual(action.get('res_model'), 'l10n_ua.print.wizard')
+        wizard = self.env['l10n_ua.print.wizard'].browse(action['res_id'])
+        self.assertEqual(wizard.report_id, default)
 
     def test_print_button_opens_wizard(self):
+        self.assertGreater(len(self._wizard().available_report_ids), 1)
         action = self.invoice.action_print_pdf()
-        if len(self._wizard().available_report_ids) > 1:
-            self.assertEqual(action['res_model'], 'l10n_ua.print.wizard')
-        else:
-            self.assertEqual(action['type'], 'ir.actions.report')
+        self.assertEqual(action['res_model'], 'l10n_ua.print.wizard')
+
+    def test_internal_user_can_open_wizard(self):
+        """Users who see invoices through other apps (e.g. sales) must keep the Print button."""
+        user = self.env['res.users'].create({
+            'name': 'Plain internal user',
+            'login': 'print_wizard_plain_user',
+            'group_ids': [(6, 0, self.env.ref('base.group_user').ids)],
+        })
+        self.assertTrue(self.env['l10n_ua.print.wizard'].with_user(user).has_access('create'))
 
     def test_print_chosen_report(self):
         wizard = self._wizard()
