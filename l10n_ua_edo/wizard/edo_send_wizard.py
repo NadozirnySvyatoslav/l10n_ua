@@ -29,9 +29,12 @@ class L10nUaEdoSendWizard(models.TransientModel):
         string='Recipient E-mails', help='Comma-separated; used when the recipient is not in the service yet.')
     send_now = fields.Boolean(
         string='Recipient Signs First', default=False,
-        help='Off: the document is uploaded and waits for your signature in the service, '
-             'where you sign and send it. On: it goes to the recipient right away, '
+        help='Off: the document is uploaded and waits for your signature: sign it with КЕП here '
+             'or in the service, then it is sent. On: it goes to the recipient right away, '
              'who signs it first.')
+    sign_now = fields.Boolean(
+        string='Sign with КЕП Now', default=True,
+        help='Right after the upload, sign the document with КЕП in the browser and send it.')
 
     def _target_ids(self):
         self.ensure_one()
@@ -96,6 +99,11 @@ class L10nUaEdoSendWizard(models.TransientModel):
             doc = records._edo_send(
                 self.account_id, self.report_id, self.recipient_edrpou, emails,
                 title=self.title, category=category, send=self.send_now)
+            if self.sign_now and not self.send_now:
+                if not doc.can_sign:
+                    doc.action_refresh()
+                if doc.can_sign:
+                    return doc.action_edo_sign()
             return {
                 'type': 'ir.actions.act_window', 'res_model': doc._name,
                 'res_id': doc.id, 'view_mode': 'form', 'target': 'current',

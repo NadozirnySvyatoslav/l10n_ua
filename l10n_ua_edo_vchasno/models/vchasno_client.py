@@ -6,7 +6,9 @@ documents are uploaded as multipart ``files`` to ``/documents`` with the
 details as query parameters (``recipient_emails`` and ``ids`` repeat once per
 value), listed by ``/documents`` and ``/incoming-documents`` page by page
 (``cursor`` ← ``next_cursor``), downloaded from ``/documents/<id>/original``
-and ``/documents/<id>/archive``. Amounts are in kopecks. Every call has a
+and ``/documents/<id>/archive``; a detached КЕП signature (p7s, base64) is
+added by ``POST /documents/<id>/signatures``; recognised data comes from
+``/documents/<id>/structured-data/download``. Amounts are in kopecks. Every call has a
 timeout and turns an HTTP error into a message the user can act on.
 """
 
@@ -97,3 +99,33 @@ class VchasnoClient:
         match = re.search(r"filename\*?=(?:UTF-8'')?\"?([^\";]+)", disposition)
         default = f'{document_id}.{"zip" if kind == "archive" else "pdf"}'
         return (match.group(1) if match else default), response.content
+
+    def sign(self, document_id, signature_b64):
+        """Add a detached signature; possible in statuses 7001–7004, 7007, 7010."""
+        self._request('POST', f'/documents/{document_id}/signatures', json={'signature': signature_b64})
+
+    def extract(self, document_ids):
+        """Start the recognition of the data of documents (up to 100 at a time)."""
+        results = []
+        ids = list(document_ids)
+        for start in range(0, len(ids), 100):
+            payload = self._request('POST', '/documents/structured-data/extractions',
+                                    json={'document_ids': ids[start:start + 100]}).json()
+            results += (payload or {}).get('data') or []
+        return results
+
+    def structured_data(self, document_id):
+        """The recognised data of a document, or None with its status while it is not confirmed.
+
+        :return: ``(data, status)`` — data is the dict of the export (``items``,
+            ``total_price``, ``details`` …) or None.
+        """
+        response = self._request('GET', f'/documents/{document_id}/structured-data/download',
+                                 params={'format': 'json'})
+        try:
+            payload = response.json()
+        except ValueError as error:
+            raise VchasnoError('Вчасно повернуло розпізнані дані не у форматі JSON.') from error
+        if isinstance(payload, dict) and 'items' not in payload and payload.get('status'):
+            return None, payload['status']
+        return payload, 'downloaded'

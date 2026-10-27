@@ -6,6 +6,8 @@
         <field name="arch" type="xml">
             <form string="EDO Document" create="0">
                 <header>
+                    <button name="action_edo_sign" type="object" string="Sign with КЕП"
+                            class="btn-primary" icon="fa-pencil" invisible="not can_sign"/>
                     <button name="action_refresh" type="object" string="Refresh Status" invisible="not provider_ref"/>
                     <button name="action_open_in_service" type="object" string="Open in the Service"
                             class="btn-primary" invisible="not url"/>
@@ -37,6 +39,8 @@
                             <field name="provider_status"/>
                             <field name="last_sync"/>
                             <field name="provider_ref" groups="base.group_no_one"/>
+                            <field name="data_state" invisible="not data_state"/>
+                            <field name="can_sign" invisible="1"/>
                             <field name="provider" invisible="1"/>
                             <field name="res_model" invisible="1"/>
                             <field name="res_id" invisible="1"/>

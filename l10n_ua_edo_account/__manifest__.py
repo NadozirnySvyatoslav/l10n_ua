@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - EDO for Invoices',
-    'version': '19.0.1.1.1',
+    'version': '19.0.1.2.0',
     'category': 'Accounting/Localization',
     'summary': 'Надсилання рахунків, актів і видаткових у ЕДО; рахунок постачальника з вхідного документа',
     'description': """

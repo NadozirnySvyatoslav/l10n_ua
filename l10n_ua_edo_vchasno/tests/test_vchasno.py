@@ -1,5 +1,6 @@
 """Провайдер ЕДО «Вчасно» з фальшивою HTTP-сесією (#81)."""
 
+import base64
 import json
 from datetime import date
 
@@ -164,3 +165,82 @@ class TestVchasno(TransactionCase):
 
     def test_annulled_document(self):
         self.assertEqual(self.account._call('normalize', {'id': 'x', 'status': 7011})['state'], 'deleted')
+
+    # ── КЕП signature, recognised data, defaults ────────────
+
+    def _doc(self, ref, direction, status, **vals):
+        return self.env['l10n_ua.edo.document'].create(dict({
+            'name': f'Документ {ref}', 'account_id': self.account.id, 'direction': direction,
+            'provider_ref': ref, 'provider_status': str(status)}, **vals))
+
+    def test_whose_turn_to_sign(self):
+        cases = [('out', 7001, True), ('out', 7003, True), ('out', 7002, False), ('out', 7004, False),
+                 ('in', 7002, True), ('in', 7004, True), ('in', 7007, True), ('in', 7008, False),
+                 ('in', 7001, False)]
+        for index, (direction, status, expected) in enumerate(cases):
+            doc = self._doc(f'turn-{index}', direction, status)
+            self.assertEqual(doc.can_sign, expected, f'{direction} {status}')
+            self.assertTrue(doc.can_extract)
+
+    def test_sign_outgoing_with_kep_and_send(self):
+        doc = self._doc('out-7', 'out', 7001, state='uploaded')
+        doc.attachment_id = self.env['ir.attachment'].create({
+            'name': 'act_7.pdf', 'raw': b'%PDF-1.4 act', 'res_model': doc._name, 'res_id': doc.id})
+        session = self._session({
+            ('GET', '/documents'): FakeResponse(200, {'documents': [
+                {'id': 'out-7', 'status': 7004, 'edrpou_owner': '11111116'}]}),
+            ('POST', '/documents/out-7/signatures'): FakeResponse(201, {}),
+            ('POST', '/documents/out-7/send'): FakeResponse(200, {}),
+        })
+        prepared = doc.kep_prepare_signing()
+        [document] = prepared['documents']
+        self.assertEqual(document['format'], 'cades_detached')       # Вчасно takes a detached p7s
+        self.assertEqual(base64.b64decode(document['data_b64']), b'%PDF-1.4 act')
+        result = doc.kep_submit_signed({'document': 'U0lHTg=='})
+        calls = [(method, path) for method, path, _h, _k in session.calls]
+        self.assertEqual(calls[:2], [('POST', '/documents/out-7/signatures'), ('POST', '/documents/out-7/send')])
+        self.assertEqual(session.calls[0][3]['json'], {'signature': 'U0lHTg=='})
+        self.assertEqual(doc.state, 'signed_owner')
+        self.assertIn('sent', result['receipt'])
+
+    def test_sign_incoming_is_not_sent_again(self):
+        doc = self._doc('in-7', 'in', 7004, state='signed_owner')
+        session = self._session({
+            ('GET', '/documents/in-7/original'): FakeResponse(
+                200, content=b'%PDF in', headers={'Content-Disposition': 'attachment; filename="in.pdf"'}),
+            ('GET', '/documents'): FakeResponse(200, {'documents': [{'id': 'in-7', 'status': 7008}]}),
+            ('GET', '/documents/in-7/archive'): FakeResponse(200, content=b'PK..'),
+            ('POST', '/documents/in-7/signatures'): FakeResponse(201, {}),
+        })
+        prepared = doc.kep_prepare_signing()
+        self.assertEqual(doc.attachment_id.name, 'in.pdf')            # the original, fetched once
+        self.assertEqual(base64.b64decode(prepared['documents'][0]['data_b64']), b'%PDF in')
+        doc.kep_submit_signed({'document': 'U0lHTg=='})
+        self.assertNotIn(('POST', '/documents/in-7/send'), [(m, p) for m, p, _h, _k in session.calls])
+        self.assertEqual(doc.state, 'signed')
+
+    def test_sign_refused_when_not_our_turn(self):
+        doc = self._doc('out-8', 'out', 7004)
+        with self.assertRaises(UserError):
+            doc.action_edo_sign()
+
+    def test_recognised_data(self):
+        session = self._session({
+            ('GET', '/documents/ready/structured-data/download'): FakeResponse(200, {
+                'items': [{'name': 'Консультація', 'quantity': 2, 'price_with_vat': 500}],
+                'total_price': {'total_price_with_vat': 1000}}),
+            ('GET', '/documents/wait/structured-data/download'): FakeResponse(200, {
+                'document_id': 'wait', 'status': 'awaiting_validation'}),
+            ('POST', '/documents/structured-data/extractions'): FakeResponse(200, {'data': [
+                {'document_id': 'wait', 'status': 'pending'}]}),
+        })
+        self.assertEqual(self.account._call('structured_data', 'ready')['items'][0]['quantity'], 2)
+        self.assertIsNone(self.account._call('structured_data', 'wait'))
+        self.assertEqual(self.account._call('extract', ['wait'])[0]['status'], 'pending')
+        self.assertEqual(session.calls[-1][3]['json'], {'document_ids': ['wait']})
+        vals = self.account._vchasno_normalize({'id': 'x', 'status': 7002, 'sd_status': 'confirmed'})
+        self.assertEqual(vals['data_state'], 'confirmed')
+
+    def test_new_account_imports_from_the_start_of_the_year(self):
+        account = self.env['l10n_ua.edo.account'].create({'name': 'Новий', 'company_id': self.company.id})
+        self.assertEqual((account.incoming_date_from.month, account.incoming_date_from.day), (1, 1))

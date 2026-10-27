@@ -128,3 +128,28 @@ class TestEdoAccount(AccountTestInvoicingCommon):
                          (False, True, True))
         with self.assertRaises(UserError):
             contract.action_create_vendor_bill()
+
+    def test_vendor_bill_lines_from_recognised_data(self):
+        """A company that is not a VAT payer books the price with VAT, without tax."""
+        doc = self.env['l10n_ua.edo.document'].create({
+            'name': 'Акт № 12', 'account_id': self.edo.id, 'direction': 'in', 'category': False,
+            'provider_ref': 'in-12', 'number': '12', 'partner_id': self.partner_a.id, 'date': '2026-10-20'})
+        data = {'items': [
+            {'name': 'Консультація', 'quantity': 2, 'price_with_vat': 600, 'price_without_vat': 500, 'vat_rate': 20},
+            {'name': 'Доставка', 'total_price_with_vat': '150.50'},
+        ]}
+        self.patch(type(doc), '_structured_data', lambda self: data)
+        bill = self.env['account.move'].browse(doc.action_create_vendor_bill()['res_id'])
+        lines = bill.invoice_line_ids.sorted('sequence')
+        self.assertEqual(lines.mapped('name'), ['Консультація', 'Доставка'])
+        self.assertEqual([(l.quantity, l.price_unit) for l in lines], [(2.0, 600.0), (1.0, 150.5)])
+        self.assertFalse(lines.tax_ids)
+        self.assertAlmostEqual(bill.amount_total, 1350.5)
+
+    def test_vendor_bill_without_recognised_data_has_no_lines(self):
+        doc = self.env['l10n_ua.edo.document'].create({
+            'name': 'Рахунок № 46', 'account_id': self.edo.id, 'direction': 'in',
+            'provider_ref': 'in-46', 'partner_id': self.partner_a.id})
+        bill = self.env['account.move'].browse(doc.action_create_vendor_bill()['res_id'])
+        self.assertFalse(bill.invoice_line_ids)
+        self.assertIn('fill in the lines', bill.message_ids[:1].body + ''.join(bill.message_ids.mapped('body')))

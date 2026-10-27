@@ -56,14 +56,16 @@ class L10nUaSignMixin(models.AbstractModel):
               'documents': [
                  {'name': 'doc',
                   'data_b64': <base64 даних для підпису>,
-                  'format': 'cades' | 'envelope' | 'asic' | 'dps_transport',
+                  'format': 'cades' | 'cades_detached' | 'envelope' | 'asic'
+                            | 'dps_transport',
                   'filename': 'file.xml',
                   'recipient_cert_b64': <base64 cert отримувача, для 'envelope'>},
                  ...
               ],
             }
 
-        ``data_b64`` — base64 сирих байтів, які підписуються (для XML це вміст
+        ``cades_detached`` — відкріплений підпис (без даних усередині), як його
+        приймають ЕДО-сервіси. ``data_b64`` — base64 сирих байтів, які підписуються (для XML це вміст
         файлу; браузер декодує перед підписом). ``documents`` може бути
         порожнім, якщо потрібен лише підпис ``auth_subject`` (авторизація) —
         тоді вікно робить усе однією кнопкою «Зчитати ключ і <submit_label>».

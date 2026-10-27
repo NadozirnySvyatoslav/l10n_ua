@@ -22,6 +22,7 @@
                         <field name="recipient_edrpou" invisible="record_count &gt; 1"/>
                         <field name="recipient_emails" invisible="record_count &gt; 1"/>
                         <field name="send_now"/>
+                        <field name="sign_now" invisible="send_now or record_count &gt; 1"/>
                     </group>
                 </group>
                 <div class="alert alert-info" role="alert" invisible="record_count &lt;= 1">
@@ -29,9 +30,9 @@
                     A document without them is skipped and listed.
                 </div>
                 <div class="text-muted small">
-                    The document is signed in the EDO service, no key is kept in Odoo. It is uploaded and
-                    waits for your signature there; with «Recipient Signs First» it goes to the recipient
-                    right away.
+                    The document is uploaded and waits for your signature: sign it with КЕП here (the key
+                    and its password stay in the browser) or in the EDO service. With «Recipient Signs
+                    First» it goes to the recipient right away.
                 </div>
                 <footer>
                     <button name="action_send" type="object" string="Send" class="btn-primary"/>

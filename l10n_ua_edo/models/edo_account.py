@@ -17,6 +17,16 @@ plain data, so the base module and the bridges never see the API:
 * ``categories()`` → [(code, name)] — the document categories of the service.
 * ``default_categories()`` (optional) → {report xmlid: category code} — the
   category each Ukrainian printed form goes under by default.
+* ``can_sign(document)`` (optional) → bool — whether the company signs the
+  document now (its turn in the service). Without it there is no КЕП button.
+* ``sign(ref, signature_b64)`` — add a detached КЕП signature (p7s, base64)
+  of the original file to the document.
+* ``extract(refs)`` (optional) — start the recognition of the data (lines,
+  totals) of documents in the service.
+* ``structured_data(ref)`` (optional) → dict or None — the recognised data:
+  ``{'items': [{'name', 'code', 'units', 'quantity', 'price_with_vat',
+  'price_without_vat', 'vat_rate', 'total_price_with_vat'}], ...}``; None
+  while it is not ready.
 * ``bill_categories()`` (optional) → {category code} — the categories of
   incoming documents a vendor bill is made from (invoices, acts, waybills).
   Without it a bill can be made from any incoming document.
@@ -50,7 +60,7 @@ class L10nUaEdoAccount(models.Model):
         string='ЄДРПОУ', default=lambda self: self.env.company.edrpou,
         help='Code of the company in the service: documents are sent on its behalf.')
     incoming_date_from = fields.Date(
-        string='Import Incoming From', default=fields.Date.context_today,
+        string='Import Incoming From', default=lambda self: self._default_incoming_date_from(),
         help='Incoming documents created since this date are imported.')
     last_sync = fields.Datetime(readonly=True, copy=False)
     last_error = fields.Text(readonly=True, copy=False)
@@ -59,6 +69,12 @@ class L10nUaEdoAccount(models.Model):
     category_rule_ids = fields.One2many(
         'l10n_ua.edo.category.rule', 'account_id', string='Categories of Printed Forms')
     document_count = fields.Integer(compute='_compute_document_count')
+
+    @api.model
+    def _default_incoming_date_from(self):
+        """The start of the year: a new account shows this year's incoming documents
+        at once ("today" imported nothing until new documents came)."""
+        return fields.Date.context_today(self).replace(month=1, day=1)
 
     def _compute_document_count(self):
         counts = dict(self.env['l10n_ua.edo.document']._read_group(

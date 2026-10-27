@@ -20,7 +20,7 @@ EDO_STATES = [
 class L10nUaEdoDocument(models.Model):
     _name = 'l10n_ua.edo.document'
     _description = 'EDO Document'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'l10n_ua.sign.mixin']
     _order = 'date desc, id desc'
 
     _FINAL_STATES = ('signed', 'rejected', 'deleted')
@@ -47,6 +47,20 @@ class L10nUaEdoDocument(models.Model):
     attachment_id = fields.Many2one('ir.attachment', string='Original', copy=False)
     archive_attachment_id = fields.Many2one('ir.attachment', string='Archive with Signatures', copy=False)
     last_sync = fields.Datetime(copy=False)
+    can_sign = fields.Boolean(
+        compute='_compute_capabilities',
+        help='The company signs the document now: it is its turn in the service.')
+    can_extract = fields.Boolean(
+        compute='_compute_capabilities',
+        help='The service can recognise the lines and totals of the document.')
+    data_state = fields.Selection([
+        ('pending', 'Being Recognised'),
+        ('awaiting_validation', 'Recognised, to Confirm in the Service'),
+        ('confirmed', 'Confirmed'),
+        ('downloaded', 'Exported'),
+        ('error', 'Recognition Error'),
+    ], string='Recognised Data', copy=False,
+        help='Recognition of the lines and totals of the document in the service.')
 
     _provider_ref_uniq = models.Constraint(
         'UNIQUE(account_id, provider_ref)',
@@ -92,6 +106,15 @@ class L10nUaEdoDocument(models.Model):
             return Partner
         return Partner.search([('edrpou', '=', edrpou), ('is_company', '=', True)], limit=1) \
             or Partner.search([('edrpou', '=', edrpou)], limit=1)
+
+    @api.depends('state', 'provider_status', 'direction', 'account_id.provider')
+    def _compute_capabilities(self):
+        for doc in self:
+            account = doc.account_id
+            method = account.provider and getattr(account, f'_{account.provider}_can_sign', None)
+            doc.can_sign = bool(doc.provider_ref and method and method(doc))
+            doc.can_extract = bool(doc.provider_ref and account.provider
+                                   and hasattr(account, f'_{account.provider}_extract'))
 
     # ── Files ───────────────────────────────────────────────
 
@@ -145,6 +168,56 @@ class L10nUaEdoDocument(models.Model):
         if not self.url:
             raise UserError(_('The service gave no link to this document.'))
         return {'type': 'ir.actions.act_url', 'url': self.url, 'target': 'new'}
+
+    # ── КЕП signature ───────────────────────────────────────
+
+    def action_edo_sign(self):
+        """Sign the document with КЕП in the browser and hand the signature to the service."""
+        self.ensure_one()
+        if self.can_sign:
+            self.action_refresh()  # the status may have moved on in the service
+        if not self.can_sign:
+            raise UserError(_('It is not the turn of your company to sign document «%s».', self.name))
+        return self.action_kep_sign()
+
+    def kep_prepare_signing(self):
+        self.ensure_one()
+        attachment = self.attachment_id or self._fetch_file('original')
+        if self.direction == 'out':
+            description = _('The signature goes to the service, then the document is sent to the counterparty.')
+        else:
+            description = _('The signature goes to the service as the signature of the recipient.')
+        return {
+            'description': description,
+            'documents': [{
+                'name': 'document',
+                'data_b64': attachment.datas.decode(),
+                'format': 'cades_detached',
+                'filename': attachment.name,
+            }],
+        }
+
+    def kep_submit_signed(self, signed, auth_signature=None):
+        self.ensure_one()
+        signature = (signed or {}).get('document')
+        if not signature:
+            raise UserError(_('The browser returned no signature.'))
+        account = self.account_id
+        account._call('sign', self.provider_ref, signature)
+        self.message_post(body=_('Signed with КЕП in Odoo.'))
+        receipt = _('Signed.')
+        if self.direction == 'out':
+            try:
+                account._call('send', self.provider_ref)
+            except UserError as error:
+                # The signature is in the service already; sending is retried there
+                self.message_post(body=_('Signed, but not sent: %s', error))
+                receipt = _('Signed, but not sent: %s', error)
+            else:
+                self.message_post(body=_('Sent to the counterparty.'))
+                receipt = _('Signed and sent to the counterparty.')
+        self.action_refresh()
+        return {'receipt': receipt}
 
     def _record(self):
         self.ensure_one()

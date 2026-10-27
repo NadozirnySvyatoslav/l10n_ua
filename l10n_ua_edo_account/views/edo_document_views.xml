@@ -7,8 +7,12 @@
         <field name="arch" type="xml">
             <xpath expr="//header/button[@name='action_refresh']" position="before">
                 <field name="can_create_bill" invisible="1"/>
+                <field name="can_extract" invisible="1"/>
                 <button name="action_create_vendor_bill" type="object" string="Create Vendor Bill"
                         class="btn-primary" invisible="not can_create_bill or res_id"/>
+                <button name="action_edo_extract" type="object" string="Recognise Data"
+                        invisible="not can_create_bill or res_id or not can_extract or data_state in ('pending', 'confirmed', 'downloaded')"
+                        help="The service recognises the lines and totals of the document; confirm them there, and the vendor bill gets its lines."/>
             </xpath>
         </field>
     </record>

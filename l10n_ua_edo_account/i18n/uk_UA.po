@@ -87,3 +87,53 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ua_edo_account.field_l10n_ua_edo_document__can_create_bill
 msgid "Can Create Bill"
 msgstr "Можна створити рахунок"
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid ""
+"Created from the EDO document «%(name)s»: %(count)s lines from the data "
+"recognised in the service. Check them against the PDF."
+msgstr ""
+"Створено з документа ЕДО «%(name)s»: %(count)s рядків з даних, розпізнаних у"
+" сервісі. Звірте їх із PDF."
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid ""
+"Created from the EDO document «%s». The service has no confirmed data of it:"
+" fill in the lines from the PDF."
+msgstr ""
+"Створено з документа ЕДО «%s». Підтверджених розпізнаних даних у сервісі "
+"немає — заповніть рядки за PDF."
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid "Item"
+msgstr "Позиція"
+
+#. module: l10n_ua_edo_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_account.view_edo_document_form_account
+msgid "Recognise Data"
+msgstr "Розпізнати дані"
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid ""
+"Recognition of the data started in the service. When it is done, confirm the"
+" data there, then create the vendor bill."
+msgstr ""
+"У сервісі запущено розпізнавання даних. Коли воно завершиться, підтвердьте "
+"дані там і створіть рахунок постачальника."
+
+#. module: l10n_ua_edo_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_account.view_edo_document_form_account
+msgid ""
+"The service recognises the lines and totals of the document; confirm them "
+"there, and the vendor bill gets its lines."
+msgstr ""
+"Сервіс розпізнає рядки й суми документа; підтвердьте їх там — і рахунок "
+"постачальника отримає рядки."

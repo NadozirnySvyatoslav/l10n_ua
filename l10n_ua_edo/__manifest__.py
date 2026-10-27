@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Electronic Document Exchange (EDO)',
-    'version': '19.0.1.1.1',
+    'version': '19.0.1.2.0',
     'category': 'Accounting/Localization',
     'summary': 'Обмін первинними документами через сервіси ЕДО (Вчасно, …): '
                'надсилання на підпис, статуси, вхідні документи',
@@ -20,12 +20,16 @@ Base of the integrations with Ukrainian electronic document exchange services
   document model; a bridge module only tells which report to send.
 * Scheduled synchronisation of the statuses and of the incoming documents.
 
-The documents are signed in the service; no key is kept in Odoo.
+* КЕП signature in the browser (``l10n_ua_sign``): the detached signature of
+  the original file goes to the service, the document is sent on. The key and
+  its password never reach the server.
+* Recognised data of an incoming document (lines, totals), when the service
+  recognises it.
     """,
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
-    'depends': ['base', 'mail', 'l10n_ua_company_base'],
+    'depends': ['base', 'mail', 'l10n_ua_company_base', 'l10n_ua_sign'],
     'external_dependencies': {'python': ['requests']},
     'data': [
         'security/edo_security.xml',

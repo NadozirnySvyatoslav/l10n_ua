@@ -241,6 +241,7 @@ async function buildDpsTransport(eu, doc, xmlBytes) {
  * Підписати один документ у потрібному форматі.
  * Сигнатури — з euscp.d.ts пакета @it-enterprise/digital-signature:
  *   SignDataInternal(appendCert, data, asBase64String)
+ *   SignData(data, asBase64String) — відкріплений підпис
  *   EnvelopData(recipientsCerts, data, signData, appendCert, asBase64String)
  */
 async function signOneDocument(eu, doc) {
@@ -249,6 +250,11 @@ async function signOneDocument(eu, doc) {
     if (fmt === "cades") {
         // CAdES/P7S із вбудованими даними та сертифікатом підписувача.
         return await eu.SignDataInternal(true, bytes, true);
+    }
+    if (fmt === "cades_detached") {
+        // Відкріплений (зовнішній) CAdES: лише підпис із сертифікатом, без даних —
+        // так його приймають ЕДО-сервіси (Вчасно: POST /documents/<id>/signatures).
+        return await eu.SignData(bytes, true);
     }
     if (fmt === "envelope") {
         if (!doc.recipient_cert_b64) {

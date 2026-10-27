@@ -18,6 +18,14 @@ VCHASNO_STATES = {
 }
 
 
+# Statuses in which the company signs: its own uploaded document, or an
+# incoming one waiting for the recipient (the guide: «Підпис можливо додати до
+# документу у статусі 7001, 7002 (вхідний), 7003, 7004 (вхідний), 7007 (вхідний)»).
+VCHASNO_SIGN_OUT = {7000, 7001, 7003}  # 7000: just uploaded, ready in a moment
+VCHASNO_SIGN_IN = {7002, 7004, 7007}
+VCHASNO_DATA_STATES = {'pending', 'awaiting_validation', 'confirmed', 'downloaded', 'error'}
+
+
 class L10nUaEdoAccount(models.Model):
     _inherit = 'l10n_ua.edo.account'
 
@@ -84,6 +92,23 @@ class L10nUaEdoAccount(models.Model):
     def _vchasno_download(self, ref, kind):
         return self._vchasno('download', ref, kind)
 
+    def _vchasno_can_sign(self, doc):
+        try:
+            status = int(doc.provider_status)
+        except (TypeError, ValueError):
+            return False
+        return status in (VCHASNO_SIGN_OUT if doc.direction == 'out' else VCHASNO_SIGN_IN)
+
+    def _vchasno_sign(self, ref, signature_b64):
+        return self._vchasno('sign', ref, signature_b64)
+
+    def _vchasno_extract(self, refs):
+        return self._vchasno('extract', refs)
+
+    def _vchasno_structured_data(self, ref):
+        data, _status = self._vchasno('structured_data', ref)
+        return data
+
     def _vchasno_normalize(self, data):
         """Values of l10n_ua.edo.document from a document of Вчасно."""
         status = data.get('status')
@@ -104,6 +129,8 @@ class L10nUaEdoAccount(models.Model):
         date = data.get('date') or data.get('date_document') or data.get('date_created')
         if date:
             vals['date'] = str(date)[:10]
+        if data.get('sd_status') in VCHASNO_DATA_STATES:
+            vals['data_state'] = data['sd_status']
         if status_code in VCHASNO_STATES:
             vals['state'] = VCHASNO_STATES[status_code]
         # The owner is the counterparty only for a document the company did not upload

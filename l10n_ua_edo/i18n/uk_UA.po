@@ -829,3 +829,154 @@ msgstr "Документів уже не існує."
 #: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
 msgid "e.g. Вчасно — основна компанія"
 msgstr "напр. Вчасно — основна компанія"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__data_state__pending
+msgid "Being Recognised"
+msgstr "Розпізнається"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__can_extract
+msgid "Can Extract"
+msgstr "Можна розпізнати"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__can_sign
+msgid "Can Sign"
+msgstr "Можна підписати"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__data_state__confirmed
+msgid "Confirmed"
+msgstr "Підтверджено"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__data_state__downloaded
+msgid "Exported"
+msgstr "Експортовано"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "It is not the turn of your company to sign document «%s»."
+msgstr "Зараз не черга вашої компанії підписувати документ «%s»."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__send_now
+msgid ""
+"Off: the document is uploaded and waits for your signature: sign it with КЕП"
+" here or in the service, then it is sent. On: it goes to the recipient right"
+" away, who signs it first."
+msgstr ""
+"Вимкнено: документ завантажується й чекає вашого підпису — підпишіть його "
+"КЕП тут або в сервісі, після чого він надсилається. Увімкнено: документ "
+"одразу йде отримувачу, який підписує його першим."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__data_state
+msgid "Recognised Data"
+msgstr "Розпізнані дані"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__data_state__awaiting_validation
+msgid "Recognised, to Confirm in the Service"
+msgstr "Розпізнано, підтвердьте в сервісі"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__data_state__error
+msgid "Recognition Error"
+msgstr "Помилка розпізнавання"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__data_state
+msgid "Recognition of the lines and totals of the document in the service."
+msgstr "Розпізнавання рядків і сум документа в сервісі."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__sign_now
+msgid ""
+"Right after the upload, sign the document with КЕП in the browser and send "
+"it."
+msgstr ""
+"Одразу після завантаження підписати документ КЕП у браузері й надіслати."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Sent to the counterparty."
+msgstr "Надіслано контрагенту."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "Sign with КЕП"
+msgstr "Підписати КЕП"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__sign_now
+msgid "Sign with КЕП Now"
+msgstr "Підписати КЕП зараз"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Signed and sent to the counterparty."
+msgstr "Підписано й надіслано контрагенту."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Signed with КЕП in Odoo."
+msgstr "Підписано КЕП в Odoo."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Signed, but not sent: %s"
+msgstr "Підписано, але не надіслано: %s"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Signed."
+msgstr "Підписано."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "The browser returned no signature."
+msgstr "Браузер не повернув підпису."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__can_sign
+msgid "The company signs the document now: it is its turn in the service."
+msgstr "Компанія підписує документ зараз: у сервісі її черга."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_send_wizard_form
+msgid ""
+"The document is uploaded and waits for your signature: sign it with КЕП here (the key\n"
+"                    and its password stay in the browser) or in the EDO service. With «Recipient Signs\n"
+"                    First» it goes to the recipient right away."
+msgstr ""
+"Документ завантажується й чекає вашого підпису: підпишіть його КЕП тут (ключ"
+" і пароль лишаються в браузері) або в сервісі ЕДО. З «Отримувач підписує "
+"першим» документ одразу йде отримувачу."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__can_extract
+msgid "The service can recognise the lines and totals of the document."
+msgstr "Сервіс може розпізнати рядки й суми документа."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "The signature goes to the service as the signature of the recipient."
+msgstr "Підпис іде в сервіс як підпис отримувача."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid ""
+"The signature goes to the service, then the document is sent to the "
+"counterparty."
+msgstr "Підпис іде в сервіс, після чого документ надсилається контрагенту."
