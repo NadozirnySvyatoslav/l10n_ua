@@ -36,6 +36,7 @@ The documents are signed in the service; no key is kept in Odoo.
         'wizard/edo_send_wizard_views.xml',
         'views/menu_views.xml',
     ],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'application': False,
 }

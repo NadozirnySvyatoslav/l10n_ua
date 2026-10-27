@@ -25,6 +25,7 @@ the API is the system parameter ``l10n_ua_edo_vchasno.base_url``
     'depends': ['l10n_ua_edo'],
     'external_dependencies': {'python': ['requests']},
     'data': [],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'auto_install': False,
 }

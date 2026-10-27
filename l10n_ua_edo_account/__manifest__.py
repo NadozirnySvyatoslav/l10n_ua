@@ -21,6 +21,7 @@ Ukraine - EDO for Invoices
         'views/account_move_views.xml',
         'views/edo_document_views.xml',
     ],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'auto_install': True,
 }

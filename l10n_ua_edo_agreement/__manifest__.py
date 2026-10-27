@@ -20,6 +20,7 @@ Ukraine - EDO for Agreements
         'views/edo_send_action.xml',
         'views/agreement_views.xml',
     ],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'auto_install': True,
 }

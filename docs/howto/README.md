@@ -17,6 +17,7 @@
 | ПРРО (фіскалізація) | [prro.md](prro.md) | 🔑 потребує акаунта Checkbox | [prro.md](../prro.md) |
 | Доставка | [delivery.md](delivery.md) | 🚧 інтеграції каркасні | [delivery.md](../delivery.md) |
 | Маркетплейси | [marketplaces.md](marketplaces.md) | 🔑 потребує API-ключів | [marketplaces.md](../marketplaces.md) |
+| Електронний документообіг (Вчасно) | [edo.md](edo.md) | 🔑 потребує токена Вчасно | — |
 | Договори з клієнтами | [agreements.md](agreements.md) | ✅ звірено наживо (потребує OCA) | [agreements.md](../agreements.md) |
 | Ціни постачальників | [supplier_prices.md](supplier_prices.md) | 📄 з коду (на демо не встановлено) | [supplier_prices.md](../supplier_prices.md) |
 | HR та зарплата (1С:ЗУП) | [hr.md](hr.md) | ✅ звірено наживо | [hr.md](../hr.md) |

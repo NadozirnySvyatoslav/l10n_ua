@@ -18,6 +18,7 @@ comes first. The EDO status is on the order form.
         'views/edo_send_action.xml',
         'views/sale_order_views.xml',
     ],
+    'images': ['static/description/banner.png'],
     'installable': True,
     'auto_install': True,
 }
