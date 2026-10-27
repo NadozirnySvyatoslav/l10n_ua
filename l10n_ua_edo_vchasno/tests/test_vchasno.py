@@ -76,7 +76,7 @@ class TestVchasno(TransactionCase):
         self.assertEqual(kwargs['params']['amount'], 1250050)          # kopecks
         self.assertEqual(kwargs['params']['date_document'], '2026-10-01')
         self.assertEqual(kwargs['params']['first_sign_by'], 'recipient')
-        self.assertEqual(kwargs['params']['recipient_emails'], 'buh@example.com')
+        self.assertEqual(kwargs['params']['recipient_emails'], ['buh@example.com'])   # repeated parameter
         self.assertIn('files', kwargs['files'])
         self.assertEqual(session.calls[1][1], '/documents/abc-1/send')
         vals = self.account._call('normalize', data)
@@ -95,7 +95,7 @@ class TestVchasno(TransactionCase):
             ('GET', '/incoming-documents'): FakeResponse(200, {'documents': [
                 {'id': 'in-9', 'title': 'Рахунок № 45', 'status': 7002, 'edrpou_owner': '22222221',
                  'company_name': 'ТОВ «Постачальник»', 'number': '45', 'amount': 99900,
-                 'date_created': '2026-10-20T09:15:00'}]}),
+                 'date': '2026-10-20', 'date_created': '2026-10-21T09:15:00'}], 'next_cursor': None}),
         })
         self.account.action_sync()
         self.assertEqual(outgoing.state, 'signed')
@@ -139,10 +139,11 @@ class TestVchasno(TransactionCase):
             {'category_id': 2, 'category_title': 'Рахунок'},
             {'category_id': 3, 'category_title': 'Договір'},
             {'category_id': 5, 'category_title': 'Видаткова накладна'},
-            {'category_id': 22, 'category_title': 'Акт'},
+            {'category_id': 22, 'category_title': 'Акт повернення'},
+            {'category_id': 37, 'category_title': 'Внутрішній тип', 'is_public': False},
         ])})
         self.account.action_load_categories()
-        self.assertEqual(sorted(self.account.category_ids.mapped('code')), ['1', '2', '22', '3', '5'])
+        self.assertEqual(sorted(self.account.category_ids.mapped('code')), ['1', '2', '22', '3', '5'])  # not the internal 37
         rahunok = self.env.ref('l10n_ua_doc_reports.action_report_rahunok_invoice', raise_if_not_found=False)
         if rahunok:
             self.assertEqual(self.account._category_for(rahunok).name, 'Рахунок')
@@ -151,3 +152,15 @@ class TestVchasno(TransactionCase):
         self.account.action_load_categories()
         self.assertEqual(len(self.account.category_ids), 5)
         self.assertEqual(len(self.account.category_rule_ids), rules)
+
+    def test_lists_follow_next_cursor_and_repeat_ids(self):
+        pages = {None: {'documents': [{'id': 'a', 'status': 7004}], 'next_cursor': 'c2'},
+                 'c2': {'documents': [{'id': 'b', 'status': 7008}], 'next_cursor': None}}
+        session = self._session({('GET', '/documents'): lambda kw: FakeResponse(200, pages[kw['params'].get('cursor')])})
+        documents = self.account._call('fetch', ['a', 'b'])
+        self.assertEqual([d['id'] for d in documents], ['a', 'b'])
+        self.assertEqual(session.calls[0][3]['params']['ids'], ['a', 'b'])
+        self.assertEqual(session.calls[1][3]['params']['cursor'], 'c2')
+
+    def test_annulled_document(self):
+        self.assertEqual(self.account._call('normalize', {'id': 'x', 'status': 7011})['state'], 'deleted')

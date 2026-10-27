@@ -1,11 +1,13 @@
 """HTTP client of the Вчасно.ЕДО API v2.
 
-Paths and fields as used by working integrations of the API: documents are
-uploaded as multipart ``files`` to ``/documents`` with query parameters,
-listed by ``/documents?ids=…`` and ``/incoming-documents``, downloaded from
-``/documents/<id>/original`` and ``/documents/<id>/archive``. Amounts are in
-kopecks. Every call has a timeout and turns an HTTP error into a message the
-user can act on.
+As described in «Інструкція до API Вчасно.ЕДО» (the guide linked from the
+service): host https://edo.vchasno.ua, header ``Authorization: <token>``;
+documents are uploaded as multipart ``files`` to ``/documents`` with the
+details as query parameters (``recipient_emails`` and ``ids`` repeat once per
+value), listed by ``/documents`` and ``/incoming-documents`` page by page
+(``cursor`` ← ``next_cursor``), downloaded from ``/documents/<id>/original``
+and ``/documents/<id>/archive``. Amounts are in kopecks. Every call has a
+timeout and turns an HTTP error into a message the user can act on.
 """
 
 import logging
@@ -15,7 +17,8 @@ import requests
 
 _logger = logging.getLogger(__name__)
 
-DEFAULT_BASE_URL = 'https://vchasno.ua/api/v2'
+DEFAULT_BASE_URL = 'https://edo.vchasno.ua/api/v2'
+MAX_PAGES = 50
 TIMEOUT = 60
 
 
@@ -67,14 +70,26 @@ class VchasnoClient:
     def send(self, document_id):
         self._request('POST', f'/documents/{document_id}/send')
 
+    def _pages(self, path, params):
+        """All documents of a list, following ``next_cursor``."""
+        documents, params = [], dict(params)
+        for _page in range(MAX_PAGES):
+            payload = self._request('GET', path, params=params).json()
+            documents += self._documents(payload)
+            cursor = payload.get('next_cursor') if isinstance(payload, dict) else None
+            if not cursor:
+                break
+            params['cursor'] = cursor
+        return documents
+
     def documents(self, ids):
         if not ids:
             return []
-        return self._documents(self._request('GET', '/documents', params={'ids': ','.join(ids)}).json())
+        return self._pages('/documents', {'ids': list(ids)})
 
     def incoming(self, date_from=None):
         params = {'date_created_from': date_from.isoformat()} if date_from else {}
-        return self._documents(self._request('GET', '/incoming-documents', params=params).json())
+        return self._pages('/incoming-documents', params)
 
     def download(self, document_id, kind):
         response = self._request('GET', f'/documents/{document_id}/{kind}')

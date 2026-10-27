@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - EDO: Вчасно',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'category': 'Accounting/Localization',
     'summary': 'Провайдер ЕДО «Вчасно»: завантаження документів на підпис, статуси, вхідні',
     'description': """
@@ -17,7 +17,7 @@ Connects ``l10n_ua_edo`` to Вчасно.ЕДО (API v2, token in the header
 
 The documents are signed in Вчасно; no key is kept in Odoo. The address of
 the API is the system parameter ``l10n_ua_edo_vchasno.base_url``
-(default https://vchasno.ua/api/v2).
+(default https://edo.vchasno.ua/api/v2).
     """,
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://1c-to-odoo.many2one.online',

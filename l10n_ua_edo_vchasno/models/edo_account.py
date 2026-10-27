@@ -13,7 +13,8 @@ VCHASNO_STATES = {
     7006: 'rejected',      # відхилений контрагентом
     7007: 'signing',       # підписаний не всіма підписами отримувача
     7008: 'signed',        # накладено всі очікувані підписи
-    7010: 'sent',          # надісланий підписантам
+    7010: 'sent',          # надісланий підписантам (багатосторонній)
+    7011: 'deleted',       # анульований
 }
 
 
@@ -41,7 +42,7 @@ class L10nUaEdoAccount(models.Model):
         if isinstance(data, dict):
             data = data.get('categories') or data.get('document_categories') or []
         return [(str(c['category_id']), c['category_title']) for c in data
-                if c.get('category_id') not in (None, 0, '0')]
+                if c.get('category_id') not in (None, 0, '0') and c.get('is_public', True)]
 
     def _vchasno_default_categories(self):
         """Standard categories of Вчасно for the Ukrainian printed forms."""
@@ -51,7 +52,7 @@ class L10nUaEdoAccount(models.Model):
             'l10n_ua_doc_reports.action_report_act': '1',               # Акт наданих послуг
             'l10n_ua_doc_reports.action_report_vydatkova': '5',         # Видаткова накладна
             'l10n_ua_agreement.action_report_agreement': '3',           # Договір
-            'l10n_ua_agreement.action_report_agreement_act': '22',      # Акт
+            'l10n_ua_agreement.action_report_agreement_act': '1',       # Акт наданих послуг
         }
 
     def _vchasno_upload(self, payload):
@@ -62,7 +63,7 @@ class L10nUaEdoAccount(models.Model):
             'amount': int(round((payload.get('amount') or 0.0) * 100)) or None,
             'category': payload.get('category'),
             'recipient_edrpou': payload.get('recipient_edrpou'),
-            'recipient_emails': ','.join(payload.get('recipient_emails') or []) or None,
+            'recipient_emails': list(payload.get('recipient_emails') or []) or None,
             'first_sign_by': 'recipient' if payload.get('recipient_signs_first') else None,
         }
         return self._vchasno('upload', payload['filename'], payload['content'], params)
@@ -96,7 +97,7 @@ class L10nUaEdoAccount(models.Model):
         }
         if data.get('title'):
             vals['name'] = data['title']
-        date = data.get('date_document') or data.get('date_created')
+        date = data.get('date') or data.get('date_document') or data.get('date_created')
         if date:
             vals['date'] = str(date)[:10]
         if status_code in VCHASNO_STATES:
