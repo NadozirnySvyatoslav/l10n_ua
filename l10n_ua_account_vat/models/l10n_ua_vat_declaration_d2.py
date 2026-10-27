@@ -45,6 +45,9 @@ class L10nUaVatDeclarationD2Line(models.Model):
     doc_year = fields.Integer(string='Рік документа', required=True)
     amount = fields.Monetary(string="Від'ємне значення", currency_field='currency_id',
                              help='Графа 6')
+    from_reorg = fields.Boolean(
+        string='Від реорганізованого',
+        help='Графа 7: сума отримана правонаступником від реорганізованого платника')
     debt_amount = fields.Monetary(string='У погашення боргу', currency_field='currency_id',
                                   help='Графа 8 (разом = рядок 20.1)')
     refund_amount = fields.Monetary(string='До відшкодування', currency_field='currency_id',

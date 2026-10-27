@@ -9,8 +9,9 @@ XSD з пакета СКЗ ДПС (``tests/schemas``). Рядки основно
 видані ПН і РК на збільшення, не зареєстровані в ЄРПН на дату подання (Д1, таблиці
 1.1.1/1.1.2 і 1.2.1/1.2.3 — для умовного ІПН нерезидента 500000000000); від'ємне
 значення (рядки 19–21 і Д2, таблиця 1) без погашення боргу й бюджетного відшкодування.
-Не формуються (і тоді XML не будується, щоб не подати неповний пакет): РК на зменшення,
-не зареєстровані в ЄРПН, Д1 таблиці 1.2.4 і 1.3, Д3–Д6.
+Пакет збирається з реєстру додатків (_vat_attachments): Д1 і Д2 — тут, Д3–Д6 і рідкісні
+таблиці (Д1 1.3, Д2 1.1/2/3) — в окремих файлах l10n_ua_vat_declaration_d*.py / _rare.py.
+РК на зменшення, не зареєстровані в ЄРПН, XML не пропускає.
 """
 import base64
 import re
@@ -61,6 +62,8 @@ MAIN_ROWS = [
     ('R61GA', 'line_6_1_base'), ('R61GB', 'line_6_1_vat'),
     ('R62GA', 'line_6_2_base'), ('R62GB', 'line_6_2_vat'),
     ('R71GA', 'line_7_1_base'), ('R71GB', 'line_7_1_vat'),
+    ('R722GA', 'line_7_2_2_base'), ('R722GB', 'line_7_2_2_vat'),
+    ('R723GA', 'line_7_2_3_base'), ('R723GB', 'line_7_2_3_vat'),
     ('R90GB', 'line_9_vat'),
     ('R101GA', 'line_10_1_base'), ('R101GB', 'line_10_1_vat'),
     ('R102GA', 'line_10_2_base'), ('R102GB', 'line_10_2_vat'),
@@ -313,9 +316,9 @@ class L10nUaVatDeclarationXml(models.Model):
         result = []
         t21, t22 = self._d1_tables()
         section1 = self._d1_section1()
-        if t21 or t22 or any(section1.values()):
+        if t21 or t22 or any(section1.values()) or self._d1_has_extra():
             result.append(('d1', lambda head: self._render_d1(head, t21, t22, section1)))
-        if float_round(self.line_19_vat, precision_digits=0) > 0:
+        if float_round(self.line_19_vat, precision_digits=0) > 0 or self._d2_has_extra():
             result.append(('d2', self._render_d2))
         return result
 
@@ -435,6 +438,7 @@ class L10nUaVatDeclarationXml(models.Model):
                 body.append(column(prefix, str(6 + i), rows, lambda r, i=i: _dec2(r[3][i])))
             for i in range(ncols):
                 body.append(f'<{total}G{6 + i}>{_int(sum(r[3][i] for r in rows))}</{total}G{6 + i}>')
+        body.append(self._render_d1_extra())
 
         if t21:
             rows = [(key, [*amounts, sum(amounts[1:])]) for key, amounts in t21]
@@ -463,6 +467,20 @@ class L10nUaVatDeclarationXml(models.Model):
         body.append(self._render_signers())
         return self._wrap(self._vat_form('d1'), self._render_head(head), ''.join(body))
 
+    def _d1_has_extra(self):
+        """Додаткові таблиці Д1 (1.3) — див. l10n_ua_vat_declaration_rare."""
+        return False
+
+    def _d2_has_extra(self):
+        """Додаткові таблиці Д2 (1.1, 2, 3) — див. l10n_ua_vat_declaration_rare."""
+        return False
+
+    def _render_d1_extra(self):
+        return ''
+
+    def _render_d2_extra(self):
+        return ''
+
     def _render_d2(self, head):
         """Д2: таблиця 1 (графи 2–6, 10) і рядок «у межах суми за п. 200-1.3»."""
         self.ensure_one()
@@ -479,6 +497,8 @@ class L10nUaVatDeclarationXml(models.Model):
             column('4', lambda r: r.partner_ipn),
             column('51', lambda r: r.doc_month), column('52', lambda r: r.doc_year),
             column('6', lambda r: _dec2(r.amount)),
+            ''.join(f'<T1RXXXXG7 ROWNUM="{n}">1</T1RXXXXG7>'
+                    for n, r in enumerate(rows, 1) if r.from_reorg),
         ]
         if any(rows.mapped('debt_amount')):
             body.append(column('8', lambda r: _dec2(r.debt_amount)))
@@ -497,6 +517,7 @@ class L10nUaVatDeclarationXml(models.Model):
         if float_round(within, precision_digits=0):
             # «Сума, що не перевищує Σнакл, … (р.20 − р.20.1)».
             body.append(f'<R02G3>{_int(within)}</R02G3>')
+        body.append(self._render_d2_extra())
         body.append(self._render_signers())
         return self._wrap(self._vat_form('d2'), self._render_head(head), ''.join(body))
 

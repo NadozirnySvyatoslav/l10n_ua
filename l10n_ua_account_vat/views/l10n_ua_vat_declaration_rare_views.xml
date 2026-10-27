@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="l10n_ua_vat_declaration_view_form_rare" model="ir.ui.view">
+        <field name="name">l10n_ua.vat.declaration.form.rare</field>
+        <field name="model">l10n_ua.vat.declaration</field>
+        <field name="inherit_id" ref="l10n_ua_account_vat.l10n_ua_vat_declaration_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='d2']//field[@name='amount']" position="after">
+                <field name="from_reorg" optional="hide"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="РЕЗ і реорганізація" name="rare">
+                    <div class="text-muted mb-2">
+                        Рідкісні випадки, вводяться вручну: коригування за експортом окремих видів
+                        товарів у режимі експортного забезпечення (Д1, таблиця 1.3 → рядки 7.2.2/7.2.3),
+                        відшкодування з таких коригувань (Д2, таблиця 1.1) і перенесення від'ємного
+                        значення при реорганізації (Д2, таблиці 2 і 3).
+                    </div>
+                    <group>
+                        <group>
+                            <field name="line_7_2_2_base"/>
+                            <field name="line_7_2_2_vat"/>
+                        </group>
+                        <group>
+                            <field name="line_7_2_3_base"/>
+                            <field name="line_7_2_3_vat"/>
+                        </group>
+                    </group>
+                    <separator string="Д1, таблиця 1.3"/>
+                    <field name="d1_t13_line_ids">
+                        <list editable="bottom">
+                            <field name="rk_date"/>
+                            <field name="rk_number"/>
+                            <field name="basis"/>
+                            <field name="pn_date"/>
+                            <field name="pn_number"/>
+                            <field name="export_month"/>
+                            <field name="export_year"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="base_amount" sum="Усього"/>
+                            <field name="vat_20" sum="Усього"/>
+                            <field name="vat_14" sum="Усього"/>
+                        </list>
+                    </field>
+                    <separator string="Д2, таблиця 1.1"/>
+                    <field name="d2_rez_line_ids">
+                        <list editable="bottom">
+                            <field name="partner_ipn"/>
+                            <field name="credit_month"/>
+                            <field name="credit_year"/>
+                            <field name="paid_month"/>
+                            <field name="paid_year"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="amount" sum="Усього"/>
+                        </list>
+                    </field>
+                    <separator string="Д2, таблиці 2 і 3"/>
+                    <field name="d2_reorg_line_ids">
+                        <list editable="bottom">
+                            <field name="kind"/>
+                            <field name="partner_ipn"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="amount" sum="Усього"/>
+                            <field name="apply_month"/>
+                            <field name="apply_year"/>
+                            <field name="confirmed_amount" sum="Усього"/>
+                            <field name="act_date"/>
+                            <field name="act_number"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

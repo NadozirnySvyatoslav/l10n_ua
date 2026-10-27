@@ -460,6 +460,7 @@ class L10nUaVatDeclaration(models.Model):
 
     @api.depends(
         'line_1_1_vat', 'line_1_2_vat', 'line_1_3_vat', 'line_7_1_vat',
+        'line_7_2_2_vat', 'line_7_2_3_vat',
         'line_4_1_vat', 'line_4_1_1_vat', 'line_4_2_vat', 'line_4_2_1_vat', 'line_4_3_vat', 'line_4_3_1_vat', 'line_6_1_vat', 'line_6_2_vat', 'line_13_1_vat', 'line_13_2_vat',
         'line_10_1_vat', 'line_10_2_vat', 'line_10_3_vat',
         'line_11_1_vat', 'line_11_2_vat', 'line_11_3_vat',
@@ -471,6 +472,7 @@ class L10nUaVatDeclaration(models.Model):
             # Section I — total liabilities (row 9)
             rec.line_9_vat = (
                 rec.line_1_1_vat + rec.line_1_2_vat + rec.line_1_3_vat + rec.line_7_1_vat
+                + rec.line_7_2_2_vat + rec.line_7_2_3_vat
                 + sum(rec[f] for f in ('line_4_1_vat', 'line_4_1_1_vat', 'line_4_2_vat', 'line_4_2_1_vat', 'line_4_3_vat', 'line_4_3_1_vat', 'line_6_1_vat', 'line_6_2_vat'))
             )
             # Section II — total credit (row 17 = 10.1..10.3 + 11.1..11.3 + 14 - 15 + 16)
