@@ -5117,3 +5117,24 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_pnl_report_line__line_type__section
 msgid "Section Title"
 msgstr "Заголовок розділу"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report__method__direct
+msgid "Direct (Form No.3)"
+msgstr "Прямий (Форма № 3)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_cashflow_report__method
+msgid ""
+"Direct: cash receipts and payments by their counterpart account. Indirect: "
+"the result before tax adjusted for depreciation, provisions and the change "
+"of current assets and liabilities."
+msgstr ""
+"Прямий: надходження й витрачання коштів за кореспондентським рахунком. "
+"Непрямий: результат до оподаткування, скоригований на амортизацію, "
+"забезпечення та зміну оборотних активів і поточних зобов'язань."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report__method__indirect
+msgid "Indirect (Form No.3-n)"
+msgstr "Непрямий (Форма № 3-н)"
