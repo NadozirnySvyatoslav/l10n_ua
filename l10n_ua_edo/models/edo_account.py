@@ -153,7 +153,8 @@ class L10nUaEdoAccount(models.Model):
 
     @api.model
     def _cron_sync(self):
-        for account in self.search([('provider', '!=', False)]):
+        # An account without a token is being set up (or is a demo): nothing to sync
+        for account in self.search([('provider', '!=', False)]).filtered(lambda a: a.sudo().token):
             try:
                 with self.env.cr.savepoint():
                     account._sync()
