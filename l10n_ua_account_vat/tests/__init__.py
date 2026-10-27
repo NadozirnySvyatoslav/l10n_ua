@@ -10,3 +10,4 @@ from . import test_vat_declaration_xml
 from . import test_tax_invoice_j1201016
 from . import test_vat_declaration_d5
 from . import test_vat_declaration_d6
+from . import test_vat_declaration_d4

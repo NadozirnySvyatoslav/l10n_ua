@@ -46,6 +46,18 @@
         <record id="l10n_ua_vat_declaration_d6_line_company_rule" model="ir.rule">
             <field name="name">Д6 декларації з ПДВ: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_vat_declaration_d6_line"/>
+        <record id="l10n_ua_vat_declaration_d4_t1_line_company_rule" model="ir.rule">
+            <field name="name">Д4 (таблиця 1) декларації з ПДВ: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_vat_declaration_d4_t1_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+        </record>
+
+        <record id="l10n_ua_vat_declaration_d4_t2_line_company_rule" model="ir.rule">
+            <field name="name">Д4 (таблиця 2) декларації з ПДВ: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_vat_declaration_d4_t2_line"/>
             <field name="global" eval="True"/>
             <field name="domain_force">
                 ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
