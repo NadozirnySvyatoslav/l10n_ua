@@ -11,28 +11,18 @@ PSP_NON_SALARY_CONTRACT_TYPES = ('civil', 'gig', 'author')
 class HrVersion(models.Model):
     _inherit = 'hr.version'
 
-    # --- Заява про застосування ПСП (#322) ---
+    # --- Заява про застосування ПСП (#322, #415) ---
     # ПКУ п. 169.2.1: the benefit applies at one place of income only; п. 169.2.2:
-    # the employee chooses that place by an application to the employer. The
-    # application is filed for one employment, so it lives on the version and
-    # not on the person: the same person on a secondary job at this company is
-    # another employee record with its own version.
-    #
-    # Nothing recorded the application before, and every employee got the
-    # benefit. The flag starts from the usual choice - the primary job applies,
-    # an internal or external secondary job does not - and stays editable for
-    # the person whose application was filed at the secondary job instead
-    # (main job elsewhere without the benefit). `copy=True` keeps such a
-    # manual choice on the next version of the contract.
+    # the employee chooses that place by an application to the employer.
+    # The application is an active hr.psp.application record. This compute field
+    # reflects whether the employee has an active application valid today.
     psp_application = fields.Boolean(
         string='PSP Application',
-        compute='_compute_psp_application', store=True, readonly=False,
-        copy=True, groups="hr.group_hr_user",
-        help='The employee has filed the application for the tax social '
-             'benefit (ПКУ п. 169.2.2) for this employment. The benefit applies '
-             'at one place of income only: by default the primary job has it '
-             'and a secondary job does not. Civil-law, gig and author contracts '
-             'never get the benefit.')
+        compute='_compute_psp_application',
+        groups="hr.group_hr_user",
+        help='The employee has an active application for the tax social '
+             'benefit (ПКУ п. 169.2.2) valid today. Civil-law, gig and author '
+             'contracts never get the benefit.')
 
     indexation_enabled = fields.Boolean(
         string='Індексувати ЗП',
@@ -77,10 +67,22 @@ class HrVersion(models.Model):
         help='Шкала «стаж → відсоток». Якщо не задано — береться перша активна '
              'шкала компанії.')
 
-    @api.depends('employment_type_ua', 'contract_type_ua')
     def _compute_psp_application(self):
+        today = fields.Date.context_today(self)
         for version in self:
-            version.psp_application = (
-                version.employment_type_ua == 'primary'
-                and version.contract_type_ua not in PSP_NON_SALARY_CONTRACT_TYPES
-            )
+            employee = version.employee_id
+            if not employee or version.contract_type_ua in PSP_NON_SALARY_CONTRACT_TYPES:
+                version.psp_application = False
+                continue
+            active_app = self.env['hr.psp.application'].search([
+                ('employee_id', '=', employee.id),
+                ('state', '=', 'active'),
+                ('date_from', '<=', today),
+                '|',
+                ('date_to', '=', False),
+                ('date_to', '>', today),
+            ], limit=1)
+            # In month of date_to, PSP no longer applies
+            if active_app and active_app.date_to and active_app.date_to.replace(day=1) <= today:
+                active_app = False
+            version.psp_application = bool(active_app)
