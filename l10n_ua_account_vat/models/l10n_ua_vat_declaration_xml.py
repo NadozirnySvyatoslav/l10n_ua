@@ -41,6 +41,7 @@ NONRESIDENT_IPN = '500000000000'
 D1_SECTION1 = {
     't111': ('T111', 'R0111', 4), 't112': ('T112', 'R0112', 3),
     't121': ('T121', 'R0121', 4), 't123': ('T123', 'R0123', 3),
+    't124': ('T124', 'R0124', 4),
 }
 
 # Рядки основної форми в порядку XSD: (тег, поле моделі).
@@ -50,7 +51,15 @@ MAIN_ROWS = [
     ('R13GA', 'line_1_3_base'), ('R13GB', 'line_1_3_vat'),
     ('R21GA', 'line_2_base'), ('R22GA', 'line_2_2_base'),
     ('R30GA', 'line_3_base'),
+    ('R41GA', 'line_4_1_base'), ('R41GB', 'line_4_1_vat'),
+    ('R411GA', 'line_4_1_1_base'), ('R411GB', 'line_4_1_1_vat'),
+    ('R42GA', 'line_4_2_base'), ('R42GB', 'line_4_2_vat'),
+    ('R421GA', 'line_4_2_1_base'), ('R421GB', 'line_4_2_1_vat'),
+    ('R43GA', 'line_4_3_base'), ('R43GB', 'line_4_3_vat'),
+    ('R431GA', 'line_4_3_1_base'), ('R431GB', 'line_4_3_1_vat'),
     ('R50GA', 'line_5_base'), ('R51GA', 'line_5_1_base'),
+    ('R61GA', 'line_6_1_base'), ('R61GB', 'line_6_1_vat'),
+    ('R62GA', 'line_6_2_base'), ('R62GB', 'line_6_2_vat'),
     ('R71GA', 'line_7_1_base'), ('R71GB', 'line_7_1_vat'),
     ('R90GB', 'line_9_vat'),
     ('R101GA', 'line_10_1_base'), ('R101GB', 'line_10_1_vat'),
@@ -61,6 +70,8 @@ MAIN_ROWS = [
     ('R112GA', 'line_11_2_base'), ('R112GB', 'line_11_2_vat'),
     ('R113GA', 'line_11_3_base'), ('R113GB', 'line_11_3_vat'),
     ('R114GA', 'line_11_4_base'),
+    ('R131GA', 'line_13_1_base'), ('R131GB', 'line_13_1_vat'),
+    ('R132GA', 'line_13_2_base'), ('R132GB', 'line_13_2_vat'),
     ('R140GB', 'line_14_vat'),
     ('R150GB', 'line_15_vat'),
     ('R160GB', 'line_16_1_vat'), ('R161GB', 'line_16_1_vat'),
@@ -249,22 +260,25 @@ class L10nUaVatDeclarationXml(models.Model):
     def _d1_section1(self):
         """Таблиці 1.1.1/1.1.2 (ПН) і 1.2.1/1.2.3 (РК на збільшення) — по документу.
 
-        Рядок: (ІПН, дата, номер, [обсяг, ПДВ 20 %, ПДВ 7 %(, ПДВ 14 %)]).
+        Рядок: (ІПН, дата, номер, [обсяг, ПДВ 20 %, ПДВ 7 %(, ПДВ 14 %)], ознака «+»).
+        РК річного перерахунку частки (п. 199.4) — таблиця 1.2.4.
         """
         self.ensure_one()
         tables = {key: [] for key in D1_SECTION1}
         for line in self._d1_unregistered_lines().sorted(lambda l: (l.date, l.id)):
             nonresident = line.partner_ipn == NONRESIDENT_IPN
+            invoice = line.tax_invoice_id
             if line.doc_type == 'rk':
-                key = 't123' if nonresident else 't121'
+                key = 't124' if invoice.vat_199_recalc else ('t123' if nonresident else 't121')
             else:
                 key = 't112' if nonresident else 't111'
-            invoice = line.tax_invoice_id
+            special = bool(invoice.vat_special_basis
+                           or invoice.original_invoice_id.vat_special_basis)
             amounts = [line.base_20 + line.base_7 + line.base_14, line.vat_20, line.vat_7,
                        line.vat_14][:D1_SECTION1[key][2]]
             tables[key].append((line.partner_ipn, line.invoice_date or invoice.date or line.date,
                                 line.invoice_number or invoice.number or invoice.name or '',
-                                amounts))
+                                amounts, special))
         return tables
 
     def _d1_tables(self):
@@ -414,6 +428,8 @@ class L10nUaVatDeclarationXml(models.Model):
                 column(prefix, '2', rows, lambda r: r[0]),
                 column(prefix, '3D', rows, lambda r: r[1].strftime('%d%m%Y')),
                 column(prefix, '4S', rows, lambda r: escape(r[2])),
+                ''.join(f'<{prefix}RXXXXG5 ROWNUM="{n}">1</{prefix}RXXXXG5>'
+                        for n, r in enumerate(rows, 1) if r[4]),
             ]
             for i in range(ncols):
                 body.append(column(prefix, str(6 + i), rows, lambda r, i=i: _dec2(r[3][i])))

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="l10n_ua_vat_declaration_view_form_d5" model="ir.ui.view">
+        <field name="name">l10n_ua.vat.declaration.form.d5</field>
+        <field name="model">l10n_ua.vat.declaration</field>
+        <field name="inherit_id" ref="l10n_ua_account_vat.l10n_ua_vat_declaration_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='d2']" position="after">
+                <page string="Д5" name="d5">
+                    <div class="text-muted mb-2">
+                        Частка використання товарів/послуг в оподатковуваних операціях (ст. 199 ПКУ).
+                        Таблиця 1 — у декларації за грудень (річний розрахунок) або в першому періоді
+                        неоподатковуваних операцій; таблиця 2 — РК з ознакою «Річний перерахунок частки»;
+                        таблиця 3 — лише для одночасного касового методу і загальних правил.
+                    </div>
+                    <group>
+                        <group string="Таблиця 1">
+                            <field name="d5_share_mode"/>
+                            <field name="d5_total_volume" invisible="not d5_share_mode"/>
+                            <field name="d5_taxable_volume" invisible="not d5_share_mode"/>
+                            <field name="d5_taxable_share" invisible="not d5_share_mode"/>
+                        </group>
+                        <group string="Таблиця 3 (касовий метод)">
+                            <field name="d5_t3_g1"/>
+                            <field name="d5_t3_g2"/>
+                            <field name="d5_t3_g3"/>
+                            <field name="d5_t3_g4"/>
+                            <field name="d5_t3_g5"/>
+                            <field name="d5_t3_g6"/>
+                            <field name="d5_t3_g7"/>
+                            <field name="d5_t3_g8"/>
+                            <field name="d5_t3_g9"/>
+                            <field name="d5_t3_g10"/>
+                            <field name="d5_t3_g11"/>
+                            <field name="d5_t3_g12"/>
+                            <field name="d5_t3_g13"/>
+                            <field name="d5_t3_g14"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

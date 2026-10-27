@@ -22,8 +22,8 @@ def _schema(name):
     return etree.XMLSchema(etree.parse(os.path.join(SCHEMAS, name)))
 
 
-@tagged('post_install', '-at_install')
-class TestVatDeclarationXml(TransactionCase):
+class VatDeclarationCase(TransactionCase):
+    """Спільна підготовка: компанія-платник ПДВ, вересень 2026, реєстри ПН."""
 
     @classmethod
     def setUpClass(cls):
@@ -76,6 +76,32 @@ class TestVatDeclarationXml(TransactionCase):
         decl.action_calculate()
         return decl
 
+    def _add_received(self, partner, day, vat, month=9):
+        self.env['l10n_ua.vat.register.line'].create({
+            'register_id': self.received.id, 'date': date(2026, month, day),
+            'partner_id': partner.id, 'base_amount': vat * 5, 'vat_amount': vat,
+            'base_20': vat * 5, 'vat_20': vat})
+
+
+    def _prev_declaration(self, line_21, d2_rows=()):
+        prev_period = self.env['l10n_ua.tax.period'].create({
+            'name': 'Серпень 2026', 'date_start': date(2026, 8, 1),
+            'date_end': date(2026, 8, 31), 'period_type': 'month', 'month': 8,
+            'year': 2026, 'quarter': 3, 'company_id': self.company.id,
+        })
+        prev = self.env['l10n_ua.vat.declaration'].create(
+            {'period_id': prev_period.id, 'company_id': self.company.id})
+        prev.write({'line_10_1_vat': line_21, 'state': 'calculated',
+                    'vat_limit_amount': 10 ** 9,
+                    'd2_line_ids': [(0, 0, row) for row in d2_rows]})
+        self.assertEqual(prev.line_21_vat, line_21)
+        return prev
+
+
+
+@tagged('post_install', '-at_install')
+class TestVatDeclarationXml(VatDeclarationCase):
+
     def test_rows_follow_form_400(self):
         decl = self._declaration()
         self.assertEqual(decl.line_1_1_vat, 20000)       # цілі гривні
@@ -127,26 +153,6 @@ class TestVatDeclarationXml(TransactionCase):
             decl.action_generate_xml()
         self.assertIn('РНОКПП', str(err.exception))
         self.assertIn('ТОВ Другий постачальник', str(err.exception))
-
-    def _add_received(self, partner, day, vat, month=9):
-        self.env['l10n_ua.vat.register.line'].create({
-            'register_id': self.received.id, 'date': date(2026, month, day),
-            'partner_id': partner.id, 'base_amount': vat * 5, 'vat_amount': vat,
-            'base_20': vat * 5, 'vat_20': vat})
-
-    def _prev_declaration(self, line_21, d2_rows=()):
-        prev_period = self.env['l10n_ua.tax.period'].create({
-            'name': 'Серпень 2026', 'date_start': date(2026, 8, 1),
-            'date_end': date(2026, 8, 31), 'period_type': 'month', 'month': 8,
-            'year': 2026, 'quarter': 3, 'company_id': self.company.id,
-        })
-        prev = self.env['l10n_ua.vat.declaration'].create(
-            {'period_id': prev_period.id, 'company_id': self.company.id})
-        prev.write({'line_10_1_vat': line_21, 'state': 'calculated',
-                    'vat_limit_amount': 10 ** 9,
-                    'd2_line_ids': [(0, 0, row) for row in d2_rows]})
-        self.assertEqual(prev.line_21_vat, line_21)
-        return prev
 
     def test_negative_value_goes_to_d2_latest_purchases_first(self):
         supplier3 = self.env['res.partner'].create({'name': 'ТОВ Третій', 'ipn': '333333333333'})
