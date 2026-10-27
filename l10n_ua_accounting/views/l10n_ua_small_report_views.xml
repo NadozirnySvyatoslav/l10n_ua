@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_small_report_form" model="ir.ui.view">
+        <field name="name">l10n_ua.small.report.form</field>
+        <field name="model">l10n_ua.small.report</field>
+        <field name="arch" type="xml">
+            <form string="Simplified Financial Statements">
+                <header>
+                    <button name="action_compute" type="object" string="Calculate"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object" string="Set to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_print" type="object" string="Print PDF" icon="fa-print"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not balance_difference">
+                        <strong>The balance does not balance:</strong> row 1300 − row 1900 =
+                        <field name="balance_difference" class="d-inline"/> thous. UAH.
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="kind" widget="radio" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Balance (1-m / 1-ms)" name="balance">
+                            <field name="balance_line_ids" readonly="1">
+                                <list decoration-bf="kind == 'sum'" decoration-info="kind == 'section'"
+                                      decoration-it="kind in ('bal_sub', 'cost', 'finished')">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="kind" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="amount_g3" string="At the start of the year"/>
+                                    <field name="amount_g4" string="At the end of the period"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Income Statement (2-m / 2-ms)" name="pnl">
+                            <field name="pnl_line_ids" readonly="state != 'draft'">
+                                <list decoration-bf="kind == 'sum'" editable="bottom" create="0" delete="0">
+                                    <field name="part" column_invisible="1"/>
+                                    <field name="kind" column_invisible="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="code" readonly="1"/>
+                                    <field name="amount_g3" string="For the period" readonly="kind != 'manual'"/>
+                                    <field name="amount_g4" string="Same period of the previous year"
+                                           readonly="kind != 'manual'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                    <div class="text-muted small">Amounts in thousands of hryvnias with one decimal.</div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_small_report_list" model="ir.ui.view">
+        <field name="name">l10n_ua.small.report.list</field>
+        <field name="model">l10n_ua.small.report</field>
+        <field name="arch" type="xml">
+            <list string="Simplified Financial Statements" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="date_to"/>
+                <field name="state" widget="badge" decoration-success="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_small_report" model="ir.actions.act_window">
+        <field name="name">Simplified Financial Statements</field>
+        <field name="res_model">l10n_ua.small.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the statements of a small or micro enterprise</p>
+            <p>Forms 1-m/2-m and 1-ms/2-ms of НП(С)БО 25, built from Forms 1 and 2.</p>
+        </field>
+    </record>
+
+</odoo>

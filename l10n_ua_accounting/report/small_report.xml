@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_small" model="ir.actions.report">
+        <field name="name">Simplified Financial Statements</field>
+        <field name="model">l10n_ua.small.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_accounting.report_small_document</field>
+        <field name="report_file">l10n_ua_accounting.report_small_document</field>
+        <field name="print_report_name">'Фінзвітність_%s_%s' % (object.kind, object.date_to)</field>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+    </record>
+
+    <template id="report_small_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="report">
+                <t t-call="web.external_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <t t-set="micro" t-value="report.kind == 'micro'"/>
+                    <t t-set="paren" t-value="('1002', '1012', '1425', '2050', '2180', '2270', '2285', '2300', '2165')"/>
+                    <div class="page ua-report">
+                        <div class="text-center small mb-2">
+                            Додаток <t t-esc="2 if micro else 1"/> до Національного положення (стандарту)
+                            бухгалтерського обліку 25 «Спрощена фінансова звітність»
+                        </div>
+                        <table class="table-borderless mb-2" style="width: 100%;">
+                            <tr>
+                                <td style="width: 120px;">Підприємство</td>
+                                <td class="border-bottom"><span t-field="report.company_id.name"/></td>
+                            </tr>
+                            <tr t-if="report.company_id.company_registry">
+                                <td>за ЄДРПОУ</td>
+                                <td class="border-bottom"><span t-field="report.company_id.company_registry"/></td>
+                            </tr>
+                        </table>
+                        <div class="small">Одиниця виміру: тис. грн. з одним десятковим знаком</div>
+
+                        <t t-foreach="('balance', 'pnl')" t-as="part">
+                            <div class="ua-report-title mt-3">
+                                <t t-if="part == 'balance'">1. Баланс</t>
+                                <t t-else="">2. Звіт про фінансові результати</t>
+                            </div>
+                            <div class="ua-report-subtitle mb-2">
+                                <t t-if="part == 'balance'">на <span t-field="report.date_to"/> р.</t>
+                                <t t-else="">за період з <span t-field="report.date_from"/> по <span t-field="report.date_to"/></t>
+                            </div>
+                            <div class="small text-center mb-2">
+                                Форма № <t t-esc="('1' if part == 'balance' else '2') + ('-мс' if micro else '-м')"/>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 56%;">Стаття</th>
+                                        <th style="width: 10%;">Код рядка</th>
+                                        <th style="width: 17%;">
+                                            <t t-if="part == 'balance'">На початок звітного року</t>
+                                            <t t-else="">За звітний період</t>
+                                        </th>
+                                        <th style="width: 17%;">
+                                            <t t-if="part == 'balance'">На кінець звітного періоду</t>
+                                            <t t-else="">За аналогічний період попереднього року</t>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="report.line_ids.filtered(lambda l: l.part == part).sorted('sequence')" t-as="line">
+                                        <tr t-if="line.kind == 'section'">
+                                            <td colspan="4" class="bold text-center" t-esc="line.name"/>
+                                        </tr>
+                                        <tr t-else="" t-att-class="'bold' if line.kind == 'sum' else ''">
+                                            <td t-att-style="'padding-left: 2em;' if line.kind in ('bal_sub', 'cost', 'finished') else ''"
+                                                t-esc="line.name"/>
+                                            <td class="text-center" t-esc="line.code"/>
+                                            <t t-foreach="(line.amount_g3, line.amount_g4)" t-as="amount">
+                                                <td class="text-right">
+                                                    <t t-if="not amount">–</t>
+                                                    <t t-elif="line.code in paren" t-esc="'(%.1f)' % abs(amount)"/>
+                                                    <t t-else="" t-esc="'%.1f' % amount"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <div class="row mt-4">
+                            <div class="col-6"><div class="signature-row"><span>Керівник</span><span class="signature-line"></span></div></div>
+                            <div class="col-6"><div class="signature-row"><span>Головний бухгалтер</span><span class="signature-line"></span></div></div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

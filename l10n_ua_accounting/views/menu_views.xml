@@ -175,6 +175,12 @@
               action="action_cashflow_report"
               sequence="50"/>
 
+    <menuitem id="menu_ua_reports_small"
+              name="Simplified Statements (Small / Micro)"
+              parent="menu_ua_reports"
+              action="action_small_report"
+              sequence="56"/>
+
     <menuitem id="menu_ua_reports_equity"
               name="Statement of Changes in Equity (Form No.4)"
               parent="menu_ua_reports"
