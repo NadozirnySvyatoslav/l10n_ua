@@ -58,6 +58,8 @@
                         </div>
 
                         <div class="small text-center mb-2">Форма № 2 · Код за ДКУД 1801003</div>
+                        <div class="small mb-1">Одиниця виміру: тис. грн. без десяткового знака</div>
+                        <t t-set="vals" t-value="report._form_values()"/>
 
                         <!-- P&L Table from stored lines -->
                         <table>
@@ -79,16 +81,15 @@
                                         <t t-set="bold" t-value="line.line_type in ('subtotal', 'loss', 'total')"/>
                                         <!-- Expenses and losses in parentheses; 2610–2650 with kopecks; 2600/2605 are counts -->
                                         <t t-set="paren" t-value="line.line_type == 'loss' or line.turnover_type == 'debit'"/>
-                                        <t t-set="fmt" t-value="'%.2f' if line.code in ('2610', '2615', '2650') else '%.0f'"/>
+
                                         <tr t-att-class="'bold' if bold else ''"
                                             t-att-style="'border-top: 2px solid black;' if line.line_type == 'total' else ''">
                                             <td t-out="line.name"/>
                                             <td class="text-center" t-out="line.code"/>
-                                            <t t-foreach="(line.current_amount, line.previous_amount)" t-as="amount">
+                                            <t t-foreach="vals.get(line.code, (0, 0))" t-as="amount">
                                                 <td class="text-right">
-                                                    <t t-if="not round(amount, 2)">–</t>
-                                                    <t t-elif="paren and amount &gt; 0" t-out="'(' + (fmt % amount) + ')'"/>
-                                                    <t t-else="" t-out="fmt % amount"/>
+                                                    <t t-if="paren and amount &gt; 0" t-out="'(' + report._ua_fmt(amount, line.code) + ')'"/>
+                                                    <t t-else="" t-out="report._ua_fmt(amount, line.code)"/>
                                                 </td>
                                             </t>
                                         </tr>

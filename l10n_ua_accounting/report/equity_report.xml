@@ -60,6 +60,8 @@
                             </t>
                         </div>
 
+                        <div class="small mb-1">Одиниця виміру: тис. грн. без десяткового знака</div>
+                        <t t-set="vals" t-value="report._form_values()"/>
                         <table class="small">
                             <thead>
                                 <tr>
@@ -95,7 +97,7 @@
                                         <td class="text-center" t-out="line.code"/>
                                         <t t-foreach="cols" t-as="col">
                                             <td t-att-class="'text-right bold' if bold else 'text-right'"
-                                                t-out="('%.0f' % line[col]) if round(line[col]) else '–'"/>
+                                                t-out="report._ua_fmt(vals.get(line.code, {}).get(col, 0))"/>
                                         </t>
                                     </tr>
                                 </t>

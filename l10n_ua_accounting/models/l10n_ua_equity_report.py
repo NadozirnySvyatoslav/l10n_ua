@@ -41,6 +41,16 @@ import io
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+from .l10n_ua_balance_report import BALANCE_LINES, BALANCE_SUB_LINES, balance_round
+from .l10n_ua_fin_rounding import format_units, round_units, to_thousands
+from .l10n_ua_pnl_report import PNL_LINES, pnl_complete
+
+
+# Rows of Form 1 that are the balances of the columns
+EQUITY_FORM1_ROWS = {
+    'registered': '1400', 'revaluation': '1405', 'additional': '1410', 'reserve': '1415',
+    'retained': '1420', 'unpaid': '1425', 'withdrawn': '1430',
+}
 
 # Columns: (field, graph, account prefixes)
 EQUITY_COLUMNS = [
@@ -404,21 +414,69 @@ class L10nUaEquityReport(models.Model):
             ]
             rec.ledger_difference = ', '.join(differences) or False
 
-    def _xml_values(self):
-        """{'R4000G3': 1234, …}: whole hryvnias, as DGdecimal0 of J0901005.
+    def _form1_column(self, date):
+        """Form 1 rounded as it is printed (``balance_round``) at a date."""
+        balance = self.env['l10n_ua.balance.report'].new({'company_id': self.company_id.id})
+        amounts, _unmapped = balance._get_row_amounts(date)
+        code_of = {line[1]: line[3] for line in BALANCE_LINES if line[3]}
+        code_of.update({sub[1]: sub[3] for sub in BALANCE_SUB_LINES})
+        return balance_round({code_of[k]: v for k, v in amounts.items() if k in code_of})
 
-        Rows and graphs with no amount are left out, as the empty cells of
-        the paper form.
-        """
+    def _net_profit_thousands(self):
+        """Net result of Form 2 for the period, as Form 2 prints it."""
+        pnl = self.env['l10n_ua.pnl.report'].new({'company_id': self.company_id.id})
+        amounts = pnl._period_amounts(self.date_from, self.date_to)
+        detail_keys = {line[1] for line in PNL_LINES if line[4] == 'detail'}
+        return round_units(pnl_complete(
+            {k: to_thousands(v) for k, v in amounts.items() if k in detail_keys})['net_profit'])
+
+    def _form_values(self):
+        """{code: {column: amount}} in thousands of hryvnias without decimals.
+
+        The movements are rounded row by row. The balances 4000 and 4300 are
+        those of Form 1 (rows 1400–1430) and the net result 4100 that of
+        Form 2, so that the forms agree; 4290 «Інші зміни в капіталі» takes
+        the difference the rounding leaves, and the totals are added up."""
+        self.ensure_one()
+        start = self._form1_column(fields.Date.subtract(self.date_from, days=1))
+        end = self._form1_column(self.date_to)
+        values = {}
+        for line in self.line_ids.filtered('code'):
+            values[line.code] = {f: to_thousands(line[f]) for f in EQUITY_FIELDS}
+        if '4110' in values:
+            parts = [c for c in values if c in ('4111', '4112', '4113', '4114', '4116')]
+            if parts:
+                values['4110'] = {f: round_units(sum(values[c][f] for c in parts)) for f in EQUITY_FIELDS}
+        if '4100' in values:
+            values['4100']['retained'] = self._net_profit_thousands()
+        for f in EQUITY_FIELDS:
+            values['4000'][f] = start.get(EQUITY_FORM1_ROWS[f], 0.0)
+            values['4300'][f] = end.get(EQUITY_FORM1_ROWS[f], 0.0)
+            values['4095'][f] = round_units(
+                values['4000'][f] + sum(values[c][f] for c in EQUITY_MANUAL_CODES if c in values))
+            values['4295'][f] = round_units(values['4300'][f] - values['4095'][f])
+            others = sum(values[c][f] for c in EQUITY_CHANGE_CODES if c in values and c != '4290')
+            values['4290'][f] = round_units(values['4295'][f] - others)
+        for code, row in values.items():
+            row['total'] = round_units(sum(row[f] for f in EQUITY_FIELDS))
+        return values
+
+    @api.model
+    def _ua_fmt(self, amount):
+        return format_units(amount, parentheses=True)
+
+    def _xml_values(self):
+        """{'R4000G3': 1234, …}: thousands without decimals (DGdecimal0 of
+        J0901005). Negative amounts keep their sign (TODO(#78): confirm
+        against an accepted J0901005). Empty cells are left out."""
         self.ensure_one()
         graphs = dict((col[0], col[1]) for col in EQUITY_COLUMNS)
         values = {}
-        for line in self.line_ids.filtered('code'):
-            for field in EQUITY_FIELDS + ['total']:
-                amount = round(line[field])
+        for code, row in self._form_values().items():
+            for field, amount in row.items():
                 if amount:
                     graph = 10 if field == 'total' else graphs[field]
-                    values[f'R{line.code}G{graph}'] = amount
+                    values[f'R{code}G{graph}'] = int(amount)
         return values
 
     # ── XLSX ────────────────────────────────────────────────

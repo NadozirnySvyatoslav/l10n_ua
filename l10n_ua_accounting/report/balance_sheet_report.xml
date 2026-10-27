@@ -56,7 +56,9 @@
                             на <span t-field="report.date_to" t-options='{"widget": "date"}'/> р.
                         </div>
 
-                        <div class="small text-center mb-2">Форма № 1</div>
+                        <div class="small text-center mb-2">Форма № 1 · Код за ДКУД 1801001</div>
+                        <div class="small mb-1">Одиниця виміру: тис. грн. без десяткового знака</div>
+                        <t t-set="vals" t-value="report._form_values()"/>
 
                         <!-- Report table from stored lines -->
                         <table>
@@ -81,29 +83,29 @@
                                     <tr t-if="line.line_type == 'detail'">
                                         <td t-out="line.name"/>
                                         <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
+                                        <td class="text-right" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[0])"/>
+                                        <td class="text-right" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[1])"/>
                                     </tr>
                                     <!-- Row «у тому числі»: not in the totals -->
                                     <tr t-if="line.line_type == 'sub'">
-                                        <td style="padding-left: 2em;" t-esc="line.name"/>
-                                        <td class="text-center" t-esc="line.code"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right" t-esc="'%.0f' % line.current_amount"/>
+                                        <td style="padding-left: 2em;" t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <td class="text-right" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[0])"/>
+                                        <td class="text-right" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[1])"/>
                                     </tr>
                                     <!-- Subtotal -->
                                     <tr t-if="line.line_type == 'subtotal'">
                                         <td class="bold" t-out="line.name"/>
                                         <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right bold" t-out="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right bold" t-out="'%.0f' % line.current_amount"/>
+                                        <td class="text-right bold" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[0])"/>
+                                        <td class="text-right bold" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[1])"/>
                                     </tr>
                                     <!-- Total -->
                                     <tr t-if="line.line_type == 'total'" style="border-top: 2px solid black;">
                                         <td class="bold" t-out="line.name"/>
                                         <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right bold" t-out="'%.0f' % line.previous_amount"/>
-                                        <td class="text-right bold" t-out="'%.0f' % line.current_amount"/>
+                                        <td class="text-right bold" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[0])"/>
+                                        <td class="text-right bold" t-out="report._ua_fmt(vals.get(line.code, (0, 0))[1])"/>
                                     </tr>
                                 </t>
                             </tbody>
