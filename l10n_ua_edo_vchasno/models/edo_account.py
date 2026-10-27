@@ -55,6 +55,10 @@ class L10nUaEdoAccount(models.Model):
             'l10n_ua_agreement.action_report_agreement_act': '1',       # Акт наданих послуг
         }
 
+    def _vchasno_bill_categories(self):
+        """Incoming documents of these categories become vendor bills; a contract does not."""
+        return {'1', '2', '5'}  # Акт наданих послуг, Рахунок, Видаткова накладна
+
     def _vchasno_upload(self, payload):
         params = {
             'title': payload.get('title'),

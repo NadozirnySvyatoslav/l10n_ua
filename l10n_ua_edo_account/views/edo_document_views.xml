@@ -6,8 +6,9 @@
         <field name="inherit_id" ref="l10n_ua_edo.view_edo_document_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header/button[@name='action_refresh']" position="before">
+                <field name="can_create_bill" invisible="1"/>
                 <button name="action_create_vendor_bill" type="object" string="Create Vendor Bill"
-                        class="btn-primary" invisible="direction != 'in' or res_id"/>
+                        class="btn-primary" invisible="not can_create_bill or res_id"/>
             </xpath>
         </field>
     </record>

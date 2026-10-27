@@ -1,6 +1,7 @@
 """Міст ЕДО для рахунків (#81): надсилання з рахунку, статус на рахунку,
 рахунок постачальника з вхідного документа. Провайдер підмінено."""
 
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
@@ -110,3 +111,20 @@ class TestEdoAccount(AccountTestInvoicingCommon):
         self.assertEqual(second.edo_document_count, 0)
         upload = next(args[0] for op, args in self.calls if op == 'upload')
         self.assertEqual(upload['recipient_emails'], ['buh@a.example.com'])
+
+    def test_no_vendor_bill_from_contract(self):
+        """A contract that came in is not a bill: no button, and the action refuses."""
+        if not hasattr(self.edo, '_vchasno_bill_categories'):
+            self.skipTest('l10n_ua_edo_vchasno is not installed')
+        self.edo.provider = 'vchasno'
+        make = self.env['l10n_ua.edo.document'].create
+        contract = make({'name': 'NDA', 'account_id': self.edo.id, 'direction': 'in',
+                         'category': '3', 'partner_id': self.partner_a.id})
+        invoice = make({'name': 'Рахунок', 'account_id': self.edo.id, 'direction': 'in',
+                        'category': '2', 'partner_id': self.partner_a.id})
+        unknown = make({'name': 'Інше', 'account_id': self.edo.id, 'direction': 'in',
+                        'partner_id': self.partner_a.id})
+        self.assertEqual((contract.can_create_bill, invoice.can_create_bill, unknown.can_create_bill),
+                         (False, True, True))
+        with self.assertRaises(UserError):
+            contract.action_create_vendor_bill()

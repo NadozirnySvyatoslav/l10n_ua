@@ -72,3 +72,18 @@ msgstr "Надіслати у ЕДО"
 msgid ""
 "Set the counterparty of the document first (it was not found by ЄДРПОУ %s)."
 msgstr "Спершу вкажіть контрагента документа (за ЄДРПОУ %s його не знайдено)."
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid ""
+"A vendor bill is made from an invoice, an act or a waybill, not from a "
+"document of this category (a contract, for example)."
+msgstr ""
+"Рахунок постачальника створюється з рахунку, акта або видаткової накладної, "
+"а не з документа цієї категорії (наприклад, договору)."
+
+#. module: l10n_ua_edo_account
+#: model:ir.model.fields,field_description:l10n_ua_edo_account.field_l10n_ua_edo_document__can_create_bill
+msgid "Can Create Bill"
+msgstr "Можна створити рахунок"
