@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - КЕП Signing',
-    'version': '20.0.1.1.2',
+    'version': '20.0.1.1.3',
     'category': 'Accounting/Localization',
     'summary': 'Переюзабельний клієнтський КЕП-підпис (IIT EndUser у браузері)',
     'description': """
