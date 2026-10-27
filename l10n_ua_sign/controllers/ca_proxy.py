@@ -12,8 +12,11 @@
 потрапляють: через проксі йдуть лише запити сертифікатів і статусів.
 
 Щоб маршрут не став відкритим проксі (SSRF), адреса пропускається лише до
-хостів із переліку ЦСК (data/CAs.json), лише http/https, без редиректів і з
-обмеженням розміру.
+хостів ЦСК, лише http/https, без редиректів і з обмеженням розміру. Перелік
+хостів: адреси з data/CAs.json, адреси з сертифікатів data/CACertificates.p7b
+(OCSP, CRL, caIssuers — під час підпису бібліотека перевіряє статус сертифіката
+самого КНЕДП у кореневому органі за адресою з його сертифіката) і кореневі
+органи ЦЗО та ЗЦ НБУ.
 """
 import base64
 import binascii
@@ -21,6 +24,7 @@ import functools
 import json
 import logging
 import os
+import re
 from urllib.parse import urlsplit
 
 import requests
@@ -32,6 +36,11 @@ from odoo.tools import file_path
 _logger = logging.getLogger(__name__)
 
 CAS_JSON = 'l10n_ua_sign/static/src/lib/euscp/data/CAs.json'
+CA_CERTS_P7B = 'l10n_ua_sign/static/src/lib/euscp/data/CACertificates.p7b'
+# Кореневі органи: Центральний засвідчувальний орган і засвідчувальний центр НБУ.
+ROOT_CA_HOSTS = frozenset({'czo.gov.ua', 'zc.bank.gov.ua'})
+_URL_IN_DER = re.compile(rb'https?://[\x21-\x7e]{3,256}')
+_HOSTNAME = re.compile(r'[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}')
 CA_ADDRESS_KEYS = ('address', 'cmpAddress', 'tspAddress', 'ocspAccessPointAddress')
 MAX_REQUEST_BYTES = 1024 * 1024
 MAX_RESPONSE_BYTES = 10 * 1024 * 1024
@@ -73,13 +82,35 @@ def _hosts_from_file(path, mtime):
     )
 
 
-def _allowed_hosts():
-    """Хости ЦСК зі списку бібліотеки; перечитується, коли файл оновили."""
+@functools.lru_cache(maxsize=4)
+def _hosts_from_certificates(path, mtime):
+    """Хости з URL у сертифікатах ЦСК (розширення AIA і CRLDP — це ASCII-рядки в DER).
+
+    Розбирати DER повністю не треба: досить знайти http(s)-адреси й лишити ті, чий
+    хост — коректне доменне ім'я (хвіст сусіднього поля DER відкидається).
+    """
+    with open(path, 'rb') as f:
+        data = f.read()
+    hosts = set()
+    for raw in _URL_IN_DER.findall(data):
+        host, _url = _split_address(raw.decode('ascii', 'ignore'))
+        if host and _HOSTNAME.fullmatch(host):
+            hosts.add(host)
+    return frozenset(hosts)
+
+
+def _cached_hosts(resource, reader):
     try:
-        path = file_path(CAS_JSON)
+        path = file_path(resource)
     except FileNotFoundError:
         return frozenset()
-    return _hosts_from_file(path, os.path.getmtime(path))
+    return reader(path, os.path.getmtime(path))
+
+
+def _allowed_hosts():
+    """Хости ЦСК і кореневих органів; файли перечитуються, коли їх оновили."""
+    return (ROOT_CA_HOSTS | _cached_hosts(CAS_JSON, _hosts_from_file)
+            | _cached_hosts(CA_CERTS_P7B, _hosts_from_certificates))
 
 
 class KepCaProxy(http.Controller):
