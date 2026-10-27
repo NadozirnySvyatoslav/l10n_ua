@@ -34,9 +34,25 @@ class L10nUaEdoAccount(models.Model):
             raise UserError(str(error)) from error
 
     def _vchasno_test(self):
-        categories = self._vchasno('categories')
-        count = len(categories) if isinstance(categories, list) else len(categories.get('categories', []))
-        return _('The token works: %s document categories in Вчасно.', count)
+        return _('The token works: %s document categories in Вчасно.', len(self._vchasno_categories()))
+
+    def _vchasno_categories(self):
+        data = self._vchasno('categories')
+        if isinstance(data, dict):
+            data = data.get('categories') or data.get('document_categories') or []
+        return [(str(c['category_id']), c['category_title']) for c in data
+                if c.get('category_id') not in (None, 0, '0')]
+
+    def _vchasno_default_categories(self):
+        """Standard categories of Вчасно for the Ukrainian printed forms."""
+        return {
+            'l10n_ua_doc_reports.action_report_rahunok_invoice': '2',   # Рахунок
+            'l10n_ua_doc_reports.action_report_rahunok_sale': '2',      # Рахунок
+            'l10n_ua_doc_reports.action_report_act': '1',               # Акт наданих послуг
+            'l10n_ua_doc_reports.action_report_vydatkova': '5',         # Видаткова накладна
+            'l10n_ua_agreement.action_report_agreement': '3',           # Договір
+            'l10n_ua_agreement.action_report_agreement_act': '22',      # Акт
+        }
 
     def _vchasno_upload(self, payload):
         params = {

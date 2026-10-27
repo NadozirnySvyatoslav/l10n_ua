@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - EDO for Sales Orders',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Надсилання рахунку-фактури із замовлення продажу у ЕДО',
     'description': """
@@ -14,7 +14,10 @@ comes first. The EDO status is on the order form.
     'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': ['sale', 'l10n_ua_edo'],
-    'data': ['views/sale_order_views.xml'],
+    'data': [
+        'views/edo_send_action.xml',
+        'views/sale_order_views.xml',
+    ],
     'installable': True,
     'auto_install': True,
 }

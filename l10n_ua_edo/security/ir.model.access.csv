@@ -4,3 +4,7 @@ access_edo_account_admin,l10n_ua.edo.account admin,model_l10n_ua_edo_account,bas
 access_edo_document_user,l10n_ua.edo.document user,model_l10n_ua_edo_document,base.group_user,1,1,1,0
 access_edo_document_admin,l10n_ua.edo.document admin,model_l10n_ua_edo_document,base.group_system,1,1,1,1
 access_edo_send_wizard_user,l10n_ua.edo.send.wizard user,model_l10n_ua_edo_send_wizard,base.group_user,1,1,1,1
+access_edo_category_user,l10n_ua.edo.category user,model_l10n_ua_edo_category,base.group_user,1,0,0,0
+access_edo_category_admin,l10n_ua.edo.category admin,model_l10n_ua_edo_category,base.group_system,1,1,1,1
+access_edo_category_rule_user,l10n_ua.edo.category.rule user,model_l10n_ua_edo_category_rule,base.group_user,1,0,0,0
+access_edo_category_rule_admin,l10n_ua.edo.category.rule admin,model_l10n_ua_edo_category_rule,base.group_system,1,1,1,1

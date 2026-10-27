@@ -88,9 +88,10 @@ class L10nUaEdoMixin(models.AbstractModel):
             raise UserError(_('Give the ЄДРПОУ or the e-mail of the recipient.'))
         filename, content = self._edo_render(report)
         meta = self._edo_meta()
+        category = category or account._category_for(report).code or meta.get('category')
         payload = dict(meta, filename=filename, content=content,
                        title=title or meta.get('title') or filename,
-                       category=category or meta.get('category'),
+                       category=category,
                        recipient_edrpou=recipient_edrpou, recipient_emails=recipient_emails or [],
                        recipient_signs_first=bool(send))
         data = account._call('upload', payload)
@@ -125,15 +126,31 @@ class L10nUaEdoMixin(models.AbstractModel):
     # ── Actions ─────────────────────────────────────────────
 
     def action_edo_send(self):
-        self.ensure_one()
+        """The send wizard for one record or for several (each to its own
+        counterparty)."""
+        if not self:
+            raise UserError(_('Select the documents to send.'))
         return {
             'type': 'ir.actions.act_window',
             'name': _('Send to EDO'),
             'res_model': 'l10n_ua.edo.send.wizard',
             'view_mode': 'form',
             'target': 'new',
-            'context': {'default_res_model': self._name, 'default_res_id': self.id},
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self[:1].id,
+                'default_res_ids': ','.join(str(i) for i in self.ids),
+            },
         }
+
+    def _edo_recipient(self):
+        """(ЄДРПОУ, [e-mails]) of the counterparty from its card."""
+        self.ensure_one()
+        partner = self._edo_partner()
+        if not partner:
+            return False, []
+        edrpou = partner['edrpou'] if 'edrpou' in partner._fields else False
+        return edrpou or False, [partner.email] if partner.email else []
 
     def action_view_edo_documents(self):
         self.ensure_one()

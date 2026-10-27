@@ -721,3 +721,111 @@ msgstr "ЕДО"
 #: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__edrpou
 msgid "ЄДРПОУ"
 msgstr "ЄДРПОУ"
+
+#. module: l10n_ua_edo
+#: model:ir.model.constraint,message:l10n_ua_edo.constraint_l10n_ua_edo_category_code_uniq
+msgid "A category of the service is loaded only once per EDO account."
+msgstr "Категорія сервісу завантажується в обліковий запис ЕДО лише один раз."
+
+#. module: l10n_ua_edo
+#: model:ir.model.constraint,message:l10n_ua_edo.constraint_l10n_ua_edo_category_rule_report_uniq
+msgid "A printed form has one category per EDO account."
+msgstr "Друкована форма має одну категорію в межах облікового запису ЕДО."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__category_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Categories"
+msgstr "Категорії"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__category_rule_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Categories of Printed Forms"
+msgstr "Категорії друкованих форм"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Categories of the Service"
+msgstr "Категорії сервісу"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__category_id
+msgid ""
+"Category in the service; proposed from the categories of printed forms of "
+"the account."
+msgstr ""
+"Категорія в сервісі; пропонується з категорій друкованих форм облікового "
+"запису."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_category__code
+msgid "Code in the Service"
+msgstr "Код у сервісі"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__res_ids
+msgid "Comma-separated ids when several documents are sent."
+msgstr "ID через кому, коли надсилається кілька документів."
+
+#. module: l10n_ua_edo
+#: model:ir.model,name:l10n_ua_edo.model_l10n_ua_edo_category_rule
+msgid "EDO Category of a Report"
+msgstr "Категорія ЕДО друкованої форми"
+
+#. module: l10n_ua_edo
+#: model:ir.model,name:l10n_ua_edo.model_l10n_ua_edo_category
+msgid "EDO Document Category"
+msgstr "Категорія документа ЕДО"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Load Categories from the Service"
+msgstr "Завантажити категорії із сервісу"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__title
+msgid "Only for a single document; several keep their own titles."
+msgstr "Лише для одного документа; кілька документів зберігають власні назви."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_category_rule__report_id
+msgid "Printed Form"
+msgstr "Друкована форма"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__record_count
+msgid "Record Count"
+msgstr "Кількість документів"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+msgid "Select the documents to send."
+msgstr "Оберіть документи для надсилання."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/wizard/edo_send_wizard.py:0
+msgid "Sent to EDO: %(sent)s of %(total)s."
+msgstr "Надіслано у ЕДО: %(sent)s з %(total)s."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_send_wizard_form
+msgid ""
+"Several documents: each goes to the counterparty of its card (ЄДРПОУ and e-mail).\n"
+"                    A document without them is skipped and listed."
+msgstr ""
+"Кілька документів: кожен іде контрагенту з його картки (ЄДРПОУ та e-mail). "
+"Документ без них пропускається й потрапляє в перелік."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/wizard/edo_send_wizard.py:0
+msgid "The documents no longer exist."
+msgstr "Документів уже не існує."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "e.g. Вчасно — основна компанія"
+msgstr "напр. Вчасно — основна компанія"

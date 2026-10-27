@@ -131,3 +131,23 @@ class TestVchasno(TransactionCase):
         self._session({('GET', '/incoming-documents'): FakeResponse(500, {'reason': 'boom'})})
         self.env['l10n_ua.edo.account']._cron_sync()
         self.assertIn('500', self.account.last_error)
+
+    def test_load_categories_and_rules(self):
+        self._session({('GET', '/document-categories'): FakeResponse(200, [
+            {'category_id': 0, 'category_title': 'Тип не обрано'},
+            {'category_id': 1, 'category_title': 'Акт наданих послуг'},
+            {'category_id': 2, 'category_title': 'Рахунок'},
+            {'category_id': 3, 'category_title': 'Договір'},
+            {'category_id': 5, 'category_title': 'Видаткова накладна'},
+            {'category_id': 22, 'category_title': 'Акт'},
+        ])})
+        self.account.action_load_categories()
+        self.assertEqual(sorted(self.account.category_ids.mapped('code')), ['1', '2', '22', '3', '5'])
+        rahunok = self.env.ref('l10n_ua_doc_reports.action_report_rahunok_invoice', raise_if_not_found=False)
+        if rahunok:
+            self.assertEqual(self.account._category_for(rahunok).name, 'Рахунок')
+        # A second load neither duplicates the categories nor the rules
+        rules = len(self.account.category_rule_ids)
+        self.account.action_load_categories()
+        self.assertEqual(len(self.account.category_ids), 5)
+        self.assertEqual(len(self.account.category_rule_ids), rules)

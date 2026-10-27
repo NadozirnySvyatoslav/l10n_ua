@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - EDO for Agreements',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Підписання договорів через ЕДО: договір стає підписаним, архів із підписами — у договорі',
     'description': """
@@ -16,7 +16,10 @@ Ukraine - EDO for Agreements
     'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
     'depends': ['l10n_ua_agreement', 'l10n_ua_edo'],
-    'data': ['views/agreement_views.xml'],
+    'data': [
+        'views/edo_send_action.xml',
+        'views/agreement_views.xml',
+    ],
     'installable': True,
     'auto_install': True,
 }

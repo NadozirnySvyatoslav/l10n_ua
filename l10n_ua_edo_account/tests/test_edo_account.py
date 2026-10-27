@@ -77,3 +77,36 @@ class TestEdoAccount(AccountTestInvoicingCommon):
             [('res_model', '=', 'account.move'), ('res_id', '=', bill.id), ('name', '=', 'bill.pdf')]))
         # Twice: opens the same bill
         self.assertEqual(doc.action_create_vendor_bill()['res_id'], bill.id)
+
+    def test_category_from_the_rule(self):
+        report = self.invoice._edo_reports()[:1]
+        category = self.env['l10n_ua.edo.category'].create(
+            {'account_id': self.edo.id, 'code': '2', 'name': 'Рахунок'})
+        self.env['l10n_ua.edo.category.rule'].create(
+            {'account_id': self.edo.id, 'report_id': report.id, 'category_id': category.id})
+        wizard = self.env['l10n_ua.edo.send.wizard'].with_context(
+            default_res_model='account.move', default_res_id=self.invoice.id).create({'account_id': self.edo.id})
+        self.assertEqual(wizard.category_id, category)
+        wizard.recipient_edrpou = '22222221'
+        wizard.action_send()
+        upload = next(args[0] for op, args in self.calls if op == 'upload')
+        self.assertEqual(upload['category'], '2')
+
+    def test_send_many(self):
+        self.partner_a.email = 'buh@a.example.com'
+        no_contacts = self.env['res.partner'].create({'name': 'Без реквізитів'})
+        second = self.init_invoice('out_invoice', partner=no_contacts, products=self.product_a, post=True)
+        invoices = self.invoice | second
+        action = invoices.action_edo_send()
+        self.assertEqual(action['context']['default_res_ids'], f'{self.invoice.id},{second.id}')
+        wizard = self.env['l10n_ua.edo.send.wizard'].with_context(**action['context']).create(
+            {'account_id': self.edo.id})
+        self.assertEqual(wizard.record_count, 2)
+        result = wizard.action_send()
+        self.assertEqual(result['tag'], 'display_notification')
+        self.assertIn('1', result['params']['message'])
+        self.assertIn(second.display_name, result['params']['message'])
+        self.assertEqual(self.invoice.edo_document_count, 1)
+        self.assertEqual(second.edo_document_count, 0)
+        upload = next(args[0] for op, args in self.calls if op == 'upload')
+        self.assertEqual(upload['recipient_emails'], ['buh@a.example.com'])

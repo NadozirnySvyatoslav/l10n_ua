@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - EDO for Invoices',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Надсилання рахунків, актів і видаткових у ЕДО; рахунок постачальника з вхідного документа',
     'description': """
@@ -17,6 +17,7 @@ Ukraine - EDO for Invoices
     'license': 'LGPL-3',
     'depends': ['account', 'l10n_ua_edo'],
     'data': [
+        'views/edo_send_action.xml',
         'views/account_move_views.xml',
         'views/edo_document_views.xml',
     ],

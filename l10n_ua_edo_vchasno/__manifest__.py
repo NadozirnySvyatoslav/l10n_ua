@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - EDO: Вчасно',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Провайдер ЕДО «Вчасно»: завантаження документів на підпис, статуси, вхідні',
     'description': """

@@ -31,6 +31,30 @@
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
+                    <notebook>
+                        <page string="Categories" name="categories">
+                            <button name="action_load_categories" type="object" string="Load Categories from the Service"
+                                    class="btn-secondary mb-2" invisible="not provider"/>
+                            <group string="Categories of Printed Forms">
+                                <field name="category_rule_ids" nolabel="1" colspan="2"
+                                       context="{'default_account_id': id}">
+                                    <list editable="bottom">
+                                        <field name="account_id" column_invisible="1"/>
+                                        <field name="report_id"/>
+                                        <field name="category_id"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Categories of the Service">
+                                <field name="category_ids" nolabel="1" colspan="2" readonly="1">
+                                    <list>
+                                        <field name="code"/>
+                                        <field name="name"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
                     <div class="alert alert-warning" role="alert" invisible="not last_error">
                         <strong>Last synchronisation failed:</strong> <field name="last_error" class="d-inline"/>
                     </div>

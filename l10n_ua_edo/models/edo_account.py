@@ -14,6 +14,9 @@ plain data, so the base module and the bridges never see the API:
   'archive' (the file with the signatures).
 * ``normalize(document)`` → values of ``l10n_ua.edo.document``.
 * ``test()`` → a text shown to the user (the company the token belongs to).
+* ``categories()`` → [(code, name)] — the document categories of the service.
+* ``default_categories()`` (optional) → {report xmlid: category code} — the
+  category each Ukrainian printed form goes under by default.
 """
 
 import logging
@@ -49,6 +52,9 @@ class L10nUaEdoAccount(models.Model):
     last_sync = fields.Datetime(readonly=True, copy=False)
     last_error = fields.Text(readonly=True, copy=False)
     document_ids = fields.One2many('l10n_ua.edo.document', 'account_id')
+    category_ids = fields.One2many('l10n_ua.edo.category', 'account_id', string='Categories')
+    category_rule_ids = fields.One2many(
+        'l10n_ua.edo.category.rule', 'account_id', string='Categories of Printed Forms')
     document_count = fields.Integer(compute='_compute_document_count')
 
     def _compute_document_count(self):
@@ -101,6 +107,41 @@ class L10nUaEdoAccount(models.Model):
         for account in self:
             account._sync()
         return True
+
+    def action_load_categories(self):
+        """Load the categories of the service and propose the category of each
+        Ukrainian printed form."""
+        Category = self.env['l10n_ua.edo.category'].with_context(active_test=False)
+        for account in self:
+            existing = {c.code: c for c in Category.search([('account_id', '=', account.id)])}
+            for code, name in account._call('categories'):
+                code = str(code)
+                if code in existing:
+                    existing[code].write({'name': name, 'active': True})
+                else:
+                    existing[code] = Category.create({'account_id': account.id, 'code': code, 'name': name})
+            account._suggest_category_rules(existing)
+        return True
+
+    def _suggest_category_rules(self, categories):
+        """Rules for the printed forms the provider knows, where none exists."""
+        self.ensure_one()
+        method = getattr(self, f'_{self.provider}_default_categories', None)
+        if not method:
+            return
+        Rule = self.env['l10n_ua.edo.category.rule']
+        mapped = set(self.category_rule_ids.report_id.ids)
+        for xmlid, code in method().items():
+            report = self.env.ref(xmlid, raise_if_not_found=False)
+            category = categories.get(str(code))
+            if report and category and report.id not in mapped:
+                Rule.create({'account_id': self.id, 'report_id': report.id, 'category_id': category.id})
+                mapped.add(report.id)
+
+    def _category_for(self, report):
+        """The category a printed form is sent under, or an empty recordset."""
+        self.ensure_one()
+        return self.category_rule_ids.filtered(lambda r: r.report_id == report)[:1].category_id
 
     def action_view_documents(self):
         self.ensure_one()
