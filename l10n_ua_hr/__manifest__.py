@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Complete',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Human Resources/Localization',
     'summary': 'Complete Ukrainian HR localization package',
     'description': """
@@ -25,7 +25,7 @@ Features:
 * Contract types per Ukrainian Labor Code
 * Termination reasons per Labor Code articles
 * Vacation types and balance tracking
-* Sick leave with FSS integration
+* Sick leave with PFU (Pension Fund) reimbursement
 * Execution documents (alimony)
 * Monthly attendance sheet (form П-5)
 * Production calendar with Ukrainian holidays

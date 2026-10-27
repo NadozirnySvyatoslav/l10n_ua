@@ -2694,8 +2694,8 @@ msgstr "Курс окладу"
 
 #. module: l10n_ua_hr_salary
 #: model:hr.accrual.type,name:l10n_ua_hr_salary.accrual_type_sick_fss
-msgid "Лікарняні (за рахунок ФСС)"
-msgstr "Лікарняні (за рахунок ФСС)"
+msgid "Лікарняні (за рахунок ПФУ)"
+msgstr "Лікарняні (за рахунок ПФУ)"
 
 #. module: l10n_ua_hr_salary
 #: model:hr.accrual.type,name:l10n_ua_hr_salary.accrual_type_sick_employer

@@ -40,7 +40,7 @@ L10N_UA_1PV_GROUP_BY_CODE = {
     'SICK_EMP': 'incentive_unworked',    # перші 5 днів непрацездатності за рахунок роботодавця
     'MAT_AID': 'material_aid',
     'INKIND': 'incentive',
-    'SICK_FSS': 'excluded',              # допомога з Фонду соцстрахування — поза ФОП
+    'SICK_FSS': 'excluded',              # допомога за рахунок ПФУ (до 2023 — ФСС) — поза ФОП
     'MATERNITY': 'excluded',
     'SEVERANCE': 'excluded',             # вихідна допомога — поза ФОП
 }
