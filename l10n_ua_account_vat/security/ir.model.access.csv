@@ -15,3 +15,6 @@ access_l10n_ua_vat_declaration_d2_line_user,l10n_ua.vat.declaration.d2.line.user
 access_l10n_ua_vat_declaration_d6_line_user,l10n_ua.vat.declaration.d6.line.user,model_l10n_ua_vat_declaration_d6_line,account.group_account_user,1,1,1,1
 access_l10n_ua_vat_declaration_d4_t1_line_user,l10n_ua.vat.declaration.d4.t1.line.user,model_l10n_ua_vat_declaration_d4_t1_line,account.group_account_user,1,1,1,1
 access_l10n_ua_vat_declaration_d4_t2_line_user,l10n_ua.vat.declaration.d4.t2.line.user,model_l10n_ua_vat_declaration_d4_t2_line,account.group_account_user,1,1,1,1
+access_l10n_ua_vat_declaration_d3_offset_user,l10n_ua.vat.declaration.d3.offset.user,model_l10n_ua_vat_declaration_d3_offset,account.group_account_user,1,1,1,1
+access_l10n_ua_vat_declaration_d3_reorg_user,l10n_ua.vat.declaration.d3.reorg.user,model_l10n_ua_vat_declaration_d3_reorg,account.group_account_user,1,1,1,1
+access_l10n_ua_vat_declaration_d3_predecessor_user,l10n_ua.vat.declaration.d3.predecessor.user,model_l10n_ua_vat_declaration_d3_predecessor,account.group_account_user,1,1,1,1

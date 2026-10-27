@@ -11,3 +11,4 @@ from . import res_partner
 from . import uom_uom
 from . import l10n_ua_vat_declaration_d6
 from . import l10n_ua_vat_declaration_d4
+from . import l10n_ua_vat_declaration_d3

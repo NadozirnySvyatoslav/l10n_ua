@@ -352,6 +352,10 @@ class TestVatDeclarationXml(VatDeclarationCase):
         self.assertEqual((august.debt_amount, august.refund_amount, august.carry_amount),
                          (1000.0, 2000.0, 0.0))
         self.assertEqual(sum(decl.d2_line_ids.mapped('refund_amount')), 4500)
+        # Рядок 20.2 вимагає Д3: рахунок для 20.2.1 і таблиця 1 для 20.2.2.
+        decl.write({'d3_iban': 'UA' + '1' * 27, 'd3_bank_name': 'Банк',
+                    'd3_offset_line_ids': [(0, 0, {'kbk': '11010100', 'amount': 500,
+                                                   'treasury_account': 'UA' + '2' * 27})]})
         decl.action_generate_xml()
         main = etree.fromstring(base64.b64decode(decl.xml_file))
         d2 = etree.fromstring(base64.b64decode(decl.d2_xml_file))
