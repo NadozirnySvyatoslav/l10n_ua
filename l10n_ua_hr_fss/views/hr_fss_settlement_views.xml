@@ -5,7 +5,7 @@
         <field name="name">hr.fss.settlement.form</field>
         <field name="model">hr.fss.settlement</field>
         <field name="arch" type="xml">
-            <form string="Взаєморозрахунки з ФСС">
+            <form string="Взаєморозрахунки з ПФУ">
                 <header>
                     <button name="action_gather_sick_leaves" string="Підтягнути лікарняні"
                             type="object" invisible="state != 'draft'"/>
@@ -49,7 +49,7 @@
                                     <field name="date_from"/>
                                     <field name="date_to"/>
                                     <field name="fss_days"/>
-                                    <field name="fss_amount" sum="Total FSS"/>
+                                    <field name="fss_amount" sum="Total PFU"/>
                                 </list>
                             </field>
                         </page>
@@ -75,7 +75,7 @@
         <field name="name">hr.fss.settlement.list</field>
         <field name="model">hr.fss.settlement</field>
         <field name="arch" type="xml">
-            <list string="Взаєморозрахунки з ФСС"
+            <list string="Взаєморозрахунки з ПФУ"
                   decoration-success="state == 'reimbursed'"
                   decoration-warning="state == 'partial'"
                   decoration-muted="state == 'written_off'">
@@ -94,13 +94,13 @@
     </record>
 
     <record id="hr_fss_settlement_action" model="ir.actions.act_window">
-        <field name="name">Взаєморозрахунки з ФСС</field>
+        <field name="name">Взаєморозрахунки з ПФУ</field>
         <field name="res_model">hr.fss.settlement</field>
         <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_hr_fss_settlement"
-              name="Взаєморозрахунки з ФСС"
+              name="Взаєморозрахунки з ПФУ"
               parent="hr_holidays.menu_hr_holidays_management"
               action="hr_fss_settlement_action"
               sequence="25"

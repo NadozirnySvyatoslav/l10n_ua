@@ -1,7 +1,7 @@
 {
-    'name': 'Ukraine - HR FSS Settlements',
-    'version': '19.0.1.0.0',
-    'summary': 'Взаєморозрахунки з ФСС: звірка, сальдо, відшкодування лікарняних',
+    'name': 'Ukraine - HR PFU Sick-Leave Settlements',
+    'version': '19.0.1.1.0',
+    'summary': 'Взаєморозрахунки з ПФУ (Пенсійний фонд України): звірка, сальдо, відшкодування лікарняних',
     'category': 'Human Resources/Payroll',
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://1c-to-odoo.many2one.online',

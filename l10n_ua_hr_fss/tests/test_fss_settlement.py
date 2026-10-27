@@ -1,4 +1,4 @@
-"""Тести взаєморозрахунків з ФСС (#157)."""
+"""Тести взаєморозрахунків з ПФУ (#157, #499)."""
 
 from datetime import date
 
@@ -33,7 +33,7 @@ class TestFssSettlement(TransactionCase):
             'date_from': date(2026, 1, 1), 'date_to': date(2026, 1, 31)})
 
     def test_gather_and_accrued(self):
-        sl = self._sick_leave(date(2026, 1, 10), date(2026, 1, 20))  # 11 днів → ФСС 6
+        sl = self._sick_leave(date(2026, 1, 10), date(2026, 1, 20))  # 11 днів → ПФУ 6
         self.assertGreater(sl.fss_amount, 0)
         st = self._settlement()
         st.action_gather_sick_leaves()

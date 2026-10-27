@@ -3,14 +3,19 @@ from odoo.exceptions import UserError
 
 
 class HrFssSettlement(models.Model):
-    """Взаєморозрахунки з ФСС: заява-розрахунок, сальдо, відшкодування (#157).
+    """Взаєморозрахунки з ПФУ: заява-розрахунок, сальдо, відшкодування (#157, #499).
 
-    Агрегує суми допомоги за лікарняними, що підлягають відшкодуванню Фондом
+    З 01.01.2023 функції ФСС з матеріального забезпечення (допомога по
+    тимчасовій непрацездатності з 6-го дня, по вагітності та пологах)
+    виконує Пенсійний фонд України. Технічні імена (модель, поля, xml id)
+    лишаються з «fss» для сумісності з наявними базами.
+
+    Агрегує суми допомоги за лікарняними, що підлягають відшкодуванню Пенсійним фондом
     (частина з 6-го дня), відстежує сальдо до відшкодування, зіставляє фактично
     отримане відшкодування й формує сторнуючу проводку на невідшкодований залишок.
     """
     _name = 'hr.fss.settlement'
-    _description = 'FSS Settlement (взаєморозрахунки з ФСС)'
+    _description = 'PFU Settlement (взаєморозрахунки з ПФУ)'
     _inherit = ['mail.thread']
     _order = 'date_to desc, id desc'
 
@@ -25,16 +30,16 @@ class HrFssSettlement(models.Model):
     sick_leave_ids = fields.One2many(
         'hr.sick.leave', 'fss_settlement_id', string='Sick Leaves')
     amount_accrued = fields.Monetary(
-        string='Accrued (FSS)', compute='_compute_amounts', store=True,
+        string='Accrued (PFU)', compute='_compute_amounts', store=True,
         currency_field='currency_id',
-        help='Сума допомоги за рахунок ФСС (з 6-го дня) за лікарняними.')
+        help='Сума допомоги за рахунок ПФУ (з 6-го дня) за лікарняними.')
     amount_received = fields.Monetary(
         string='Reimbursement Received', tracking=True,
         currency_field='currency_id')
     residual = fields.Monetary(
-        string='FSS Debt (residual)', compute='_compute_amounts', store=True,
+        string='PFU Debt (residual)', compute='_compute_amounts', store=True,
         currency_field='currency_id',
-        help='Сальдо заборгованості ФСС до відшкодування.')
+        help='Сальдо заборгованості ПФУ до відшкодування.')
 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -54,8 +59,8 @@ class HrFssSettlement(models.Model):
         'account.account', string='Expense Account',
         help='Рахунок витрат для сторно невідшкодованої допомоги (Дт).')
     fss_receivable_account_id = fields.Many2one(
-        'account.account', string='FSS Receivable Account',
-        help='Рахунок розрахунків з ФСС (Кт при сторно).')
+        'account.account', string='PFU Receivable Account',
+        help='Рахунок розрахунків з ПФУ (Кт при сторно).')
     storno_move_id = fields.Many2one(
         'account.move', string='Storno Entry', readonly=True, copy=False)
     notes = fields.Text(string='Notes')
@@ -88,7 +93,7 @@ class HrFssSettlement(models.Model):
         return super().create(vals_list)
 
     def action_gather_sick_leaves(self):
-        """Підтягнути лікарняні періоду з сумою до відшкодування ФСС."""
+        """Підтягнути лікарняні періоду з сумою до відшкодування ПФУ."""
         self.ensure_one()
         leaves = self.env['hr.sick.leave'].search([
             ('company_id', '=', self.company_id.id),
@@ -103,7 +108,7 @@ class HrFssSettlement(models.Model):
     def action_submit(self):
         for rec in self:
             if not rec.sick_leave_ids:
-                raise UserError(_('Немає лікарняних для звірки з ФСС.'))
+                raise UserError(_('Немає лікарняних для звірки з ПФУ.'))
             rec.date_submitted = fields.Date.context_today(rec)
 
     def action_register_reimbursement(self):
@@ -115,27 +120,27 @@ class HrFssSettlement(models.Model):
         return True
 
     def action_write_off_unreimbursed(self):
-        """Сторнуюча проводка на невідшкодований залишок (Дт витрати — Кт ФСС)."""
+        """Сторнуюча проводка на невідшкодований залишок (Дт витрати — Кт ПФУ)."""
         self.ensure_one()
         if self.residual <= 0.01:
             raise UserError(_('Немає невідшкодованого залишку для сторно.'))
         if not (self.journal_id and self.expense_account_id
                 and self.fss_receivable_account_id):
             raise UserError(_(
-                'Заповніть журнал і рахунки (витрати / розрахунки з ФСС) '
+                'Заповніть журнал і рахунки (витрати / розрахунки з ПФУ) '
                 'для сторнуючої проводки.'))
         move = self.env['account.move'].create({
             'move_type': 'entry',
             'journal_id': self.journal_id.id,
             'date': fields.Date.context_today(self),
-            'ref': _('Сторно невідшкодованої допомоги ФСС: %s') % self.name,
+            'ref': _('Сторно невідшкодованої допомоги ПФУ: %s') % self.name,
             'line_ids': [
                 (0, 0, {'account_id': self.expense_account_id.id,
                         'debit': self.residual, 'credit': 0.0,
-                        'name': _('Невідшкодовано ФСС')}),
+                        'name': _('Невідшкодовано ПФУ')}),
                 (0, 0, {'account_id': self.fss_receivable_account_id.id,
                         'debit': 0.0, 'credit': self.residual,
-                        'name': _('Невідшкодовано ФСС')}),
+                        'name': _('Невідшкодовано ПФУ')}),
             ],
         })
         self.storno_move_id = move.id

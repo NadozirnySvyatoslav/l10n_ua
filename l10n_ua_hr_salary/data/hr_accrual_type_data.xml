@@ -76,7 +76,7 @@
         </record>
         
         <record id="accrual_type_sick_fss" model="hr.accrual.type">
-            <field name="name">Лікарняні (за рахунок ФСС)</field>
+            <field name="name">Лікарняні (за рахунок ПФУ)</field>
             <field name="code">SICK_FSS</field>
             <field name="category">sick</field>
             <field name="calculation_method">daily</field>
@@ -86,7 +86,7 @@
             <field name="is_esv_base">True</field>
             <field name="d4_income_type">127</field>
             <field name="sequence">55</field>
-            <field name="description">Допомога по тимчасовій непрацездатності за рахунок ФСС</field>
+            <field name="description">Допомога по тимчасовій непрацездатності за рахунок ПФУ (з 6-го дня)</field>
         </record>
         
         <record id="accrual_type_maternity" model="hr.accrual.type">
