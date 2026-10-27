@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Д6: заява із скаргою на контрагента (п. 201.10 ПКУ) -->
+    <record id="l10n_ua_vat_declaration_view_form_d6" model="ir.ui.view">
+        <field name="name">l10n_ua.vat.declaration.form.d6</field>
+        <field name="model">l10n_ua.vat.declaration</field>
+        <field name="inherit_id" ref="l10n_ua_account_vat.l10n_ua_vat_declaration_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='d2']" position="after">
+                <page string="Д6" name="d6">
+                    <div class="text-muted mb-2">
+                        Заява про допущення продавцем помилок в обов'язкових реквізитах
+                        податкової накладної та/або порушення продавцем / покупцем граничних
+                        термінів реєстрації ПН / РК в ЄРПН (п. 201.10 ПКУ). Додається до
+                        декларації, якщо є хоча б один рядок. Номер документа не заповнюється,
+                        якщо він невідомий (відмова надати або зареєструвати ПН).
+                    </div>
+                    <field name="d6_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="company_id" column_invisible="True"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="tax_invoice_id" optional="show"/>
+                            <field name="doc_kind"/>
+                            <field name="partner_id" optional="show"/>
+                            <field name="partner_name"/>
+                            <field name="partner_ipn"/>
+                            <field name="doc_date"/>
+                            <field name="doc_number"/>
+                            <field name="base_amount" sum="Усього"/>
+                            <field name="vat_amount" sum="Усього"/>
+                            <field name="description"/>
+                        </list>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="d6_attached_sheets"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

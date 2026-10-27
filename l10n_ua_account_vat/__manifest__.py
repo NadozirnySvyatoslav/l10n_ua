@@ -42,6 +42,7 @@ Requires l10n_ua_tax module.
         'views/l10n_ua_vat_register_views.xml',
         'views/l10n_ua_vat_declaration_views.xml',
         'views/l10n_ua_vat_declaration_d5_views.xml',
+        'views/l10n_ua_vat_declaration_d6_views.xml',
         'views/l10n_ua_vat_erpn_limit_views.xml',
         'views/account_move_views.xml',
         'views/menu_views.xml',
