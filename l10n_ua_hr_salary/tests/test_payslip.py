@@ -1210,3 +1210,48 @@ class TestPayslipClosedMonth(SalaryTestCase):
         payslip.action_payslip_draft()
         payslip.action_compute_sheet()
         self.assertEqual(payslip.psp_type, '200')
+
+
+@tagged('post_install', '-at_install')
+class TestPayslipEsvMinimumExemptions(TestPayslip):
+    """#509 — дотяжка бази ЄСВ до мінімальної зарплати (абз. 2 ч. 5 ст. 8
+    Закону № 2464-VI) лише за основним місцем роботи і не для ставки 8,41 %.
+
+    Червень 2025, оклад 5000 грн — нижче мінімальної (8000 грн у фікстурі),
+    повний місяць.
+    """
+
+    def test_primary_job_below_minimum_is_topped_up(self):
+        payslip = self._create_payslip_with_accrual(5000)
+        self.assertEqual(payslip.esv_base, self.psp_params.min_wage)
+        self.assertAlmostEqual(
+            payslip.esv_amount,
+            round(self.psp_params.min_wage * payslip.esv_rate / 100, 2), places=2)
+
+    def test_internal_secondary_job_below_minimum_is_topped_up(self):
+        """Внутрішнє сумісництво — той самий роботодавець за основним місцем."""
+        self.version.employment_type_ua = 'internal'
+        payslip = self._create_payslip_with_accrual(5000)
+        self.assertEqual(payslip.esv_base, self.psp_params.min_wage)
+
+    def test_external_secondary_job_is_charged_on_actual_income(self):
+        """Абз. 3 ч. 5 ст. 8: не за основним місцем роботи — без дотяжки."""
+        self.version.employment_type_ua = 'external'
+        payslip = self._create_payslip_with_accrual(5000)
+        self.assertEqual(payslip.esv_base, 5000)
+        self.assertAlmostEqual(
+            payslip.esv_amount, round(5000 * payslip.esv_rate / 100, 2), places=2)
+
+    def test_disabled_employee_is_charged_841_on_actual_income(self):
+        """Ч. 13 ст. 8: 8,41 % від фактичної бази, без дотяжки до мінімуму."""
+        self.employee.benefit_ids = [
+            (4, self.env.ref('l10n_ua_hr_base.benefit_disability_2').id)]
+        payslip = self._create_payslip_with_accrual(5000)
+        self.assertTrue(payslip.is_disability)
+        self.assertEqual(payslip.esv_base, 5000)
+        self.assertAlmostEqual(payslip.esv_amount, 420.5, places=2)
+
+    def test_external_secondary_job_keeps_the_ceiling(self):
+        self.version.employment_type_ua = 'external'
+        payslip = self._create_payslip_with_accrual(200000)
+        self.assertEqual(payslip.esv_base, self.psp_params.max_esv_base)
