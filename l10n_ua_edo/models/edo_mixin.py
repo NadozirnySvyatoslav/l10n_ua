@@ -38,10 +38,13 @@ class L10nUaEdoMixin(models.AbstractModel):
     # ── Hooks ───────────────────────────────────────────────
 
     def _edo_reports(self):
-        """PDF reports of the model offered in the menu «Друк»."""
-        return self.env['ir.actions.report'].search([
+        """PDF reports of the model offered in the menu «Друк», the Ukrainian
+        forms (modules l10n_ua*) first."""
+        reports = self.env['ir.actions.report'].search([
             ('model', '=', self._name), ('report_type', '=', 'qweb-pdf'),
             ('binding_model_id', '!=', False)])
+        xmlids = reports.get_external_id()
+        return reports.sorted(lambda r: (not (xmlids.get(r.id) or '').startswith('l10n_ua'), r.name))
 
     def _edo_partner(self):
         self.ensure_one()

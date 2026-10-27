@@ -63,11 +63,12 @@ class L10nUaEdoDocument(models.Model):
             vals.pop('direction', None)
             doc.write({k: v for k, v in vals.items() if k in self._fields})
             if doc.state != old_state:
+                # The archive first: the record may want to keep it
+                if doc.state == 'signed' and not doc.archive_attachment_id:
+                    doc._fetch_file('archive')
                 record = doc._record()
                 if record and hasattr(record, '_edo_on_state'):
                     record._edo_on_state(doc)
-                if doc.state == 'signed' and not doc.archive_attachment_id:
-                    doc._fetch_file('archive')
 
     @api.model
     def _upsert_incoming(self, account, vals):
