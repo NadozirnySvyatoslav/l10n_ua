@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Д4: пільги, підприємства осіб з інвалідністю, п. 68 підрозд. 10 розд. XX ПКУ -->
+    <record id="l10n_ua_vat_declaration_view_form_d4" model="ir.ui.view">
+        <field name="name">l10n_ua.vat.declaration.form.d4</field>
+        <field name="model">l10n_ua.vat.declaration</field>
+        <field name="inherit_id" ref="l10n_ua_account_vat.l10n_ua_vat_declaration_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='d2']" position="after">
+                <page string="Д4" name="d4">
+                    <div class="text-muted mb-2">
+                        Обов'язковий, якщо заповнено рядок 5. Таблиця 2 заповнюється при
+                        розрахунку зі звільнених операцій виданих ПН за кодом пільги; обсяги
+                        придбання (графи 6–9) внесіть вручну — вони зберігаються при перерахунку.
+                        Рядок 5 = таблиця 1 + графа 5 таблиці 2, рядок 5.1 = графа 5 таблиці 2.
+                        Після зміни таблиці 1 натисніть «Розрахувати».
+                    </div>
+                    <group>
+                        <group>
+                            <field name="d4_t1_total"/>
+                            <field name="d4_t2_total"/>
+                        </group>
+                    </group>
+                    <separator string="Таблиця 1. Не є об'єктом оподаткування / послуги за межами митної території"/>
+                    <field name="d4_t1_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="operation_type"/>
+                            <field name="name"/>
+                            <field name="article"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="amount" sum="Усього"/>
+                        </list>
+                    </field>
+                    <separator string="Таблиця 2. ПДВ, не сплачений у зв'язку з податковими пільгами"/>
+                    <field name="d4_t2_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="benefit_code"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="vat_unpaid" sum="Усього"/>
+                            <field name="supply_amount" sum="Усього"/>
+                            <field name="purchase_20" sum="Усього"/>
+                            <field name="purchase_7" sum="Усього" optional="show"/>
+                            <field name="purchase_0" sum="Усього" optional="show"/>
+                            <field name="purchase_14" sum="Усього" optional="show"/>
+                        </list>
+                    </field>
+                    <group>
+                        <group string="Таблиця 3. Підприємство осіб з інвалідністю">
+                            <field name="d4_disabled_staff_pct"/>
+                            <field name="d4_disabled_payroll_pct"/>
+                            <field name="d4_processing_cost_pct"/>
+                        </group>
+                        <group string="Таблиця 4. Пункт 68 підрозд. 10 розд. XX ПКУ">
+                            <field name="d4_own_production_pct"/>
+                            <field name="d4_capacity_mark"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

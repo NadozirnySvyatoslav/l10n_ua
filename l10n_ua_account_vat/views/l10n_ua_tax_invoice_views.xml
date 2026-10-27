@@ -40,6 +40,8 @@
                             <field name="registration_deadline"/>
                             <field name="is_import"/>
                             <field name="non_payer_reason" invisible="invoice_type != 'issued'"/>
+                            <field name="vat_special_basis" invisible="invoice_type != 'issued'"/>
+                            <field name="vat_199_recalc" invisible="invoice_type != 'issued' or doc_type != 'rk'"/>
                             <field name="contract_number" invisible="non_payer_reason != '07'"/>
                             <field name="contract_date" invisible="non_payer_reason != '07'"/>
                             <field name="customs_number" invisible="non_payer_reason != '07'"

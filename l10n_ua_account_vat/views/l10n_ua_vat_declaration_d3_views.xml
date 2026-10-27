@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Д3: заяви про повернення бюджетного відшкодування / коштів СЕА ПДВ, реорганізація -->
+    <record id="l10n_ua_vat_declaration_view_form_d3" model="ir.ui.view">
+        <field name="name">l10n_ua.vat.declaration.form.d3</field>
+        <field name="model">l10n_ua.vat.declaration</field>
+        <field name="inherit_id" ref="l10n_ua_account_vat.l10n_ua_vat_declaration_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='d2']" position="after">
+                <page string="Д3" name="d3">
+                    <div class="text-muted mb-2">
+                        Заяви додатка 3. Додаток формується, якщо заповнено рядок 20.2
+                        (бюджетне відшкодування) або будь-яку із заяв нижче; інакше він
+                        до пакета не входить.
+                    </div>
+                    <group string="а) Відшкодування на рахунок у банку (рядок 20.2.1)"
+                           name="d3_bank" invisible="not line_20_2_1_vat">
+                        <field name="line_20_2_1_vat" readonly="True"/>
+                        <field name="d3_iban" placeholder="UA000000000000000000000000000"/>
+                        <field name="d3_bank_name"/>
+                    </group>
+                    <group string="Відомості щодо зміни реквізитів рахунку" name="d3_change">
+                        <div class="text-muted" colspan="2">
+                            Лише у разі зміни рахунку, вказаного в раніше поданій заяві:
+                            період тієї декларації і новий рахунок.
+                        </div>
+                        <field name="d3_change_month"/>
+                        <field name="d3_change_year" options="{'format': false}"/>
+                        <field name="d3_change_iban"/>
+                        <field name="d3_change_bank_name"/>
+                    </group>
+                    <separator string="б) У рахунок інших платежів до держбюджету (таблиця 1, разом = рядок 20.2.2)"/>
+                    <field name="d3_offset_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="kbk"/>
+                            <field name="treasury_account"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="amount" sum="Усього"/>
+                        </list>
+                    </field>
+                    <group>
+                        <group string="Кошти на рахунку в СЕА ПДВ (таблиця 2)" name="d3_sea">
+                            <field name="d3_sea_balance"/>
+                            <field name="line_18_vat" string="Зобов'язання (р.18)" readonly="True"/>
+                            <field name="d3_sea_tax_debt"/>
+                            <field name="d3_sea_available"/>
+                        </group>
+                        <group string="Перерахування надлишку СЕА (таблиця 3)" name="d3_sea_refund">
+                            <field name="d3_sea_refund_amount"/>
+                            <field name="d3_sea_refund_iban" invisible="not d3_sea_refund_amount"/>
+                            <field name="d3_sea_refund_bank_name" invisible="not d3_sea_refund_amount"/>
+                            <field name="d3_sea_debt_amount"/>
+                        </group>
+                    </group>
+                    <separator string="Заява платника, що реорганізується (таблиця 4)"/>
+                    <group>
+                        <field name="d3_reorg_amount"/>
+                    </group>
+                    <field name="d3_reorg_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="partner_id"/>
+                            <field name="partner_ipn"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="amount" sum="Усього"/>
+                            <field name="act_date"/>
+                            <field name="act_number"/>
+                        </list>
+                    </field>
+                    <separator string="Заява правонаступника реорганізованого платника (таблиця 5)"/>
+                    <field name="d3_predecessor_line_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="partner_id"/>
+                            <field name="partner_ipn"/>
+                            <field name="currency_id" column_invisible="True"/>
+                            <field name="amount_termination"/>
+                            <field name="amount_confirmed" sum="Усього"/>
+                            <field name="act_date"/>
+                            <field name="act_number"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

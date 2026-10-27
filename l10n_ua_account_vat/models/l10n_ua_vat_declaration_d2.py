@@ -45,10 +45,17 @@ class L10nUaVatDeclarationD2Line(models.Model):
     doc_year = fields.Integer(string='Рік документа', required=True)
     amount = fields.Monetary(string="Від'ємне значення", currency_field='currency_id',
                              help='Графа 6')
+    from_reorg = fields.Boolean(
+        string='Від реорганізованого',
+        help='Графа 7: сума отримана правонаступником від реорганізованого платника')
+    debt_amount = fields.Monetary(string='У погашення боргу', currency_field='currency_id',
+                                  help='Графа 8 (разом = рядок 20.1)')
+    refund_amount = fields.Monetary(string='До відшкодування', currency_field='currency_id',
+                                    help='Графа 9 (разом = рядок 20.2)')
     carry_amount = fields.Monetary(
         string='До ПК наступного періоду', currency_field='currency_id',
         compute='_compute_carry_amount', store=True, readonly=False,
-        help='Графа 10. Без погашення боргу й відшкодування дорівнює графі 6')
+        help='Графа 10 = графа 6 − графа 8 − графа 9 (разом = рядок 21)')
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -57,10 +64,10 @@ class L10nUaVatDeclarationD2Line(models.Model):
             if ipn:
                 line.partner_ipn = ipn
 
-    @api.depends('amount')
+    @api.depends('amount', 'debt_amount', 'refund_amount')
     def _compute_carry_amount(self):
         for line in self:
-            line.carry_amount = line.amount
+            line.carry_amount = line.amount - line.debt_amount - line.refund_amount
 
 
 class L10nUaVatDeclarationD2(models.Model):
@@ -160,7 +167,46 @@ class L10nUaVatDeclarationD2(models.Model):
                 'partner_id': partner, 'partner_ipn': ipn,
                 'doc_month': month, 'doc_year': year, 'amount': _r2(amount),
             })
+        self._d2_allocate_use(rows)
         self.write({'d2_line_ids': [(0, 0, dict(r, sequence=i)) for i, r in enumerate(rows)]})
+
+    def _d2_allocate_use(self, rows):
+        """Графи 8 і 9: погашення боргу (р.20.1), потім відшкодування (р.20.2) —
+        з найстаріших сум від'ємного значення."""
+        rows.sort(key=lambda r: (r['origin_year'], r['origin_month'],
+                                 r['doc_year'], r['doc_month']))
+        for field, total in (('debt_amount', self.line_20_1_vat),
+                             ('refund_amount', self.line_20_2_vat)):
+            left = _r2(total)
+            for row in rows:
+                if left <= 0:
+                    break
+                free = _r2(row['amount'] - row.get('debt_amount', 0.0)
+                           - row.get('refund_amount', 0.0))
+                used = min(free, left)
+                if used > 0:
+                    row[field] = _r2(row.get(field, 0.0) + used)
+                    left = _r2(left - used)
+
+    def write(self, vals):
+        res = super().write(vals)
+        if {'line_20_1_vat', 'line_20_2_1_vat', 'line_20_2_2_vat'} & set(vals) \
+                and 'd2_line_ids' not in vals:
+            for rec in self.filtered('d2_line_ids'):
+                rec._d2_reallocate()
+        return res
+
+    def _d2_reallocate(self):
+        """Перерозподілити графи 8/9 наявних рядків після зміни рядків 20.1/20.2."""
+        self.ensure_one()
+        lines = self.d2_line_ids
+        rows = [{'id': l.id, 'origin_year': l.origin_year, 'origin_month': l.origin_month,
+                 'doc_year': l.doc_year, 'doc_month': l.doc_month, 'amount': l.amount}
+                for l in lines]
+        self._d2_allocate_use(rows)
+        for row in rows:
+            lines.browse(row['id']).write({'debt_amount': row.get('debt_amount', 0.0),
+                                           'refund_amount': row.get('refund_amount', 0.0)})
 
     def _d2_check(self):
         """Помилки в Д2 (для ``_check_vat_xml_ready``)."""
@@ -177,6 +223,16 @@ class L10nUaVatDeclarationD2(models.Model):
                                                                  precision_digits=0):
             problems.append(_('Д2: сума графи 6 (%(d2).2f) не дорівнює рядку 19 (%(r19).0f)',
                               d2=total, r19=self.line_19_vat))
+        for field, line_value, column in (('debt_amount', self.line_20_1_vat, '8'),
+                                          ('refund_amount', self.line_20_2_vat, '9')):
+            total_use = sum(lines.mapped(field))
+            if float_round(total_use, precision_digits=0) != float_round(
+                    line_value or 0.0, precision_digits=0):
+                problems.append(_('Д2: сума графи %(col)s (%(d2).2f) не дорівнює рядку '
+                                  '%(row)s (%(val).0f)', col=column, d2=total_use,
+                                  row='20.1' if column == '8' else '20.2', val=line_value))
+        if any(l.carry_amount < 0 for l in lines):
+            problems.append(_('Д2: графа 10 від\'ємна — графи 8 і 9 перевищують графу 6'))
         carry = sum(lines.mapped('carry_amount'))
         if float_round(carry, precision_digits=0) != float_round(self.line_21_vat,
                                                                  precision_digits=0):

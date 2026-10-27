@@ -149,6 +149,10 @@
                                     <field name="vat_limit_amount" invisible="not line_19_vat"/>
                                     <field name="line_19_1_vat" invisible="not line_19_vat"/>
                                     <field name="line_20_vat" invisible="not line_19_vat"/>
+                                    <field name="line_20_1_vat" invisible="not line_19_vat"/>
+                                    <field name="line_20_2_1_vat" invisible="not line_19_vat"/>
+                                    <field name="line_20_2_2_vat" invisible="not line_19_vat"/>
+                                    <field name="line_20_2_vat" invisible="not line_19_vat"/>
                                     <field name="line_20_3_vat" invisible="not line_19_vat"/>
                                     <field name="line_21_vat"/>
                                 </group>
@@ -174,6 +178,8 @@
                                     <field name="doc_year"/>
                                     <field name="currency_id" column_invisible="True"/>
                                     <field name="amount" sum="Усього"/>
+                                    <field name="debt_amount" sum="Усього" optional="show"/>
+                                    <field name="refund_amount" sum="Усього" optional="show"/>
                                     <field name="carry_amount" sum="Усього"/>
                                 </list>
                             </field>
@@ -197,6 +203,18 @@
                                     <field name="d2_xml_file" filename="d2_xml_filename" readonly="True"
                                            invisible="not d2_xml_file"/>
                                     <field name="d2_xml_filename" invisible="1"/>
+                                    <field name="d3_xml_file" filename="d3_xml_filename" readonly="True"
+                                           invisible="not d3_xml_file"/>
+                                    <field name="d3_xml_filename" invisible="1"/>
+                                    <field name="d4_xml_file" filename="d4_xml_filename" readonly="True"
+                                           invisible="not d4_xml_file"/>
+                                    <field name="d4_xml_filename" invisible="1"/>
+                                    <field name="d5_xml_file" filename="d5_xml_filename" readonly="True"
+                                           invisible="not d5_xml_file"/>
+                                    <field name="d5_xml_filename" invisible="1"/>
+                                    <field name="d6_xml_file" filename="d6_xml_filename" readonly="True"
+                                           invisible="not d6_xml_file"/>
+                                    <field name="d6_xml_filename" invisible="1"/>
                                     <field name="submission_date" readonly="True"/>
                                 </group>
                             </group>
