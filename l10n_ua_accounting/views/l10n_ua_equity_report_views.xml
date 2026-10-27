@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_equity_report_form" model="ir.ui.view">
+        <field name="name">l10n_ua.equity.report.form</field>
+        <field name="model">l10n_ua.equity.report</field>
+        <field name="arch" type="xml">
+            <form string="Statement of Changes in Equity">
+                <header>
+                    <button name="action_compute" type="object" string="Calculate"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object" string="Set to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_print" type="object" string="Print PDF" icon="fa-print"/>
+                    <button name="action_export_xlsx" type="object" string="Export XLSX"
+                            icon="fa-file-excel-o"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not ledger_difference">
+                        <strong>Row 4300 differs from the ledger:</strong>
+                        <field name="ledger_difference" class="d-inline"/>.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Parameters">
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state == 'confirmed'"/>
+                            <field name="date_from" readonly="state == 'confirmed'"/>
+                            <field name="date_to" readonly="state == 'confirmed'"/>
+                        </group>
+                        <group string="Totals">
+                            <field name="total_opening"/>
+                            <field name="total_closing"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Report Lines" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list decoration-bf="line_type in ('opening', 'subtotal', 'total', 'closing')"
+                                      decoration-info="line_type == 'header'"
+                                      decoration-it="line_type == 'sub'"
+                                      editable="bottom" create="0" delete="0" no_open="1">
+                                    <field name="sequence" column_invisible="1"/>
+                                    <field name="line_type" column_invisible="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="code" readonly="1"/>
+                                    <field name="registered" string="Gr. 3" readonly="line_type != 'manual'"/>
+                                    <field name="revaluation" string="Gr. 4" readonly="line_type != 'manual'"/>
+                                    <field name="additional" string="Gr. 5" readonly="line_type != 'manual'"/>
+                                    <field name="reserve" string="Gr. 6" readonly="line_type != 'manual'"/>
+                                    <field name="retained" string="Gr. 7" readonly="line_type != 'manual'"/>
+                                    <field name="unpaid" string="Gr. 8" readonly="line_type != 'manual'"/>
+                                    <field name="withdrawn" string="Gr. 9" readonly="line_type != 'manual'"/>
+                                    <field name="total" string="Gr. 10"/>
+                                </list>
+                            </field>
+                            <div class="text-muted small">
+                                Gr. 3 — registered capital (40), 4 — revaluation (41), 5 — additional (42),
+                                6 — reserve (43), 7 — retained earnings (44 and unclosed 7–9),
+                                8 — unpaid (46), 9 — withdrawn (45), 10 — total.
+                                Rows 4005, 4010 and 4090 are entered by hand; what is entered there is taken out of row 4290 «Other changes in equity», where the posted correction went.
+                            </div>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_equity_report_list" model="ir.ui.view">
+        <field name="name">l10n_ua.equity.report.list</field>
+        <field name="model">l10n_ua.equity.report</field>
+        <field name="arch" type="xml">
+            <list string="Statements of Changes in Equity" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_opening"/>
+                <field name="total_closing"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'confirmed'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_equity_report_search" model="ir.ui.view">
+        <field name="name">l10n_ua.equity.report.search</field>
+        <field name="model">l10n_ua.equity.report</field>
+        <field name="arch" type="xml">
+            <search string="Statements of Changes in Equity">
+                <field name="name"/>
+                <field name="date_to"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <separator/>
+                <group>
+                    <filter string="Period End" name="groupby_date" domain="[]" context="{'group_by': 'date_to:year'}"/>
+                    <filter string="State" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_equity_report" model="ir.actions.act_window">
+        <field name="name">Statements of Changes in Equity</field>
+        <field name="res_model">l10n_ua.equity.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a Statement of Changes in Equity</p>
+            <p>Звіт про власний капітал (Форма № 4) is calculated from the equity accounts 40–46.</p>
+        </field>
+    </record>
+
+</odoo>

@@ -5035,3 +5035,272 @@ msgstr ""
 #: model:ir.ui.menu,name:account.menu_finance
 msgid "Accounting"
 msgstr "Бухоблік"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,print_report_name:l10n_ua_accounting.action_report_equity
+msgid "'Ф4_власний_капітал_%s' % object.date_to"
+msgstr "'Ф4_власний_капітал_%s' % object.date_to"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
+msgid "<strong>Accounts without a row of the form:</strong>"
+msgstr "<strong>Рахунки без рядка форми:</strong>"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "<strong>Row 4300 differs from the ledger:</strong>"
+msgstr "<strong>Рядок 4300 розходиться з обліком:</strong>"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_equity_report.py:0
+msgid "A confirmed report cannot be changed. Set it back to draft first."
+msgstr ""
+"Затверджений звіт змінювати не можна. Спершу поверніть його в чернетку."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__additional
+msgid "Additional Capital"
+msgstr "Додатковий капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_equity_report_line__line_type__subtotal
+msgid "Adjusted Opening Balance"
+msgstr "Скоригований залишок на початок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_equity_report_line__line_type__manual
+msgid "Adjustment (entered by hand)"
+msgstr "Коригування (вводиться вручну)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_equity_report_line__line_type__closing
+msgid "Closing Balance"
+msgstr "Залишок на кінець"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_equity_report__ledger_difference
+msgid ""
+"Columns whose balance at the end of the period (row 4300) differs from the "
+"balance of their accounts in the ledger. It appears when an amount is "
+"entered in the rows «Коригування» and not taken out of the row the entry "
+"went to."
+msgstr ""
+"Графи, залишок яких на кінець періоду (рядок 4300) відрізняється від залишку"
+" їхніх рахунків в обліку."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_equity_report
+msgid "Create a Statement of Changes in Equity"
+msgstr "Створіть звіт про власний капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report__ledger_difference
+msgid "Difference with the Ledger"
+msgstr "Розбіжність з обліком"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report__total_closing
+msgid "Equity at Period End"
+msgstr "Власний капітал на кінець періоду"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report__total_opening
+msgid "Equity at Period Start"
+msgstr "Власний капітал на початок періоду"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 10"
+msgstr "Гр. 10"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 3"
+msgstr "Гр. 3"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid ""
+"Gr. 3 — registered capital (40), 4 — revaluation (41), 5 — additional (42),\n"
+"                                6 — reserve (43), 7 — retained earnings (44 and unclosed 7–9),\n"
+"                                8 — unpaid (46), 9 — withdrawn (45), 10 — total.\n"
+"                                Rows 4005, 4010 and 4090 are entered by hand; what is entered there is taken out of row 4290 «Other changes in equity», where the posted correction went."
+msgstr ""
+"Гр. 3 — зареєстрований капітал (40), 4 — капітал у дооцінках (41), 5 — "
+"додатковий (42), 6 — резервний (43), 7 — нерозподілений прибуток (44 і "
+"незакриті 7–9), 8 — неоплачений (46), 9 — вилучений (45), 10 — всього. Рядки"
+" 4005, 4010 і 4090 вводяться вручну; введене там вираховується з рядка 4290 "
+"«Інші зміни в капіталі», куди потрапила проведена виправна проводка."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 4"
+msgstr "Гр. 4"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 5"
+msgstr "Гр. 5"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 6"
+msgstr "Гр. 6"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 7"
+msgstr "Гр. 7"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 8"
+msgstr "Гр. 8"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Gr. 9"
+msgstr "Гр. 9"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_equity_report_line__line_type__header
+msgid "Group Title"
+msgstr "Заголовок групи"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_calendar_event_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "Подія календаря наступної дії"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_equity_report.py:0
+msgid ""
+"Only the rows «Коригування» (4005, 4010, 4090) are entered by hand; the "
+"other rows come from the ledger. Recalculate the report instead."
+msgstr ""
+"Вручну вводяться лише рядки «Коригування» (4005, 4010, 4090); решта рядків "
+"береться з обліку. Перерахуйте звіт."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_equity_report_line__line_type__opening
+msgid "Opening Balance"
+msgstr "Залишок на початок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__parent_code
+msgid "Part of Row"
+msgstr "Частина рядка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report__date_from
+msgid "Period Start"
+msgstr "Початок періоду"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_aging_report__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_balance_report__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_cashflow_report__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_exchange__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__rating_ids
+msgid "Ratings"
+msgstr "Оцінки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__registered
+msgid "Registered Capital"
+msgstr "Зареєстрований (пайовий) капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__reserve
+msgid "Reserve Capital"
+msgstr "Резервний капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__retained
+msgid "Retained Earnings"
+msgstr "Нерозподілений прибуток (непокритий збиток)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__revaluation
+msgid "Revaluation Reserve"
+msgstr "Капітал у дооцінках"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_form
+msgid "Statement of Changes in Equity"
+msgstr "Звіт про власний капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_equity
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_equity_report
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_equity
+msgid "Statement of Changes in Equity (Form No.4)"
+msgstr "Звіт про власний капітал (Форма № 4)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_equity_report_line
+msgid "Statement of Changes in Equity Line"
+msgstr "Рядок звіту про власний капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_equity_report
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_equity_report_search
+msgid "Statements of Changes in Equity"
+msgstr "Звіти про власний капітал"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_equity_report.py:0
+msgid "The start of the period must not be after its end."
+msgstr "Початок періоду не може бути пізніше за його кінець."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_equity_report_line__line_type__total
+msgid "Total Changes"
+msgstr "Разом змін"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__unpaid
+msgid "Unpaid Capital"
+msgstr "Неоплачений капітал"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_equity_report_line__withdrawn
+msgid "Withdrawn Capital"
+msgstr "Вилучений капітал"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_equity_report.py:0
+msgid "graph %(graph)s: %(amount)s"
+msgstr "графа %(graph)s: %(amount)s"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_equity_report
+msgid ""
+"Звіт про власний капітал (Форма № 4) is calculated from the equity accounts "
+"40–46."
+msgstr ""
+"Звіт про власний капітал (Форма № 4) розраховується за рахунками власного "
+"капіталу 40–46."
