@@ -4,6 +4,7 @@ from odoo.addons.l10n_ua_account_base.tools.formatters import amount_to_words_ua
 
 
 class SaleOrder(models.Model):
+    _name = 'sale.order'
     _inherit = ['sale.order', 'l10n_ua.doc.report.mixin']
 
     l10n_ua_amount_words = fields.Char(

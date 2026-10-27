@@ -2,6 +2,7 @@ from odoo import models
 
 
 class AccountMove(models.Model):
+    _name = 'account.move'
     _inherit = ['account.move', 'l10n_ua.doc.report.mixin']
 
     def _get_ua_report_lines(self):
