@@ -6,7 +6,7 @@ import os
 from odoo.tests import TransactionCase, tagged
 
 MIGRATION = os.path.join(os.path.dirname(__file__), '..', 'migrations',
-                         '19.0.1.5.5', 'post-migration.py')
+                         '19.0.1.5.6', 'post-migration.py')
 
 
 def _migrate(cr):
