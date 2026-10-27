@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account VAT',
-    'version': '19.0.6.0.0',
+    'version': '19.0.6.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian VAT: tax invoices, registers, declaration',
     'description': """

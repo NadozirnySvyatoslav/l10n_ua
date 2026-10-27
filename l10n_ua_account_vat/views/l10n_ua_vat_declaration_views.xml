@@ -146,9 +146,37 @@
                                 <group>
                                     <field name="line_18_vat"/>
                                     <field name="line_19_vat"/>
+                                    <field name="vat_limit_amount" invisible="not line_19_vat"/>
+                                    <field name="line_19_1_vat" invisible="not line_19_vat"/>
+                                    <field name="line_20_vat" invisible="not line_19_vat"/>
+                                    <field name="line_20_3_vat" invisible="not line_19_vat"/>
                                     <field name="line_21_vat"/>
                                 </group>
                             </group>
+                        </page>
+
+                        <!-- Д2, таблиця 1: розшифровка від'ємного значення -->
+                        <page string="Д2" name="d2" invisible="not line_19_vat">
+                            <div class="text-muted mb-2">
+                                Розшифровка рядка 19 за періодом виникнення і постачальником.
+                                Заповнюється при розрахунку: залишок минулого періоду — з Д2
+                                попередньої декларації, нова частина — на останні отримані ПН.
+                                Сума графи 6 має дорівнювати рядку 19, графи 10 — рядку 21.
+                            </div>
+                            <field name="d2_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="origin_month"/>
+                                    <field name="origin_year"/>
+                                    <field name="partner_id"/>
+                                    <field name="partner_ipn"/>
+                                    <field name="doc_month"/>
+                                    <field name="doc_year"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="amount" sum="Усього"/>
+                                    <field name="carry_amount" sum="Усього"/>
+                                </list>
+                            </field>
                         </page>
 
                         <!-- Подання до ДПС -->
@@ -166,6 +194,9 @@
                                     <field name="d1_xml_file" filename="d1_xml_filename" readonly="True"
                                            invisible="not d1_xml_file"/>
                                     <field name="d1_xml_filename" invisible="1"/>
+                                    <field name="d2_xml_file" filename="d2_xml_filename" readonly="True"
+                                           invisible="not d2_xml_file"/>
+                                    <field name="d2_xml_filename" invisible="1"/>
                                     <field name="submission_date" readonly="True"/>
                                 </group>
                             </group>

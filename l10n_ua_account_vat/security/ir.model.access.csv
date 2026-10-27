@@ -11,3 +11,4 @@ access_l10n_ua_vat_declaration_user,l10n_ua.vat.declaration.user,model_l10n_ua_v
 access_l10n_ua_vat_declaration_manager,l10n_ua.vat.declaration.manager,model_l10n_ua_vat_declaration,account.group_account_manager,1,1,1,1
 access_l10n_ua_vat_erpn_limit_user,l10n_ua.vat.erpn.limit.user,model_l10n_ua_vat_erpn_limit,account.group_account_user,1,1,1,0
 access_l10n_ua_vat_erpn_limit_manager,l10n_ua.vat.erpn.limit.manager,model_l10n_ua_vat_erpn_limit,account.group_account_manager,1,1,1,1
+access_l10n_ua_vat_declaration_d2_line_user,l10n_ua.vat.declaration.d2.line.user,model_l10n_ua_vat_declaration_d2_line,account.group_account_user,1,1,1,1

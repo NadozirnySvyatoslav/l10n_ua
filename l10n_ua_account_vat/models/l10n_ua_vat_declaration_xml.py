@@ -1,13 +1,16 @@
-"""XML декларації з ПДВ (J0200126) і додатка Д1 (J0200526) та подання до ДПС.
+"""XML декларації з ПДВ (J0200126), додатків Д1 (J0200526) і Д2 (J0215226) та подання до ДПС.
 
 Форма — наказ Мінфіну № 21 у редакції наказу № 400 від 09.08.2024; структура —
 XSD з пакета СКЗ ДПС (``tests/schemas``). Рядки основної форми — у цілих гривнях
 (DGdecimal0), таблиці додатка — з копійками (Decimal2Column).
 
 Підтримується типовий місяць платника-юрособи: зобов'язання за ПН/РК, податковий
-кредит за ПН/РК з розшифровкою за постачальниками (Д1, таблиці 2.1 і 2.2), імпорт.
-Не формуються (і тоді XML не будується, щоб не подати неповний пакет): Д1 таблиці
-1.1/1.2 (незареєстровані видані ПН/РК), Д2 (від'ємне значення), Д3–Д6.
+кредит за ПН/РК з розшифровкою за постачальниками (Д1, таблиці 2.1 і 2.2), імпорт;
+видані ПН і РК на збільшення, не зареєстровані в ЄРПН на дату подання (Д1, таблиці
+1.1.1/1.1.2 і 1.2.1/1.2.3 — для умовного ІПН нерезидента 500000000000); від'ємне
+значення (рядки 19–21 і Д2, таблиця 1) без погашення боргу й бюджетного відшкодування.
+Не формуються (і тоді XML не будується, щоб не подати неповний пакет): РК на зменшення,
+не зареєстровані в ЄРПН, Д1 таблиці 1.2.4 і 1.3, Д3–Д6.
 """
 import base64
 import re
@@ -25,6 +28,13 @@ SOFTWARE = 'Odoo l10n_ua'
 # C_DOC, C_DOC_SUB, C_DOC_VER
 MAIN_FORM = ('J02', '001', '26')
 D1_FORM = ('J02', '005', '26')
+D2_FORM = ('J02', '152', '26')
+NONRESIDENT_IPN = '500000000000'
+# Таблиці розділу I Д1: (префікс, рядок підсумку, кількість граф сум 6..).
+D1_SECTION1 = {
+    't111': ('T111', 'R0111', 4), 't112': ('T112', 'R0112', 3),
+    't121': ('T121', 'R0121', 4), 't123': ('T123', 'R0123', 3),
+}
 
 # Рядки основної форми в порядку XSD: (тег, поле моделі).
 MAIN_ROWS = [
@@ -50,6 +60,9 @@ MAIN_ROWS = [
     ('R170GB', 'line_17_vat'),
     ('R180GB', 'line_18_vat'),
     ('R190GB', 'line_19_vat'),
+    ('R191GB', 'line_19_1_vat'),
+    ('R200GB', 'line_20_vat'),
+    ('R203GB', 'line_20_3_vat'),
     ('R210GB', 'line_21_vat'),
 ]
 
@@ -81,6 +94,8 @@ class L10nUaVatDeclarationXml(models.Model):
     xml_filename = fields.Char(string='Ім\'я файлу декларації', copy=False)
     d1_xml_file = fields.Binary(string='XML додатка Д1', attachment=True, copy=False)
     d1_xml_filename = fields.Char(string='Ім\'я файлу Д1', copy=False)
+    d2_xml_file = fields.Binary(string='XML додатка Д2', attachment=True, copy=False)
+    d2_xml_filename = fields.Char(string='Ім\'я файлу Д2', copy=False)
     submission_date = fields.Date(string='Дата подання', copy=False)
     signatory_name = fields.Char(
         string='Керівник',
@@ -107,7 +122,7 @@ class L10nUaVatDeclarationXml(models.Model):
     # ------------------------------------------------------------------ дані
 
     def _vat_head(self, form, linked=None):
-        """Реквізити DECLARHEAD; ``linked`` — (форма, ім'я файлу, TYPE) пов'язаного."""
+        """Реквізити DECLARHEAD; ``linked`` — список (форма, ім'я файлу, TYPE) пов'язаних."""
         self.ensure_one()
         company = self.company_id
         office = company.l10n_ua_tax_office_id
@@ -122,7 +137,7 @@ class L10nUaVatDeclarationXml(models.Model):
             'period_month': period.date_end.month, 'period_type': '1',
             'period_year': period.date_end.year, 'c_sti_orig': office_code,
             'office_name': office.name if office else '',
-            'linked': linked,
+            'linked': linked or [],
         }
 
     def _check_vat_xml_ready(self):
@@ -146,16 +161,21 @@ class L10nUaVatDeclarationXml(models.Model):
             problems.append(_('податкова інспекція компанії (4-значний код ДПІ)'))
         if not self.signatory_name or not re.fullmatch(r'\d{10}', self.signatory_rnokpp or ''):
             problems.append(_('керівник і його РНОКПП (вкладка «Подання»)'))
-        unregistered = (self.register_issued_id.line_ids.tax_invoice_id
-                        .filtered(lambda i: i.state != 'registered'))
-        if unregistered:
+        decreasing = self._d1_unregistered_lines().filtered(
+            lambda l: l.doc_type == 'rk' and l.vat_amount < 0)
+        if decreasing:
             problems.append(_(
-                'видані ПН/РК не зареєстровані в ЄРПН (%s) — для них потрібні таблиці '
-                '1.1/1.2 додатка Д1, які ще не формуються')
-                % ', '.join(unregistered.mapped('display_name')[:5]))
-        if self.line_19_vat:
-            problems.append(_('від\'ємне значення (рядок 19) потребує додатка Д2, '
-                              'який ще не формується'))
+                'РК на зменшення не зареєстровані в ЄРПН (%s) — без реєстрації вони не '
+                'зменшують зобов\'язання; зареєструйте їх або приберіть з реєстру')
+                % ', '.join(decreasing.tax_invoice_id.mapped('display_name')[:5]))
+        no_buyer_ipn = self._d1_unregistered_lines().filtered(
+            lambda l: not re.fullmatch(r'\d{12}', l.partner_ipn or ''))
+        if no_buyer_ipn:
+            problems.append(_('ІПН покупців у незареєстрованих ПН/РК: %s')
+                            % ', '.join(no_buyer_ipn.mapped(
+                                lambda l: l.partner_id.display_name or l.invoice_number
+                                or '?')[:5]))
+        problems += self._d2_check()
         no_ipn = self._d1_lines().filtered(
             lambda l: not re.fullmatch(r'\d{12}', l.partner_ipn or ''))
         if no_ipn:
@@ -169,6 +189,32 @@ class L10nUaVatDeclarationXml(models.Model):
         """Рядки реєстру отриманих, що розшифровуються в Д1 (без імпорту)."""
         return self.register_received_id.line_ids.filtered(
             lambda l: not l.tax_invoice_id.is_import)
+
+    def _d1_unregistered_lines(self):
+        """Видані ПН/РК, не зареєстровані в ЄРПН на дату подання (Д1, розділ I)."""
+        return self.register_issued_id.line_ids.filtered(
+            lambda l: l.tax_invoice_id and l.tax_invoice_id.state != 'registered')
+
+    def _d1_section1(self):
+        """Таблиці 1.1.1/1.1.2 (ПН) і 1.2.1/1.2.3 (РК на збільшення) — по документу.
+
+        Рядок: (ІПН, дата, номер, [обсяг, ПДВ 20 %, ПДВ 7 %(, ПДВ 14 %)]).
+        """
+        self.ensure_one()
+        tables = {key: [] for key in D1_SECTION1}
+        for line in self._d1_unregistered_lines().sorted(lambda l: (l.date, l.id)):
+            nonresident = line.partner_ipn == NONRESIDENT_IPN
+            if line.doc_type == 'rk':
+                key = 't123' if nonresident else 't121'
+            else:
+                key = 't112' if nonresident else 't111'
+            invoice = line.tax_invoice_id
+            amounts = [line.base_20 + line.base_7 + line.base_14, line.vat_20, line.vat_7,
+                       line.vat_14][:D1_SECTION1[key][2]]
+            tables[key].append((line.partner_ipn, line.invoice_date or invoice.date or line.date,
+                                line.invoice_number or invoice.number or invoice.name or '',
+                                amounts))
+        return tables
 
     def _d1_tables(self):
         """Таблиці 2.1 (ПН) і 2.2 (РК) додатка Д1, згруповані за постачальником і періодом."""
@@ -196,20 +242,24 @@ class L10nUaVatDeclarationXml(models.Model):
         for rec in self:
             rec._check_vat_xml_ready()
             t21, t22 = rec._d1_tables()
+            section1 = rec._d1_section1()
+            has_d1 = bool(t21 or t22 or any(section1.values()))
+            has_d2 = float_round(rec.line_19_vat, precision_digits=0) > 0
             main_head = rec._vat_head(MAIN_FORM)
-            vals = {}
-            if t21 or t22:
-                d1_head = rec._vat_head(D1_FORM)
-                main_name = _filename(main_head)
-                d1_name = _filename(d1_head)
-                main_head['linked'] = (D1_FORM, d1_name, 1)
-                d1_head['linked'] = (MAIN_FORM, main_name, 2)
-                d1_xml = rec._render_d1(d1_head, t21, t22)
-                vals.update(d1_xml_file=base64.b64encode(d1_xml),
-                            d1_xml_filename=dps_standard_filename(d1_xml))
-            else:
-                vals.update(d1_xml_file=False, d1_xml_filename=False)
-            main_xml = rec._render_main(main_head, has_d1=bool(t21 or t22))
+            main_name = _filename(main_head)
+            vals = {'d1_xml_file': False, 'd1_xml_filename': False,
+                    'd2_xml_file': False, 'd2_xml_filename': False}
+            for flag, form, render, prefix in (
+                    (has_d1, D1_FORM, lambda h: rec._render_d1(h, t21, t22, section1), 'd1'),
+                    (has_d2, D2_FORM, rec._render_d2, 'd2')):
+                if not flag:
+                    continue
+                head = rec._vat_head(form, linked=[(MAIN_FORM, main_name, 2)])
+                main_head['linked'].append((form, _filename(head), 1))
+                xml = render(head)
+                vals.update({f'{prefix}_xml_file': base64.b64encode(xml),
+                             f'{prefix}_xml_filename': dps_standard_filename(xml)})
+            main_xml = rec._render_main(main_head, has_d1=has_d1, has_d2=has_d2)
             vals.update(xml_file=base64.b64encode(main_xml),
                         xml_filename=dps_standard_filename(main_xml))
             rec.write(vals)
@@ -218,12 +268,12 @@ class L10nUaVatDeclarationXml(models.Model):
     def _render_head(self, head):
         linked = head['linked']
         if linked:
-            form, fname, link_type = linked
-            linked_xml = (
-                '<LINKED_DOCS><DOC NUM="1" TYPE="%s"><C_DOC>%s</C_DOC><C_DOC_SUB>%s</C_DOC_SUB>'
+            linked_xml = '<LINKED_DOCS>%s</LINKED_DOCS>' % ''.join(
+                '<DOC NUM="%s" TYPE="%s"><C_DOC>%s</C_DOC><C_DOC_SUB>%s</C_DOC_SUB>'
                 '<C_DOC_VER>%s</C_DOC_VER><C_DOC_TYPE>0</C_DOC_TYPE><C_DOC_CNT>1</C_DOC_CNT>'
-                '<C_DOC_STAN>1</C_DOC_STAN><FILENAME>%s</FILENAME></DOC></LINKED_DOCS>'
-                % (link_type, form[0], form[1], form[2], fname[:-4] + '.XML'))
+                '<C_DOC_STAN>1</C_DOC_STAN><FILENAME>%s</FILENAME></DOC>'
+                % (num, link_type, form[0], form[1], form[2], fname[:-4] + '.XML')
+                for num, (form, fname, link_type) in enumerate(linked, 1))
         else:
             linked_xml = '<LINKED_DOCS xsi:nil="true"/>'
         return (
@@ -263,7 +313,7 @@ class L10nUaVatDeclarationXml(models.Model):
                f'{head_xml}<DECLARBODY>{body_xml}</DECLARBODY></DECLAR>')
         return xml.encode('windows-1251', errors='xmlcharrefreplace')
 
-    def _render_main(self, head, has_d1):
+    def _render_main(self, head, has_d1, has_d2=False):
         self.ensure_one()
         company = self.company_id
         address = ', '.join(filter(None, [company.zip, company.state_id.name, company.city,
@@ -273,22 +323,41 @@ class L10nUaVatDeclarationXml(models.Model):
             body.append(f'<HZIP>{escape(company.zip)}</HZIP>')
         body.append(f'<HSTI>{escape(head["office_name"])}</HSTI>')
         for tag, field in MAIN_ROWS:
+            if tag == 'R191GB' and has_d2:
+                # Службове поле рядка 19.1: сума за п. 200-1.3 на дату подання.
+                body.append(f'<R191G3>{_int(self.vat_limit_amount)}</R191G3>')
             value = self[field]
             if float_round(value or 0.0, precision_digits=0):
                 body.append(f'<{tag}>{_int(value)}</{tag}>')
         if has_d1:
             body.append('<HD1>1</HD1>')
+        if has_d2:
+            body.append('<HD2>1</HD2>')
         body.append(self._render_signers())
         return self._wrap(MAIN_FORM, self._render_head(head), ''.join(body))
 
-    def _render_d1(self, head, t21, t22):
-        """Д1: таблиці 2.1 і 2.2 — стовпцями з ROWNUM, як вимагає XSD."""
+    def _render_d1(self, head, t21, t22, section1=None):
+        """Д1: таблиці розділу I і 2.1/2.2 — стовпцями з ROWNUM, як вимагає XSD."""
         self.ensure_one()
         body = [self._render_taxpayer(head)]
 
         def column(prefix, col, rows, fmt):
             return ''.join(f'<{prefix}RXXXXG{col} ROWNUM="{n}">{fmt(row)}</{prefix}RXXXXG{col}>'
                            for n, row in enumerate(rows, 1))
+
+        for key, (prefix, total, ncols) in D1_SECTION1.items():
+            rows = (section1 or {}).get(key)
+            if not rows:
+                continue
+            body += [
+                column(prefix, '2', rows, lambda r: r[0]),
+                column(prefix, '3D', rows, lambda r: r[1].strftime('%d%m%Y')),
+                column(prefix, '4S', rows, lambda r: escape(r[2])),
+            ]
+            for i in range(ncols):
+                body.append(column(prefix, str(6 + i), rows, lambda r, i=i: _dec2(r[3][i])))
+            for i in range(ncols):
+                body.append(f'<{total}G{6 + i}>{_int(sum(r[3][i] for r in rows))}</{total}G{6 + i}>')
 
         if t21:
             rows = [(key, [*amounts, sum(amounts[1:])]) for key, amounts in t21]
@@ -317,6 +386,38 @@ class L10nUaVatDeclarationXml(models.Model):
         body.append(self._render_signers())
         return self._wrap(D1_FORM, self._render_head(head), ''.join(body))
 
+    def _render_d2(self, head):
+        """Д2: таблиця 1 (графи 2–6, 10) і рядок «у межах суми за п. 200-1.3»."""
+        self.ensure_one()
+        body = [self._render_taxpayer(head)]
+        rows = self.d2_line_ids.sorted(lambda l: (l.origin_year, l.origin_month,
+                                                  l.doc_year, l.doc_month, l.sequence, l.id))
+
+        def column(col, fmt):
+            return ''.join(f'<T1RXXXXG{col} ROWNUM="{n}">{fmt(row)}</T1RXXXXG{col}>'
+                           for n, row in enumerate(rows, 1))
+
+        body += [
+            column('2', lambda r: r.origin_month), column('3', lambda r: r.origin_year),
+            column('4', lambda r: r.partner_ipn),
+            column('51', lambda r: r.doc_month), column('52', lambda r: r.doc_year),
+            column('6', lambda r: _dec2(r.amount)),
+            column('10', lambda r: _dec2(r.carry_amount)),
+            f'<R01G6>{_int(self.line_19_vat)}</R01G6>',
+            f'<R01G10>{_int(self.line_21_vat)}</R01G10>',
+        ]
+        if float_round(self.line_20_vat, precision_digits=0):
+            # Без податкового боргу сюди переноситься рядок 20.3 (= 20 − 20.1).
+            body.append(f'<R02G3>{_int(self.line_20_3_vat)}</R02G3>')
+        body.append(self._render_signers())
+        return self._wrap(D2_FORM, self._render_head(head), ''.join(body))
+
+    def _attachment_files(self):
+        """Додатки пакета: (ключ підпису, base64, ім'я файлу)."""
+        self.ensure_one()
+        return [(key, self[f'{key}_xml_file'], self[f'{key}_xml_filename'])
+                for key in ('d1', 'd2') if self[f'{key}_xml_file']]
+
     # ------------------------------------------------- контракт dps.submit.mixin
 
     def action_submit(self):
@@ -337,26 +438,28 @@ class L10nUaVatDeclarationXml(models.Model):
 
     def kep_prepare_signing(self):
         spec = super().kep_prepare_signing()
-        if self.d1_xml_file:
+        for key, data, filename in self._attachment_files():
             doc = dict(spec['documents'][0])
-            data = self.d1_xml_file
-            doc.update(name='d1', data_b64=data.decode() if isinstance(data, bytes) else data,
-                       filename=self.d1_xml_filename)
+            doc.update(name=key, data_b64=data.decode() if isinstance(data, bytes) else data,
+                       filename=filename)
             spec['documents'].append(doc)
         return spec
 
     def kep_submit_signed(self, signed, auth_signature=None):
-        """Декларація і Д1 — одним запитом: кабінет приймає масив звітів."""
+        """Декларація з додатками — одним запитом: кабінет приймає масив звітів."""
         self.ensure_one()
-        if not self.d1_xml_file:
+        attachments = self._attachment_files()
+        if not attachments:
             return super().kep_submit_signed(signed, auth_signature)
         self._dps_check_can_submit()
         config = self._dps_config()
-        if not signed.get('doc') or not signed.get('d1'):
-            raise UserError(_('Не отримано підпис декларації або додатка Д1.'))
+        missing = [key.upper() for key, _d, _f in attachments if not signed.get(key)]
+        if not signed.get('doc') or missing:
+            raise UserError(_('Не отримано підпис декларації або додатків: %s')
+                            % ', '.join(missing or [_('декларація')]))
         result = config._api_submit_document_presigned(
             signed['doc'], self._dps_filename(), auth_signature,
-            extra_files=[(signed['d1'], self.d1_xml_filename)])
+            extra_files=[(signed[key], filename) for key, _d, filename in attachments])
         self._dps_check_result(result)
         receipt = self._dps_receipt_text(result)
         self._dps_store_receipts(result)
