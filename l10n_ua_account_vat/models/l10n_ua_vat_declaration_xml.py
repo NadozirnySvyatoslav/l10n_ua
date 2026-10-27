@@ -20,15 +20,22 @@ from xml.sax.saxutils import escape
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.tools import float_round
+from odoo.tools import float_compare, float_round
 
 from odoo.addons.l10n_ua_tax_cabinet.models.l10n_ua_dps_submit_mixin import dps_standard_filename
 
 SOFTWARE = 'Odoo l10n_ua'
-# C_DOC, C_DOC_SUB, C_DOC_VER
-MAIN_FORM = ('J02', '001', '26')
-D1_FORM = ('J02', '005', '26')
-D2_FORM = ('J02', '152', '26')
+FORM_VERSION = '26'
+# C_DOC_SUB кожної форми пакета: (юрособа J02, ФОП F02). Д1 ФОП — F0200426.
+FORM_SUBS = {
+    'main': ('001', '001'), 'd1': ('005', '004'), 'd2': ('152', '152'),
+    'd3': ('998', '998'), 'd4': ('993', '993'), 'd5': ('157', '157'), 'd6': ('158', '158'),
+}
+ATTACHMENT_KEYS = ('d1', 'd2', 'd3', 'd4', 'd5', 'd6')
+# Сумісність зі старими посиланнями: форми юрособи.
+MAIN_FORM = ('J02', '001', FORM_VERSION)
+D1_FORM = ('J02', '005', FORM_VERSION)
+D2_FORM = ('J02', '152', FORM_VERSION)
 NONRESIDENT_IPN = '500000000000'
 # Таблиці розділу I Д1: (префікс, рядок підсумку, кількість граф сум 6..).
 D1_SECTION1 = {
@@ -62,6 +69,10 @@ MAIN_ROWS = [
     ('R190GB', 'line_19_vat'),
     ('R191GB', 'line_19_1_vat'),
     ('R200GB', 'line_20_vat'),
+    ('R201GB', 'line_20_1_vat'),
+    ('R202GB', 'line_20_2_vat'),
+    ('R2021GB', 'line_20_2_1_vat'),
+    ('R2022GB', 'line_20_2_2_vat'),
     ('R203GB', 'line_20_3_vat'),
     ('R210GB', 'line_21_vat'),
 ]
@@ -96,6 +107,14 @@ class L10nUaVatDeclarationXml(models.Model):
     d1_xml_filename = fields.Char(string='Ім\'я файлу Д1', copy=False)
     d2_xml_file = fields.Binary(string='XML додатка Д2', attachment=True, copy=False)
     d2_xml_filename = fields.Char(string='Ім\'я файлу Д2', copy=False)
+    d3_xml_file = fields.Binary(string='XML додатка Д3', attachment=True, copy=False)
+    d3_xml_filename = fields.Char(string='Ім\'я файлу Д3', copy=False)
+    d4_xml_file = fields.Binary(string='XML додатка Д4', attachment=True, copy=False)
+    d4_xml_filename = fields.Char(string='Ім\'я файлу Д4', copy=False)
+    d5_xml_file = fields.Binary(string='XML додатка Д5', attachment=True, copy=False)
+    d5_xml_filename = fields.Char(string='Ім\'я файлу Д5', copy=False)
+    d6_xml_file = fields.Binary(string='XML додатка Д6', attachment=True, copy=False)
+    d6_xml_filename = fields.Char(string='Ім\'я файлу Д6', copy=False)
     submission_date = fields.Date(string='Дата подання', copy=False)
     signatory_name = fields.Char(
         string='Керівник',
@@ -121,6 +140,21 @@ class L10nUaVatDeclarationXml(models.Model):
 
     # ------------------------------------------------------------------ дані
 
+    def _is_fop_declaration(self):
+        return bool(self.company_id.l10n_ua_is_fop)
+
+    def _vat_form(self, key):
+        """(C_DOC, C_DOC_SUB, C_DOC_VER) форми пакета: J02 — юрособа, F02 — ФОП."""
+        fop = self._is_fop_declaration()
+        return ('F02' if fop else 'J02', FORM_SUBS[key][1 if fop else 0], FORM_VERSION)
+
+    def _vat_tin(self):
+        """HTIN/TIN: ЄДРПОУ юрособи або РНОКПП ФОП."""
+        company = self.company_id
+        if self._is_fop_declaration():
+            return re.sub(r'\D', '', company.vat or company.company_registry or '')
+        return re.sub(r'\D', '', company.edrpou or company.company_registry or '')
+
     def _vat_head(self, form, linked=None):
         """Реквізити DECLARHEAD; ``linked`` — список (форма, ім'я файлу, TYPE) пов'язаних."""
         self.ensure_one()
@@ -130,7 +164,7 @@ class L10nUaVatDeclarationXml(models.Model):
                              or company.tax_office_code or '')
         period = self.period_id
         return {
-            'tin': re.sub(r'\D', '', company.edrpou or company.company_registry or ''),
+            'tin': self._vat_tin(),
             'c_doc': form[0], 'c_doc_sub': form[1], 'c_doc_ver': form[2],
             'c_doc_type': 0, 'c_doc_cnt': 1, 'c_doc_stan': '1',
             'c_reg': office_code[:2], 'c_raj': office_code[2:4],
@@ -143,15 +177,27 @@ class L10nUaVatDeclarationXml(models.Model):
     def _check_vat_xml_ready(self):
         """Помилки до формування — усе, чого бракує, одним повідомленням."""
         self.ensure_one()
+        problems = self._vat_xml_problems()
+        if problems:
+            raise UserError(_('Неможливо сформувати XML декларації з ПДВ:\n• %s')
+                            % '\n• '.join(problems))
+
+    def _vat_xml_problems(self):
+        """Список проблем; додатки дописують свої через super()."""
+        self.ensure_one()
         company = self.company_id
         problems = []
-        if company.l10n_ua_is_fop:
-            problems.append(_('декларація ФОП-платника ПДВ (F0200126) ще не формується'))
         period = self.period_id
         if not period.date_start or not period.date_end or \
                 period.date_start.month != period.date_end.month:
-            problems.append(_('XML формується лише за місячний період'))
-        if not re.sub(r'\D', '', company.edrpou or company.company_registry or ''):
+            # Податковий період з ПДВ — календарний місяць (ст. 202 ПКУ); форма
+            # № 400 не має квартальних полів.
+            problems.append(_('декларація з ПДВ подається лише за календарний місяць'))
+        tin = self._vat_tin()
+        if self._is_fop_declaration():
+            if not re.fullmatch(r'\d{10}', tin):
+                problems.append(_('РНОКПП ФОП (10 цифр, поле «ІПН/РНОКПП» компанії)'))
+        elif not tin:
             problems.append(_('код ЄДРПОУ компанії'))
         if not re.fullmatch(r'\d{12}', company.l10n_ua_vat_ipn or ''):
             problems.append(_('ІПН платника ПДВ компанії (12 цифр)'))
@@ -176,14 +222,19 @@ class L10nUaVatDeclarationXml(models.Model):
                                 lambda l: l.partner_id.display_name or l.invoice_number
                                 or '?')[:5]))
         problems += self._d2_check()
+        if (self.line_20_1_vat or 0.0) < 0 or (self.line_20_2_1_vat or 0.0) < 0 \
+                or (self.line_20_2_2_vat or 0.0) < 0:
+            problems.append(_('рядки 20.1, 20.2.1, 20.2.2 не можуть бути від\'ємними'))
+        if float_compare((self.line_20_1_vat or 0.0) + (self.line_20_2_vat or 0.0),
+                         self.line_20_vat or 0.0, precision_digits=0) > 0:
+            problems.append(_('рядки 20.1 + 20.2 перевищують рядок 20 (від\'ємне значення '
+                              'в межах Σнакл)'))
         no_ipn = self._d1_lines().filtered(
             lambda l: not re.fullmatch(r'\d{12}', l.partner_ipn or ''))
         if no_ipn:
             problems.append(_('ІПН постачальників: %s')
                             % ', '.join(no_ipn.partner_id.mapped('display_name')[:5]))
-        if problems:
-            raise UserError(_('Неможливо сформувати XML декларації з ПДВ:\n• %s')
-                            % '\n• '.join(problems))
+        return problems
 
     def _d1_lines(self):
         """Рядки реєстру отриманих, що розшифровуються в Д1 (без імпорту)."""
@@ -238,28 +289,39 @@ class L10nUaVatDeclarationXml(models.Model):
 
     # ------------------------------------------------------------------ XML
 
+    def _vat_attachments(self):
+        """Додатки, потрібні цій декларації: [(ключ, render(head) -> bytes)].
+
+        Порядок — як у пакеті ДПС. Модулі/файли з іншими додатками дописують свої
+        через super().
+        """
+        self.ensure_one()
+        result = []
+        t21, t22 = self._d1_tables()
+        section1 = self._d1_section1()
+        if t21 or t22 or any(section1.values()):
+            result.append(('d1', lambda head: self._render_d1(head, t21, t22, section1)))
+        if float_round(self.line_19_vat, precision_digits=0) > 0:
+            result.append(('d2', self._render_d2))
+        return result
+
     def action_generate_xml(self):
         for rec in self:
             rec._check_vat_xml_ready()
-            t21, t22 = rec._d1_tables()
-            section1 = rec._d1_section1()
-            has_d1 = bool(t21 or t22 or any(section1.values()))
-            has_d2 = float_round(rec.line_19_vat, precision_digits=0) > 0
-            main_head = rec._vat_head(MAIN_FORM)
+            main_head = rec._vat_head(rec._vat_form('main'))
             main_name = _filename(main_head)
-            vals = {'d1_xml_file': False, 'd1_xml_filename': False,
-                    'd2_xml_file': False, 'd2_xml_filename': False}
-            for flag, form, render, prefix in (
-                    (has_d1, D1_FORM, lambda h: rec._render_d1(h, t21, t22, section1), 'd1'),
-                    (has_d2, D2_FORM, rec._render_d2, 'd2')):
-                if not flag:
-                    continue
-                head = rec._vat_head(form, linked=[(MAIN_FORM, main_name, 2)])
+            vals = {}
+            for key in ATTACHMENT_KEYS:
+                vals.update({f'{key}_xml_file': False, f'{key}_xml_filename': False})
+            attachments = sorted(rec._vat_attachments(), key=lambda a: ATTACHMENT_KEYS.index(a[0]))
+            for key, render in attachments:
+                form = rec._vat_form(key)
+                head = rec._vat_head(form, linked=[(rec._vat_form('main'), main_name, 2)])
                 main_head['linked'].append((form, _filename(head), 1))
                 xml = render(head)
-                vals.update({f'{prefix}_xml_file': base64.b64encode(xml),
-                             f'{prefix}_xml_filename': dps_standard_filename(xml)})
-            main_xml = rec._render_main(main_head, has_d1=has_d1, has_d2=has_d2)
+                vals.update({f'{key}_xml_file': base64.b64encode(xml),
+                             f'{key}_xml_filename': dps_standard_filename(xml)})
+            main_xml = rec._render_main(main_head, keys={key for key, _r in attachments})
             vals.update(xml_file=base64.b64encode(main_xml),
                         xml_filename=dps_standard_filename(main_xml))
             rec.write(vals)
@@ -313,7 +375,7 @@ class L10nUaVatDeclarationXml(models.Model):
                f'{head_xml}<DECLARBODY>{body_xml}</DECLARBODY></DECLAR>')
         return xml.encode('windows-1251', errors='xmlcharrefreplace')
 
-    def _render_main(self, head, has_d1, has_d2=False):
+    def _render_main(self, head, keys=()):
         self.ensure_one()
         company = self.company_id
         address = ', '.join(filter(None, [company.zip, company.state_id.name, company.city,
@@ -323,18 +385,17 @@ class L10nUaVatDeclarationXml(models.Model):
             body.append(f'<HZIP>{escape(company.zip)}</HZIP>')
         body.append(f'<HSTI>{escape(head["office_name"])}</HSTI>')
         for tag, field in MAIN_ROWS:
-            if tag == 'R191GB' and has_d2:
+            if tag == 'R191GB' and 'd2' in keys:
                 # Службове поле рядка 19.1: сума за п. 200-1.3 на дату подання.
                 body.append(f'<R191G3>{_int(self.vat_limit_amount)}</R191G3>')
             value = self[field]
             if float_round(value or 0.0, precision_digits=0):
                 body.append(f'<{tag}>{_int(value)}</{tag}>')
-        if has_d1:
-            body.append('<HD1>1</HD1>')
-        if has_d2:
-            body.append('<HD2>1</HD2>')
+        for key in ATTACHMENT_KEYS:
+            if key in keys:
+                body.append(f'<HD{key[1]}>1</HD{key[1]}>')
         body.append(self._render_signers())
-        return self._wrap(MAIN_FORM, self._render_head(head), ''.join(body))
+        return self._wrap(self._vat_form('main'), self._render_head(head), ''.join(body))
 
     def _render_d1(self, head, t21, t22, section1=None):
         """Д1: таблиці розділу I і 2.1/2.2 — стовпцями з ROWNUM, як вимагає XSD."""
@@ -384,7 +445,7 @@ class L10nUaVatDeclarationXml(models.Model):
             for col, idx in (('4', 0), ('5', 1), ('6', 2), ('7', 3), ('8', 4)):
                 body.append(f'<R022G{col}>{_int(sum(r[1][idx] for r in rows))}</R022G{col}>')
         body.append(self._render_signers())
-        return self._wrap(D1_FORM, self._render_head(head), ''.join(body))
+        return self._wrap(self._vat_form('d1'), self._render_head(head), ''.join(body))
 
     def _render_d2(self, head):
         """Д2: таблиця 1 (графи 2–6, 10) і рядок «у межах суми за п. 200-1.3»."""
@@ -402,21 +463,32 @@ class L10nUaVatDeclarationXml(models.Model):
             column('4', lambda r: r.partner_ipn),
             column('51', lambda r: r.doc_month), column('52', lambda r: r.doc_year),
             column('6', lambda r: _dec2(r.amount)),
+        ]
+        if any(rows.mapped('debt_amount')):
+            body.append(column('8', lambda r: _dec2(r.debt_amount)))
+        if any(rows.mapped('refund_amount')):
+            body.append(column('9', lambda r: _dec2(r.refund_amount)))
+        body += [
             column('10', lambda r: _dec2(r.carry_amount)),
             f'<R01G6>{_int(self.line_19_vat)}</R01G6>',
-            f'<R01G10>{_int(self.line_21_vat)}</R01G10>',
         ]
-        if float_round(self.line_20_vat, precision_digits=0):
-            # Без податкового боргу сюди переноситься рядок 20.3 (= 20 − 20.1).
-            body.append(f'<R02G3>{_int(self.line_20_3_vat)}</R02G3>')
+        if float_round(self.line_20_1_vat or 0.0, precision_digits=0):
+            body.append(f'<R01G8>{_int(self.line_20_1_vat)}</R01G8>')
+        if float_round(self.line_20_2_vat or 0.0, precision_digits=0):
+            body.append(f'<R01G9>{_int(self.line_20_2_vat)}</R01G9>')
+        body.append(f'<R01G10>{_int(self.line_21_vat)}</R01G10>')
+        within = (self.line_20_vat or 0.0) - (self.line_20_1_vat or 0.0)
+        if float_round(within, precision_digits=0):
+            # «Сума, що не перевищує Σнакл, … (р.20 − р.20.1)».
+            body.append(f'<R02G3>{_int(within)}</R02G3>')
         body.append(self._render_signers())
-        return self._wrap(D2_FORM, self._render_head(head), ''.join(body))
+        return self._wrap(self._vat_form('d2'), self._render_head(head), ''.join(body))
 
     def _attachment_files(self):
         """Додатки пакета: (ключ підпису, base64, ім'я файлу)."""
         self.ensure_one()
         return [(key, self[f'{key}_xml_file'], self[f'{key}_xml_filename'])
-                for key in ('d1', 'd2') if self[f'{key}_xml_file']]
+                for key in ATTACHMENT_KEYS if self[f'{key}_xml_file']]
 
     # ------------------------------------------------- контракт dps.submit.mixin
 

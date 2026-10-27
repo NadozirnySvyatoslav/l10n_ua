@@ -327,3 +327,73 @@ class TestVatDeclarationXml(TransactionCase):
         self.assertEqual(posted['files'],
                          [decl.xml_filename, decl.d1_xml_filename, decl.d2_xml_filename])
         self.assertEqual(decl.state, 'submitted')
+
+    def test_refund_rows_fill_d2_columns_8_and_9(self):
+        self._prev_declaration(3000, [
+            {'origin_month': 8, 'origin_year': 2026, 'partner_ipn': '111111111111',
+             'doc_month': 8, 'doc_year': 2026, 'amount': 3000},
+        ])
+        self._add_received(self.supplier2, 3, 25000.0)
+        decl = self._declaration()
+        decl.vat_limit_amount = 100000
+        self.assertEqual(decl.line_19_vat, 16800)   # 33800 + 3000 − 20000
+        decl.write({'line_20_1_vat': 1000, 'line_20_2_1_vat': 4000, 'line_20_2_2_vat': 500})
+        self.assertEqual(decl.line_20_2_vat, 4500)
+        self.assertEqual(decl.line_20_3_vat, 16800 - 1000 - 4500)
+        self.assertEqual(decl.line_21_vat, 11300)
+        # Найстаріше (серпень, 3000) — спершу в борг (1000), решта 2000 — у відшкодування.
+        august = decl.d2_line_ids.filtered(lambda l: l.origin_month == 8)
+        self.assertEqual((august.debt_amount, august.refund_amount, august.carry_amount),
+                         (1000.0, 2000.0, 0.0))
+        self.assertEqual(sum(decl.d2_line_ids.mapped('refund_amount')), 4500)
+        decl.action_generate_xml()
+        main = etree.fromstring(base64.b64decode(decl.xml_file))
+        d2 = etree.fromstring(base64.b64decode(decl.d2_xml_file))
+        _schema('J0200126.xsd').assertValid(main)
+        _schema('J0215226.xsd').assertValid(d2)
+        body = main.find('DECLARBODY')
+        self.assertEqual([body.findtext(t) for t in ('R201GB', 'R202GB', 'R2021GB', 'R2022GB',
+                                                      'R203GB', 'R210GB')],
+                         ['1000', '4500', '4000', '500', '11300', '11300'])
+        d2body = d2.find('DECLARBODY')
+        self.assertEqual([d2body.findtext(t) for t in ('R01G8', 'R01G9', 'R01G10', 'R02G3')],
+                         ['1000', '4500', '11300', '15800'])
+
+    def test_refund_over_row_20_is_refused(self):
+        self._add_received(self.supplier2, 3, 25000.0)
+        decl = self._declaration()
+        decl.vat_limit_amount = 100000
+        decl.line_20_2_1_vat = decl.line_20_vat + 1
+        with self.assertRaisesRegex(UserError, '20.1 \\+ 20.2'):
+            decl.action_generate_xml()
+
+    def test_fop_declaration_uses_f_forms(self):
+        self.company.write({'vat': '3123456789'})
+        with patch.object(type(self.env['l10n_ua.vat.declaration']), '_is_fop_declaration',
+                          return_value=True):
+            self._add_received(self.supplier2, 3, 25000.0)
+            decl = self._declaration()
+            decl.vat_limit_amount = 100000
+            decl.action_generate_xml()
+            main = etree.fromstring(base64.b64decode(decl.xml_file))
+            _schema('F0200126.xsd').assertValid(main)
+            _schema('F0200426.xsd').assertValid(
+                etree.fromstring(base64.b64decode(decl.d1_xml_file)))
+            _schema('F0215226.xsd').assertValid(
+                etree.fromstring(base64.b64decode(decl.d2_xml_file)))
+        self.assertEqual(main.findtext('DECLARHEAD/TIN'), '3123456789')
+        self.assertEqual(main.findtext('DECLARBODY/HTIN'), '3123456789')
+        self.assertTrue(decl.xml_filename.startswith('26503123456789F0200126'))
+        self.assertIn('F0200426', decl.d1_xml_filename)
+
+    def test_quarter_period_is_refused(self):
+        quarter = self.env['l10n_ua.tax.period'].create({
+            'name': 'III кв. 2026', 'date_start': date(2026, 7, 1),
+            'date_end': date(2026, 9, 30), 'period_type': 'quarter', 'quarter': 3,
+            'year': 2026, 'company_id': self.company.id,
+        })
+        decl = self.env['l10n_ua.vat.declaration'].create({
+            'period_id': quarter.id, 'company_id': self.company.id,
+            'signatory_name': 'Іван ПЕТРЕНКО', 'signatory_rnokpp': '1234567890'})
+        with self.assertRaisesRegex(UserError, 'календарний місяць'):
+            decl.action_generate_xml()

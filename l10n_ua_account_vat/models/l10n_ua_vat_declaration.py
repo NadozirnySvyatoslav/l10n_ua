@@ -290,6 +290,29 @@ class L10nUaVatDeclaration(models.Model):
         store=True,
         currency_field='currency_id',
     )
+    line_20_1_vat = fields.Monetary(
+        string='р.20.1 У зменшення податкового боргу з ПДВ',
+        currency_field='currency_id',
+        help='Частина рядка 20, що зараховується у погашення податкового боргу з ПДВ '
+             '(Д2, графа 8)',
+    )
+    line_20_2_1_vat = fields.Monetary(
+        string='р.20.2.1 Відшкодування на рахунок у банку',
+        currency_field='currency_id',
+        help='Бюджетне відшкодування на рахунок платника (Д2 графа 9, Д3 підпункт «а»)',
+    )
+    line_20_2_2_vat = fields.Monetary(
+        string='р.20.2.2 Відшкодування в рахунок інших платежів',
+        currency_field='currency_id',
+        help='Бюджетне відшкодування в рахунок сплати інших платежів до держбюджету '
+             '(Д3, таблиця 1)',
+    )
+    line_20_2_vat = fields.Monetary(
+        string='р.20.2 Бюджетне відшкодування',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id',
+    )
     line_20_3_vat = fields.Monetary(
         string='р.20.3 Залишок (р.20 − 20.1 − 20.2)',
         compute='_compute_totals',
@@ -357,6 +380,7 @@ class L10nUaVatDeclaration(models.Model):
         'line_10_1_vat', 'line_10_2_vat', 'line_10_3_vat',
         'line_11_1_vat', 'line_11_2_vat', 'line_11_3_vat',
         'line_14_vat', 'line_15_vat', 'line_16_1_vat', 'vat_limit_amount',
+        'line_20_1_vat', 'line_20_2_1_vat', 'line_20_2_2_vat',
     )
     def _compute_totals(self):
         for rec in self:
@@ -374,13 +398,14 @@ class L10nUaVatDeclaration(models.Model):
             diff = rec.line_9_vat - rec.line_17_vat
             rec.line_18_vat = max(diff, 0.0)
             rec.line_19_vat = max(-diff, 0.0)
-            # 19.1 — перевищення над Σнакл, 20 — у межах. Без погашення боргу (20.1)
-            # і відшкодування (20.2): 20.3 = 20, а 21 = 19.1 + 20.3 = 19.
+            # 19.1 — перевищення над Σнакл, 20 — у межах; з рядка 20 — погашення
+            # боргу (20.1) і відшкодування (20.2), решта (20.3) разом з 19.1 → 21.
             limit = max(rec.vat_limit_amount or 0.0, 0.0)
             rec.line_19_1_vat = float_round(max(rec.line_19_vat - limit, 0.0),
                                             precision_digits=0)
             rec.line_20_vat = rec.line_19_vat - rec.line_19_1_vat
-            rec.line_20_3_vat = rec.line_20_vat
+            rec.line_20_2_vat = (rec.line_20_2_1_vat or 0.0) + (rec.line_20_2_2_vat or 0.0)
+            rec.line_20_3_vat = rec.line_20_vat - (rec.line_20_1_vat or 0.0) - rec.line_20_2_vat
             rec.line_21_vat = rec.line_19_1_vat + rec.line_20_3_vat
 
     # =====================================================
