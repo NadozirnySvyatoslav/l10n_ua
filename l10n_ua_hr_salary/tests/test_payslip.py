@@ -1251,6 +1251,21 @@ class TestPayslipEsvMinimumExemptions(TestPayslip):
         self.assertEqual(payslip.esv_base, 5000)
         self.assertAlmostEqual(payslip.esv_amount, 420.5, places=2)
 
+    def test_parent_of_disabled_child_is_not_a_disabled_employee(self):
+        """Пільга DISABLED_CHILD (укр. назва містить «інвалід») не знижує ставку ЄСВ."""
+        benefit = self.env.ref('l10n_ua_hr_base.benefit_disabled_child')
+        benefit.name = 'Батько дитини з інвалідністю'
+        self.employee.benefit_ids = [(4, benefit.id)]
+        payslip = self._create_payslip_with_accrual(5000)
+        self.assertFalse(payslip.is_disability)
+        self.assertEqual(payslip.esv_base, self.psp_params.min_wage)
+
+    def test_disability_group_on_employee_card_counts(self):
+        self.employee.disability_group = '3'
+        payslip = self._create_payslip_with_accrual(5000)
+        self.assertTrue(payslip.is_disability)
+        self.assertEqual(payslip.esv_base, 5000)
+
     def test_external_secondary_job_keeps_the_ceiling(self):
         self.version.employment_type_ua = 'external'
         payslip = self._create_payslip_with_accrual(200000)

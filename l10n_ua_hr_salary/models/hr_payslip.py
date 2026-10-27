@@ -301,7 +301,7 @@ class HrPayslip(models.Model):
             payslip.department_id = payslip.employee_id.department_id
             payslip.job_id = payslip.employee_id.job_id
 
-    @api.depends('employee_id')
+    @api.depends('employee_id', 'employee_id.disability_group', 'employee_id.benefit_ids')
     def _compute_employee_benefits(self):
         """Compute employee benefit flags for special tax regimes"""
         for payslip in self:
@@ -311,14 +311,13 @@ class HrPayslip(models.Model):
             is_diia_city = False
 
             if payslip.employee_id:
-                # Check for disability benefits
-                if payslip.employee_id.benefit_ids:
-                    for benefit in payslip.employee_id.benefit_ids:
-                        code_lower = (benefit.code or '').lower()
-                        name_lower = (benefit.name or '').lower()
-                        if 'disability' in code_lower or 'інвалід' in name_lower:
-                            is_disability = True
-                            break
+                # Інвалідність самого працівника (ЄСВ 8,41 %, ч. 13 ст. 8 Закону № 2464-VI):
+                # група в картці або пільга DISABILITY_*. Не за назвою: «Батько дитини з
+                # інвалідністю» (DISABLED_CHILD) теж містить «інвалід», але ставки не знижує.
+                employee = payslip.employee_id
+                is_disability = employee.disability_group in ('1', '2', '3') or any(
+                    (benefit.code or '').upper().startswith('DISABILITY')
+                    for benefit in employee.benefit_ids)
 
                 # Check for Diia.City status from contract version
                 version = payslip.version_id or payslip.employee_id.current_version_id
