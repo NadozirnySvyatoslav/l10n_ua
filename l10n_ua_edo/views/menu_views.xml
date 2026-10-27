@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_edo_root" name="EDO" sequence="60" web_icon="l10n_ua_edo,static/description/icon.png"/>
+    <menuitem id="menu_edo_incoming" name="Incoming" parent="menu_edo_root" action="action_edo_document_in" sequence="10"/>
+    <menuitem id="menu_edo_outgoing" name="Outgoing" parent="menu_edo_root" action="action_edo_document_out" sequence="20"/>
+    <menuitem id="menu_edo_config" name="Configuration" parent="menu_edo_root" sequence="90" groups="base.group_system"/>
+    <menuitem id="menu_edo_accounts" name="Accounts" parent="menu_edo_config" action="action_edo_account" sequence="10"/>
+</odoo>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_edo_document_form" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.document.form</field>
+        <field name="model">l10n_ua.edo.document</field>
+        <field name="arch" type="xml">
+            <form string="EDO Document" create="0">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh Status" invisible="not provider_ref"/>
+                    <button name="action_open_in_service" type="object" string="Open in the Service"
+                            class="btn-primary" invisible="not url"/>
+                    <button name="action_download_archive" type="object" string="Download with Signatures"
+                            invisible="state != 'signed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="uploaded,sent,signed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_record" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="not res_id">
+                            <span>Odoo Document</span>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="direction"/>
+                            <field name="number"/>
+                            <field name="date"/>
+                            <field name="amount"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="counterparty_edrpou"/>
+                            <field name="counterparty_name"/>
+                            <field name="account_id"/>
+                            <field name="provider_status"/>
+                            <field name="last_sync"/>
+                            <field name="provider_ref" groups="base.group_no_one"/>
+                            <field name="provider" invisible="1"/>
+                            <field name="res_model" invisible="1"/>
+                            <field name="res_id" invisible="1"/>
+                            <field name="url" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Files">
+                        <field name="attachment_id"/>
+                        <field name="archive_attachment_id"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_edo_document_list" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.document.list</field>
+        <field name="model">l10n_ua.edo.document</field>
+        <field name="arch" type="xml">
+            <list string="EDO Documents" create="0"
+                  decoration-success="state == 'signed'" decoration-danger="state == 'rejected'"
+                  decoration-muted="state == 'deleted'">
+                <field name="date"/>
+                <field name="direction"/>
+                <field name="name"/>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="counterparty_edrpou" optional="hide"/>
+                <field name="amount" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'signed'" decoration-info="state in ('sent', 'signing', 'signed_owner')"
+                       decoration-danger="state == 'rejected'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_edo_document_search" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.document.search</field>
+        <field name="model">l10n_ua.edo.document</field>
+        <field name="arch" type="xml">
+            <search string="EDO Documents">
+                <field name="name"/>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="counterparty_edrpou"/>
+                <filter string="Incoming" name="filter_in" domain="[('direction', '=', 'in')]"/>
+                <filter string="Outgoing" name="filter_out" domain="[('direction', '=', 'out')]"/>
+                <separator/>
+                <filter string="Awaiting Signature" name="filter_open"
+                        domain="[('state', 'in', ('uploaded', 'sent', 'signing', 'signed_owner'))]"/>
+                <filter string="Signed by All" name="filter_signed" domain="[('state', '=', 'signed')]"/>
+                <filter string="Rejected" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <group>
+                    <filter string="Counterparty" name="groupby_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Status" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_edo_document_in" model="ir.actions.act_window">
+        <field name="name">Incoming</field>
+        <field name="res_model">l10n_ua.edo.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('direction', '=', 'in')]</field>
+        <field name="context">{'default_direction': 'in'}</field>
+    </record>
+
+    <record id="action_edo_document_out" model="ir.actions.act_window">
+        <field name="name">Outgoing</field>
+        <field name="res_model">l10n_ua.edo.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('direction', '=', 'out')]</field>
+    </record>
+</odoo>

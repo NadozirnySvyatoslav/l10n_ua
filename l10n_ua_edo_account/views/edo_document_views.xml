@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_edo_document_form_account" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.document.form.account</field>
+        <field name="model">l10n_ua.edo.document</field>
+        <field name="inherit_id" ref="l10n_ua_edo.view_edo_document_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_refresh']" position="before">
+                <button name="action_create_vendor_bill" type="object" string="Create Vendor Bill"
+                        class="btn-primary" invisible="direction != 'in' or res_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

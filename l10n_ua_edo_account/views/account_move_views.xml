@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_edo" model="ir.ui.view">
+        <field name="name">account.move.form.edo</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_edo_send" type="object" string="Send to EDO"
+                        invisible="state != 'posted' or move_type == 'entry'"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_edo_documents" type="object" class="oe_stat_button"
+                        icon="fa-exchange" invisible="not edo_document_count">
+                    <div class="o_stat_info">
+                        <field name="edo_state" class="o_stat_value"/>
+                        <span class="o_stat_text">EDO</span>
+                    </div>
+                    <field name="edo_document_count" invisible="1"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

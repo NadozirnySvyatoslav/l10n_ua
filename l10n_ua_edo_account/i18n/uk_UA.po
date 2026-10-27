@@ -1,0 +1,74 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_edo_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_account.view_move_form_edo
+msgid "<span class=\"o_stat_text\">EDO</span>"
+msgstr "<span class=\"o_stat_text\">ЕДО</span>"
+
+#. module: l10n_ua_edo_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_account.view_edo_document_form_account
+msgid "Create Vendor Bill"
+msgstr "Створити рахунок постачальника"
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid "Created from the EDO document «%s»."
+msgstr "Створено з документа ЕДО «%s»."
+
+#. module: l10n_ua_edo_account
+#: model:ir.model.fields,field_description:l10n_ua_edo_account.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo_account.field_l10n_ua_edo_document__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_edo_account
+#: model:ir.model,name:l10n_ua_edo_account.model_l10n_ua_edo_document
+msgid "EDO Document"
+msgstr "Документ ЕДО"
+
+#. module: l10n_ua_edo_account
+#: model:ir.model.fields,field_description:l10n_ua_edo_account.field_account_move__edo_document_ids
+msgid "EDO Documents"
+msgstr "Документи ЕДО"
+
+#. module: l10n_ua_edo_account
+#: model:ir.model.fields,field_description:l10n_ua_edo_account.field_account_move__edo_document_count
+msgid "EDO Documents Count"
+msgstr "Кількість документів ЕДО"
+
+#. module: l10n_ua_edo_account
+#: model:ir.model.fields,field_description:l10n_ua_edo_account.field_account_move__edo_state
+msgid "EDO Status"
+msgstr "Статус ЕДО"
+
+#. module: l10n_ua_edo_account
+#: model:ir.model,name:l10n_ua_edo_account.model_account_move
+msgid "Journal Entry"
+msgstr "Проводка"
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid "Only an incoming document becomes a vendor bill."
+msgstr "Рахунком постачальника може стати лише вхідний документ."
+
+#. module: l10n_ua_edo_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_account.view_move_form_edo
+msgid "Send to EDO"
+msgstr "Надіслати у ЕДО"
+
+#. module: l10n_ua_edo_account
+#. odoo-python
+#: code:addons/l10n_ua_edo_account/models/edo_document.py:0
+msgid ""
+"Set the counterparty of the document first (it was not found by ЄДРПОУ %s)."
+msgstr "Спершу вкажіть контрагента документа (за ЄДРПОУ %s його не знайдено)."

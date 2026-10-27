@@ -1,0 +1,723 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "<span>Odoo Document</span>"
+msgstr "<span>Документ Odoo</span>"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "<strong>Last synchronisation failed:</strong>"
+msgstr "<strong>Остання синхронізація не вдалася:</strong>"
+
+#. module: l10n_ua_edo
+#: model:ir.model.constraint,message:l10n_ua_edo.constraint_l10n_ua_edo_document_provider_ref_uniq
+msgid "A document of the service is linked only once per EDO account."
+msgstr ""
+"Документ сервісу прив'язується до облікового запису ЕДО лише один раз."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__token
+msgid "API Token"
+msgstr "Токен API"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__account_id
+msgid "Account"
+msgstr "Обліковий запис"
+
+#. module: l10n_ua_edo
+#: model:ir.ui.menu,name:l10n_ua_edo.menu_edo_accounts
+msgid "Accounts"
+msgstr "Облікові записи"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_needaction
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_needaction
+msgid "Action Needed"
+msgstr "Потрібна дія"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__active
+msgid "Active"
+msgstr "Активний"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__amount
+msgid "Amount"
+msgstr "Сума"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__archive_attachment_id
+msgid "Archive with Signatures"
+msgstr "Архів із підписами"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Archived"
+msgstr "Архівовано"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_attachment_count
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_attachment_count
+msgid "Attachment Count"
+msgstr "Кількість вкладень"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Awaiting Signature"
+msgstr "Очікують підпису"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__signing
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__signing
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__signing
+msgid "Being Signed"
+msgstr "Підписується"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_send_wizard_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__category
+msgid "Category"
+msgstr "Категорія"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+msgid "Choose the service of EDO account %s."
+msgstr "Оберіть сервіс облікового запису ЕДО %s."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__edrpou
+msgid "Code of the company in the service: documents are sent on its behalf."
+msgstr "Код компанії в сервісі: документи надсилаються від її імені."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__recipient_emails
+msgid "Comma-separated; used when the recipient is not in the service yet."
+msgstr "Через кому; потрібні, коли отримувача ще немає в сервісі."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__company_id
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__company_id
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__company_id
+msgid "Company"
+msgstr "Компанія"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+msgid ""
+"Company %(company)s has no EDO account. Add one in EDO → Configuration → "
+"Accounts."
+msgstr ""
+"Компанія %(company)s не має облікового запису ЕДО. Додайте його в ЕДО → "
+"Налаштування → Облікові записи."
+
+#. module: l10n_ua_edo
+#: model:ir.ui.menu,name:l10n_ua_edo.menu_edo_config
+msgid "Configuration"
+msgstr "Налаштування"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.actions.act_window,help:l10n_ua_edo.action_edo_account
+msgid "Connect an EDO service"
+msgstr "Підключіть сервіс ЕДО"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+msgid "Connection works"
+msgstr "З'єднання працює"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__partner_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Counterparty"
+msgstr "Контрагент"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__counterparty_name
+msgid "Counterparty Name"
+msgstr "Назва контрагента"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__counterparty_edrpou
+msgid "Counterparty ЄДРПОУ"
+msgstr "ЄДРПОУ контрагента"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__create_uid
+msgid "Created by"
+msgstr "Створив"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__create_date
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__create_date
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__create_date
+msgid "Created on"
+msgstr "Створено"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Date"
+msgstr "Дата"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__deleted
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__deleted
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__deleted
+msgid "Deleted"
+msgstr "Видалено"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__direction
+msgid "Direction"
+msgstr "Напрямок"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_mixin__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__document_ids
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__report_id
+msgid "Document"
+msgstr "Документ"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__document_count
+msgid "Document Count"
+msgstr "Кількість документів"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__res_id
+msgid "Document ID"
+msgstr "ID документа"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__res_model
+msgid "Document Model"
+msgstr "Модель документа"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Documents"
+msgstr "Документи"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "Download with Signatures"
+msgstr "Завантажити з підписами"
+
+#. module: l10n_ua_edo
+#: model:ir.model,name:l10n_ua_edo.model_l10n_ua_edo_account
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__account_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "EDO Account"
+msgstr "Обліковий запис ЕДО"
+
+#. module: l10n_ua_edo
+#: model:ir.actions.act_window,name:l10n_ua_edo.action_edo_account
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_list
+msgid "EDO Accounts"
+msgstr "Облікові записи ЕДО"
+
+#. module: l10n_ua_edo
+#: model:ir.model,name:l10n_ua_edo.model_l10n_ua_edo_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "EDO Document"
+msgstr "Документ ЕДО"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_mixin__edo_document_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "EDO Documents"
+msgstr "Документи ЕДО"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_mixin__edo_document_count
+msgid "EDO Documents Count"
+msgstr "Кількість документів ЕДО"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_mixin__edo_state
+msgid "EDO Status"
+msgstr "Статус ЕДО"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+msgid "EDO account %s has no API token."
+msgstr "Обліковий запис ЕДО %s не має токена API."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__provider
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__provider
+msgid ""
+"EDO service. Each service is a separate module (Вчасно — "
+"l10n_ua_edo_vchasno)."
+msgstr ""
+"Сервіс ЕДО. Кожен сервіс — окремий модуль (Вчасно — l10n_ua_edo_vchasno)."
+
+#. module: l10n_ua_edo
+#: model:ir.model,name:l10n_ua_edo.model_l10n_ua_edo_mixin
+msgid "EDO: send a document"
+msgstr "ЕДО: надсилання документа"
+
+#. module: l10n_ua_edo
+#: model:ir.actions.server,name:l10n_ua_edo.ir_cron_edo_sync_ir_actions_server
+msgid "EDO: synchronise statuses and incoming documents"
+msgstr "ЕДО: синхронізація статусів і вхідних документів"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+msgid "EDO: «%(title)s» — %(state)s."
+msgstr "ЕДО: «%(title)s» — %(state)s."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "Files"
+msgstr "Файли"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_follower_ids
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_follower_ids
+msgid "Followers"
+msgstr "Підписники"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_partner_ids
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Підписники (партнери)"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+msgid "Give the ЄДРПОУ or the e-mail of the recipient."
+msgstr "Вкажіть ЄДРПОУ або e-mail отримувача."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__has_message
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__has_message
+msgid "Has Message"
+msgstr "Є повідомлення"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__provider_ref
+msgid "ID in the Service"
+msgstr "ID у сервісі"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__message_needaction
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Якщо позначено, нові повідомлення потребують вашої уваги."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__message_has_error
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__message_has_sms_error
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__message_has_error
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__incoming_date_from
+msgid "Import Incoming From"
+msgstr "Імпортувати вхідні з"
+
+#. module: l10n_ua_edo
+#: model:ir.actions.act_window,name:l10n_ua_edo.action_edo_document_in
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__direction__in
+#: model:ir.ui.menu,name:l10n_ua_edo.menu_edo_incoming
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Incoming"
+msgstr "Вхідні"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Incoming document imported from the EDO service."
+msgstr "Вхідний документ імпортовано із сервісу ЕДО."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__incoming_date_from
+msgid "Incoming documents created since this date are imported."
+msgstr "Імпортуються вхідні документи, створені з цієї дати."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.actions.act_window,help:l10n_ua_edo.action_edo_account
+msgid ""
+"Install the module of the service (e.g. Вчасно), then add its API token "
+"here."
+msgstr ""
+"Встановіть модуль сервісу (наприклад, Вчасно), потім додайте тут його токен "
+"API."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_is_follower
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_is_follower
+msgid "Is Follower"
+msgstr "Підписник"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__last_error
+msgid "Last Error"
+msgstr "Остання помилка"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__last_sync
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__last_sync
+msgid "Last Sync"
+msgstr "Остання синхронізація"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Востаннє оновив"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__write_date
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__write_date
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__write_date
+msgid "Last Updated on"
+msgstr "Востаннє оновлено"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__url
+msgid "Link"
+msgstr "Посилання"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_has_error
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_has_error
+msgid "Message Delivery error"
+msgstr "Помилка доставки повідомлення"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_ids
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_ids
+msgid "Messages"
+msgstr "Повідомлення"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__name
+msgid "Name"
+msgstr "Назва"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__draft
+msgid "Not Sent"
+msgstr "Не надіслано"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__number
+msgid "Number"
+msgstr "Номер"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_needaction_counter
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Кількість дій"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_has_error_counter
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_has_error_counter
+msgid "Number of errors"
+msgstr "Кількість помилок"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__message_needaction_counter
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Кількість повідомлень, що потребують дії"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__message_has_error_counter
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__send_now
+msgid ""
+"Off: the document is uploaded and waits for your signature in the service, "
+"where you sign and send it. On: it goes to the recipient right away, who "
+"signs it first."
+msgstr ""
+"Вимкнено: документ завантажується й чекає вашого підпису в сервісі, де ви "
+"його підписуєте й надсилаєте. Увімкнено: документ одразу йде отримувачу, "
+"який підписує першим."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "Open in the Service"
+msgstr "Відкрити в сервісі"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__attachment_id
+msgid "Original"
+msgstr "Оригінал"
+
+#. module: l10n_ua_edo
+#: model:ir.actions.act_window,name:l10n_ua_edo.action_edo_document_out
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__direction__out
+#: model:ir.ui.menu,name:l10n_ua_edo.menu_edo_outgoing
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Outgoing"
+msgstr "Вихідні"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__rating_ids
+msgid "Ratings"
+msgstr "Оцінки"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__recipient_emails
+msgid "Recipient E-mails"
+msgstr "E-mail отримувача"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__send_now
+msgid "Recipient Signs First"
+msgstr "Отримувач підписує першим"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__recipient_edrpou
+msgid "Recipient ЄДРПОУ"
+msgstr "ЄДРПОУ отримувача"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "Refresh Status"
+msgstr "Оновити статус"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__rejected
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__rejected
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__rejected
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Rejected"
+msgstr "Відхилено"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__report_model
+msgid "Report Model"
+msgstr "Модель звіту"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__res_model
+msgid "Res Model"
+msgstr "Модель"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Помилка доставки SMS"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_send_wizard_form
+msgid "Send"
+msgstr "Надіслати"
+
+#. module: l10n_ua_edo
+#: model:ir.model,name:l10n_ua_edo.model_l10n_ua_edo_send_wizard
+msgid "Send a Document to EDO"
+msgstr "Надсилання документа в ЕДО"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_send_wizard_form
+msgid "Send to EDO"
+msgstr "Надіслати у ЕДО"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__sent
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__sent
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__sent
+msgid "Sent for Signature"
+msgstr "Надіслано на підпис"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+msgid "Sent to EDO: «%s»."
+msgstr "Надіслано у ЕДО: «%s»."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__provider
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__provider
+msgid "Service"
+msgstr "Сервіс"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+msgid "Service %(provider)s does not support «%(operation)s»."
+msgstr "Сервіс %(provider)s не підтримує «%(operation)s»."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__signed
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__signed
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__signed
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Signed by All"
+msgstr "Підписано всіма"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__signed_owner
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__signed_owner
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__signed_owner
+msgid "Signed by Sender"
+msgstr "Підписано відправником"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__state
+msgid "State"
+msgstr "Стан"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_search
+msgid "Status"
+msgstr "Статус"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__provider_status
+msgid "Status in the Service"
+msgstr "Статус у сервісі"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Synchronise Now"
+msgstr "Синхронізувати зараз"
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_account_form
+msgid "Test Connection"
+msgstr "Перевірити з'єднання"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "The document is not in the EDO service yet."
+msgstr "Документа ще немає в сервісі ЕДО."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "The document is not linked to a record in Odoo."
+msgstr "Документ не пов'язаний із записом в Odoo."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_send_wizard_form
+msgid ""
+"The document is signed in the EDO service, no key is kept in Odoo. It is uploaded and\n"
+"                    waits for your signature there; with «Recipient Signs First» it goes to the recipient\n"
+"                    right away."
+msgstr ""
+"Документ підписується в сервісі ЕДО, ключ в Odoo не зберігається. Його "
+"завантажують, і він чекає вашого підпису там; з «Отримувач підписує першим» "
+"він одразу йде отримувачу."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/wizard/edo_send_wizard.py:0
+msgid "The document no longer exists."
+msgstr "Документа вже не існує."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "The service gave no link to this document."
+msgstr "Сервіс не дав посилання на цей документ."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__name
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__title
+msgid "Title"
+msgstr "Назва"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__token
+msgid "Token issued in the settings of the service. Kept only on the server."
+msgstr "Токен із налаштувань сервісу. Зберігається лише на сервері."
+
+#. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_list
+msgid "Total"
+msgstr "Разом"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__account_move__edo_state__uploaded
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_document__state__uploaded
+#: model:ir.model.fields.selection,name:l10n_ua_edo.selection__l10n_ua_edo_mixin__edo_state__uploaded
+msgid "Uploaded"
+msgstr "Завантажено"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__website_message_ids
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_document__website_message_ids
+msgid "Website Messages"
+msgstr "Повідомлення сайту"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__website_message_ids
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_document__website_message_ids
+msgid "Website communication history"
+msgstr "Історія спілкування на сайті"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_account.py:0
+msgid "account_id"
+msgstr "account_id"
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_mixin.py:0
+msgid "res_model"
+msgstr "res_model"
+
+#. module: l10n_ua_edo
+#: model:ir.ui.menu,name:l10n_ua_edo.menu_edo_root
+msgid "EDO"
+msgstr "ЕДО"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__edrpou
+msgid "ЄДРПОУ"
+msgstr "ЄДРПОУ"

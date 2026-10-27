@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_edo_send_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.send.wizard.form</field>
+        <field name="model">l10n_ua.edo.send.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send to EDO">
+                <group>
+                    <group>
+                        <field name="res_model" invisible="1"/>
+                        <field name="res_id" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="report_model" invisible="1"/>
+                        <field name="account_id"/>
+                        <field name="report_id"/>
+                        <field name="title"/>
+                    </group>
+                    <group>
+                        <field name="recipient_edrpou"/>
+                        <field name="recipient_emails"/>
+                        <field name="send_now"/>
+                    </group>
+                </group>
+                <div class="text-muted small">
+                    The document is signed in the EDO service, no key is kept in Odoo. It is uploaded and
+                    waits for your signature there; with «Recipient Signs First» it goes to the recipient
+                    right away.
+                </div>
+                <footer>
+                    <button name="action_send" type="object" string="Send" class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
