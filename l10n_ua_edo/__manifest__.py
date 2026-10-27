@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Electronic Document Exchange (EDO)',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.1.1',
     'category': 'Accounting/Localization',
     'summary': 'Обмін первинними документами через сервіси ЕДО (Вчасно, …): '
                'надсилання на підпис, статуси, вхідні документи',
