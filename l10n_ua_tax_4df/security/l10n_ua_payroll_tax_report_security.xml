@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="l10n_ua_payroll_tax_report_company_rule" model="ir.rule">
+        <field name="name">Податковий розрахунок: мультикомпанія</field>
+        <field name="model_id" ref="model_l10n_ua_payroll_tax_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="l10n_ua_payroll_tax_report_d4_line_company_rule" model="ir.rule">
+        <field name="name">Податковий розрахунок, рядок Д4: мультикомпанія</field>
+        <field name="model_id" ref="model_l10n_ua_payroll_tax_report_d4_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

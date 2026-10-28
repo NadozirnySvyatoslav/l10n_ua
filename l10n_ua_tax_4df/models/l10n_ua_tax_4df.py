@@ -433,7 +433,8 @@ class L10nUaTax4DF(models.Model):
             rows = []
             for i, p in enumerate(persons, 1):
                 val = p.get(key)
-                if val in (None, ''):
+                # False — порожнє поле Odoo (дата без значення), не «0».
+                if val is None or val is False or val == '':
                     continue
                 rows.append('        <%s ROWNUM="%d">%s</%s>' % (
                     tag, i, fmt(val), tag))
@@ -468,6 +469,9 @@ class L10nUaTax4DF(models.Model):
         else:
             period = f"        <HZM>{vals['hzm']}</HZM>"
 
+        # Пакет Податкового розрахунку: посилання на головну форму J/F0500111.
+        linked = ('\n        ' + vals['linked_xml']) if vals.get('linked_xml') else ''
+
         xml = f'''<?xml version="1.0" encoding="windows-1251"?>
 <DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="{vals['prefix'][0]}0510411.xsd">
     <DECLARHEAD>
@@ -483,7 +487,7 @@ class L10nUaTax4DF(models.Model):
         <PERIOD_TYPE>{vals['period_type']}</PERIOD_TYPE>
         <PERIOD_YEAR>{vals['period_year']}</PERIOD_YEAR>
         <C_STI_ORIG>{esc(vals['c_sti_orig'])}</C_STI_ORIG>
-        <C_DOC_STAN>{vals['doc_stan']}</C_DOC_STAN>
+        <C_DOC_STAN>{vals['doc_stan']}</C_DOC_STAN>{linked}
         <D_FILL>{vals['d_fill']}</D_FILL>
         <SOFTWARE>{D4_SOFTWARE}</SOFTWARE>
     </DECLARHEAD>
