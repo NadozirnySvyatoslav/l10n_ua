@@ -16,3 +16,4 @@ from . import l10n_ua_aging_report
 from . import l10n_ua_tax_period
 from . import l10n_ua_debt_netting
 from . import l10n_ua_deferral
+from . import l10n_ua_trade_markup

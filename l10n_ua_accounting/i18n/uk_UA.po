@@ -7055,3 +7055,228 @@ msgstr "Кінець року"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report__date_from
 msgid "Year Start"
 msgstr "Початок року"
+
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__goods_account_id
+msgid "Account 282 «Товари в торгівлі», kept at retail (sale) prices."
+msgstr "Рахунок 282 «Товари в торгівлі», що ведеться за продажними (роздрібними) цінами."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__markup_account_id
+msgid "Account 285 «Торгова націнка»."
+msgstr "Рахунок 285 «Торгова націнка»."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_trade_markup_view_form
+msgid "Average Markup (NP(S)BO 9, item 22)"
+msgstr "Середній відсоток націнки (НП(С)БО 9, п. 22)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__markup_percent
+msgid "Average Markup, %"
+msgstr "Середня націнка, %"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_trade_markup_view_form
+msgid "Cancel this write-off? Its journal entry will be reversed."
+msgstr "Скасувати списання? Його проводку буде сторновано."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_trade_markup_view_form
+msgid "Compute"
+msgstr "Розрахувати"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__opening_markup
+msgid "Credit balance of 285 at the start of the period."
+msgstr "Кредитове сальдо 285 на початок періоду."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__disposed_retail
+msgid "Credit turnover of 282 in the period: sales, returns, shortages."
+msgstr "Кредитовий оборот 282 за період: продаж, повернення, нестачі."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__received_markup
+msgid "Credit turnover of 285 in the period."
+msgstr "Кредитовий оборот 285 за період."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__opening_retail
+msgid "Debit balance of 282 at the start of the period."
+msgstr "Дебетове сальдо 282 на початок періоду."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__received_retail
+msgid "Debit turnover of 282 in the period."
+msgstr "Дебетовий оборот 282 за період."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__default_account_id
+msgid "Default Disposal Account"
+msgstr "Рахунок вибуття за замовчуванням"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup_line__account_id
+msgid "Disposal Account"
+msgstr "Рахунок вибуття"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__disposed_retail
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup_line__retail_amount
+msgid "Disposed at Retail Value"
+msgstr "Вибуло за продажною вартістю"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__line_ids
+msgid "Distribution"
+msgstr "Розподіл"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__date_from
+msgid "From"
+msgstr "З"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__goods_account_id
+msgid "Goods at Retail Value"
+msgstr "Товари за продажною вартістю"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup_line__markup_amount
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup_line__markup_id
+msgid "Markup"
+msgstr "Націнка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__received_markup
+msgid "Markup on Receipts"
+msgstr "Націнка на надходження"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__markup_amount
+msgid "Markup to Write Off"
+msgstr "Націнка до списання"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "New"
+msgstr "Новий"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Only a draft write-off can be computed."
+msgstr "Розрахувати можна лише чернетку списання."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Only a draft write-off can be posted."
+msgstr "Провести можна лише чернетку списання."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__opening_markup
+msgid "Opening Markup"
+msgstr "Націнка на залишок на початок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__opening_retail
+msgid "Opening Retail Value"
+msgstr "Залишок за продажною вартістю на початок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__received_retail
+msgid "Received at Retail Value"
+msgstr "Надійшло за продажною вартістю"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_trade_markup_action
+msgid ""
+"Retail at sale prices (accounts 282 and 285): the markup on goods\n"
+"               sold or otherwise disposed of is written off at the average markup\n"
+"               percent of the month (NP(S)BO 9, item 22). The period closing does\n"
+"               this automatically."
+msgstr "Облік за продажними цінами (рахунки 282 і 285): націнка на продані\n               та інакше вибулі товари списується за середнім відсотком націнки\n               місяця (НП(С)БО 9, п. 22). Закриття періоду робить це автоматично."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Reversal: %s"
+msgstr "Сторно: %s"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid ""
+"Set the accounts of goods at retail value (282), trade markup (285) and the "
+"default disposal account (902)."
+msgstr "Вкажіть рахунки товарів за продажною вартістю (282), торгової націнки (285) і рахунок вибуття за замовчуванням (902)."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__closing_id
+msgid "The period closing that posted this write-off."
+msgstr "Закриття періоду, яке провело це списання."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__date_to
+msgid "To"
+msgstr "По"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_trade_markup__markup_account_id
+msgid "Trade Markup"
+msgstr "Торгова націнка"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.l10n_ua_trade_markup_action
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_trade_markup
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_trade_markup
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_trade_markup_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_trade_markup_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_trade_markup_view_search
+msgid "Trade Markup Write-off"
+msgstr "Списання торгової націнки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_trade_markup_line
+msgid "Trade Markup Write-off Line"
+msgstr "Рядок списання торгової націнки"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Trade markup %s"
+msgstr "Торгова націнка %s"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Trade markup is already written off for this period: %s."
+msgstr "Торгову націнку за цей період уже списано: %s."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Trade markup on disposed goods"
+msgstr "Торгова націнка на вибулі товари"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+msgid "Trade markup write-off, average %s %%"
+msgstr "Списання торгової націнки, середній %s %%"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_trade_markup__default_account_id
+msgid ""
+"Used when the entry that credits 282 has no other debit line (normally 902 "
+"«Собівартість реалізованих товарів»)."
+msgstr "Застосовується, коли в проводці, що кредитує 282, немає іншого дебетового рядка (зазвичай 902 «Собівартість реалізованих товарів»)."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_trade_markup_action
+msgid "Write off the trade markup of a month"
+msgstr "Списати торгову націнку місяця"
