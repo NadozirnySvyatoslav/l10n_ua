@@ -125,9 +125,11 @@ class TestErpnRegister(TransactionCase):
         self.assertEqual(args[0], 'ENVELOPE==')
         self.assertEqual(args[2], 'AUTHSIG==')
         self.assertTrue(args[1].endswith('.xml'))
-        self.assertEqual(inv.state, 'registered')
+        # Квитанція № 1 — лише «прийнято в обробку», не реєстрація.
+        self.assertEqual(inv.state, 'submitted')
         self.assertIn('прийнято', inv.erpn_receipt)
-        self.assertTrue(inv.erpn_date)
+        self.assertTrue(inv.erpn_submitted_date)
+        self.assertFalse(inv.erpn_date)
         self.assertEqual(res['receipt'], 'Квитанція №1: прийнято')
 
     def test_submit_signed_failure_keeps_draft(self):
@@ -151,6 +153,60 @@ class TestErpnRegister(TransactionCase):
         inv = self._invoice()
         with self.assertRaises(UserError):
             inv.kep_submit_signed({}, 'AUTHSIG==')  # немає підпису 'doc'
+
+    # --- Рішення ЄРПН (квитанція № 2) ---
+
+    def _submitted(self):
+        self._config()
+        inv = self._invoice()
+        with patch(CONFIG_PATH + '._api_submit_document_presigned',
+                   return_value={'message': 'прийнято'}):
+            inv.kep_submit_signed({'doc': 'ENVELOPE=='}, 'AUTHSIG==')
+        self.assertEqual(inv.state, 'submitted')
+        return inv
+
+    def test_submitted_is_not_resubmittable(self):
+        inv = self._submitted()
+        with self.assertRaises(UserError):
+            inv.action_register_erpn()
+
+    def test_registered_needs_erpn_number(self):
+        inv = self._submitted()
+        with self.assertRaises(UserError):
+            inv.action_erpn_registered()
+        self.assertEqual(inv.state, 'submitted')
+        inv.erpn_number = '9001234567'
+        inv.action_erpn_registered()
+        self.assertEqual(inv.state, 'registered')
+        self.assertTrue(inv.erpn_date)
+
+    def test_stopped_then_registered_by_commission(self):
+        inv = self._submitted()
+        inv.action_erpn_stopped()
+        self.assertEqual(inv.state, 'stopped')
+        inv.erpn_number = '9001234568'
+        inv.action_erpn_registered()
+        self.assertEqual(inv.state, 'registered')
+
+    def test_rejected_back_to_draft_and_resubmit(self):
+        inv = self._submitted()
+        inv.action_erpn_rejected()
+        self.assertEqual(inv.state, 'rejected')
+        with self.assertRaises(UserError):
+            inv.action_erpn_registered()
+        inv.action_draft()
+        self.assertEqual(inv.state, 'draft')
+        action = inv.action_register_erpn()
+        self.assertEqual(action['tag'], 'l10n_ua_sign.kep_sign')
+
+    def test_decision_buttons_need_submission(self):
+        self._config()
+        inv = self._invoice()
+        for method in ('action_erpn_registered', 'action_erpn_stopped',
+                       'action_erpn_rejected'):
+            with self.assertRaises(UserError):
+                getattr(inv, method)()
+        self.assertEqual(inv.state, 'draft')
 
 
 @tagged('post_install', '-at_install')
