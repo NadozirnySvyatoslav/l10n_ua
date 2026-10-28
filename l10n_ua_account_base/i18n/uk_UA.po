@@ -7964,3 +7964,8 @@ msgid ""
 msgstr ""
 "Сума й кількість у записі позабалансового обліку не можуть бути від'ємними: "
 "напрям задає поле «Напрям»."
+
+#. module: l10n_ua_account_base
+#: model:l10n_ua.subconto.type,name:l10n_ua_account_base.subconto_type_product
+msgid "Products"
+msgstr "Номенклатура"

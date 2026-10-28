@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account Base Localization',
-    'version': '19.0.1.3.1',
+    'version': '19.0.1.4.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian localization base module with accounting',
     'description': """
@@ -19,7 +19,9 @@ Foundation module for all Ukrainian localization modules providing:
 * Formatters (dates, money, numbers to words)
 
 Accounting features:
-* Chart of accounts according to P(S)BO (classes 0-9)
+* Chart of accounts according to P(S)BO, Order No. 291 (classes 0-9):
+  completes the stock l10n_ua chart with missing subaccounts, names and
+  analytics (partner / employee / product, currency, quantity)
 * Account extensions (ua_class, ua_subaccount, analytics_type)
 * Document extensions (ua_doc_type, ua_doc_number)
 * Journal orders (Журнали-ордери №1-7)
