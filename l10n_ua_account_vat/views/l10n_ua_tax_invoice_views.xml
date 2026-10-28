@@ -18,9 +18,16 @@
                             invisible="invoice_type != 'received' or received_status != 'expected'"/>
                     <button name="action_mark_erpn_verified" string="Перевірено в ЄРПН" type="object"
                             invisible="invoice_type != 'received' or received_status != 'received'"/>
+                    <button name="action_erpn_registered" string="Зареєстровано (квитанція № 2)"
+                            type="object" class="btn-primary"
+                            invisible="state not in ('submitted', 'stopped')"/>
+                    <button name="action_erpn_stopped" string="Реєстрацію зупинено" type="object"
+                            invisible="state != 'submitted'"/>
+                    <button name="action_erpn_rejected" string="Відмовлено" type="object"
+                            invisible="state not in ('submitted', 'stopped')"/>
                     <button name="action_draft" string="Повернути в чернетку" type="object"
                             invisible="state == 'draft'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,registered"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,registered"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -54,7 +61,9 @@
                             <field name="partner_id"/>
                             <field name="partner_ipn"/>
                             <field name="move_id"/>
-                            <field name="erpn_number"/>
+                            <field name="erpn_number"
+                                   required="state == 'submitted'"/>
+                            <field name="erpn_submitted_date" invisible="not erpn_submitted_date"/>
                             <field name="erpn_date"/>
                             <field name="erpn_receipt" readonly="1"
                                    invisible="not erpn_receipt"/>
@@ -124,7 +133,8 @@
             <list string="Податкові накладні"
                   decoration-muted="state == 'cancelled'"
                   decoration-success="state == 'registered'"
-                  decoration-danger="is_overdue">
+                  decoration-warning="state in ('submitted', 'stopped')"
+                  decoration-danger="is_overdue or state == 'rejected'">
                 <field name="number"/>
                 <field name="date"/>
                 <field name="doc_type"/>
@@ -141,7 +151,8 @@
                 <field name="state" widget="badge"
                        decoration-success="state == 'registered'"
                        decoration-info="state == 'draft'"
-                       decoration-danger="state == 'cancelled'"/>
+                       decoration-warning="state in ('submitted', 'stopped')"
+                       decoration-danger="state in ('cancelled', 'rejected')"/>
             </list>
         </field>
     </record>
@@ -157,7 +168,9 @@
                 <field name="move_id"/>
 
                 <filter string="Чернетка" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Очікує реєстрації" name="filter_submitted" domain="[('state', 'in', ('submitted', 'stopped'))]"/>
                 <filter string="Зареєстровано" name="filter_registered" domain="[('state', '=', 'registered')]"/>
+                <filter string="Відмовлено" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
                 <filter string="Скасовано" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
                 <separator/>
                 <filter string="Видані" name="filter_issued" domain="[('invoice_type', '=', 'issued')]"/>
