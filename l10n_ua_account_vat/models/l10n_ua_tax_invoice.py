@@ -203,7 +203,10 @@ class L10nUaTaxInvoice(models.Model):
     state = fields.Selection(
         selection=[
             ('draft', 'Чернетка'),
+            ('submitted', 'Подано, очікує реєстрації'),
             ('registered', 'Зареєстровано в ЄРПН'),
+            ('stopped', 'Реєстрацію зупинено'),
+            ('rejected', 'Відмовлено в реєстрації'),
             ('cancelled', 'Скасовано'),
         ],
         string='Стан',
@@ -217,6 +220,13 @@ class L10nUaTaxInvoice(models.Model):
     )
     erpn_date = fields.Datetime(
         string='Дата реєстрації ЄРПН',
+    )
+    erpn_submitted_date = fields.Datetime(
+        string='Дата подання до ЄРПН',
+        readonly=True,
+        copy=False,
+        help='Коли ДПС прийняла документ в обробку (квитанція № 1). '
+             'Реєстрацію підтверджує лише квитанція № 2.',
     )
     registration_deadline = fields.Date(
         string='Граничний строк реєстрації',
@@ -356,7 +366,11 @@ class L10nUaTaxInvoice(models.Model):
 
         Тонка обгортка над спільним action_kep_submit (l10n_ua.dps.submit.mixin):
         валідує чернетку/XML/конфіг і відкриває універсальний діалог підпису.
-        Статус 'registered' — лише після квитанції ДПС.
+
+        Квитанція № 1, яку кабінет повертає на подання, означає лише «прийнято
+        в обробку» — документ переходить у 'submitted'. Рішення ЄРПН
+        (зареєстровано / зупинено / відмовлено) приходить квитанцією № 2 у
+        вхідні кабінету; її поки фіксує бухгалтер кнопками на формі.
         """
         return self.action_kep_submit()
 
@@ -385,12 +399,50 @@ class L10nUaTaxInvoice(models.Model):
 
     def _dps_on_submitted(self, receipt):
         self.write({
-            'state': 'registered',
-            'erpn_date': fields.Datetime.now(),
+            'state': 'submitted',
+            'erpn_submitted_date': fields.Datetime.now(),
             'erpn_receipt': receipt,
         })
-        self.message_post(
-            body=_('Зареєстровано в ЄРПН. Квитанція: %s') % (receipt or '—'))
+        self.message_post(body=_(
+            'Подано до ЄРПН, ДПС прийняла документ в обробку. Квитанція № 1: %s. '
+            'Реєстрацію підтвердить квитанція № 2.') % (receipt or '—'))
+
+    # --- рішення ЄРПН за квитанцією № 2 ---
+
+    def action_erpn_registered(self):
+        """Квитанція № 2: документ зареєстровано (номер — з квитанції)."""
+        for rec in self:
+            if rec.state not in ('submitted', 'stopped'):
+                raise UserError(_(
+                    'Зареєстрованою можна позначити лише подану або зупинену ПН/РК.'))
+            if not rec.erpn_number:
+                raise UserError(_(
+                    'Вкажіть реєстраційний номер ЄРПН з квитанції № 2.'))
+            rec.write({
+                'state': 'registered',
+                'erpn_date': rec.erpn_date or fields.Datetime.now(),
+            })
+            rec.message_post(body=_('Зареєстровано в ЄРПН, № %s.') % rec.erpn_number)
+
+    def action_erpn_stopped(self):
+        """Квитанція № 2: реєстрацію зупинено (моніторинг ризиковості)."""
+        for rec in self:
+            if rec.state != 'submitted':
+                raise UserError(_('Зупинити можна лише подану ПН/РК.'))
+            rec.state = 'stopped'
+            rec.message_post(body=_(
+                'Реєстрацію в ЄРПН зупинено. Подайте пояснення й документи '
+                'до ДПС; після рішення комісії позначте результат.'))
+
+    def action_erpn_rejected(self):
+        """Квитанція № 2: у реєстрації відмовлено (помилки у документі)."""
+        for rec in self:
+            if rec.state not in ('submitted', 'stopped'):
+                raise UserError(_('Відмовити можна лише поданій або зупиненій ПН/РК.'))
+            rec.state = 'rejected'
+            rec.message_post(body=_(
+                'У реєстрації в ЄРПН відмовлено. Виправте документ (повернення '
+                'в чернетку) і подайте знову.'))
 
     def action_cancel(self):
         self.write({'state': 'cancelled'})
