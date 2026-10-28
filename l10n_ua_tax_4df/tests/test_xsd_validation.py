@@ -83,3 +83,12 @@ class TestD4XsdValidation(TransactionCase):
         self.assertEqual(f.findtext('DECLARBODY/HZKV'), '3')
         self.assertEqual(f.findtext('DECLARBODY/HNM'), '2')
         self.assertIsNone(f.find('DECLARBODY/HZM'))
+
+    def test_d4_empty_date_omitted(self):
+        """Порожня дата з поля Odoo (False) не потрапляє в XML як «None»."""
+        model = self.env['l10n_ua.tax.4df']
+        vals = self._sample_vals('J05')
+        vals['persons'][0]['date_hire'] = False
+        xml = model._render_d4_xml(vals)
+        self.assertNotIn('None', xml)
+        self._schema('J05').assertValid(etree.fromstring(xml.encode('windows-1251')))

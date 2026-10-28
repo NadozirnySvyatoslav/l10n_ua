@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="l10n_ua_payroll_tax_report_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.payroll.tax.report.form</field>
+        <field name="model">l10n_ua.payroll.tax.report</field>
+        <field name="arch" type="xml">
+            <form string="Податковий розрахунок">
+                <header>
+                    <button name="action_calculate" string="Розрахувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_calculate" string="Перерахувати" type="object"
+                            invisible="state != 'calculated'"
+                            confirm="Перезібрати Д1 і Д4 з розрахункових листів? Ручні правки рядків Д4 буде втрачено."/>
+                    <button name="action_generate_xml" string="Сформувати XML" type="object"
+                            invisible="state != 'calculated'"/>
+                    <button name="action_submit" string="Подати до ДПС" type="object"
+                            class="btn-primary" invisible="state != 'calculated'"/>
+                    <button name="action_draft" string="Повернути в чернетку" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,calculated,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="year" options="{'enable_formatting': false}"
+                                   readonly="state != 'draft'"/>
+                            <field name="month" readonly="state != 'draft'"/>
+                            <field name="number" readonly="state == 'submitted'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="d5_report_id" invisible="not d5_report_id"/>
+                            <field name="submission_date" invisible="not submission_date"/>
+                            <field name="xml_file" filename="xml_filename" readonly="1"
+                                   invisible="not xml_file"/>
+                            <field name="xml_filename" invisible="1"/>
+                            <field name="d1_xml_file" filename="d1_xml_filename" readonly="1"
+                                   invisible="not d1_xml_file"/>
+                            <field name="d1_xml_filename" invisible="1"/>
+                            <field name="d4_xml_file" filename="d4_xml_filename" readonly="1"
+                                   invisible="not d4_xml_file"/>
+                            <field name="d4_xml_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Головна форма" name="main">
+                            <group>
+                                <group string="Кількість працівників">
+                                    <field name="headcount_avg" readonly="state == 'submitted'"/>
+                                    <field name="headcount_disabled" readonly="state == 'submitted'"/>
+                                    <field name="r092_count"/>
+                                    <field name="new_jobs" readonly="state == 'submitted'"/>
+                                </group>
+                                <group string="ПДФО і військовий збір (з Д4)">
+                                    <field name="total_pdfo"/>
+                                    <field name="total_military"/>
+                                </group>
+                            </group>
+                            <group string="Розділ I. Нарахування доходу та єдиного внеску">
+                                <group>
+                                    <field name="r01_income"/>
+                                    <field name="r011_salary"/>
+                                    <field name="r012_civil"/>
+                                    <field name="r02_base"/>
+                                    <field name="r021_base22"/>
+                                    <field name="r022_base841"/>
+                                    <field name="r025_extra"/>
+                                </group>
+                                <group>
+                                    <field name="r03_esv"/>
+                                    <field name="r031_esv22"/>
+                                    <field name="r032_esv841"/>
+                                    <field name="r035_esv_extra"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Додаток 4ДФ (Д4)" name="d4">
+                            <field name="d4_line_ids" readonly="state == 'submitted'">
+                                <list editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="rnokpp"/>
+                                    <field name="income_code"/>
+                                    <field name="income_accrued" sum="Усього"/>
+                                    <field name="income_paid" sum="Усього"/>
+                                    <field name="pdfo_accrued" sum="Усього"/>
+                                    <field name="pdfo_paid" sum="Усього"/>
+                                    <field name="mil_accrued" sum="Усього"/>
+                                    <field name="mil_paid" sum="Усього"/>
+                                    <field name="date_hire" optional="show"/>
+                                    <field name="date_term" optional="show"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_payroll_tax_report_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.payroll.tax.report.list</field>
+        <field name="model">l10n_ua.payroll.tax.report</field>
+        <field name="arch" type="xml">
+            <list string="Податкові розрахунки" decoration-muted="state == 'submitted'">
+                <field name="name"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="r03_esv"/>
+                <field name="total_pdfo"/>
+                <field name="total_military"/>
+                <field name="submission_date" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'submitted'"
+                       decoration-info="state == 'calculated'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_payroll_tax_report_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.payroll.tax.report.search</field>
+        <field name="model">l10n_ua.payroll.tax.report</field>
+        <field name="arch" type="xml">
+            <search string="Податкові розрахунки">
+                <field name="year"/>
+                <filter string="Чернетки" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Розраховані" name="filter_calculated" domain="[('state', '=', 'calculated')]"/>
+                <filter string="Подані" name="filter_submitted" domain="[('state', '=', 'submitted')]"/>
+                <group>
+                    <filter string="Рік" name="groupby_year" domain="[]" context="{'group_by': 'year'}"/>
+                    <filter string="Стан" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_payroll_tax_report_action" model="ir.actions.act_window">
+        <field name="name">Податковий розрахунок</field>
+        <field name="res_model">l10n_ua.payroll.tax.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_payroll_tax_report_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Створіть Податковий розрахунок за місяць</p>
+            <p>
+                Щомісячний розрахунок ПДФО, військового збору та ЄСВ (форма J0500111,
+                версія 11) з додатками Д1 і Д4 — одним пакетом до ДПС.
+            </p>
+        </field>
+    </record>
+
+</odoo>
