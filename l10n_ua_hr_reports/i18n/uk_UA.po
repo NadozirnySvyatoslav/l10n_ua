@@ -2579,3 +2579,64 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_reports.report_hr_report_labor
 msgid "телефон:"
 msgstr ""
+
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__gross_amount
+msgid "Accrued Total"
+msgstr "Нараховано всього"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__citizen_ua
+msgid "Citizen of Ukraine"
+msgstr "Громадянин України"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__employment_days
+msgid "Employment Days"
+msgstr "Дні трудових відносин"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields.selection,name:l10n_ua_hr_reports.selection__hr_report_d5_line__gender__female
+msgid "Female"
+msgstr "Жіноча"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__gender
+msgid "Gender"
+msgstr "Стать"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__main_job
+msgid "Main Job"
+msgstr "Основне місце роботи"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields.selection,name:l10n_ua_hr_reports.selection__hr_report_d5_line__gender__male
+msgid "Male"
+msgstr "Чоловіча"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__maternity_days
+msgid "Maternity Leave Days"
+msgstr "Дні відпустки по вагітності та пологах"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__part_time
+msgid "Part Time"
+msgstr "Неповний робочий час"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__sick_days
+msgid "Sick Leave Days"
+msgstr "Дні тимчасової непрацездатності"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__min_wage_diff
+msgid "Top-up to Minimum Wage"
+msgstr "Доплата до мінімальної зарплати"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__unpaid_days
+msgid "Unpaid Leave Days"
+msgstr "Дні відпустки без збереження зарплати"

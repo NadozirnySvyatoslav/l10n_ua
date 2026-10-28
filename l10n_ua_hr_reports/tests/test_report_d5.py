@@ -126,7 +126,7 @@ class TestReportD5(TransactionCase):
             report.action_export_xml()
 
     def test_export_xml_produces_file(self):
-        """Повний прохід: реквізити + рядок → xml_file збережено, це J0510210."""
+        """Повний прохід: реквізити + рядок → xml_file збережено, це Д1 J0510111."""
         director = self.env['hr.employee'].create({
             'name': 'Директоренко Іван', 'company_id': self.company.id,
             'rnokpp': '2940910418'})
@@ -142,10 +142,30 @@ class TestReportD5(TransactionCase):
             'category': '1', 'esv_base': 25000, 'esv_amount': 5500})
         report.action_export_xml()
         self.assertTrue(report.xml_file)
-        self.assertTrue(report.xml_filename.startswith('J0510210_2027_09'))
+        self.assertTrue(report.xml_filename.startswith('J0510111_2027_09'))
         xml = base64.b64decode(report.xml_file).decode('windows-1251')
         self.assertIn('<C_DOC>J05</C_DOC>', xml)
-        self.assertIn('<T1RXXXXG6S ROWNUM="1">3184710691</T1RXXXXG6S>', xml)
+        self.assertIn('<C_DOC_SUB>101</C_DOC_SUB>', xml)
+        self.assertIn('<T1RXXXXG7S ROWNUM="1">3184710691</T1RXXXXG7S>', xml)
+        # Без валової суми в рядку гр. 16 бере базу ЄСВ.
+        self.assertIn('<T1RXXXXG16 ROWNUM="1">25000.00</T1RXXXXG16>', xml)
+
+    def test_standalone_submit_refused(self):
+        """Д1 подається лише пакетом із головною формою J0500111."""
+        report = self._create_report(year=2027, month='10')
+        report.action_generate()
+        with self.assertRaises(UserError):
+            report.action_submit()
+
+    def test_employment_days(self):
+        """Гр. 14: дні договору в межах місяця."""
+        from datetime import date
+        Report = self.env['hr.report.d5']
+        start, nxt = date(2027, 2, 1), date(2027, 3, 1)
+        self.assertEqual(Report._employment_days(False, start, nxt), 28)
+        version = self.employee.version_id
+        version.contract_date_start = date(2027, 2, 10)
+        self.assertEqual(Report._employment_days(version, start, nxt), 19)
 
     def test_report_line_categories(self):
         """Report line categories should be valid."""

@@ -1,9 +1,9 @@
 """Валідація згенерованого XML Додатка 4ДФ проти офіційного XSD ДПС.
 
-XSD `tests/schemas/F0510410.xsd` (+ `J0510410.xsd`, `common_types.xsd`) —
-контрольні схеми з пакета СКЗ ДПС (повна версія 1.34.0.0,
-tax.gov.ua/data/files/627351.zip). Публічні держсхеми, вендоряться як
-тест-фікстури. Оновлювати при зміні версії форми (docs/forms-watch-playbook.md).
+XSD `tests/schemas/F0510411.xsd`, `J0510411.xsd` (v11, наказ № 243) — з
+оновлення СКЗ 1.34.9.0 (tax.gov.ua/data/files/719211.zip, NSIS-інсталятор,
+каталог xsd/); `common_types.xsd` — з повної версії 1.34.0.0. Публічні
+держсхеми, вендоряться як тест-фікстури (docs/forms-watch-playbook.md).
 """
 
 import os
@@ -27,9 +27,10 @@ class TestD4XsdValidation(TransactionCase):
             'tin': '2940910418',
             'doc_type': 0, 'doc_cnt': 1,
             'c_reg': '17', 'c_raj': '16',
-            'period_month': 3, 'period_type': 2, 'period_year': 2026,
-            'c_sti_orig': '1716', 'doc_stan': 1, 'd_fill': '15072026',
-            'hzy': 2026, 'hzm': 3, 'hnum': 1,
+            'period_month': 9 if prefix == 'F05' else 8,
+            'period_type': 2 if prefix == 'F05' else 1, 'period_year': 2026,
+            'c_sti_orig': '1716', 'doc_stan': 1, 'd_fill': '15092026',
+            'hzy': 2026, 'hzm': 8, 'hzkv': 3, 'hnm': 2, 'hnum': 1,
             'hname': 'ТОВ Тест', 'htin': '2940910418',
             'hkatottg': 'UA' + '0' * 17,
             'hkbos': '2940910418', 'hbos': 'Директор Тест',
@@ -48,7 +49,7 @@ class TestD4XsdValidation(TransactionCase):
         }
 
     def _schema(self, prefix):
-        fname = ('F' if prefix == 'F05' else 'J') + '0510410.xsd'
+        fname = ('F' if prefix == 'F05' else 'J') + '0510411.xsd'
         return etree.XMLSchema(etree.parse(os.path.join(SCHEMA_DIR, fname)))
 
     def test_d4_validates_against_official_xsd(self):
@@ -68,3 +69,17 @@ class TestD4XsdValidation(TransactionCase):
         doc = etree.fromstring(xml.encode('windows-1251'))
         self.assertTrue(self._schema('F05').validate(doc),
                         self._schema('F05').error_log)
+
+    def test_d4_v11_period(self):
+        """Юрособа — місяць (HZM); ФОП — квартал і номер місяця (HZKV, HNM)."""
+        model = self.env['l10n_ua.tax.4df']
+        j = etree.fromstring(model._render_d4_xml(self._sample_vals('J05'))
+                             .encode('windows-1251'))
+        f = etree.fromstring(model._render_d4_xml(self._sample_vals('F05'))
+                             .encode('windows-1251'))
+        self.assertEqual(j.findtext('DECLARHEAD/C_DOC_VER'), '11')
+        self.assertEqual(j.findtext('DECLARBODY/HZM'), '8')
+        self.assertIsNone(j.find('DECLARBODY/HZKV'))
+        self.assertEqual(f.findtext('DECLARBODY/HZKV'), '3')
+        self.assertEqual(f.findtext('DECLARBODY/HNM'), '2')
+        self.assertIsNone(f.find('DECLARBODY/HZM'))
