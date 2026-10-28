@@ -46,10 +46,18 @@
             <field name="description">Accounting journals (Журнали)</field>
         </record>
 
+        <record id="subconto_type_product" model="l10n_ua.subconto.type">
+            <field name="name">Products</field>
+            <field name="code">PRODUCT</field>
+            <field name="sequence">50</field>
+            <field name="model_id" ref="product.model_product_product"/>
+            <field name="field_name">display_name</field>
+            <field name="description">Products for inventory accounts 20-28 (Номенклатура)</field>
+        </record>
+
         <!--
         Additional subconto types to create manually when modules are installed:
 
-        - Products (PRODUCT): product.model_product_product - Номенклатура
         - Warehouses (WAREHOUSE): stock.model_stock_warehouse - Склади
         - Departments (DEPARTMENT): hr.model_hr_department - Підрозділи
         - Employees (EMPLOYEE): hr.model_hr_employee - Працівники
