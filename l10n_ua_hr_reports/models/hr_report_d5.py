@@ -1,19 +1,22 @@
 import base64
 import re
-from datetime import date
+from datetime import date, timedelta
 from xml.sax.saxutils import escape
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
-# Додаток 1 (Відомості про нарахування ЄСВ) об'єднаного розрахунку —
-# форма J0510210, версія 10 (Наказ Мінфіну № 4 від 13.01.2015 у ред. № 39
-# від 24.04.2025 зі змінами № 53 від 30.05.2025). Коди C_DOC/C_DOC_SUB/
-# C_DOC_VER — fixed-значення з офіційного XSD ДПС (пакет СКЗ), звірені
-# в tests/test_xsd_validation.py проти J0510210.xsd.
+# Додаток Д1 «Відомості про нарахування заробітної плати (доходу, грошового
+# забезпечення) застрахованим особам» до Податкового розрахунку ЮО — форма
+# J0510111, версія 11 (наказ Мінфіну № 4 від 13.01.2015 у ред. наказу № 243
+# від 07.05.2026, чинна з 17.07.2026). Коди — fixed-значення офіційного XSD
+# ДПС (СКЗ 1.34.9.0), валідація — tests/test_d5_xsd.py.
+#
+# До версії 11 тут стояла J0510210 — це Д2 (особи, що доглядають за дитиною
+# до трьох років), а не Д1: ЄСВ працівників ішов у чужу форму (#210).
 D1_C_DOC = 'J05'
-D1_C_DOC_SUB = '102'
-D1_C_DOC_VER = '10'
+D1_C_DOC_SUB = '101'
+D1_C_DOC_VER = '11'
 D1_SOFTWARE = 'Odoo l10n_ua'
 
 # Категорія працівника (модель) -> код категорії застрахованої особи (гр.8,
@@ -25,6 +28,12 @@ D1_ZO_CATEGORY = {
     '3': 2,   # найманий працівник з інвалідністю
     '4': 1,   # декрет — базова категорія (уточнюється за випадком)
 }
+
+
+# Графа 06 «Жінка (Ж), чоловік (Ч)» в електронній формі — ознака 0/1
+# (DGOzn). Порядок заповнення відповідності не наводить; прийнято
+# 1 — чоловік, 0 — жінка. Звірити з квитанцією першого живого подання.
+D1_GENDER_CODE = {'male': 1, 'female': 0}
 
 
 class HrReportD5(models.Model):
@@ -145,9 +154,26 @@ class HrReportD5(models.Model):
                 if disability_benefits:
                     category = '3'  # Disabled
 
+            gross = slip.gross_salary or 0.0
+            esv_base = slip.esv_base or 0.0
+            # Гр. 18 — доплата бази до мінімальної зарплати: частина бази ЄСВ
+            # понад фактичний дохід. Коли дохід вищий за максимум, база менша
+            # за дохід і доплати немає.
+            min_wage_diff = max(0.0, esv_base - gross)
+            country = employee.country_id
             self.env['hr.report.d5.line'].create({
                 'report_id': self.id,
                 'employee_id': employee.id,
+                'citizen_ua': not country or country.code == 'UA',
+                'gender': employee.gender if employee.gender in ('male', 'female') else False,
+                'gross_amount': gross,
+                'min_wage_diff': min_wage_diff,
+                'employment_days': self._employment_days(
+                    version, date_from, date_to),
+                'main_job': not version or getattr(
+                    version, 'employment_type_ua', 'primary') == 'primary',
+                'part_time': bool(version) and 0 < (getattr(
+                    version, 'work_rate', 1.0) or 1.0) < 1.0,
                 'rnokpp': employee.rnokpp or '',
                 'last_name': employee.name.split()[0] if employee.name else '',
                 'first_name': employee.name.split()[1] if employee.name and len(employee.name.split()) > 1 else '',
@@ -164,9 +190,31 @@ class HrReportD5(models.Model):
         self.write({'state': 'generated'})
         return True
 
+    @api.model
+    def _employment_days(self, version, date_from, date_to):
+        """Гр. 14: календарні дні трудових відносин у звітному місяці.
+
+        ``date_to`` — перший день наступного місяця (як у пошуку листів).
+        """
+        start, end = date_from, date_to - timedelta(days=1)
+        if version:
+            if version.contract_date_start and version.contract_date_start > start:
+                start = version.contract_date_start
+            if version.contract_date_end and version.contract_date_end < end:
+                end = version.contract_date_end
+        return max(0, (end - start).days + 1)
+
     def action_submit(self):
-        """Відкрити КЕП-підпис і подання Д5/Додатка 1 (ЄСВ) до ДПС."""
-        return self.action_kep_submit()
+        """Д1 окремо не подається — лише в пакеті Податкового розрахунку ЮО.
+
+        ДПС приймає Д1 як додаток до головної форми J0500111 (LINKED_DOCS);
+        самостійний файл кабінет відхиляє. Подання — з документа
+        «Податковий розрахунок» (#210), тут лише формування XML.
+        """
+        raise UserError(_(
+            'Додаток Д1 подається лише у складі Податкового розрахунку ЮО '
+            '(головна форма J0500111). Сформуйте XML кнопкою «Export XML»; '
+            'подання пакетом — з документа «Податковий розрахунок».'))
 
     # --- контракт l10n_ua.dps.submit.mixin ---
 
@@ -194,7 +242,7 @@ class HrReportD5(models.Model):
         self.write({'state': 'draft'})
 
     def action_export_xml(self):
-        """Сформувати XML Додатка 1 (ЄСВ, J0510210 v10), валідний за XSD ДПС.
+        """Сформувати XML Додатка Д1 (J0510111 v11), валідний за XSD ДПС.
 
         Зберігає результат у ``xml_file`` (кодування windows-1251, як приймає
         ДПС) і публікує повідомлення в чатер. Структуру звірено з офіційним
@@ -206,8 +254,8 @@ class HrReportD5(models.Model):
             raise UserError(_('Спочатку згенеруйте звіт (кнопка «Generate»).'))
         xml = self._render_d1_xml(self._d1_vals())
         self.xml_file = base64.b64encode(xml.encode('windows-1251'))
-        self.xml_filename = 'J0510210_%s_%02d.xml' % (self.year, int(self.month))
-        self.message_post(body=_('Сформовано XML Додатка 1 (ЄСВ): %s') % self.xml_filename)
+        self.xml_filename = 'J0510111_%s_%02d.xml' % (self.year, int(self.month))
+        self.message_post(body=_('Сформовано XML Додатка Д1: %s') % self.xml_filename)
         return True
 
     def _d1_vals(self):
@@ -249,8 +297,22 @@ class HrReportD5(models.Model):
                 'first_name': line.first_name or '',
                 'middle_name': line.middle_name or '',
                 'zo_category': D1_ZO_CATEGORY.get(line.category or '1', 1),
-                'esv_base': line.esv_base,
+                'citizen': 1 if line.citizen_ua else 0,
+                'gender': D1_GENDER_CODE.get(line.gender),
+                'sick_days': line.sick_days or None,
+                'unpaid_days': line.unpaid_days or None,
+                'employment_days': line.employment_days,
+                'maternity_days': line.maternity_days or None,
+                'gross': line.gross_amount or line.esv_base,
+                'esv_base': line.esv_base - (line.min_wage_diff or 0.0),
+                'min_wage_diff': line.min_wage_diff or None,
+                'esv_withheld': 0.0,
                 'esv_amount': line.esv_amount,
+                'main_job': 1 if line.main_job else 0,
+                'part_time': 1 if line.part_time else 0,
+                'special_stage': 0,
+                'new_workplace': 0,
+                'unfixed_hours': 0,
             })
         return {
             'tin': edrpou,
@@ -274,17 +336,19 @@ class HrReportD5(models.Model):
 
     @api.model
     def _render_d1_xml(self, vals):
-        """Рендер XML Додатка 1 (J0510210 v10) з dict значень.
+        """Рендер XML Додатка Д1 (J0510111 v11) з dict значень.
 
         Стейтлес (лише ``vals``) — щоб валідацію проти офіційного XSD можна
-        було проганяти без залежності від записів. Порядок і склад елементів
-        звірені з J0510210.xsd (DHead: fixed J05/102/10; DBody: choice
-        HZ|HZN|HZU, HZY, HZM, HNAME, HTIN, таблиця персон column-major
-        T1RXXXXG5..G17, підсумки R01G14..G16, HFILL, HKBOS, HBOS).
-
-        Поколонкова відомість про ставки ЄСВ (R01..R06 G3..G6) — опційний блок
-        (minOccurs=0), наразі не заповнюється (потребує розбивки за ставками);
-        документ лишається XSD-валідним. Це наступний інкремент.
+        було проганяти без записів. Графи таблиці (column-major, ROWNUM — номер
+        запису): 05 громадянин України, 06 стать, 07 РНОКПП, 08 категорія ЗО,
+        09 код типу нарахувань (лише у випадках 1–15), 10 місяць/рік,
+        11 ПІБ, 12 дні непрацездатності, 13 дні без збереження зарплати,
+        14 дні трудових відносин, 15 дні відпустки по вагітності й пологах,
+        16 нараховано всього, 17 у межах максимуму, 18 доплата до мінімальної,
+        19 утриманий ЄСВ, 20 нарахований ЄСВ, 21 основне місце роботи,
+        22 неповний робочий час, 23 спецстаж, 24 нове робоче місце,
+        26 нефіксований робочий час. Гр. 25 — лише для «Звітного нового» й
+        «Уточнюючого», тут не заповнюється.
         """
         def esc(v):
             return escape(str(v or ''))
@@ -292,76 +356,78 @@ class HrReportD5(models.Model):
         def num(v):
             return '%.2f' % (v or 0.0)
 
-        def i(v):  # цілі колонки (ознаки/тип/період) — 0 має рендеритись як «0»
+        def i(v):  # цілі колонки — 0 має рендеритись як «0»
             return str(int(v))
 
         persons = vals.get('persons') or []
-
-        # Технічні сталі колонки (ознаки/тип нарахування/період) — по кожній
-        # особі, до рендеру column-major нижче.
         for p in persons:
-            p.setdefault('g5', 0)
-            p.setdefault('accrual_type', 1)
             p.setdefault('month', vals['hzm'])
             p.setdefault('year', vals['hzy'])
-            p.setdefault('g17', 0)
 
         def column(tag, key, fmt):
             rows = []
-            for i, p in enumerate(persons, 1):
+            for n, p in enumerate(persons, 1):
                 val = p.get(key)
                 if val in (None, ''):
                     continue
                 rows.append('        <%s ROWNUM="%d">%s</%s>' % (
-                    tag, i, fmt(val), tag))
+                    tag, n, fmt(val), tag))
             return '\n'.join(rows)
 
         cols = [
-            column('T1RXXXXG5', 'g5', i),
-            column('T1RXXXXG6S', 'rnokpp', lambda v: esc(v)),
-            column('T1RXXXXG71S', 'last_name', lambda v: esc(v)),
-            column('T1RXXXXG72S', 'first_name', lambda v: esc(v)),
-            column('T1RXXXXG73S', 'middle_name', lambda v: esc(v)),
+            column('T1RXXXXG5', 'citizen', i),
+            column('T1RXXXXG6', 'gender', i),
+            column('T1RXXXXG7S', 'rnokpp', esc),
             column('T1RXXXXG8', 'zo_category', i),
-            column('T1RXXXXG12', 'accrual_type', i),
-            column('T1RXXXXG131', 'month', i),
-            column('T1RXXXXG132', 'year', i),
-            column('T1RXXXXG14', 'esv_base', num),
-            column('T1RXXXXG15', 'esv_base', num),
-            column('T1RXXXXG16', 'esv_amount', num),
-            column('T1RXXXXG17', 'g17', i),
+            column('T1RXXXXG9', 'accrual_type', i),
+            column('T1RXXXXG101', 'month', i),
+            column('T1RXXXXG102', 'year', i),
+            column('T1RXXXXG111S', 'last_name', esc),
+            column('T1RXXXXG112S', 'first_name', esc),
+            column('T1RXXXXG113S', 'middle_name', esc),
+            column('T1RXXXXG12', 'sick_days', i),
+            column('T1RXXXXG13', 'unpaid_days', i),
+            column('T1RXXXXG14', 'employment_days', i),
+            column('T1RXXXXG15', 'maternity_days', i),
+            column('T1RXXXXG16', 'gross', num),
+            column('T1RXXXXG17', 'esv_base', num),
+            column('T1RXXXXG18', 'min_wage_diff', num),
+            column('T1RXXXXG19', 'esv_withheld', num),
+            column('T1RXXXXG20', 'esv_amount', num),
+            column('T1RXXXXG21', 'main_job', i),
+            column('T1RXXXXG22', 'part_time', i),
+            column('T1RXXXXG23', 'special_stage', i),
+            column('T1RXXXXG24', 'new_workplace', i),
+            column('T1RXXXXG26', 'unfixed_hours', i),
         ]
         table = '\n'.join(c for c in cols if c)
 
-        tot_base = sum(p['esv_base'] for p in persons)
-        tot_esv = sum(p['esv_amount'] for p in persons)
+        def total(key):
+            return sum(p.get(key) or 0.0 for p in persons)
 
-        totals = (
-            '        <R01G14>%s</R01G14>\n'
-            '        <R01G15>%s</R01G15>\n'
-            '        <R01G16>%s</R01G16>' % (
-                num(tot_base), num(tot_base), num(tot_esv))
+        totals = '\n'.join(
+            '        <R01G%d>%s</R01G%d>' % (g, num(total(key)), g)
+            for g, key in ((16, 'gross'), (17, 'esv_base'), (18, 'min_wage_diff'),
+                           (19, 'esv_withheld'), (20, 'esv_amount'))
         ) if persons else ''
 
         accountant = ''
         if vals.get('hkbuh') and vals.get('hbuh'):
             accountant = (
                 '        <HKBUH>%s</HKBUH>\n'
-                '        <HBUH>%s</HBUH>\n' % (
-                    esc(vals['hkbuh']), esc(vals['hbuh']))
-            )
+                '        <HBUH>%s</HBUH>' % (esc(vals['hkbuh']), esc(vals['hbuh'])))
 
         parts = [
             '<?xml version="1.0" encoding="windows-1251"?>',
             '<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
-            ' xsi:noNamespaceSchemaLocation="J0510210.xsd">',
+            ' xsi:noNamespaceSchemaLocation="J0510111.xsd">',
             '    <DECLARHEAD>',
             '        <TIN>%s</TIN>' % esc(vals['tin']),
             '        <C_DOC>%s</C_DOC>' % D1_C_DOC,
             '        <C_DOC_SUB>%s</C_DOC_SUB>' % D1_C_DOC_SUB,
             '        <C_DOC_VER>%s</C_DOC_VER>' % D1_C_DOC_VER,
-            '        <C_DOC_TYPE>0</C_DOC_TYPE>',
-            '        <C_DOC_CNT>1</C_DOC_CNT>',
+            '        <C_DOC_TYPE>%s</C_DOC_TYPE>' % vals.get('doc_type', 0),
+            '        <C_DOC_CNT>%s</C_DOC_CNT>' % vals.get('doc_cnt', 1),
             '        <C_REG>%s</C_REG>' % vals['c_reg'],
             '        <C_RAJ>%s</C_RAJ>' % vals['c_raj'],
             '        <PERIOD_MONTH>%s</PERIOD_MONTH>' % vals['period_month'],
@@ -387,7 +453,7 @@ class HrReportD5(models.Model):
         parts.append('        <HKBOS>%s</HKBOS>' % esc(vals['hkbos']))
         parts.append('        <HBOS>%s</HBOS>' % esc(vals['hbos']))
         if accountant:
-            parts.append(accountant.rstrip('\n'))
+            parts.append(accountant)
         parts.append('    </DECLARBODY>')
         parts.append('</DECLAR>')
         return '\n'.join(parts)
@@ -429,6 +495,26 @@ class HrReportD5Line(models.Model):
     
     esv_base = fields.Float(string='ESV Base')
     esv_amount = fields.Float(string='ESV Amount')
+
+    # Графи Д1 (J0510111), яких не було в рядку до версії 11.
+    citizen_ua = fields.Boolean(string='Citizen of Ukraine', default=True)
+    gender = fields.Selection([('male', 'Male'), ('female', 'Female')],
+                              string='Gender')
+    gross_amount = fields.Float(
+        string='Accrued Total',
+        help='Д1, гр. 16: загальна сума нарахованої зарплати за місяць.')
+    min_wage_diff = fields.Float(
+        string='Top-up to Minimum Wage',
+        help='Д1, гр. 18: різниця між мінімальною і фактично нарахованою '
+             'зарплатою, на яку нараховано ЄСВ.')
+    employment_days = fields.Integer(
+        string='Employment Days',
+        help='Д1, гр. 14: календарні дні трудових відносин у місяці.')
+    sick_days = fields.Integer(string='Sick Leave Days', help='Д1, гр. 12.')
+    unpaid_days = fields.Integer(string='Unpaid Leave Days', help='Д1, гр. 13.')
+    maternity_days = fields.Integer(string='Maternity Leave Days', help='Д1, гр. 15.')
+    main_job = fields.Boolean(string='Main Job', default=True, help='Д1, гр. 21.')
+    part_time = fields.Boolean(string='Part Time', help='Д1, гр. 22.')
     
     worked_days = fields.Integer(string='Worked Days')
     worked_hours = fields.Float(string='Worked Hours')
