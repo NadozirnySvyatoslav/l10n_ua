@@ -348,6 +348,11 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
 
 #. module: l10n_ua_edo
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
+msgid "The counterparty in Odoo: it can be set even after the document is in the service."
+msgstr "Контрагент в Odoo: його можна вказати й після того, як документ потрапив у сервіс."
+
+#. module: l10n_ua_edo
 #: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__fetch_files
 msgid "Keep Files in Odoo"
 msgstr "Зберігати файли в Odoo"

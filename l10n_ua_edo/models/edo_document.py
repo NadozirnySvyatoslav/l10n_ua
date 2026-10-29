@@ -31,8 +31,8 @@ class L10nUaEdoDocument(models.Model):
     provider = fields.Selection(related='account_id.provider')
     direction = fields.Selection(
         [('out', 'Outgoing'), ('in', 'Incoming')], required=True, default='out', index=True)
-    provider_ref = fields.Char(string='ID in the Service', copy=False, index=True)
-    provider_status = fields.Char(string='Status in the Service', copy=False)
+    provider_ref = fields.Char(string='ID in the Service', copy=False, index=True, readonly=True)
+    provider_status = fields.Char(string='Status in the Service', copy=False, readonly=True)
     state = fields.Selection(EDO_STATES, default='draft', required=True, tracking=True, index=True)
     url = fields.Char(string='Link', copy=False)
     number = fields.Char()
@@ -46,7 +46,7 @@ class L10nUaEdoDocument(models.Model):
     res_id = fields.Many2oneReference(string='Document ID', model_field='res_model', copy=False)
     attachment_id = fields.Many2one('ir.attachment', string='Original', copy=False)
     archive_attachment_id = fields.Many2one('ir.attachment', string='Archive with Signatures', copy=False)
-    last_sync = fields.Datetime(copy=False)
+    last_sync = fields.Datetime(copy=False, readonly=True)
     can_sign = fields.Boolean(
         compute='_compute_capabilities',
         help='The company signs the document now: it is its turn in the service.')

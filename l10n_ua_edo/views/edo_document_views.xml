@@ -22,20 +22,20 @@
                             <span>Odoo Document</span>
                         </button>
                     </div>
-                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <div class="oe_title"><h1><field name="name" readonly="state != 'draft'"/></h1></div>
                     <group>
                         <group>
-                            <field name="direction"/>
-                            <field name="number"/>
-                            <field name="date"/>
-                            <field name="amount"/>
-                            <field name="category"/>
+                            <field name="direction" readonly="state != 'draft'"/>
+                            <field name="number" readonly="state != 'draft'"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <field name="category" readonly="state != 'draft'"/>
                         </group>
                         <group>
-                            <field name="partner_id"/>
-                            <field name="counterparty_edrpou"/>
-                            <field name="counterparty_name"/>
-                            <field name="account_id"/>
+                            <field name="partner_id" help="The counterparty in Odoo: it can be set even after the document is in the service."/>
+                            <field name="counterparty_edrpou" readonly="state != 'draft'"/>
+                            <field name="counterparty_name" readonly="state != 'draft'"/>
+                            <field name="account_id" readonly="state != 'draft'"/>
                             <field name="provider_status"/>
                             <field name="last_sync"/>
                             <field name="provider_ref" groups="base.group_no_one"/>
@@ -48,8 +48,8 @@
                         </group>
                     </group>
                     <group string="Files">
-                        <field name="attachment_id"/>
-                        <field name="archive_attachment_id"/>
+                        <field name="attachment_id" readonly="state != 'draft'"/>
+                        <field name="archive_attachment_id" readonly="state != 'draft'"/>
                     </group>
                 </sheet>
                 <chatter/>
