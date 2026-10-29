@@ -65,6 +65,11 @@ class L10nUaEdoAccount(models.Model):
     incoming_date_from = fields.Date(
         string='Import Documents From', default=lambda self: self._default_incoming_date_from(),
         help='Incoming and outgoing documents created in the service since this date are imported.')
+    fetch_files = fields.Boolean(
+        string='Keep Files in Odoo', default=True,
+        help='Each synchronisation downloads the files of the documents: the archive with the '
+             'signatures of a signed document, the original of any other one. Without it a file '
+             'is downloaded only when it is opened or signed.')
     last_sync = fields.Datetime(readonly=True, copy=False)
     last_error = fields.Text(readonly=True, copy=False)
     document_ids = fields.One2many('l10n_ua.edo.document', 'account_id')
@@ -208,7 +213,8 @@ class L10nUaEdoAccount(models.Model):
             for data in self._call('outgoing', self.incoming_date_from):
                 vals = self._call('normalize', data)
                 Document._upsert_from_service(self, vals, 'out')
-        self._fetch_missing_files()
+        if self.fetch_files:
+            self._fetch_missing_files()
         self.write({'last_sync': fields.Datetime.now(), 'last_error': False})
 
     # Files downloaded per synchronisation: the rest come with the next one

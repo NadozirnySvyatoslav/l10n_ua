@@ -348,6 +348,22 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
 
 #. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__fetch_files
+msgid "Keep Files in Odoo"
+msgstr "Зберігати файли в Odoo"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__fetch_files
+msgid ""
+"Each synchronisation downloads the files of the documents: the archive with "
+"the signatures of a signed document, the original of any other one. Without "
+"it a file is downloaded only when it is opened or signed."
+msgstr ""
+"Кожна синхронізація завантажує файли документів: архів з підписами для "
+"підписаного документа, оригінал для решти. Без цього файл завантажується "
+"лише тоді, коли його відкривають або підписують."
+
+#. module: l10n_ua_edo
 #: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__incoming_date_from
 msgid "Import Documents From"
 msgstr "Імпортувати документи з"

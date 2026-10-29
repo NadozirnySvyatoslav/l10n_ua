@@ -186,6 +186,19 @@ class TestVchasno(TransactionCase):
         again = len([c for c in session.calls if c[1].startswith('/documents/f-')])
         self.assertEqual(again - downloads, 1)                          # only the broken one
 
+    def test_files_are_not_downloaded_when_switched_off(self):
+        self.account.fetch_files = False
+        doc = self.env['l10n_ua.edo.document'].create({
+            'name': 'Акт', 'account_id': self.account.id, 'direction': 'in',
+            'provider_ref': 'f-9', 'state': 'signed'})
+        session = self._session({
+            ('GET', '/documents'): FakeResponse(200, {'documents': []}),
+            ('GET', '/incoming-documents'): FakeResponse(200, {'documents': []}),
+        })
+        self.account.action_sync()
+        self.assertFalse(doc.archive_attachment_id)
+        self.assertFalse([c for c in session.calls if c[1].startswith('/documents/f-')])
+
     def test_rejected_token_is_a_user_error(self):
         self._session({('GET', '/document-categories'): FakeResponse(401, {'reason': 'Unauthorized'})})
         with self.assertRaisesRegex(UserError, 'токен'):

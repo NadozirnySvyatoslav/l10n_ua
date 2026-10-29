@@ -27,6 +27,7 @@
                         <group>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="incoming_date_from"/>
+                            <field name="fetch_files"/>
                             <field name="last_sync"/>
                             <field name="active" invisible="1"/>
                         </group>
