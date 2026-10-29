@@ -56,6 +56,17 @@ def sign(data, signer, attached=False):
             .sign(serialization.Encoding.DER, options))
 
 
+def asic(files, signature, kind='s'):
+    """An ASiC container as czo.gov.ua makes it: mimetype first, the data, META-INF/signature.p7s."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, 'w') as z:
+        z.writestr('mimetype', f'application/vnd.etsi.asic-{kind}+zip')
+        for name, data in files:
+            z.writestr(name, data)
+        z.writestr('META-INF/signature.p7s', signature)
+    return buffer.getvalue()
+
+
 @tagged('post_install', '-at_install', 'l10n_ua_edo')
 class TestKep(TransactionCase):
 
@@ -183,6 +194,37 @@ class TestKep(TransactionCase):
         self.assertEqual(doc.state, 'signed_owner')
         self.assertEqual(doc.kep_invalid_count, 1)
 
+    def test_signature_made_on_czo_gov_ua_and_uploaded(self):
+        # A .p7s with the data inside (CAdES enveloping)
+        doc = self._outgoing()
+        doc._kep_portal_upload('Akt_7.pdf.p7s', sign(PDF, self.customer_key, attached=True))
+        self.assertEqual(doc.kep_signature_ids.party, 'recipient')
+        self.assertTrue(doc.kep_signature_ids.attached)
+        # A detached .p7s
+        doc = self._outgoing()
+        doc._kep_portal_upload('Akt_7.pdf.p7s', sign(PDF, self.customer_key))
+        self.assertFalse(doc.kep_signature_ids.attached)
+        # An ASiC-S archive with CAdES (the format czo.gov.ua recommends)
+        doc = self._outgoing()
+        doc._kep_portal_upload('Akt_7.zip', asic([('Akt_7.pdf', PDF)], sign(PDF, self.customer_key)))
+        self.assertEqual(doc.kep_signature_ids.drfo, '2222222222')
+        with self.assertRaises(UserError):  # the same signature again
+            doc._kep_portal_upload('Akt_7.zip', asic([('Akt_7.pdf', PDF)], sign(PDF, self.customer_key)))
+
+    def test_uploaded_signature_that_does_not_fit_is_refused(self):
+        doc = self._outgoing()
+        with self.assertRaises(UserError):  # ASiC-E: the signature covers a manifest
+            doc._kep_portal_upload('Akt_7.asice', asic([('Akt_7.pdf', PDF)], sign(PDF, self.customer_key), 'e'))
+        with self.assertRaises(UserError):  # another file in the archive
+            doc._kep_portal_upload('x.zip', asic([('x.pdf', b'other')], sign(b'other', self.customer_key)))
+        with self.assertRaises(UserError):  # the data inside is another file
+            doc._kep_portal_upload('x.p7s', sign(b'other', self.customer_key, attached=True))
+        with self.assertRaises(UserError):  # not a signature
+            doc._kep_portal_upload('x.p7s', b'garbage')
+        with self.assertRaises(UserError):  # the company's own key on the counterparty's link
+            doc._kep_portal_upload('x.p7s', sign(PDF, self.director))
+        self.assertFalse(doc.kep_signature_ids)
+
     def test_rejected_on_the_portal(self):
         doc = self._outgoing()
         doc._kep_reject('Не та сума', by_counterparty=True)
@@ -259,6 +301,13 @@ class TestKep(TransactionCase):
         self.assertEqual((doc.attachment_id.name, doc.attachment_id.raw), ('Dohovir.pdf', PDF))
         self.assertTrue(doc.kep_signature_ids.attached)
 
+    def test_incoming_asic_s_from_czo_gov_ua(self):
+        doc = self._receive([('Akt_20.zip', asic([('Akt_20.pdf', PDF)], sign(PDF, self.customer_key)))],
+                            subject='Акт 20')
+        self.assertEqual((doc.attachment_id.name, doc.attachment_id.raw), ('Akt_20.pdf', PDF))
+        self.assertEqual(len(doc.kep_signature_ids), 1)
+        self.assertEqual(doc.state, 'signed_owner')
+
     def test_message_without_a_signed_document(self):
         doc = self._receive([('photo.jpg', b'\xff\xd8\xff')], subject='Просто лист')
         self.assertEqual(doc.direction, 'in')
@@ -281,6 +330,7 @@ class TestKepPortal(HttpCase):
         self.assertEqual(page.status_code, 200)
         self.assertIn('Акт № 9', page.text)
         self.assertIn('o_kep_sign_card', page.text)
+        self.assertIn('czo.gov.ua/sign', page.text)
         self.assertEqual(self.url_open(f'/my/edo/{doc.id}').status_code, 404)
         self.assertEqual(self.url_open(f'/my/edo/{doc.id}?access_token=wrong').status_code, 404)
         original = self.url_open(f'/my/edo/{doc.id}/file/original?access_token={doc.access_token}')

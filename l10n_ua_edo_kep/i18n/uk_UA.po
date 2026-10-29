@@ -513,3 +513,44 @@ msgstr "КЕП-підпис документа ЕДО"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
 msgid "КЕП Signatures"
 msgstr "КЕП-підписи"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid ""
+"This container (ASiC-E or XAdES) is not supported yet: sign in the CAdES "
+"format — a .p7s file (the signature with the data, or separately), or an "
+"ASiC-S archive with CAdES."
+msgstr ""
+"Такий контейнер (ASiC-E чи XAdES) поки не підтримується: підпишіть у форматі"
+" CAdES — файл .p7s (підпис з даними або окремо) чи архів ASiC-S з CAdES."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The file is not an archive with a signature."
+msgstr "Файл — не архів з підписом."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "No CAdES signature (.p7s) in the archive."
+msgstr "В архіві немає підпису CAdES (.p7s)."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The archive holds another file, not «%s»."
+msgstr "В архіві інший файл, а не «%s»."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "This signature is already on the document."
+msgstr "Цей підпис уже є на документі."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/controllers/portal.py:0
+msgid "Choose the file of the signature (up to 30 MB)."
+msgstr "Виберіть файл підпису (до 30 МБ)."

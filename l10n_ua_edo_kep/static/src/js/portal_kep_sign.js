@@ -22,6 +22,7 @@ export class PortalKepSign extends Interaction {
     dynamicContent = {
         ".o_kep_sign": { "t-on-click.prevent": this.sign },
         ".o_kep_reject": { "t-on-click.prevent": this.reject },
+        ".o_kep_upload": { "t-on-click.prevent": this.upload },
     };
 
     async willStart() {
@@ -60,7 +61,7 @@ export class PortalKepSign extends Interaction {
     }
 
     busy(on) {
-        for (const button of this.el.querySelectorAll(".o_kep_sign, .o_kep_reject")) {
+        for (const button of this.el.querySelectorAll(".o_kep_sign, .o_kep_reject, .o_kep_upload")) {
             button.disabled = on;
         }
     }
@@ -106,6 +107,36 @@ export class PortalKepSign extends Interaction {
                 throw new Error(result.error);
             }
             this.show(".o_kep_status", "Документ підписано.");
+            window.location.reload();
+        } catch (e) {
+            this.show(".o_kep_error", (e && (e.data?.message || e.message)) || String(e));
+        } finally {
+            this.busy(false);
+        }
+    }
+
+    /** Підпис, зроблений деінде (czo.gov.ua/sign): ключ на наш сайт не потрапляє зовсім. */
+    async upload() {
+        const file = this.el.querySelector(".o_kep_upload_file").files[0];
+        if (!file) {
+            this.show(".o_kep_error", "Виберіть файл підпису (.p7s або архів ASiC-S).");
+            return;
+        }
+        this.busy(true);
+        try {
+            this.show(".o_kep_status", "Завантаження підпису…");
+            const bytes = new Uint8Array(await this.waitFor(file.arrayBuffer()));
+            let binary = "";
+            for (let i = 0; i < bytes.length; i += 0x8000) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+            }
+            const result = await this.waitFor(rpc(`${this.docUrl}/kep/upload`, {
+                access_token: this.token, filename: file.name, data_b64: btoa(binary),
+            }));
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            this.show(".o_kep_status", "Підпис прийнято.");
             window.location.reload();
         } catch (e) {
             this.show(".o_kep_error", (e && (e.data?.message || e.message)) || String(e));

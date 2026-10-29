@@ -76,6 +76,20 @@ class EdoKepPortal(CustomerPortal):
             return {'error': error.args[0]}
         return {'ok': True}
 
+    @http.route('/my/edo/<int:doc_id>/kep/upload', type='jsonrpc', auth='public')
+    def portal_kep_upload(self, doc_id, filename=None, data_b64=None, access_token=None):
+        """A signature made elsewhere (czo.gov.ua/sign …) uploaded by the counterparty."""
+        doc = self._kep_document(doc_id, access_token)
+        try:
+            content = base64.b64decode(data_b64 or '')
+            if not content or len(content) > 30 * 1024 * 1024:
+                return {'error': _('Choose the file of the signature (up to 30 MB).')}
+            doc._kep_portal_upload(filename or 'signature.p7s', content)
+        except (UserError, ValueError) as error:
+            request.env.cr.rollback()
+            return {'error': error.args[0]}
+        return {'ok': True}
+
     @http.route('/my/edo/<int:doc_id>/kep/reject', type='jsonrpc', auth='public')
     def portal_kep_reject(self, doc_id, reason=None, access_token=None):
         doc = self._kep_document(doc_id, access_token)

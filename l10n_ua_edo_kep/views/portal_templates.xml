@@ -40,6 +40,8 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
+                        <div class="alert alert-danger small d-none o_kep_error" role="alert"/>
+                        <div class="alert alert-info small d-none o_kep_status" role="status"/>
                         <div t-if="can_sign" class="card mb-3 o_kep_sign_card">
                             <div class="card-body">
                                 <h5 class="card-title">Підписати КЕП</h5>
@@ -61,8 +63,6 @@
                                            name="kep-key-password" autocomplete="new-password"
                                            data-lpignore="true" data-1p-ignore="true"/>
                                 </div>
-                                <div class="alert alert-danger small d-none o_kep_error" role="alert"/>
-                                <div class="alert alert-info small d-none o_kep_status" role="status"/>
                                 <button type="button" class="btn btn-primary w-100 o_kep_sign">
                                     <i class="fa fa-pencil"/> Підписати документ</button>
                                 <hr/>
@@ -73,6 +73,27 @@
                                     <button type="button" class="btn btn-sm btn-outline-danger mt-2 o_kep_reject">
                                         Відхилити</button>
                                 </details>
+                            </div>
+                        </div>
+                        <div t-if="can_sign" class="card mb-3 o_kep_upload_card">
+                            <div class="card-body">
+                                <h5 class="card-title">Або підпишіть на сайті держави</h5>
+                                <p class="small text-muted">Не хочете вводити ключ на нашому сайті? Підпишіть
+                                    документ у сервісі Центрального засвідчувального органу — ключ
+                                    використовується лише там.</p>
+                                <ol class="small ps-3">
+                                    <li>Завантажте
+                                        <a t-att-href="'/my/edo/%s/file/original?download=1&amp;access_token=%s' % (doc.id, access_token)">документ</a>.</li>
+                                    <li>Підпишіть його на
+                                        <a href="https://czo.gov.ua/sign" target="_blank" rel="noopener">czo.gov.ua/sign</a>.
+                                        Формат — <strong>CAdES</strong>: файл .p7s (підпис з даними або окремо)
+                                        чи архів ASiC-S з CAdES.</li>
+                                    <li>Завантажте сюди отриманий файл підпису.</li>
+                                </ol>
+                                <input type="file" class="form-control form-control-sm mb-2 o_kep_upload_file"
+                                       accept=".p7s,.p7m,.zip,.asics,.scs"/>
+                                <button type="button" class="btn btn-outline-primary w-100 o_kep_upload">
+                                    <i class="fa fa-upload"/> Завантажити підпис</button>
                             </div>
                         </div>
                         <div t-if="doc.kep_rejected" class="alert alert-danger">
@@ -93,7 +114,8 @@
                                         </div>
                                     </li>
                                 </ul>
-                                <p class="small text-muted mt-3 mb-0">Перевірити підписи можна на czo.gov.ua/verify:
+                                <p class="small text-muted mt-3 mb-0">Перевірити підписи незалежно можна на
+                                    <a href="https://czo.gov.ua/verify" target="_blank" rel="noopener">czo.gov.ua/verify</a>:
                                     файл документа і файл .p7s з архіву.</p>
                             </div>
                         </div>

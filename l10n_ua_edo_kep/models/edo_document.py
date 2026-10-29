@@ -15,6 +15,8 @@ from .kep_cms import KepSignatureError, embedded_content, parse_signature
 _logger = logging.getLogger(__name__)
 
 SIGNATURE_EXTENSIONS = ('.p7s', '.p7m', '.sig')
+ARCHIVE_EXTENSIONS = ('.zip', '.asics', '.scs', '.asice', '.sce')
+ASIC_MIMETYPES = ('application/vnd.etsi.asic-s+zip', 'application/vnd.etsi.asic-e+zip')
 # Files of an archive of an EDO service that are not the document
 SERVICE_FILES = ('kvytantsiia', 'instruktsiia', 'квитанц', 'квітанц', 'інструкц', 'receipt', 'instruction')
 MAX_ZIP_BYTES = 50 * 1024 * 1024
@@ -291,11 +293,47 @@ class L10nUaEdoDocument(models.Model):
     # ── Portal ──────────────────────────────────────────────
 
     def _kep_portal_sign(self, signature_b64):
-        """The counterparty's signature from the portal."""
+        """The counterparty's signature from the portal (made there in the browser)."""
         self.ensure_one()
         if not self._kep_can_sign_their():
             raise UserError(_('The document is not waiting for your signature.'))
-        signature = self._kep_add_signature_b64(signature_b64, expect='their')
+        return self._kep_portal_signed(self._kep_add_signature_b64(signature_b64, expect='their'))
+
+    def _kep_portal_upload(self, filename, content):
+        """A signature the counterparty made elsewhere (czo.gov.ua/sign, id.gov.ua, its own
+        software) and uploaded on the portal: a .p7s (detached or with the data) or an ASiC-S
+        archive with CAdES. Its key never touches our site."""
+        self.ensure_one()
+        if not self._kep_can_sign_their():
+            raise UserError(_('The document is not waiting for your signature.'))
+        signatures = []
+        lower = (filename or '').lower()
+        if lower.endswith(ARCHIVE_EXTENSIONS) or content[:2] == b'PK':
+            try:
+                container = self._kep_asic(zipfile.ZipFile(io.BytesIO(content)))
+            except zipfile.BadZipFile as error:
+                raise UserError(_('The file is not an archive with a signature.')) from error
+            if not container or not container[1]:
+                raise UserError(_('No CAdES signature (.p7s) in the archive.'))
+            files, found = container
+            if not any(data == self.attachment_id.raw for _name, data in files):
+                raise UserError(_('The archive holds another file, not «%s».', self.attachment_id.name))
+            signatures = [(name, data, False) for name, data in found]
+        else:
+            try:
+                attached = embedded_content(content) is not None
+            except KepSignatureError as error:
+                raise UserError(_('This is not a КЕП signature of the document: %s', error)) from error
+            signatures = [(filename, content, attached)]
+        added = self.env['l10n_ua.edo.kep.signature']
+        for name, data, attached in signatures:
+            added |= self._kep_add_signature(data, filename=name, expect='their', attached=attached)
+        if not added:
+            raise UserError(_('This signature is already on the document.'))
+        return self._kep_portal_signed(added[:1])
+
+    def _kep_portal_signed(self, signature):
+        self.ensure_one()
         self.message_post(
             body=_('Signed by %s on the portal. Check the signature in Odoo.',
                    signature.signer_name if signature else self.counterparty_name),
@@ -381,6 +419,29 @@ class L10nUaEdoDocument(models.Model):
             return {'type': 'ir.actions.act_url', 'url': self.get_portal_url(), 'target': 'new'}
         return super().action_open_in_service()
 
+    @api.model
+    def _kep_asic(self, archive):
+        """(data files, CAdES signatures) of an ASiC container (as czo.gov.ua makes it), or None
+        for an ordinary archive.
+
+        ASiC-S with CAdES: one data file and META-INF/signature*.p7s — a detached
+        signature of that file. XAdES (signatures*.xml) and ASiC-E with CAdES (the
+        signature covers a manifest, not the file) are refused with a hint.
+        """
+        names = archive.namelist()
+        mimetype = archive.read('mimetype').decode('ascii', 'ignore').strip() if 'mimetype' in names else ''
+        if mimetype not in ASIC_MIMETYPES:
+            return None
+        meta = [n for n in names if n.upper().startswith('META-INF/')]
+        if mimetype.endswith('asic-e+zip') or any(n.lower().endswith('.xml') and 'signature' in n.lower() for n in meta):
+            raise UserError(_(
+                'This container (ASiC-E or XAdES) is not supported yet: sign in the CAdES format — '
+                'a .p7s file (the signature with the data, or separately), or an ASiC-S archive with CAdES.'))
+        data = [(os.path.basename(n), archive.read(n)) for n in names
+                if n != 'mimetype' and not n.upper().startswith('META-INF/') and not n.endswith('/')]
+        signatures = [(os.path.basename(n), archive.read(n)) for n in meta if n.lower().endswith('.p7s')]
+        return data, signatures
+
     # ── Incoming by e-mail ──────────────────────────────────
 
     @api.model
@@ -394,9 +455,15 @@ class L10nUaEdoDocument(models.Model):
 
         def walk(name, content, depth=0):
             lower = (name or '').lower()
-            if lower.endswith('.zip') and depth < 2:
+            if lower.endswith(ARCHIVE_EXTENSIONS) and depth < 2:
                 try:
                     archive = zipfile.ZipFile(io.BytesIO(content))
+                    container = self._kep_asic(archive)
+                    if container:
+                        originals.extend(container[0])
+                        detached.extend((f'{container[0][0][0]}.p7s' if container[0] else n, c)
+                                        for n, c in container[1])
+                        return
                     members = [m for m in archive.infolist() if not m.is_dir()][:MAX_ZIP_FILES]
                     if sum(m.file_size for m in members) > MAX_ZIP_BYTES:
                         _logger.warning('EDO КЕП: archive %s is too large, skipped', name)
@@ -405,6 +472,8 @@ class L10nUaEdoDocument(models.Model):
                         walk(os.path.basename(member.filename), archive.read(member), depth + 1)
                 except zipfile.BadZipFile:
                     originals.append((name, content))
+                except UserError as error:
+                    _logger.info('EDO КЕП: %s skipped: %s', name, error)
                 return
             if lower.endswith(SIGNATURE_EXTENSIONS):
                 try:
