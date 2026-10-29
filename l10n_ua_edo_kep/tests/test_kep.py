@@ -124,6 +124,8 @@ class TestKep(TransactionCase):
         self.assertEqual(len(invitation), 1)
         self.assertIn('buh@customer.example', invitation.email_to)
         self.assertIn(doc.get_portal_url().split('?')[0], invitation.body_html)
+        self.env['ir.config_parameter'].set_param('l10n_ua_edo_kep.reply_to', 'info@nasha.example')
+        self.assertEqual(doc.kep_reply_to(), 'info@nasha.example')
         # The counterparty signs on the portal: a signature and a seal
         self.assertTrue(doc._kep_can_sign_their())
         doc._kep_portal_sign(base64.b64encode(sign(PDF, self.customer_key)).decode())
@@ -191,6 +193,9 @@ class TestKep(TransactionCase):
     def test_answer_by_e_mail_with_the_signature(self):
         doc = self._outgoing()
         doc._kep_add_signature(sign(PDF, self.director))
+        self.env['ir.config_parameter'].set_param('l10n_ua_edo_kep.reply_to', 'info@nasha.example')
+        self.account._call('send', doc.provider_ref)
+        self.assertEqual(self._mails(doc).reply_to, 'info@nasha.example')
         doc.message_update({'attachments': [
             self.env['mail.thread']._Attachment('Akt_7.pdf.p7s', sign(PDF, self.customer_key), {})]})
         self.assertEqual(doc.state, 'signed')

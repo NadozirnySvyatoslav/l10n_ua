@@ -5,6 +5,7 @@
         <field name="model_id" ref="l10n_ua_edo.model_l10n_ua_edo_document"/>
         <field name="subject">Документ на підпис: {{ object.name }}</field>
         <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="reply_to">{{ object.kep_reply_to() }}</field>
         <field name="auto_delete" eval="False"/>
         <field name="body_html" type="html">
 <div style="font-size: 14px;">
@@ -29,6 +30,7 @@
         <field name="model_id" ref="l10n_ua_edo.model_l10n_ua_edo_document"/>
         <field name="subject">Підписано: {{ object.name }}</field>
         <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="reply_to">{{ object.kep_reply_to() }}</field>
         <field name="auto_delete" eval="False"/>
         <field name="body_html" type="html">
 <div style="font-size: 14px;">
@@ -47,6 +49,7 @@
         <field name="model_id" ref="l10n_ua_edo.model_l10n_ua_edo_document"/>
         <field name="subject">Відхилено: {{ object.name }}</field>
         <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="reply_to">{{ object.kep_reply_to() }}</field>
         <field name="auto_delete" eval="False"/>
         <field name="body_html" type="html">
 <div style="font-size: 14px;">

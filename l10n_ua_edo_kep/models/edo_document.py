@@ -255,6 +255,14 @@ class L10nUaEdoDocument(models.Model):
             self._kep_send_mail(template, attachments=self.archive_attachment_id)
             self.message_post(body=_('The archive with the signatures sent to %s.', self.kep_recipient_emails))
 
+    def kep_reply_to(self):
+        """Where the counterparty's answers go: the alias of the account, else the system
+        parameter ``l10n_ua_edo_kep.reply_to`` (a mailbox Odoo reads), else Odoo's default.
+        An answer is matched to the document by its headers, whatever the address."""
+        self.ensure_one()
+        return self.account_id.alias_email or self.env['ir.config_parameter'].sudo().get_param(
+            'l10n_ua_edo_kep.reply_to') or ''
+
     def _kep_send_mail(self, template, attachments=None):
         self.ensure_one()
         partner = self.partner_id
