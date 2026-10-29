@@ -208,4 +208,30 @@ class L10nUaEdoAccount(models.Model):
             for data in self._call('outgoing', self.incoming_date_from):
                 vals = self._call('normalize', data)
                 Document._upsert_from_service(self, vals, 'out')
+        self._fetch_missing_files()
         self.write({'last_sync': fields.Datetime.now(), 'last_error': False})
+
+    # Files downloaded per synchronisation: the rest come with the next one
+    _FILES_PER_SYNC = 100
+
+    def _fetch_missing_files(self):
+        """Keep a copy of each document's file in Odoo: the archive with the
+        signatures of a signed document, the original of any other one.
+
+        A file the service does not give stays missing until the next
+        synchronisation; it never stops the synchronisation itself.
+        """
+        self.ensure_one()
+        Document = self.env['l10n_ua.edo.document']
+        docs = Document.search([
+            ('account_id', '=', self.id), ('provider_ref', '!=', False), ('state', '!=', 'deleted'),
+            '|', '&', ('state', '=', 'signed'), ('archive_attachment_id', '=', False),
+                 '&', ('state', '!=', 'signed'), ('attachment_id', '=', False),
+        ], limit=self._FILES_PER_SYNC, order='date desc, id desc')
+        for doc in docs:
+            kind = 'archive' if doc.state == 'signed' else 'original'
+            try:
+                with self.env.cr.savepoint():
+                    doc._fetch_file(kind)
+            except Exception as error:  # noqa: BLE001 — one file must not stop the others
+                _logger.warning('EDO document %s: %s file not downloaded: %s', doc.id, kind, error)

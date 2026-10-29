@@ -155,6 +155,37 @@ class TestVchasno(TransactionCase):
         self.account.action_sync()
         self.assertEqual(self.env['l10n_ua.edo.document'].search_count([('provider_ref', '=', 'out-7')]), 1)
 
+    def test_sync_downloads_missing_files(self):
+        signed = self.env['l10n_ua.edo.document'].create({
+            'name': 'Акт', 'account_id': self.account.id, 'direction': 'in',
+            'provider_ref': 'f-1', 'state': 'signed'})
+        waiting = self.env['l10n_ua.edo.document'].create({
+            'name': 'Рахунок', 'account_id': self.account.id, 'direction': 'in',
+            'provider_ref': 'f-2', 'state': 'sent'})
+        broken = self.env['l10n_ua.edo.document'].create({
+            'name': 'Договір', 'account_id': self.account.id, 'direction': 'in',
+            'provider_ref': 'f-3', 'state': 'signed'})
+        session = self._session({
+            ('GET', '/documents'): FakeResponse(200, {'documents': [
+                {'id': 'f-2', 'title': 'Рахунок', 'status': 7002}]}),
+            ('GET', '/incoming-documents'): FakeResponse(200, {'documents': []}),
+            ('GET', '/documents/f-1/archive'): FakeResponse(
+                200, content=b'PK..', headers={'Content-Disposition': 'attachment; filename="akt.zip"'}),
+            ('GET', '/documents/f-2/original'): FakeResponse(200, content=b'%PDF-1.4'),
+            ('GET', '/documents/f-3/archive'): FakeResponse(500, {'reason': 'boom'}),
+        })
+        self.account.action_sync()
+        self.assertEqual(signed.archive_attachment_id.name, 'akt.zip')
+        self.assertEqual(waiting.attachment_id.name, 'f-2.pdf')
+        self.assertFalse(broken.archive_attachment_id)                 # tried again next time
+        self.assertTrue(self.account.last_sync)
+        self.assertFalse(self.account.last_error)
+        # Files already in Odoo are not downloaded again
+        downloads = len([c for c in session.calls if c[1].startswith('/documents/f-')])
+        self.account.action_sync()
+        again = len([c for c in session.calls if c[1].startswith('/documents/f-')])
+        self.assertEqual(again - downloads, 1)                          # only the broken one
+
     def test_rejected_token_is_a_user_error(self):
         self._session({('GET', '/document-categories'): FakeResponse(401, {'reason': 'Unauthorized'})})
         with self.assertRaisesRegex(UserError, 'токен'):
