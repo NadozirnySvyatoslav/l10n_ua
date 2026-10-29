@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_kep_signature_user,l10n_ua.edo.kep.signature user,model_l10n_ua_edo_kep_signature,base.group_user,1,1,1,0
+access_kep_signature_admin,l10n_ua.edo.kep.signature admin,model_l10n_ua_edo_kep_signature,base.group_system,1,1,1,1
+access_kep_reject_wizard_user,l10n_ua.edo.kep.reject.wizard user,model_l10n_ua_edo_kep_reject_wizard,base.group_user,1,1,1,1

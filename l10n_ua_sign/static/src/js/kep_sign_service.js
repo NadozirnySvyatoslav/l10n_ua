@@ -20,6 +20,9 @@ import { _t } from "@web/core/l10n/translation";
  *   readKey(key, pwd, caName) / getKeySession() / forgetKey()
  *                       → один зчитаний ключ на вкладку, спільний для модулів
  *   signWithKey(spec)   → підписи для kep_submit_signed
+ *   verifyDetached(data_b64, sign_b64) / verifyAttached(sign_b64, data_b64)
+ *                       → перевірка відкріпленого підпису (ключ не потрібен)
+ *   setCaProxyUrl(url)  → інший проксі ЦСК (портал: маршрут із токеном документа)
  */
 
 export const EUSCP_BASE = "/l10n_ua_sign/static/src/lib/euscp";
@@ -28,6 +31,15 @@ export const EUSCP_WORKER = `${EUSCP_BASE}/euscp.worker.js`;
 export const CA_SETTINGS_URL = `${EUSCP_BASE}/data/CAs.json`;
 export const CA_CERTIFICATES_URL = `${EUSCP_BASE}/data/CACertificates.p7b`;
 export const CA_PROXY_URL = "/l10n_ua_sign/ca_proxy";
+
+// Проксі, з яким ініціалізується бібліотека. Типовий маршрут — лише для
+// користувачів Odoo; сторінка порталу підставляє свій (із токеном документа)
+// до першого підпису чи перевірки.
+let caProxyUrl = CA_PROXY_URL;
+
+export function setCaProxyUrl(url) {
+    caProxyUrl = url || CA_PROXY_URL;
+}
 
 // EU_ERROR_CERT_NOT_FOUND: ключ виданий не тим ЦСК, що вибрано в діалозі.
 export const KEY_CA_MISMATCH = 0x0033;
@@ -135,7 +147,7 @@ function getEndUser() {
             await eu.Initialize({
                 language: "uk",
                 encoding: "UTF-8",
-                httpProxyServiceURL: CA_PROXY_URL,
+                httpProxyServiceURL: caProxyUrl,
                 directAccess: true,
                 CAs: cas,
                 CACertificates: certificates,
@@ -375,4 +387,54 @@ export async function signWithKey(spec) {
         signed[doc.name] = await signOneDocument(eu, doc);
     }
     return { auth_signature: authSignature, signed };
+}
+
+/**
+ * Перевірити відкріплений підпис (CAdES detached) даних.
+ *
+ * Приватний ключ не потрібен: бібліотека перевіряє підпис і сертифікат
+ * підписувача (ланцюжок до ЦСК, статус за OCSP).
+ * @returns {{valid: boolean, owner: (Object|null), time: (string|null), error: (string|null)}}
+ */
+export async function verifyDetached(dataB64, signB64) {
+    const eu = await getEndUser();
+    try {
+        const info = await eu.VerifyData(b64ToBytes(dataB64), b64ToBytes(signB64));
+        const owner = (info && (info.ownerInfo || info.owner)) || null;
+        const timeInfo = (info && info.timeInfo) || {};
+        const time = timeInfo.time || timeInfo.signTime || null;
+        return {
+            valid: true,
+            owner,
+            time: time ? new Date(time).toISOString() : null,
+            error: null,
+        };
+    } catch (e) {
+        return { valid: false, owner: null, time: null, error: (e && e.message) || String(e) };
+    }
+}
+
+/**
+ * Перевірити підпис із вбудованими даними (CAdES enveloping) і що всередині —
+ * саме ці дані (``dataB64``; без нього лише сам підпис).
+ * @returns {{valid: boolean, owner: (Object|null), time: (string|null), error: (string|null)}}
+ */
+export async function verifyAttached(signB64, dataB64 = null) {
+    const eu = await getEndUser();
+    try {
+        const info = await eu.VerifyDataInternal(b64ToBytes(signB64));
+        if (dataB64 && info && info.data) {
+            const inside = info.data instanceof Uint8Array ? info.data : b64ToBytes(String(info.data));
+            if (bytesToB64(inside) !== dataB64.replace(/\s/g, "")) {
+                return { valid: false, owner: null, time: null,
+                         error: _t("Підпис дійсний, але всередині інший файл.") };
+            }
+        }
+        const owner = (info && (info.ownerInfo || info.owner)) || null;
+        const timeInfo = (info && info.timeInfo) || {};
+        const time = timeInfo.time || timeInfo.signTime || null;
+        return { valid: true, owner, time: time ? new Date(time).toISOString() : null, error: null };
+    } catch (e) {
+        return { valid: false, owner: null, time: null, error: (e && e.message) || String(e) };
+    }
 }

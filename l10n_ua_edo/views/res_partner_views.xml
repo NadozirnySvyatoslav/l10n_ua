@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_edo" model="ir.ui.view">
+        <field name="name">res.partner.form.l10n_ua_edo</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='misc']" position="inside">
+                <field name="l10n_ua_edo_account_id" invisible="parent_id" options="{'no_create': True}"
+                       groups="base.group_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

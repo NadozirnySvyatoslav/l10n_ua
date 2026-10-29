@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_kep_reject_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.kep.reject.wizard.form</field>
+        <field name="model">l10n_ua.edo.kep.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject the Document">
+                <field name="document_id" invisible="1"/>
+                <group>
+                    <field name="reason" placeholder="Why the document is not signed: the counterparty gets it by e-mail."/>
+                </group>
+                <footer>
+                    <button name="action_reject" type="object" string="Reject" class="btn-danger"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

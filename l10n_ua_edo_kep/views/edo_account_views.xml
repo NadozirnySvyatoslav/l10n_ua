@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_edo_account_form_kep" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.account.form.kep</field>
+        <field name="model">l10n_ua.edo.account</field>
+        <field name="inherit_id" ref="l10n_ua_edo.view_edo_account_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='token']" position="attributes">
+                <attribute name="invisible">provider == 'kep'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='incoming_date_from']" position="attributes">
+                <attribute name="invisible">provider == 'kep'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='edrpou']" position="after">
+                <label for="alias_name" string="Incoming by E-mail" invisible="provider != 'kep'"/>
+                <div class="o_row" invisible="provider != 'kep'">
+                    <field name="alias_name" placeholder="e.g. edo"/>
+                    <span>@</span>
+                    <field name="alias_domain_id" placeholder="Domain" options="{'no_create': True}"/>
+                </div>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <div class="alert alert-info" role="alert" invisible="provider != 'kep'">
+                    Exchange with КЕП, without an EDO service: the document is signed in the browser, the
+                    counterparty gets a link to sign it on the portal (or answers the e-mail with its .p7s).
+                    Documents sent to the e-mail alias above come in as incoming ones: the original with its
+                    .p7s files, an archive (.zip), or a signature with the data inside (as from id.gov.ua).
+                    The mailbox of the alias must reach Odoo (incoming mail server or forwarding).
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

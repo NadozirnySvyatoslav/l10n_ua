@@ -12,7 +12,8 @@ class L10nUaEdoSendWizard(models.TransientModel):
     record_count = fields.Integer(compute='_compute_record_count')
     company_id = fields.Many2one('res.company', compute='_compute_defaults_from_record')
     account_id = fields.Many2one(
-        'l10n_ua.edo.account', string='EDO Account', required=True,
+        'l10n_ua.edo.account', string='Exchange via', required=True,
+        help='The EDO service or КЕП: proposed from the card of the counterparty.',
         domain="[('company_id', '=', company_id), ('provider', '!=', False)]")
     report_model = fields.Char(compute='_compute_defaults_from_record')
     report_id = fields.Many2one(
@@ -76,8 +77,7 @@ class L10nUaEdoSendWizard(models.TransientModel):
         record = self.env[model].browse(res_id)
         company = record['company_id'] if 'company_id' in record._fields and record['company_id'] \
             else self.env.company
-        account = self.env['l10n_ua.edo.account'].search(
-            [('company_id', '=', company.id), ('provider', '!=', False)], limit=1)
+        account = self._default_account(record, company)
         edrpou, emails = record._edo_recipient()
         vals.update({
             'account_id': account.id or False,
@@ -87,6 +87,16 @@ class L10nUaEdoSendWizard(models.TransientModel):
             'recipient_emails': ', '.join(emails) or False,
         })
         return vals
+
+    @api.model
+    def _default_account(self, record, company):
+        """The exchange chosen on the counterparty's card, else the first EDO account."""
+        partner = record._edo_partner()
+        account = partner.with_company(company).l10n_ua_edo_account_id if partner else False
+        if account and account.company_id == company and account.provider:
+            return account
+        return self.env['l10n_ua.edo.account'].search(
+            [('company_id', '=', company.id), ('provider', '!=', False)], limit=1)
 
     def action_send(self):
         self.ensure_one()

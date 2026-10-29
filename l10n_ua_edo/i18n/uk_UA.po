@@ -349,8 +349,12 @@ msgstr "Якщо позначено, деякі повідомлення маю�
 
 #. module: l10n_ua_edo
 #: model_terms:ir.ui.view,arch_db:l10n_ua_edo.view_edo_document_form
-msgid "The counterparty in Odoo: it can be set even after the document is in the service."
-msgstr "Контрагент в Odoo: його можна вказати й після того, як документ потрапив у сервіс."
+msgid ""
+"The counterparty in Odoo: it can be set even after the document is in the "
+"service."
+msgstr ""
+"Контрагент в Odoo: його можна вказати й після того, як документ потрапив у "
+"сервіс."
 
 #. module: l10n_ua_edo
 #: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__fetch_files
@@ -395,8 +399,11 @@ msgstr "Вхідний документ імпортовано із сервіс
 
 #. module: l10n_ua_edo
 #: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__incoming_date_from
-msgid "Incoming and outgoing documents created in the service since this date are imported."
-msgstr "Імпортуються вхідні та вихідні документи, створені в сервісі з цієї дати."
+msgid ""
+"Incoming and outgoing documents created in the service since this date are "
+"imported."
+msgstr ""
+"Імпортуються вхідні та вихідні документи, створені в сервісі з цієї дати."
 
 #. module: l10n_ua_edo
 #: model_terms:ir.actions.act_window,help:l10n_ua_edo.action_edo_account
@@ -1007,3 +1014,30 @@ msgid ""
 "The signature goes to the service, then the document is sent to the "
 "counterparty."
 msgstr "Підпис іде в сервіс, після чого документ надсилається контрагенту."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_res_partner__l10n_ua_edo_account_id
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_res_users__l10n_ua_edo_account_id
+msgid "Document Exchange"
+msgstr "Документообіг"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_send_wizard__account_id
+msgid "Exchange via"
+msgstr "Обмін через"
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_res_partner__l10n_ua_edo_account_id
+#: model:ir.model.fields,help:l10n_ua_edo.field_res_users__l10n_ua_edo_account_id
+msgid ""
+"How documents are exchanged with this counterparty (an EDO service or КЕП): "
+"proposed when a document is sent. Empty — the first EDO account of the "
+"company."
+msgstr ""
+"Як вести документообіг з цим контрагентом (сервіс ЕДО чи КЕП): пропонується "
+"під час надсилання документа. Порожньо — перший акаунт ЕДО компанії."
+
+#. module: l10n_ua_edo
+#: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_send_wizard__account_id
+msgid "The EDO service or КЕП: proposed from the card of the counterparty."
+msgstr "Сервіс ЕДО чи КЕП: пропонується з картки контрагента."

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_edo_document_form_kep" model="ir.ui.view">
+        <field name="name">l10n_ua.edo.document.form.kep</field>
+        <field name="model">l10n_ua.edo.document</field>
+        <field name="inherit_id" ref="l10n_ua_edo.view_edo_document_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_refresh']" position="before">
+                <field name="kep_unchecked_count" invisible="1"/>
+                <field name="kep_invalid_count" invisible="1"/>
+                <button name="action_kep_verify" type="object" string="Check Signatures" icon="fa-check-circle"
+                        class="btn-primary" invisible="provider != 'kep' or not kep_unchecked_count"/>
+                <button name="action_kep_verify" type="object" string="Check Signatures again" icon="fa-check-circle"
+                        invisible="provider != 'kep' or kep_unchecked_count or not kep_signature_ids"/>
+                <button name="action_kep_send_again" type="object" string="Send by E-mail" icon="fa-envelope"
+                        invisible="provider != 'kep' or state in ('rejected', 'deleted', 'uploaded')"
+                        help="The invitation to sign while the counterparty has not signed, else the archive with the signatures."/>
+                <button name="action_kep_reject" type="object" string="Reject"
+                        invisible="provider != 'kep' or state in ('signed', 'rejected', 'deleted')"/>
+            </xpath>
+            <xpath expr="//button[@name='action_open_in_service']" position="attributes">
+                <attribute name="string">Open</attribute>
+            </xpath>
+            <xpath expr="//sheet/div[@name='button_box']" position="after">
+                <div class="alert alert-warning" role="alert"
+                     invisible="provider != 'kep' or not kep_unchecked_count">
+                    <field name="kep_unchecked_count" class="d-inline"/> signature(s) not checked yet. A signature
+                    that came from the portal or by e-mail is only taken on trust until «Check Signatures»
+                    checks it against the file in your browser.
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="provider != 'kep' or not kep_invalid_count">
+                    <field name="kep_invalid_count" class="d-inline"/> signature(s) failed the check: they do not
+                    count and are left out of the archive.
+                </div>
+                <div class="alert alert-secondary" role="alert" invisible="not kep_rejected">
+                    <strong>Rejected:</strong> <field name="kep_reject_reason" class="d-inline"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="kep_rejected" invisible="1"/>
+                <field name="kep_recipient_emails" invisible="provider != 'kep'"
+                       readonly="state in ('signed', 'rejected', 'deleted')"/>
+            </xpath>
+            <xpath expr="//field[@name='attachment_id']/.." position="before">
+                <group string="КЕП Signatures" invisible="provider != 'kep'">
+                    <field name="kep_signature_ids" nolabel="1" colspan="2">
+                        <list decoration-success="verification == 'valid'" decoration-danger="verification == 'invalid'"
+                              decoration-muted="verification == 'pending'">
+                            <field name="party"/>
+                            <field name="signer_name"/>
+                            <field name="signer_title" optional="show"/>
+                            <field name="organization" optional="hide"/>
+                            <field name="drfo" optional="show"/>
+                            <field name="edrpou" optional="show"/>
+                            <field name="is_stamp" optional="show"/>
+                            <field name="issuer" optional="hide"/>
+                            <field name="signing_time"/>
+                            <field name="verification" widget="badge"
+                                   decoration-success="verification == 'valid'" decoration-danger="verification == 'invalid'"/>
+                            <field name="verification_error" optional="hide"/>
+                            <field name="attachment_id" optional="hide"/>
+                        </list>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

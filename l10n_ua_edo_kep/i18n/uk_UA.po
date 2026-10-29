@@ -1,0 +1,515 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid "<strong>Rejected:</strong>"
+msgstr "<strong>Відхилено:</strong>"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Came in the same message as «%s»."
+msgstr "Прийшов у тому ж листі, що й «%s»."
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_kep_reject_wizard_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__cert_serial
+msgid "Certificate Serial Number"
+msgstr "Серійний номер сертифіката"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__issuer
+msgid "Certification Authority"
+msgstr "ЦСК"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__verification_error
+msgid "Check Result"
+msgstr "Результат перевірки"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid "Check Signatures"
+msgstr "Перевірити підписи"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid "Check Signatures again"
+msgstr "Перевірити підписи ще раз"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__verified_on
+msgid "Checked On"
+msgstr "Перевірено"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,help:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__verification
+msgid ""
+"Checked by the IIT library in the browser of an Odoo user: the signature of "
+"the original file and the certificate of the signer (its chain and status)."
+msgstr ""
+"Перевіряється бібліотекою ІІТ у браузері користувача Odoo: підпис саме "
+"оригінального файлу і сертифікат підписувача (ланцюжок і статус)."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_document__kep_recipient_emails
+msgid "Counterparty E-mails"
+msgstr "E-mail контрагента"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__create_uid
+msgid "Created by"
+msgstr "Створив"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__create_date
+msgid "Created on"
+msgstr "Створено"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_account__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_document__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__document_id
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__document_id
+msgid "Document"
+msgstr "Документ"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Document by e-mail"
+msgstr "Документ з пошти"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_account.py:0
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Document «%s» has no original file."
+msgstr "У документа «%s» немає оригінального файлу."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Document «%s» is already closed."
+msgstr "Документ «%s» уже закрито."
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_account_form_kep
+msgid ""
+"Exchange with КЕП, without an EDO service: the document is signed in the browser, the\n"
+"                    counterparty gets a link to sign it on the portal (or answers the e-mail with its .p7s).\n"
+"                    Documents sent to the e-mail alias above come in as incoming ones: the original with its\n"
+"                    .p7s files, an archive (.zip), or a signature with the data inside (as from id.gov.ua).\n"
+"                    The mailbox of the alias must reach Odoo (incoming mail server or forwarding)."
+msgstr ""
+"Обмін з КЕП без сервісу ЕДО: документ підписується в браузері, контрагент "
+"отримує посилання, щоб підписати його на порталі (або відповідає на лист "
+"своїм .p7s). Документи, надіслані на поштовий псевдонім вище, стають "
+"вхідними: оригінал з файлами .p7s, архів (.zip) або підпис з даними "
+"всередині (як з id.gov.ua). Поштова скринька псевдоніма має доходити до Odoo"
+" (сервер вхідної пошти або переадресація)."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_account.py:0
+msgid ""
+"Exchange with КЕП: no service and no token. Give the account an e-mail alias"
+" to receive the documents of the counterparties."
+msgstr ""
+"Обмін з КЕП: без сервісу й токена. Задайте акаунту поштовий псевдонім, щоб "
+"отримувати документи контрагентів."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_account.py:0
+msgid "Exchange with КЕП: no service and no token. Incoming documents: %s."
+msgstr "Обмін з КЕП: без сервісу й токена. Вхідні документи: %s."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Give the e-mail of the counterparty of «%s» to send it."
+msgstr "Вкажіть e-mail контрагента документа «%s», щоб його надіслати."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/controllers/portal.py:0
+msgid "Give the reason."
+msgstr "Вкажіть причину."
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_account_form_kep
+msgid "Incoming by E-mail"
+msgstr "Вхідні поштою"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields.selection,name:l10n_ua_edo_kep.selection__l10n_ua_edo_kep_signature__verification__invalid
+msgid "Invalid"
+msgstr "Недійсний"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_document__kep_invited
+msgid "Invitation Sent"
+msgstr "Запрошення надіслано"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Invitation to sign sent to %s."
+msgstr "Запрошення підписати надіслано на %s."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__write_uid
+msgid "Last Updated by"
+msgstr "Востаннє оновив"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__write_date
+msgid "Last Updated on"
+msgstr "Востаннє оновлено"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "No document with a КЕП signature found in the message."
+msgstr "У листі не знайдено документа з підписом КЕП."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_account.py:0
+msgid "No КЕП document %s in this account."
+msgstr "В акаунті немає КЕП-документа %s."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields.selection,name:l10n_ua_edo_kep.selection__l10n_ua_edo_kep_signature__verification__pending
+msgid "Not Checked"
+msgstr "Не перевірено"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid "Open"
+msgstr "Відкрити"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__organization
+msgid "Organization"
+msgstr "Організація"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__party
+msgid "Party"
+msgstr "Сторона"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__signer_title
+msgid "Position"
+msgstr "Посада"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_reject_wizard__reason
+msgid "Reason"
+msgstr "Причина"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_document__kep_reject_reason
+msgid "Reason of Rejection"
+msgstr "Причина відхилення"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields.selection,name:l10n_ua_edo_kep.selection__l10n_ua_edo_kep_signature__party__recipient
+msgid "Recipient"
+msgstr "Отримувач"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_kep_reject_wizard_form
+msgid "Reject"
+msgstr "Відхилити"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model,name:l10n_ua_edo_kep.model_l10n_ua_edo_kep_reject_wizard
+msgid "Reject a КЕП Document"
+msgstr "Відхилення КЕП-документа"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_kep_reject_wizard_form
+msgid "Reject the Document"
+msgstr "Відхилити документ"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_document__kep_rejected
+msgid "Rejected"
+msgstr "Відхилено"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Rejected by the counterparty: %s"
+msgstr "Відхилено контрагентом: %s"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Rejected: %s. The counterparty is told."
+msgstr "Відхилено: %s. Контрагенту повідомлено."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__is_stamp
+msgid "Seal"
+msgstr "Печатка"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid "Send by E-mail"
+msgstr "Надіслати поштою"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields.selection,name:l10n_ua_edo_kep.selection__l10n_ua_edo_kep_signature__party__owner
+msgid "Sender"
+msgstr "Відправник"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Signature %(name)s not taken: %(error)s"
+msgstr "Підпис %(name)s не прийнято: %(error)s"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__attachment_id
+msgid "Signature (.p7s)"
+msgstr "Підпис (.p7s)"
+
+#. module: l10n_ua_edo_kep
+#. odoo-javascript
+#: code:addons/l10n_ua_edo_kep/static/src/js/kep_verify_action.js:0
+msgid "Signatures checked"
+msgstr "Підписи перевірено"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Signatures checked: %(valid)s valid, %(invalid)s invalid."
+msgstr "Підписи перевірено: дійсних %(valid)s, недійсних %(invalid)s."
+
+#. module: l10n_ua_edo_kep
+#. odoo-javascript
+#: code:addons/l10n_ua_edo_kep/static/src/js/kep_verify_action.js:0
+msgid "Signatures not checked"
+msgstr "Підписи не перевірено"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "Signed by %s on the portal. Check the signature in Odoo."
+msgstr "Підписав %s на порталі. Перевірте підпис в Odoo."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__signer_name
+msgid "Signer"
+msgstr "Підписувач"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__signing_time
+msgid "Signing Time"
+msgstr "Час підпису"
+
+#. module: l10n_ua_edo_kep
+#. odoo-javascript
+#: code:addons/l10n_ua_edo_kep/static/src/js/kep_verify_action.js:0
+msgid ""
+"The IIT library is not on the server (l10n_ua_sign/static/src/lib/euscp)."
+msgstr "Бібліотеки ІІТ немає на сервері (l10n_ua_sign/static/src/lib/euscp)."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The archive with the signatures sent to %s."
+msgstr "Архів з підписами надіслано на %s."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The counterparty signed by e-mail. Check the signature."
+msgstr "Контрагент підписав поштою. Перевірте підпис."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The document has no signatures yet."
+msgstr "У документа ще немає підписів."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/controllers/portal.py:0
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The document is not waiting for your signature."
+msgstr "Документ не чекає вашого підпису."
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid ""
+"The invitation to sign while the counterparty has not signed, else the "
+"archive with the signatures."
+msgstr ""
+"Запрошення підписати, поки контрагент не підписав, інакше — архів з "
+"підписами."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid ""
+"The key belongs to %(who)s (%(codes)s), not to the company (%(company)s)."
+msgstr "Ключ належить %(who)s (%(codes)s), а не компанії (%(company)s)."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid ""
+"The key belongs to %(who)s (%(codes)s), not to the counterparty of the "
+"document (ЄДРПОУ %(edrpou)s)."
+msgstr ""
+"Ключ належить %(who)s (%(codes)s), а не контрагенту документа (ЄДРПОУ "
+"%(edrpou)s)."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,help:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__is_stamp
+msgid "The key of the organisation, not of a person."
+msgstr "Ключ організації, а не особи."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,help:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__attached
+msgid "The signature carries the signed file (CAdES enveloping)."
+msgstr "Підпис містить підписаний файл (CAdES з даними)."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "The signature is of another file, not of «%s»."
+msgstr "Підпис іншого файлу, а не «%s»."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid ""
+"The signature stays in Odoo; the archive with the signatures goes back to "
+"the sender."
+msgstr ""
+"Підпис зберігається в Odoo; архів з підписами повертається відправнику."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid ""
+"The signature stays in Odoo; the counterparty then gets a link to sign the "
+"document with its КЕП."
+msgstr ""
+"Підпис зберігається в Odoo; потім контрагент отримує посилання, щоб "
+"підписати документ своїм КЕП."
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid "This is not a КЕП signature of the document: %s"
+msgstr "Це не КЕП-підпис документа: %s"
+
+#. module: l10n_ua_edo_kep
+#. odoo-python
+#: code:addons/l10n_ua_edo_kep/models/edo_document.py:0
+msgid ""
+"This link is for the counterparty: the company signs the document in Odoo."
+msgstr "Це посилання — для контрагента: компанія підписує документ в Odoo."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields.selection,name:l10n_ua_edo_kep.selection__l10n_ua_edo_kep_signature__verification__valid
+msgid "Valid"
+msgstr "Дійсний"
+
+#. module: l10n_ua_edo_kep
+#. odoo-javascript
+#: code:addons/l10n_ua_edo_kep/static/src/js/kep_verify_action.js:0
+msgid "Valid: %(valid)s, invalid: %(invalid)s."
+msgstr "Дійсних: %(valid)s, недійсних: %(invalid)s."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__verification
+msgid "Verification"
+msgstr "Перевірка"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,help:l10n_ua_edo_kep.field_l10n_ua_edo_document__kep_recipient_emails
+msgid ""
+"Where the document goes: the invitation to sign, the signed archive. For a "
+"document received by e-mail — its sender."
+msgstr ""
+"Куди йде документ: запрошення підписати, підписаний архів. Для документа з "
+"пошти — його відправник."
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_kep_reject_wizard_form
+msgid "Why the document is not signed: the counterparty gets it by e-mail."
+msgstr "Чому документ не підписується: контрагент отримає це листом."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_kep_signature__attached
+msgid "With the Data"
+msgstr "З даними"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_account_form_kep
+msgid "e.g. edo"
+msgstr "напр. edo"
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid ""
+"signature(s) failed the check: they do not\n"
+"                    count and are left out of the archive."
+msgstr ""
+"підпис(и) не пройшли перевірку: вони не враховуються і не потрапляють в "
+"архів."
+
+#. module: l10n_ua_edo_kep
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid ""
+"signature(s) not checked yet. A signature\n"
+"                    that came from the portal or by e-mail is only taken on trust until «Check Signatures»\n"
+"                    checks it against the file in your browser."
+msgstr ""
+"підпис(и) ще не перевірено. Підпис, що прийшов з порталу чи поштою, "
+"приймається на віру, доки «Перевірити підписи» не звірить його з файлом у "
+"вашому браузері."
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model,name:l10n_ua_edo_kep.model_l10n_ua_edo_kep_signature
+msgid "КЕП Signature of an EDO Document"
+msgstr "КЕП-підпис документа ЕДО"
+
+#. module: l10n_ua_edo_kep
+#: model:ir.model.fields,field_description:l10n_ua_edo_kep.field_l10n_ua_edo_document__kep_signature_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_edo_kep.view_edo_document_form_kep
+msgid "КЕП Signatures"
+msgstr "КЕП-підписи"

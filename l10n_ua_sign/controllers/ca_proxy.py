@@ -113,39 +113,48 @@ def _allowed_hosts():
             | _cached_hosts(CA_CERTS_P7B, _hosts_from_certificates))
 
 
+def forward_ca_request(address, content_type):
+    """Переслати запит бібліотеки до ЦСК і повернути відповідь для неї.
+
+    Спільне ядро для маршрутів-проксі: цього (користувачі Odoo) і тих, що
+    модулі відкривають на порталі з власною перевіркою доступу.
+    """
+    host, url = _split_address(address)
+    if not host or host not in _allowed_hosts():
+        _logger.warning("КЕП-проксі: відхилено адресу %r", address)
+        return Response('Address not allowed', status=403)
+
+    method = request.httprequest.method
+    body = None
+    if method == 'POST':
+        raw = request.httprequest.get_data(cache=False)
+        try:
+            body = base64.b64decode(raw)
+        except (binascii.Error, ValueError):
+            return Response('Bad request body', status=400)
+        if len(body) > MAX_REQUEST_BYTES:
+            return Response('Request too large', status=413)
+
+    headers = {'Content-Type': content_type} if content_type else {}
+    try:
+        upstream = requests.request(
+            method, url, data=body, headers=headers, timeout=TIMEOUT,
+            allow_redirects=False, stream=True)
+        content = upstream.raw.read(MAX_RESPONSE_BYTES + 1, decode_content=True)
+    except requests.RequestException as e:
+        _logger.warning("КЕП-проксі: ЦСК %s недоступний: %s", host, e)
+        return Response('CA unavailable', status=502)
+
+    if upstream.status_code != 200 or len(content) > MAX_RESPONSE_BYTES:
+        _logger.warning("КЕП-проксі: ЦСК %s відповів %s", host, upstream.status_code)
+        return Response('CA error', status=502)
+    return Response(base64.b64encode(content), status=200,
+                    content_type='X-user/base64-data')
+
+
 class KepCaProxy(http.Controller):
 
     @http.route('/l10n_ua_sign/ca_proxy', type='http', auth='user',
                 methods=['GET', 'POST'], csrf=False)
     def ca_proxy(self, address='', contentType='', **kwargs):
-        host, url = _split_address(address)
-        if not host or host not in _allowed_hosts():
-            _logger.warning("КЕП-проксі: відхилено адресу %r", address)
-            return Response('Address not allowed', status=403)
-
-        method = request.httprequest.method
-        body = None
-        if method == 'POST':
-            raw = request.httprequest.get_data(cache=False)
-            try:
-                body = base64.b64decode(raw)
-            except (binascii.Error, ValueError):
-                return Response('Bad request body', status=400)
-            if len(body) > MAX_REQUEST_BYTES:
-                return Response('Request too large', status=413)
-
-        headers = {'Content-Type': contentType} if contentType else {}
-        try:
-            upstream = requests.request(
-                method, url, data=body, headers=headers, timeout=TIMEOUT,
-                allow_redirects=False, stream=True)
-            content = upstream.raw.read(MAX_RESPONSE_BYTES + 1, decode_content=True)
-        except requests.RequestException as e:
-            _logger.warning("КЕП-проксі: ЦСК %s недоступний: %s", host, e)
-            return Response('CA unavailable', status=502)
-
-        if upstream.status_code != 200 or len(content) > MAX_RESPONSE_BYTES:
-            _logger.warning("КЕП-проксі: ЦСК %s відповів %s", host, upstream.status_code)
-            return Response('CA error', status=502)
-        return Response(base64.b64encode(content), status=200,
-                        content_type='X-user/base64-data')
+        return forward_ca_request(address, contentType)

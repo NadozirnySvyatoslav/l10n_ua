@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_template_kep_invitation" model="mail.template">
+        <field name="name">ЕДО КЕП: запрошення підписати документ</field>
+        <field name="model_id" ref="l10n_ua_edo.model_l10n_ua_edo_document"/>
+        <field name="subject">Документ на підпис: {{ object.name }}</field>
+        <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+<div style="font-size: 14px;">
+    <p>Добрий день!</p>
+    <p><t t-out="object.company_id.name"/> надсилає вам документ <strong t-out="object.name"/>
+        <t t-if="object.number"> № <t t-out="object.number"/></t> на підпис кваліфікованим електронним підписом (КЕП).</p>
+    <p style="margin: 24px 0;">
+        <a t-att-href="object.get_base_url() + object.get_portal_url()"
+           style="background-color: #714B67; color: #fff; padding: 10px 18px; border-radius: 4px; text-decoration: none;">
+            Переглянути й підписати</a>
+    </p>
+    <p>За посиланням можна переглянути документ, підписати його ключем КЕП (файл-ключ і пароль
+        використовуються лише у вашому браузері) або відхилити з причиною. Можна також відповісти на
+        цей лист, доклавши файл підпису .p7s (відкріплений або разом з даними, напр. з id.gov.ua).</p>
+    <p>Після підписання обидві сторони отримають архів: документ, файли підписів і квитанцію.</p>
+</div>
+        </field>
+    </record>
+
+    <record id="mail_template_kep_signed" model="mail.template">
+        <field name="name">ЕДО КЕП: підписаний документ</field>
+        <field name="model_id" ref="l10n_ua_edo.model_l10n_ua_edo_document"/>
+        <field name="subject">Підписано: {{ object.name }}</field>
+        <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+<div style="font-size: 14px;">
+    <p>Добрий день!</p>
+    <p>Документ <strong t-out="object.name"/><t t-if="object.number"> № <t t-out="object.number"/></t>
+        <t t-if="object.state == 'signed'">підписано обома сторонами.</t>
+        <t t-else="">підписано <t t-out="object.company_id.name"/>.</t></p>
+    <p>В архіві — документ, файли підписів (.p7s) і квитанція з переліком підписів та інструкцією,
+        як їх перевірити на czo.gov.ua/verify.</p>
+</div>
+        </field>
+    </record>
+
+    <record id="mail_template_kep_rejected" model="mail.template">
+        <field name="name">ЕДО КЕП: документ відхилено</field>
+        <field name="model_id" ref="l10n_ua_edo.model_l10n_ua_edo_document"/>
+        <field name="subject">Відхилено: {{ object.name }}</field>
+        <field name="email_from">{{ (object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+<div style="font-size: 14px;">
+    <p>Добрий день!</p>
+    <p><t t-out="object.company_id.name"/> не підписує документ <strong t-out="object.name"/>.</p>
+    <p t-if="object.kep_reject_reason">Причина: <t t-out="object.kep_reject_reason"/></p>
+</div>
+        </field>
+    </record>
+</odoo>

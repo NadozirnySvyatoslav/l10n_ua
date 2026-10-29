@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_kep_document" name="EDO КЕП: document">
+        <t t-call="web.frontend_layout">
+            <t t-set="title" t-value="doc.name"/>
+            <div class="container my-4 o_kep_portal" t-att-data-doc-id="doc.id"
+                 t-att-data-access-token="access_token" t-att-data-proxy-url="proxy_url">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                    <div>
+                        <div class="text-muted small">Документ від <t t-out="doc.company_id.name"/></div>
+                        <h2 class="mb-1" t-out="doc.name"/>
+                        <div class="text-muted">
+                            <t t-if="doc.number">№ <t t-out="doc.number"/></t>
+                            <t t-if="doc.date"> від <t t-out="doc.date" t-options="{'widget': 'date'}"/></t>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span t-if="doc.state == 'signed'" class="badge text-bg-success fs-6">Підписано обома сторонами</span>
+                        <span t-elif="doc.state == 'rejected'" class="badge text-bg-danger fs-6">Відхилено</span>
+                        <span t-elif="can_sign" class="badge text-bg-warning fs-6">Чекає вашого підпису</span>
+                        <span t-else="" class="badge text-bg-info fs-6">Підписано вами, чекає відправника</span>
+                        <div class="mt-2">
+                            <a class="btn btn-sm btn-outline-secondary"
+                               t-att-href="'/my/edo/%s/file/original?download=1&amp;access_token=%s' % (doc.id, access_token)">
+                                <i class="fa fa-download"/> Документ</a>
+                            <a t-if="signatures" class="btn btn-sm btn-outline-secondary"
+                               t-att-href="'/my/edo/%s/file/archive?access_token=%s' % (doc.id, access_token)">
+                                <i class="fa fa-file-archive-o"/> Архів з підписами</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <iframe t-if="is_pdf" class="w-100 border rounded" style="height: 75vh;"
+                                t-att-src="'/my/edo/%s/file/original?access_token=%s' % (doc.id, access_token)"/>
+                        <div t-else="" class="alert alert-secondary">
+                            Перегляд доступний лише для PDF: завантажте файл
+                            <strong t-out="doc.attachment_id.name"/> кнопкою «Документ».
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div t-if="can_sign" class="card mb-3 o_kep_sign_card">
+                            <div class="card-body">
+                                <h5 class="card-title">Підписати КЕП</h5>
+                                <p class="small text-muted">Файл-ключ і пароль використовуються лише в цьому
+                                    браузері й нікуди не передаються.</p>
+                                <div class="mb-2">
+                                    <label class="form-label small">Центр сертифікації (ЦСК)</label>
+                                    <select class="form-select form-select-sm o_kep_ca">
+                                        <option value="">Визначити автоматично</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small">Файл ключа (.dat, .pfx, .jks, .zs2)</label>
+                                    <input type="file" class="form-control form-control-sm o_kep_key"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Пароль ключа</label>
+                                    <input type="password" class="form-control form-control-sm o_kep_password"
+                                           autocomplete="off"/>
+                                </div>
+                                <div class="alert alert-danger small d-none o_kep_error" role="alert"/>
+                                <div class="alert alert-info small d-none o_kep_status" role="status"/>
+                                <button type="button" class="btn btn-primary w-100 o_kep_sign">
+                                    <i class="fa fa-pencil"/> Підписати документ</button>
+                                <hr/>
+                                <details>
+                                    <summary class="small">Відхилити документ</summary>
+                                    <textarea class="form-control form-control-sm mt-2 o_kep_reason" rows="3"
+                                              placeholder="Причина відмови"/>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2 o_kep_reject">
+                                        Відхилити</button>
+                                </details>
+                            </div>
+                        </div>
+                        <div t-if="doc.kep_rejected" class="alert alert-danger">
+                            Документ відхилено<t t-if="doc.kep_reject_reason">: <t t-out="doc.kep_reject_reason"/></t>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Підписи</h5>
+                                <p t-if="not signatures" class="small text-muted mb-0">Підписів ще немає.</p>
+                                <ul class="list-unstyled mb-0">
+                                    <li t-foreach="signatures" t-as="s" class="mb-2">
+                                        <i class="fa fa-check text-success"/>
+                                        <strong t-out="s.signer_name"/><t t-if="s.is_stamp"> (печатка)</t>
+                                        <div class="small text-muted">
+                                            <t t-out="s.signer_title or ''"/>
+                                            <t t-if="s.organization and s.organization != s.signer_name"> · <t t-out="s.organization"/></t>
+                                            <br/><t t-out="s.signing_time" t-options="{'widget': 'datetime'}"/>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <p class="small text-muted mt-3 mb-0">Перевірити підписи можна на czo.gov.ua/verify:
+                                    файл документа і файл .p7s з архіву.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

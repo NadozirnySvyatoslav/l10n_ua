@@ -96,8 +96,6 @@ class L10nUaEdoMixin(models.AbstractModel):
                        recipient_signs_first=bool(send))
         data = account._call('upload', payload)
         vals = account._call('normalize', data)
-        if send:
-            account._call('send', vals['provider_ref'])
         partner = self._edo_partner()
         doc = self.env['l10n_ua.edo.document'].create({
             **{k: v for k, v in vals.items() if k in self.env['l10n_ua.edo.document']._fields},
@@ -117,7 +115,9 @@ class L10nUaEdoMixin(models.AbstractModel):
         attachment = self.env['ir.attachment'].create({
             'name': filename, 'raw': content, 'res_model': doc._name, 'res_id': doc.id})
         doc.attachment_id = attachment
+        # Sent once the document exists: a provider without an API (КЕП) works on it
         if send:
+            account._call('send', vals['provider_ref'])
             doc.action_refresh()
         if hasattr(self, 'message_post'):
             self.message_post(body=_('Sent to EDO: «%s».', payload['title']))

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Electronic Document Exchange (EDO)',
-    'version': '19.0.1.6.0',
+    'version': '19.0.1.7.0',
     'category': 'Accounting/Localization',
     'summary': 'Обмін первинними документами через сервіси ЕДО (Вчасно, …): '
                'надсилання на підпис, статуси, вхідні документи',
@@ -10,7 +10,8 @@ Ukraine - Electronic Document Exchange (EDO)
 
 Base of the integrations with Ukrainian electronic document exchange services
 (ЕДО: Вчасно, Paperless, …). The service itself is a separate provider module
-(``l10n_ua_edo_vchasno``).
+(``l10n_ua_edo_vchasno``; ``l10n_ua_edo_kep`` — exchange with КЕП without a service).
+The way of the exchange is chosen per counterparty and in the send wizard.
 
 * EDO account per company: provider, API token, ЄДРПОУ.
 * EDO document: incoming or outgoing, status, number, date, amount,
@@ -37,6 +38,7 @@ Base of the integrations with Ukrainian electronic document exchange services
         'data/ir_cron.xml',
         'views/edo_account_views.xml',
         'views/edo_document_views.xml',
+        'views/res_partner_views.xml',
         'wizard/edo_send_wizard_views.xml',
         'views/menu_views.xml',
     ],

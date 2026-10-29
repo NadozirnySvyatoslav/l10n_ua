@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Квитанція: протокол підписів, що кладеться в архів документа -->
+    <record id="action_report_kep_receipt" model="ir.actions.report">
+        <field name="name">Квитанція про підписання КЕП</field>
+        <field name="model">l10n_ua.edo.document</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_edo_kep.report_kep_receipt</field>
+        <field name="report_file">l10n_ua_edo_kep.report_kep_receipt</field>
+        <field name="print_report_name">'Kvytantsiia_%s' % (object.name)</field>
+    </record>
+
+    <template id="report_kep_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-size: 10pt;">
+                        <h3>Квитанція про підписання документа кваліфікованим електронним підписом</h3>
+                        <table class="table table-sm table-borderless">
+                            <tr><td style="width: 30%;">Документ</td><td><strong t-out="o.name"/></td></tr>
+                            <tr t-if="o.number"><td>Номер</td><td t-out="o.number"/></tr>
+                            <tr t-if="o.date"><td>Дата</td><td t-out="o.date" t-options="{'widget': 'date'}"/></tr>
+                            <tr><td>Файл</td><td t-out="o.attachment_id.name"/></tr>
+                            <tr><td>SHA-256 файлу</td><td style="font-family: monospace; font-size: 8pt;" t-out="o._kep_original_sha256()"/></tr>
+                            <tr>
+                                <td t-out="'Відправник' if o.direction == 'out' else 'Отримувач'"/>
+                                <td><t t-out="o.company_id.name"/> <t t-if="o.account_id.edrpou">(ЄДРПОУ <t t-out="o.account_id.edrpou"/>)</t></td>
+                            </tr>
+                            <tr>
+                                <td t-out="'Отримувач' if o.direction == 'out' else 'Відправник'"/>
+                                <td><t t-out="o.counterparty_name or o.partner_id.name or '—'"/> <t t-if="o.counterparty_edrpou">(ЄДРПОУ <t t-out="o.counterparty_edrpou"/>)</t></td>
+                            </tr>
+                            <tr t-if="o.kep_rejected"><td>Відхилено</td><td t-out="o.kep_reject_reason or '—'"/></tr>
+                        </table>
+
+                        <h5>Підписи</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Сторона</th><th>Підписувач</th><th>РНОКПП / ЄДРПОУ</th>
+                                    <th>Сертифікат</th><th>Час підпису (UTC)</th><th>Перевірка в Odoo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.kep_signature_ids.filtered(lambda s: s.verification != 'invalid')" t-as="s">
+                                    <td t-out="'Відправник' if s.party == 'owner' else 'Отримувач'"/>
+                                    <td>
+                                        <t t-out="s.signer_name"/><t t-if="s.is_stamp"> (печатка)</t>
+                                        <div t-if="s.signer_title" class="text-muted" t-out="s.signer_title"/>
+                                        <div t-if="s.organization and s.organization != s.signer_name" class="text-muted" t-out="s.organization"/>
+                                    </td>
+                                    <td><t t-out="s.drfo or ''"/><t t-if="s.drfo and s.edrpou"> / </t><t t-out="s.edrpou or ''"/></td>
+                                    <td style="font-size: 8pt;"><t t-out="s.issuer"/><br/><span style="font-family: monospace;" t-out="s.cert_serial"/></td>
+                                    <td t-out="s.signing_time"/>
+                                    <td>
+                                        <t t-if="s.verification == 'valid'">Дійсний (<t t-out="s.verified_on"/>)</t>
+                                        <t t-else="">Не перевірено</t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h5>Як перевірити</h5>
+                        <ol>
+                            <li>Відкрийте сервіс перевірки підпису центрального засвідчувального органу:
+                                <strong>https://czo.gov.ua/verify</strong> (або https://id.gov.ua/verify).</li>
+                            <li>Завантажте файл документа <t t-out="o.attachment_id.name"/> з цього архіву і
+                                файл підпису (.p7s) — для кожного підпису окремо.</li>
+                            <li>Сервіс покаже підписувача, час підпису і чи відповідає підпис саме цьому файлу.
+                                Підпис, накладений на інший файл, перевірку не пройде.</li>
+                        </ol>
+                        <p class="text-muted" style="font-size: 8pt;">
+                            Документ підписано у браузері бібліотекою ІІТ «Користувач ЦСК»; приватні ключі
+                            підписувачів не передавались. Квитанцію сформовано в Odoo
+                            <t t-out="context_timestamp(datetime.datetime.now()).strftime('%d.%m.%Y %H:%M')"/>.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
