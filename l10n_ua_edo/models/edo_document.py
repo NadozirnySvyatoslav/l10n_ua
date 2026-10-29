@@ -75,6 +75,8 @@ class L10nUaEdoDocument(models.Model):
             old_state = doc.state
             vals = dict(vals, last_sync=fields.Datetime.now())
             vals.pop('direction', None)
+            if doc.partner_id:
+                vals.pop('partner_id', None)  # a counterparty set in Odoo stays
             doc.write({k: v for k, v in vals.items() if k in self._fields})
             if doc.state != old_state:
                 # The archive first: the record may want to keep it
@@ -87,16 +89,28 @@ class L10nUaEdoDocument(models.Model):
     @api.model
     def _upsert_incoming(self, account, vals):
         """Create or update an incoming document; find the counterparty by ЄДРПОУ."""
+        return self._upsert_from_service(account, vals, 'in')
+
+    @api.model
+    def _upsert_from_service(self, account, vals, direction):
+        """Create or update a document listed by the service; find the counterparty by ЄДРПОУ.
+
+        A document already linked (sent from Odoo, or imported before) is only
+        updated: its direction never changes.
+        """
         doc = self.search([('account_id', '=', account.id),
                            ('provider_ref', '=', vals.get('provider_ref'))], limit=1)
         if doc:
             doc._apply_provider_vals(vals)
             return doc
-        vals = dict(vals, account_id=account.id, direction='in', last_sync=fields.Datetime.now())
+        vals = dict(vals, account_id=account.id, direction=direction, last_sync=fields.Datetime.now())
         if not vals.get('partner_id') and vals.get('counterparty_edrpou'):
             vals['partner_id'] = self._find_partner(vals['counterparty_edrpou']).id or False
         doc = self.create({k: v for k, v in vals.items() if k in self._fields})
-        doc.message_post(body=_('Incoming document imported from the EDO service.'))
+        if direction == 'in':
+            doc.message_post(body=_('Incoming document imported from the EDO service.'))
+        else:
+            doc.message_post(body=_('Outgoing document imported from the EDO service.'))
         return doc
 
     @api.model

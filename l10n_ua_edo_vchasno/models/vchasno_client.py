@@ -93,6 +93,11 @@ class VchasnoClient:
         params = {'date_created_from': date_from.isoformat()} if date_from else {}
         return self._pages('/incoming-documents', params)
 
+    def outgoing(self, date_from=None):
+        """Documents of the company: ``/documents`` without ``ids`` lists the ones it uploaded."""
+        params = {'date_created_from': date_from.isoformat()} if date_from else {}
+        return self._pages('/documents', params)
+
     def download(self, document_id, kind):
         response = self._request('GET', f'/documents/{document_id}/{kind}')
         disposition = response.headers.get('Content-Disposition', '')

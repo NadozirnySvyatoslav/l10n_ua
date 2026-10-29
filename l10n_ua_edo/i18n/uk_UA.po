@@ -349,8 +349,8 @@ msgstr "Якщо позначено, деякі повідомлення маю�
 
 #. module: l10n_ua_edo
 #: model:ir.model.fields,field_description:l10n_ua_edo.field_l10n_ua_edo_account__incoming_date_from
-msgid "Import Incoming From"
-msgstr "Імпортувати вхідні з"
+msgid "Import Documents From"
+msgstr "Імпортувати документи з"
 
 #. module: l10n_ua_edo
 #: model:ir.actions.act_window,name:l10n_ua_edo.action_edo_document_in
@@ -363,13 +363,19 @@ msgstr "Вхідні"
 #. module: l10n_ua_edo
 #. odoo-python
 #: code:addons/l10n_ua_edo/models/edo_document.py:0
+msgid "Outgoing document imported from the EDO service."
+msgstr "Вихідний документ імпортовано із сервісу ЕДО."
+
+#. module: l10n_ua_edo
+#. odoo-python
+#: code:addons/l10n_ua_edo/models/edo_document.py:0
 msgid "Incoming document imported from the EDO service."
 msgstr "Вхідний документ імпортовано із сервісу ЕДО."
 
 #. module: l10n_ua_edo
 #: model:ir.model.fields,help:l10n_ua_edo.field_l10n_ua_edo_account__incoming_date_from
-msgid "Incoming documents created since this date are imported."
-msgstr "Імпортуються вхідні документи, створені з цієї дати."
+msgid "Incoming and outgoing documents created in the service since this date are imported."
+msgstr "Імпортуються вхідні та вихідні документи, створені в сервісі з цієї дати."
 
 #. module: l10n_ua_edo
 #: model_terms:ir.actions.act_window,help:l10n_ua_edo.action_edo_account

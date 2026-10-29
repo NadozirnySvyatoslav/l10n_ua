@@ -89,6 +89,11 @@ class L10nUaEdoAccount(models.Model):
     def _vchasno_incoming(self, date_from):
         return self._vchasno('incoming', date_from)
 
+    def _vchasno_outgoing(self, date_from):
+        # The list holds only the company's own documents; keep a foreign one out all the same
+        return [doc for doc in self._vchasno('outgoing', date_from)
+                if not doc.get('edrpou_owner') or doc['edrpou_owner'] == self.edrpou]
+
     def _vchasno_download(self, ref, kind):
         return self._vchasno('download', ref, kind)
 
@@ -138,4 +143,24 @@ class L10nUaEdoAccount(models.Model):
         if owner and owner != self.edrpou:
             vals['counterparty_edrpou'] = owner
             vals['counterparty_name'] = data.get('company_name') or False
+        else:
+            # The list of documents gives no recipient: the counterparty is the one who signed
+            partner = self._vchasno_signer_partner(data.get('signatures'))
+            if partner:
+                vals['partner_id'] = partner.id
         return vals
+
+    def _vchasno_signer_partner(self, signatures):
+        """The contact of a signer outside the company (by email), or an empty recordset."""
+        Partner = self.env['res.partner']
+        own = {e.lower() for e in self.env['res.users'].sudo().search(
+            [('share', '=', False)]).mapped('email') if e}
+        for signature in signatures or []:
+            email = (signature.get('email') or '').strip().lower()
+            if not email or email in own:
+                continue
+            partner = Partner.search([('email', '=ilike', email)], limit=1)
+            partner = partner.commercial_partner_id
+            if partner and partner not in self.env['res.company'].sudo().search([]).partner_id:
+                return partner
+        return Partner

@@ -123,6 +123,38 @@ class TestVchasno(TransactionCase):
         doc = self.env['l10n_ua.edo.document'].search([('provider_ref', '=', 'in-1')])
         self.assertEqual(doc.partner_id, supplier)
 
+    def test_outgoing_created_in_the_service_is_imported(self):
+        customer = self.env['res.partner'].create({'name': 'ТОВ «Катана»', 'is_company': True})
+        self.env['res.partner'].create({'name': 'Бухгалтер', 'parent_id': customer.id,
+                                        'email': 'Buh@katana.example'})
+        sent_from_odoo = self.env['l10n_ua.edo.document'].create({
+            'name': 'Акт № 5', 'account_id': self.account.id, 'direction': 'out',
+            'provider_ref': 'out-5', 'state': 'signed'})
+        session = self._session({
+            ('GET', '/incoming-documents'): FakeResponse(200, {'documents': []}),
+            ('GET', '/documents'): FakeResponse(200, {'documents': [
+                {'id': 'out-7', 'title': 'NDA', 'status': 7008, 'number': '2', 'category': 3,
+                 'date': '2026-10-29T00:00:00+02:00', 'date_created': '2026-10-29T13:58:19+02:00',
+                 'signatures': [{'email': self.env.user.email or 'me@example.com'},
+                                {'email': 'buh@katana.example'}]},
+                {'id': 'out-5', 'title': 'Акт № 5', 'status': 7008},
+                {'id': 'in-3', 'title': 'Чужий', 'status': 7008, 'edrpou_owner': '22222221'},
+            ], 'next_cursor': None}),
+        })
+        self.account.action_sync()
+        listing = [c for c in session.calls if c[1] == '/documents']
+        self.assertEqual(listing[-1][3]['params'], {'date_created_from': '2026-01-01'})
+        doc = self.env['l10n_ua.edo.document'].search([('provider_ref', '=', 'out-7')])
+        self.assertEqual((doc.direction, doc.state, doc.number, str(doc.date), doc.category),
+                         ('out', 'signed', '2', '2026-10-29', '3'))
+        self.assertEqual(doc.partner_id, customer)                     # found by the signer's email
+        self.assertFalse(self.env['l10n_ua.edo.document'].search([('provider_ref', '=', 'in-3')]))
+        # Sent from Odoo: updated, not duplicated
+        self.assertEqual(self.env['l10n_ua.edo.document'].search_count([('provider_ref', '=', 'out-5')]), 1)
+        self.assertEqual(sent_from_odoo.direction, 'out')
+        self.account.action_sync()
+        self.assertEqual(self.env['l10n_ua.edo.document'].search_count([('provider_ref', '=', 'out-7')]), 1)
+
     def test_rejected_token_is_a_user_error(self):
         self._session({('GET', '/document-categories'): FakeResponse(401, {'reason': 'Unauthorized'})})
         with self.assertRaisesRegex(UserError, 'токен'):

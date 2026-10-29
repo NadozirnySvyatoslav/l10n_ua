@@ -10,6 +10,9 @@ plain data, so the base module and the bridges never see the API:
 * ``send(ref)`` — send an uploaded document to the counterparty.
 * ``fetch(refs)`` → [provider document] — the current state of documents.
 * ``incoming(date_from)`` → [provider document] — incoming documents.
+* ``outgoing(date_from)`` (optional) → [provider document] — documents the
+  company created in the service itself (not only from Odoo); they are
+  imported as outgoing ones.
 * ``download(ref, kind)`` → (filename, bytes); kind is 'original' or
   'archive' (the file with the signatures).
 * ``normalize(document)`` → values of ``l10n_ua.edo.document``.
@@ -60,8 +63,8 @@ class L10nUaEdoAccount(models.Model):
         string='ЄДРПОУ', default=lambda self: self.env.company.edrpou,
         help='Code of the company in the service: documents are sent on its behalf.')
     incoming_date_from = fields.Date(
-        string='Import Incoming From', default=lambda self: self._default_incoming_date_from(),
-        help='Incoming documents created since this date are imported.')
+        string='Import Documents From', default=lambda self: self._default_incoming_date_from(),
+        help='Incoming and outgoing documents created in the service since this date are imported.')
     last_sync = fields.Datetime(readonly=True, copy=False)
     last_error = fields.Text(readonly=True, copy=False)
     document_ids = fields.One2many('l10n_ua.edo.document', 'account_id')
@@ -184,7 +187,8 @@ class L10nUaEdoAccount(models.Model):
     # ── Synchronisation ─────────────────────────────────────
 
     def _sync(self):
-        """Refresh the open outgoing documents and import the incoming ones."""
+        """Refresh the open documents, import the incoming ones and the outgoing
+        ones created in the service (when the provider lists them)."""
         self.ensure_one()
         Document = self.env['l10n_ua.edo.document']
         open_docs = Document.search([
@@ -200,4 +204,8 @@ class L10nUaEdoAccount(models.Model):
         for data in self._call('incoming', self.incoming_date_from):
             vals = self._call('normalize', data)
             Document._upsert_incoming(self, vals)
+        if hasattr(self, f'_{self.provider}_outgoing'):
+            for data in self._call('outgoing', self.incoming_date_from):
+                vals = self._call('normalize', data)
+                Document._upsert_from_service(self, vals, 'out')
         self.write({'last_sync': fields.Datetime.now(), 'last_error': False})
