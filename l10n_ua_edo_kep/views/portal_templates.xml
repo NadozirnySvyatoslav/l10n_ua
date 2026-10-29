@@ -58,7 +58,8 @@
                                 <div class="mb-3">
                                     <label class="form-label small">Пароль ключа</label>
                                     <input type="password" class="form-control form-control-sm o_kep_password"
-                                           autocomplete="off"/>
+                                           name="kep-key-password" autocomplete="new-password"
+                                           data-lpignore="true" data-1p-ignore="true"/>
                                 </div>
                                 <div class="alert alert-danger small d-none o_kep_error" role="alert"/>
                                 <div class="alert alert-info small d-none o_kep_status" role="status"/>

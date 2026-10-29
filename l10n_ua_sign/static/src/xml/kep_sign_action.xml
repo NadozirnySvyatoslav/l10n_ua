@@ -117,8 +117,9 @@
                             </div>
                             <div class="mb-2">
                                 <label class="form-label">Пароль до ключа</label>
-                                <input type="password" class="form-control"
-                                       autocomplete="off"
+                                <!-- new-password: «off» Chrome ігнорує й підставляє збережений пароль від Odoo -->
+                                <input type="password" class="form-control" name="kep-key-password"
+                                       autocomplete="new-password" data-lpignore="true" data-1p-ignore="true"
                                        t-att-disabled="busy"
                                        t-att-value="state.password"
                                        t-on-input="onPasswordInput"/>
