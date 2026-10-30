@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_hr_psp_application" model="ir.actions.report">
+        <field name="name">Заява про застосування ПСП</field>
+        <field name="model">hr.psp.application</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_hr_salary.report_hr_psp_application</field>
+        <field name="report_file">l10n_ua_hr_salary.report_hr_psp_application</field>
+        <field name="print_report_name">'Заява ПСП - %s' % (object.employee_id.name)</field>
+        <field name="binding_model_id" ref="model_hr_psp_application"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_hr_psp_application">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-family: Arial, sans-serif; font-size: 13pt; line-height: 1.5; padding: 20mm 15mm;">
+                        <!-- Header Right-aligned -->
+                        <div style="width: 50%; margin-left: 50%; margin-bottom: 30px;">
+                            <p style="margin: 0;">
+                                <strong>Керівнику</strong><br/>
+                                <span t-esc="o.company_id.name"/><br/>
+                                <t t-if="o.company_id.partner_id.name and o.company_id.partner_id.name != o.company_id.name">
+                                    <span t-esc="o.company_id.partner_id.name"/><br/>
+                                </t>
+                            </p>
+                            <p style="margin-top: 15px; margin-bottom: 0;">
+                                <strong>від працівника:</strong><br/>
+                                <span t-esc="o.employee_id.name"/><br/>
+                                РНОКПП: <span t-esc="o.rnokpp or '___________________'"/><br/>
+                                <t t-if="o.employee_id.job_id">
+                                    Посада: <span t-esc="o.employee_id.job_id.name"/><br/>
+                                </t>
+                                <t t-set="emp_addr" t-value="o.employee_id.private_street or ''"/>
+                                <t t-if="emp_addr">
+                                    Адреса: <span t-esc="emp_addr"/><br/>
+                                </t>
+                            </p>
+                        </div>
+
+                        <!-- Title -->
+                        <div style="text-align: center; margin-top: 40px; margin-bottom: 30px;">
+                            <h3 style="font-size: 16pt; font-weight: bold; margin-bottom: 5px;">ЗАЯВА</h3>
+                            <h4 style="font-size: 13pt; font-weight: bold; margin-top: 0;">про застосування податкової соціальної пільги</h4>
+                        </div>
+
+                        <!-- Statement Text -->
+                        <div style="text-align: justify; text-indent: 30px; margin-bottom: 20px;">
+                            Відповідно до підпункту 169.2.2 пункту 169.2 статті 169 розділу IV Податкового кодексу України
+                            прошу застосовувати до нарахованого мені заробітку податкову соціальну пільгу у розмірі:
+                            <span style="font-weight: bold; text-decoration: underline;" t-esc="dict(o._fields['psp_type'].selection).get(o.psp_type, o.psp_type)"/>.
+                        </div>
+
+                        <t t-if="o.note">
+                            <div style="margin-bottom: 20px;">
+                                <strong>Підстава та підтвердні документи:</strong>
+                                <p style="margin-top: 5px; text-indent: 30px;" t-esc="o.note"/>
+                            </div>
+                        </t>
+
+                        <div style="text-align: justify; text-indent: 30px; margin-bottom: 30px;">
+                            Підтверджую, що самостійно обрав(ла) дане підприємство як єдине місце застосування податкової соціальної пільги,
+                            і не подавав(ла) заяви про застосування пільги іншому роботодавцю.
+                            Зобов'язуюсь негайно повідомити у разі зміни обставин або втрати права на податкову соціальну пільгу.
+                        </div>
+
+                        <!-- Date and Signature -->
+                        <div style="margin-top: 50px;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 40%;">
+                                        «<span t-esc="o.date_from.strftime('%d')"/>»
+                                        <span t-esc="o.date_from.strftime('%m')"/>
+                                        <span t-esc="o.date_from.strftime('%Y')"/> р.
+                                    </td>
+                                    <td style="width: 25%; text-align: center; border-bottom: 1px solid black;">
+                                    </td>
+                                    <td style="width: 35%; text-align: right;">
+                                        <span t-esc="o.employee_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="text-align: center; font-size: 9pt; color: #555;">(підпис)</td>
+                                    <td style="text-align: right; font-size: 9pt; color: #555;">(ініціали, прізвище)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

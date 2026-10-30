@@ -44,6 +44,7 @@ class SalaryTestCase(TransactionCase):
 
         cls.employee = cls.env['hr.employee'].create({
             'name': 'Петренко Олександр Миколайович',
+            'rnokpp': '2812345678',
             'company_id': cls.company.id,
             'department_id': cls.department.id,
             'job_id': cls.job.id,
@@ -61,6 +62,15 @@ class SalaryTestCase(TransactionCase):
             'company_id': cls.company.id,
         })
         cls.employee.write({'current_version_id': cls.version.id})
+
+        # Active PSP application for test employee
+        cls.psp_application = cls.env['hr.psp.application'].create({
+            'employee_id': cls.employee.id,
+            'company_id': cls.company.id,
+            'date_from': date(2024, 1, 15),
+            'psp_type': 'standard',
+            'state': 'active',
+        })
 
         # Find or create PSP parameters for 2025
         cls.psp_params = cls.env['hr.psp.parameters'].search([

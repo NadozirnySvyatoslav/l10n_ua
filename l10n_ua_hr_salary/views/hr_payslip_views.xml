@@ -94,6 +94,7 @@
                             <group>
                                 <group string="PSP (Tax Social Benefit)">
                                     <field name="psp_eligible"/>
+                                    <field name="psp_application_id" invisible="not psp_application_id"/>
                                     <field name="psp_type"/>
                                     <field name="psp_amount"/>
                                 </group>
