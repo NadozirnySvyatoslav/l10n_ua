@@ -12,12 +12,6 @@
                             type="object" class="btn-primary"
                             invisible="state == 'submitted'"
                             confirm="Згенерувати рядки з payslips? Існуючі дані буде перезаписано."/>
-                    <button name="action_generate_xml" string="Сформувати XML"
-                            type="object" class="btn-secondary"
-                            invisible="state == 'draft'"/>
-                    <button name="action_submit" string="Підписати і подати"
-                            type="object" class="btn-primary"
-                            invisible="state != 'generated'"/>
                     <button name="action_draft" string="Повернути в чернетку"
                             type="object"
                             invisible="state == 'draft'"/>

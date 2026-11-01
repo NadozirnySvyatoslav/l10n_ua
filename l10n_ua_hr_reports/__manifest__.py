@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Reports',
-    'version': '19.0.1.2.2',
+    'version': '19.0.1.3.0',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR regulatory reports',
     'description': """

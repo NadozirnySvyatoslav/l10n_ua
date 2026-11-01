@@ -8,9 +8,10 @@
 
 Обсяг:
 - Модель заголовка + Додаток 4ДФ (ПДФО/ВЗ по особах) + Додаток 1 (ЄСВ)
-- XML Додатка 4ДФ (F0510410/J0510410 v10) — валідний за офіційним XSD ДПС
-  (tests/test_xsd_validation.py). Головна форма F0500110/J0500110, Д1/Д5/Д6
-  та пакування LINKED_DOCS — наступні інкременти (#142).
+- Рендер Додатка 4ДФ (F0510411/J0510411 v11) — валідний за офіційним XSD
+  ДПС (tests/test_xsd_validation.py). Сам XML подається у складі Податкового
+  розрахунку (головна форма J/F0500111 + LINKED_DOCS, #210): юрособа —
+  щомісяця, ФОП — щокварталу з помісячними Д4.
 """
 
 import re
@@ -20,10 +21,11 @@ from xml.sax.saxutils import escape
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-# Додаток 4ДФ = F0510410 (ФОП) / J0510410 (юрособа), версія 10 об'єднаного
-# розрахунку. Коди й структура звірені з офіційним XSD ДПС (пакет СКЗ 1.34.0.0).
+# Додаток 4ДФ = F0510411 (ФОП) / J0510411 (юрособа), версія 11 (наказ
+# Мінфіну № 243 від 07.05.2026, чинна з 17.07.2026; версію 10 знято з реєстру
+# ДПС). Коди й структура — з офіційного XSD (СКЗ 1.34.9.0).
 D4_C_DOC_SUB = '104'
-D4_C_DOC_VER = '10'
+D4_C_DOC_VER = '11'
 D4_SOFTWARE = 'Odoo l10n_ua'
 
 
@@ -284,8 +286,8 @@ class L10nUaTax4DF(models.Model):
     # --- Стан ---
 
     def action_submit(self):
-        """Відкрити КЕП-підпис і подання 4ДФ до ДПС (l10n_ua.dps.submit.mixin)."""
-        return self.action_kep_submit()
+        """Квартальний 4ДФ окремо не подається — див. ``action_generate_xml``."""
+        return self.action_generate_xml()
 
     # --- контракт l10n_ua.dps.submit.mixin ---
 
@@ -318,22 +320,19 @@ class L10nUaTax4DF(models.Model):
         return True
 
     def action_generate_xml(self):
-        """Сформувати XML Додатка 4ДФ (F0510410/J0510410 v10), валідний за XSD ДПС.
+        """XML Додатка 4ДФ версії 11 цей квартальний документ не формує.
 
-        Наразі формує саме Додаток 4ДФ (per-person ПДФО/ВЗ). Головна форма
-        (F0500110/J0500110), Д1/Д5/Д6 і пакування через LINKED_DOCS — окремі
-        інкременти (див. #142). Валідність структури підтверджує
-        tests/test_xsd_validation.py проти вендореного F0510410.xsd.
+        З версії 11 юрособа подає Д4 щомісяця, ФОП — по Д4 на кожен місяць
+        кварталу (HZKV + HNM), і лише в пакеті з головною формою J/F0500111.
+        Квартальні підсумки цього документа в жодну з них не лягають, а
+        версію 10 ДПС уже не приймає. XML формує «Податковий розрахунок»
+        (#210) тим самим рендером ``_render_d4_xml``.
         """
-        import base64
-        for rec in self:
-            if rec.state == 'draft':
-                raise UserError(_('Спочатку згенеруйте звіт з payslips.'))
-            xml = self._render_d4_xml(rec._d4_vals())
-            rec.xml_file = base64.b64encode(xml.encode('windows-1251'))
-            prefix = 'F0510410' if rec._d4_prefix() == 'F05' else 'J0510410'
-            rec.xml_filename = '%s_%s_Q%s.xml' % (prefix, rec.year, rec.quarter)
-        return True
+        raise UserError(_(
+            'Додаток 4ДФ версії 11 формується помісячно в документі '
+            '«Податковий розрахунок» (юрособа — щомісяця, ФОП — за квартал '
+            'з розбивкою по місяцях). Квартальний 4ДФ лишається зведенням '
+            'для перевірки сум.'))
 
     def _d4_prefix(self):
         """C_DOC-префікс додатка: F05 (ФОП) / J05 (юрособа)."""
@@ -406,14 +405,15 @@ class L10nUaTax4DF(models.Model):
 
     @api.model
     def _render_d4_xml(self, vals):
-        """Рендер XML Додатка 4ДФ (F0510410/J0510410 v10) з dict значень.
+        """Рендер XML Додатка 4ДФ (F0510411/J0510411 v11) з dict значень.
 
         Стейтлес (лише ``vals``) — щоб валідацію проти офіційного XSD можна
         було проганяти без залежності від наявних записів. Кодування —
         windows-1251 (як приймає ДПС). Порядок і склад елементів звірені з
-        F0510410.xsd (DBody: HZ, HZY, HZM, HNUM, HNAME, HTIN, HKATOTTG,
+        F/J0510411.xsd (DBody: HZ, HZY, період, HNUM, HNAME, HTIN, HKATOTTG,
         лічильники, стовпці T1RXXXXG02..G09 по особах, підсумки, HFILL,
-        HKBOS, HBOS).
+        HKBOS, HBOS). Період: юрособа — HZM (місяць); ФОП — HZKV (квартал)
+        і HNM (номер місяця в кварталі, 1–3).
         """
         def esc(v):
             return escape(str(v or ''))
@@ -462,8 +462,14 @@ class L10nUaTax4DF(models.Model):
         tot_mil_a = sum(p['mil_accrued'] for p in persons)
         tot_mil = sum(p['mil_paid'] for p in persons)
 
+        if vals['prefix'] == 'F05':
+            period = (f"        <HZKV>{vals['hzkv']}</HZKV>\n"
+                      f"        <HNM>{vals['hnm']}</HNM>")
+        else:
+            period = f"        <HZM>{vals['hzm']}</HZM>"
+
         xml = f'''<?xml version="1.0" encoding="windows-1251"?>
-<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="{vals['prefix'][0]}0510410.xsd">
+<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="{vals['prefix'][0]}0510411.xsd">
     <DECLARHEAD>
         <TIN>{esc(vals['tin'])}</TIN>
         <C_DOC>{vals['prefix']}</C_DOC>
@@ -484,7 +490,7 @@ class L10nUaTax4DF(models.Model):
     <DECLARBODY>
         <HZ>1</HZ>
         <HZY>{vals['hzy']}</HZY>
-        <HZM>{vals['hzm']}</HZM>
+{period}
         <HNUM>{vals['hnum']}</HNUM>
         <HNAME>{esc(vals['hname'])}</HNAME>
         <HTIN>{esc(vals['htin'])}</HTIN>

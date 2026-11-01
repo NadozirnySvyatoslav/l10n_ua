@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - 4DF Unified Tax Report',
-    'version': '19.0.1.0.2',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': '4ДФ — об\'єднана квартальна звітність ПДФО/ВЗ/ЄСВ '
                '(заміна 1ДФ + Д5 з 01.01.2021)',

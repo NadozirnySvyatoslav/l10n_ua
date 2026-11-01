@@ -11,8 +11,6 @@
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_export_xml" string="Export XML" type="object"
                             invisible="state == 'draft'"/>
-                    <button name="action_submit" string="Підписати і подати" type="object"
-                            class="btn-primary" invisible="state != 'generated'"/>
                     <button name="action_draft" string="Set to Draft" type="object"
                             invisible="state == 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,submitted"/>
@@ -49,10 +47,20 @@
                                     <field name="first_name"/>
                                     <field name="middle_name"/>
                                     <field name="category"/>
+                                    <field name="citizen_ua" optional="hide"/>
+                                    <field name="gender" optional="hide"/>
+                                    <field name="gross_amount" sum="Total"/>
                                     <field name="esv_base" sum="Total"/>
+                                    <field name="min_wage_diff" sum="Total" optional="hide"/>
                                     <field name="esv_amount" sum="Total"/>
-                                    <field name="worked_days"/>
-                                    <field name="worked_hours"/>
+                                    <field name="employment_days"/>
+                                    <field name="sick_days" optional="hide"/>
+                                    <field name="unpaid_days" optional="hide"/>
+                                    <field name="maternity_days" optional="hide"/>
+                                    <field name="main_job" optional="hide"/>
+                                    <field name="part_time" optional="hide"/>
+                                    <field name="worked_days" optional="hide"/>
+                                    <field name="worked_hours" optional="hide"/>
                                 </list>
                             </field>
                         </page>
