@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '19.0.7.10.0',
+    'version': '19.0.7.11.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
@@ -32,6 +32,12 @@ Complete Ukrainian accounting functionality for Odoo:
 * Journal entry with automatic (partial) reconciliation of the documents
 * Printable act of netting of counter homogeneous claims
 * Cancellation by reversal entry
+
+**Trade Markup Write-off (NP(S)BO 9, item 22):**
+* Retail at sale prices (282/285): average markup percent of the month
+* Markup on disposed goods written off Dt 285 Ct 902 / 947 / ...
+  by the account the goods went to
+* Posted automatically by the period closing before 9x is closed
 
 **Financial Statements:**
 * Balance Sheet (Баланс, Форма №1)
@@ -108,6 +114,7 @@ Dependencies:
         'report/debt_netting_report.xml',
         'views/l10n_ua_debt_netting_views.xml',
         'views/l10n_ua_deferral_views.xml',
+        'views/l10n_ua_trade_markup_views.xml',
         # Wizards
         'wizard/cash_book_wizard_views.xml',
         'wizard/reconciliation_act_wizard_views.xml',

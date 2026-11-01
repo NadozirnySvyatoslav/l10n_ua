@@ -21,3 +21,4 @@ from . import test_equity_report
 from . import test_pnl_form
 from . import test_small_report
 from . import test_notes_report
+from . import test_trade_markup
