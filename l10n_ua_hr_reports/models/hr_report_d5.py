@@ -435,6 +435,11 @@ class HrReportD5(models.Model):
             '        <PERIOD_YEAR>%s</PERIOD_YEAR>' % vals['period_year'],
             '        <C_STI_ORIG>%s</C_STI_ORIG>' % esc(vals['c_sti_orig']),
             '        <C_DOC_STAN>1</C_DOC_STAN>',
+        ]
+        if vals.get('linked_xml'):
+            # Пакет Податкового розрахунку: посилання на головну форму J0500111.
+            parts.append('        %s' % vals['linked_xml'])
+        parts += [
             '        <D_FILL>%s</D_FILL>' % vals['hfill'],
             '        <SOFTWARE>%s</SOFTWARE>' % D1_SOFTWARE,
             '    </DECLARHEAD>',

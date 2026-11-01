@@ -5,3 +5,6 @@ access_l10n_ua_tax_4df_line_4df_user,l10n_ua.tax.4df.line.4df.user,model_l10n_ua
 access_l10n_ua_tax_4df_line_4df_manager,l10n_ua.tax.4df.line.4df.manager,model_l10n_ua_tax_4df_line_4df,account.group_account_manager,1,1,1,1
 access_l10n_ua_tax_4df_line_t1_user,l10n_ua.tax.4df.line.t1.user,model_l10n_ua_tax_4df_line_t1,account.group_account_user,1,1,1,1
 access_l10n_ua_tax_4df_line_t1_manager,l10n_ua.tax.4df.line.t1.manager,model_l10n_ua_tax_4df_line_t1,account.group_account_manager,1,1,1,1
+access_l10n_ua_payroll_tax_report_user,l10n_ua.payroll.tax.report.user,model_l10n_ua_payroll_tax_report,account.group_account_user,1,1,1,0
+access_l10n_ua_payroll_tax_report_manager,l10n_ua.payroll.tax.report.manager,model_l10n_ua_payroll_tax_report,account.group_account_manager,1,1,1,1
+access_l10n_ua_payroll_tax_report_d4_line_user,l10n_ua.payroll.tax.report.d4.line.user,model_l10n_ua_payroll_tax_report_d4_line,account.group_account_user,1,1,1,1

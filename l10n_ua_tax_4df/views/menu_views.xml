@@ -16,4 +16,17 @@
               parent="l10n_ua_tax.menu_ua_tax_reporting"
               action="l10n_ua_tax_4df_action"
               sequence="30"/>
+
+    <menuitem id="menu_l10n_ua_payroll_tax_report"
+              name="Податковий розрахунок"
+              parent="l10n_ua_tax.menu_ua_tax_reporting"
+              action="l10n_ua_payroll_tax_report_action"
+              sequence="29"/>
+
+    <menuitem id="menu_l10n_ua_payroll_tax_report_accounting"
+              name="Податковий розрахунок"
+              parent="l10n_ua_account_base.menu_l10n_ua_accounting"
+              action="l10n_ua_payroll_tax_report_action"
+              sequence="59"
+              groups="account.group_account_user"/>
 </odoo>
