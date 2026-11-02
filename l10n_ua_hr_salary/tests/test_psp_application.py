@@ -219,3 +219,46 @@ class TestPspApplication(SalaryTestCase):
         pdf_content, _ = report._render_qweb_pdf(report, self.psp_application.ids)
         self.assertTrue(pdf_content)
         self.assertTrue(len(pdf_content) > 100)
+
+    # --- перенесення позначок договорів (міграція 19.0.1.6.0) ---
+
+    def test_migration_creates_active_application(self):
+        """Позначка на договорі → чинна заява, і ПСП у листі не зникає."""
+        self.env['hr.psp.application'].search([('employee_id', '=', self.employee.id)]).unlink()
+        apps = self.env['hr.psp.application']._create_from_version_flags(self.version)
+        self.assertEqual(len(apps), 1)
+        self.assertEqual(apps.state, 'active')
+        self.assertEqual(apps.employee_id, self.employee)
+        payslip = self._create_payslip_with_accrual(3000)
+        self.assertEqual(payslip.psp_application_id, apps)
+        self.assertNotEqual(payslip.psp_type, 'none')
+
+    def test_migration_idempotent(self):
+        self.env['hr.psp.application'].search([('employee_id', '=', self.employee.id)]).unlink()
+        Psp = self.env['hr.psp.application']
+        Psp._create_from_version_flags(self.version)
+        self.assertFalse(Psp._create_from_version_flags(self.version))
+
+    def test_migration_same_rnokpp_second_stays_draft(self):
+        """Один РНОКПП на двох картках: чинна лише одна заява, друга — чернетка."""
+        Psp = self.env['hr.psp.application'].sudo()
+        Psp.search([('rnokpp', '=', self.employee.rnokpp)]).unlink()
+        versions = self.version | self.employee_2.current_version_id
+        apps = Psp._create_from_version_flags(versions)
+        self.assertEqual(sorted(apps.mapped('state')), ['active', 'draft'])
+
+    def test_overlap_message_hides_other_company(self):
+        """Чужа компанія в помилці не розкривається."""
+        Psp = self.env['hr.psp.application'].sudo()
+        Psp.search([('rnokpp', '=', self.employee.rnokpp)]).unlink()
+        other = Psp.create({'employee_id': self.employee_2.id, 'company_id': self.company_2.id,
+                            'date_from': date(2025, 1, 1)})
+        other.action_activate()
+        mine = self.env['hr.psp.application'].with_company(self.company).with_context(
+            allowed_company_ids=[self.company.id]).create({
+                'employee_id': self.employee.id, 'date_from': date(2025, 1, 1)})
+        with self.assertRaises(ValidationError) as ctx:
+            mine.action_activate()
+            mine.flush_recordset()
+        self.assertIn('в іншій компанії', str(ctx.exception))
+        self.assertNotIn(self.company_2.name, str(ctx.exception))

@@ -1,7 +1,10 @@
 from dateutil.relativedelta import relativedelta
-
 from odoo import api, fields, models, _
+import logging
+
 from odoo.exceptions import ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class HrPspApplication(models.Model):
@@ -142,9 +145,67 @@ class HrPspApplication(models.Model):
                     overlaps = False
 
                 if overlaps:
+                    # Заява іншої компанії бази перевіряється через sudo, але її
+                    # реквізити користувачу без доступу до тієї компанії не показуємо.
+                    if other.company_id in self.env.companies:
+                        where = _(" (співробітник: %(emp)s, компанія: %(co)s)",
+                                  emp=other.employee_id.name, co=other.company_id.name)
+                        ref = other.name
+                    else:
+                        where = _(" в іншій компанії")
+                        ref = ""
                     raise ValidationError(
-                        _("Працівник з РНОКПП %s вже має чинну заяву про застосування ПСП %s "
-                          "(співробітник: %s, компанія: %s) на цей період! "
-                          "Згідно з пп. 169.2.1 ПКУ, ПСП може застосовуватися лише за одним місцем роботи.") %
-                        (app.rnokpp, other.name, other.employee_id.name, other.company_id.name)
+                        _("Працівник з РНОКПП %(rnokpp)s вже має чинну заяву про застосування "
+                          "ПСП %(ref)s%(where)s на цей період! Згідно з пп. 169.2.1 ПКУ, ПСП "
+                          "може застосовуватися лише за одним місцем роботи.",
+                          rnokpp=app.rnokpp, ref=ref, where=where)
                     )
+
+    @api.model
+    def _create_from_version_flags(self, versions):
+        """Заяви з позначки «подано заяву на ПСП» на договорах (до #415).
+
+        До окремого документа ПСП визначала позначка на hr.version, і основне
+        місце роботи мало її за замовчуванням. Без перенесення всі працівники
+        після оновлення втратили б пільгу. На кожного працівника — одна чинна
+        заява з дати початку найранішого позначеного договору; основне місце
+        роботи — першим, щоб при одному РНОКПП на кількох картках заяву
+        отримало саме воно. Що не можна зробити чинним (немає РНОКПП, уже є
+        заява за цим РНОКПП) — лишається чернеткою для ручного розбору.
+        """
+        from .hr_version import PSP_NON_SALARY_CONTRACT_TYPES
+        by_employee = {}
+        for version in versions:
+            employee = version.employee_id
+            if not employee or version.contract_type_ua in PSP_NON_SALARY_CONTRACT_TYPES:
+                continue
+            start = version.contract_date_start or version.date_version
+            if employee.id not in by_employee or (start and start < by_employee[employee.id][1]):
+                by_employee[employee.id] = (employee, start or fields.Date.today())
+        has_type = 'employment_type_ua' in self.env['hr.version']._fields
+
+        def priority(item):
+            employee = item[0]
+            primary = not has_type or (employee.current_version_id.employment_type_ua or 'primary') == 'primary'
+            return (0 if primary else 1, item[1], employee.id)
+
+        created = self.browse()
+        for employee, start in sorted(by_employee.values(), key=priority):
+            if self.with_context(active_test=False).search_count([('employee_id', '=', employee.id)]):
+                continue
+            app = self.create({
+                'employee_id': employee.id,
+                'company_id': employee.company_id.id,
+                'date_from': start,
+                'note': _('Перенесено з позначки «Заява на ПСП» договору під час оновлення.'),
+            })
+            try:
+                with self.env.cr.savepoint():
+                    app.action_activate()
+                    app.flush_recordset()
+            except ValidationError as e:
+                app.invalidate_recordset()
+                _logger.warning('ПСП: заяву %s для %s лишено чернеткою: %s',
+                                app.name, employee.display_name, e)
+            created |= app
+        return created
