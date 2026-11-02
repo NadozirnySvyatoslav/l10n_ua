@@ -73,9 +73,77 @@ class MemorialOrderWizard(models.TransientModel):
         report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
         return report.report_action(self, data=data)
 
+    def _get_report_data_mo_16(self):
+        """MO-16 off-balance report from l10n_ua.offbalance.move.line + historical AML."""
+        rows = []
+        sum_d = sum_c = 0.0
+
+        # 1. New off-balance register (single-entry)
+        ob_domain = [
+            ('state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+        ]
+        ob_lines = self.env['l10n_ua.offbalance.move.line'].search(ob_domain, order='date, id')
+        for ln in ob_lines:
+            move_name = ln.move_id.name
+            if ln.move_id.ref:
+                move_name = f"{move_name} ({ln.move_id.ref})"
+            qty = ln.quantity_in if ln.direction == 'debit' else ln.quantity_out
+            rows.append({
+                'date': ln.date,
+                'move_name': move_name,
+                'account_code': ln.account_id.code,
+                'account_name': ln.account_id.name,
+                'description': ln.name or '',
+                'partner': ln.partner_id.name if ln.partner_id else '',
+                'quantity': qty,
+                'debit': ln.debit,
+                'credit': ln.credit,
+            })
+            sum_d += ln.debit
+            sum_c += ln.credit
+
+        # 2. Historical account.move.line entries for off-balance accounts
+        aml_domain = [
+            ('parent_state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('account_id.account_type', '=', 'off_balance'),
+        ]
+        aml_lines = self.env['account.move.line'].search(aml_domain, order='date, id')
+        for ln in aml_lines:
+            move_name = ln.move_id.name
+            if ln.move_id.ref:
+                move_name = f"{move_name} ({ln.move_id.ref})"
+            rows.append({
+                'date': ln.date,
+                'move_name': move_name,
+                'account_code': ln.account_id.code,
+                'account_name': ln.account_id.name,
+                'description': ln.name or '',
+                'partner': ln.partner_id.name if ln.partner_id else '',
+                'quantity': ln.quantity or 0.0,
+                'debit': ln.debit,
+                'credit': ln.credit,
+            })
+            sum_d += ln.debit
+            sum_c += ln.credit
+
+        rows.sort(key=lambda r: (r['date'] or fields.Date.today(), r['move_name'] or ''))
+        return {
+            'rows': rows,
+            'sum_debit': sum_d,
+            'sum_credit': sum_c,
+        }
+
     def get_report_data(self):
         """Aggregate posted journal lines per MO definition."""
         self.ensure_one()
+        if self.mo_kind == 'mo_16':
+            return self._get_report_data_mo_16()
         spec = MO_ACCOUNT_FILTER.get(self.mo_kind, {})
         AML = self.env['account.move.line']
         domain = [

@@ -11,15 +11,15 @@
 
     <template id="memorial_order_template">
         <t t-call="web.html_container">
-            <t t-set="wizard" t-value="env['l10n_ua.budget.memorial_order.wizard'].browse(data.get('wizard_id'))"/>
+            <t t-set="wizard" t-value="docs and docs[0] or (data and env['l10n_ua.budget.memorial_order.wizard'].browse(data.get('wizard_id')))"/>
             <t t-set="report_data" t-value="wizard.get_report_data()"/>
             <t t-set="rows" t-value="report_data['rows']"/>
 
             <t t-call="web.external_layout">
                 <div class="page" style="font-size:10px;">
-                    <h2 style="text-align:center; margin-bottom:0;"><t t-out="data.get('mo_label')"/></h2>
+                    <h2 style="text-align:center; margin-bottom:0;"><t t-out="(data and data.get('mo_label')) or dict(wizard._fields['mo_kind'].selection).get(wizard.mo_kind)"/></h2>
                     <p style="text-align:center; margin-top:0;">
-                        Період: <t t-out="data.get('date_from')"/> — <t t-out="data.get('date_to')"/>
+                        Період: <t t-out="(data and data.get('date_from')) or wizard.date_from"/> — <t t-out="(data and data.get('date_to')) or wizard.date_to"/>
                     </p>
                     <p style="margin-bottom:4px;">
                         <strong>Установа:</strong> <t t-out="wizard.company_id.name"/>
@@ -34,6 +34,7 @@
                                 <th>Назва рахунку</th>
                                 <th>Призначення</th>
                                 <th>Контрагент</th>
+                                <th class="text-end" t-if="wizard.mo_kind == 'mo_16'">К-сть</th>
                                 <th class="text-end">Дт</th>
                                 <th class="text-end">Кт</th>
                             </tr>
@@ -46,11 +47,12 @@
                                 <td><t t-out="r['account_name']"/></td>
                                 <td><t t-out="r['description']"/></td>
                                 <td><t t-out="r['partner']"/></td>
+                                <td class="text-end" t-if="wizard.mo_kind == 'mo_16'"><t t-out="'{:,.2f}'.format(r['quantity']).replace(',', ' ') if r.get('quantity') else ''"/></td>
                                 <td class="text-end"><t t-out="'{:,.2f}'.format(r['debit']).replace(',', ' ') if r['debit'] else ''"/></td>
                                 <td class="text-end"><t t-out="'{:,.2f}'.format(r['credit']).replace(',', ' ') if r['credit'] else ''"/></td>
                             </tr>
                             <tr style="background:#f8f8f8;">
-                                <td colspan="6"><strong>РАЗОМ</strong></td>
+                                <td t-att-colspan="wizard.mo_kind == 'mo_16' and 7 or 6"><strong>РАЗОМ</strong></td>
                                 <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_debit']).replace(',', ' ')"/></strong></td>
                                 <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_credit']).replace(',', ' ')"/></strong></td>
                             </tr>

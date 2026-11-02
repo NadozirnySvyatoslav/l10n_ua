@@ -99,3 +99,59 @@ class TestBudgetReports(TransactionCase):
                           'l10n_ua_budget_reports.budget_form_2d_template')
         # data dict should be propagated
         self.assertEqual(result.get('data', {}).get('estimate_id'), self.estimate.id)
+    def test_memorial_order_16_offbalance(self):
+        """MO-16 should collect lines from l10n_ua.offbalance.move.line with quantity."""
+        from odoo import fields
+        Account = self.env['account.account'].with_company(self.env.company)
+        offbalance_acc = Account.search([
+            ('account_type', '=', 'off_balance'),
+            ('company_ids', 'parent_of', self.env.company.id),
+        ], limit=1)
+        if not offbalance_acc:
+            offbalance_acc = Account.create({
+                'name': 'Орендовані необоротні активи',
+                'code': '011_test',
+                'account_type': 'off_balance',
+                'company_ids': [(6, 0, [self.env.company.id])],
+            })
+
+        partner = self.env['res.partner'].create({'name': 'Тестовий Орендодавець'})
+        today = fields.Date.today()
+        move = self.env['l10n_ua.offbalance.move'].create({
+            'date': today,
+            'company_id': self.env.company.id,
+            'ref': 'Договір № 100',
+            'line_ids': [(0, 0, {
+                'account_id': offbalance_acc.id,
+                'direction': 'debit',
+                'name': 'Орендована будівля',
+                'partner_id': partner.id,
+                'quantity': 2.0,
+                'amount': 150000.0,
+            })],
+        })
+        move.action_post()
+
+        wizard = self.env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': today.replace(day=1),
+            'date_to': today,
+            'company_id': self.env.company.id,
+        })
+        report_data = wizard.get_report_data()
+        matching_rows = [r for r in report_data['rows'] if 'Орендована будівля' in r['description']]
+        self.assertEqual(len(matching_rows), 1)
+        self.assertEqual(matching_rows[0]['quantity'], 2.0)
+        self.assertEqual(matching_rows[0]['debit'], 150000.0)
+        self.assertEqual(matching_rows[0]['credit'], 0.0)
+        self.assertIn('Договір № 100', matching_rows[0]['move_name'])
+
+        # Check rendering of the QWeb template
+        self.env.company.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        action_dict = wizard.action_print()
+        report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
+        html, _ = report._render_qweb_html(report.report_name, [wizard.id], data={'data': action_dict.get('data')})
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('Орендована будівля', html_str)
+        self.assertIn('150 000.00', html_str)
+
