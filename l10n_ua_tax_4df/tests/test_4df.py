@@ -146,33 +146,17 @@ class TestReport4DF(TransactionCase):
         self.assertAlmostEqual(rec.total_military, 1250, places=2)
         self.assertAlmostEqual(rec.total_esv, 5500, places=2)
 
-    def test_xml_export(self):
-        # Реквізити компанії, потрібні для валідного 4ДФ. Юрособа (J05):
-        # ЄДРПОУ 8 цифр (тип HTIN=DGHTINJ приймає), КАТОТТГ, ДПІ, керівник.
-        self.company.write({
-            'edrpou': '29409104',
-            'katottg': 'UA' + '0' * 17,
-            'tax_office_code': '1716',
-            'director_id': self.emp1.id,
-        })
-        self._create_payslip(self.emp1, date(2025, 1, 1), date(2025, 1, 31),
-                            gross=10000, pdfo=1800, military=500,
-                            esv_base=10000, esv=2200)
-        rec = self.env['l10n_ua.tax.4df'].create({
-            'year': 2025, 'quarter': '1',  # form_code за замовчуванням J0501T01
-        })
+    def test_quarterly_xml_refused(self):
+        """Д4 v11 — помісячний і лише в пакеті Розрахунку; квартальний не формується.
+
+        Версію 10 ДПС знято з реєстру, а квартальні суми не лягають ні в
+        місячний Д4 юрособи, ні в помісячні Д4 ФОП (#210).
+        """
+        rec = self.env['l10n_ua.tax.4df'].create({'year': 2025, 'quarter': '1'})
         rec.action_generate()
-        rec.action_generate_xml()
-        self.assertTrue(rec.xml_file)
-        self.assertTrue(rec.xml_filename.startswith('J0510410'))
-        xml = base64.b64decode(rec.xml_file).decode('windows-1251')
-        # Валідна структура Додатка 4ДФ (не старий стаб).
-        self.assertIn('<C_DOC>J05</C_DOC>', xml)
-        self.assertIn('<C_DOC_SUB>104</C_DOC_SUB>', xml)
-        self.assertIn('<C_DOC_VER>10</C_DOC_VER>', xml)
-        self.assertIn('<HKATOTTG>UA00000000000000000</HKATOTTG>', xml)
-        self.assertIn('<T1RXXXXG02 ROWNUM="1">1234567890</T1RXXXXG02>', xml)
-        self.assertIn('<T1RXXXXG04A ROWNUM="1">1800.00</T1RXXXXG04A>', xml)
+        with self.assertRaises(UserError):
+            rec.action_generate_xml()
+        self.assertFalse(rec.xml_file)
 
     def test_submit_workflow(self):
         rec = self.env['l10n_ua.tax.4df'].create({

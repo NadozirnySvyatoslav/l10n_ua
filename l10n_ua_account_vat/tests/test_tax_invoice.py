@@ -88,7 +88,7 @@ class TestTaxInvoice(TransactionCase):
                         'Registration deadline should be computed')
 
     def test_tax_invoice_issued_state_workflow(self):
-        """Issued invoice: draft → registered (через підписаний конверт) → cancelled.
+        """Issued invoice: draft → submitted → registered → cancelled.
 
         Реєстрація тепер — реальний релей у ЄРПН (#146): action_register_erpn
         лише відкриває браузерний підпис, а статус 'registered' виставляє
@@ -111,10 +111,14 @@ class TestTaxInvoice(TransactionCase):
         self.assertEqual(action['tag'], 'l10n_ua_sign.kep_sign')
         self.assertEqual(ti.state, 'draft')
 
-        # Підписаний у браузері конверт подано → квитанція → registered.
+        # Підписаний у браузері конверт подано → квитанція № 1 → submitted;
+        # реєстрацію фіксує квитанція № 2 (номер ЄРПН).
         with patch(_CONFIG_PATH + '._api_submit_document_presigned',
                    return_value={'message': 'прийнято'}):
             ti.kep_submit_signed({'doc': 'ENV=='}, 'AUTH==')
+        self.assertEqual(ti.state, 'submitted')
+        ti.erpn_number = '9000000001'
+        ti.action_erpn_registered()
         self.assertEqual(ti.state, 'registered')
 
         ti.action_cancel()

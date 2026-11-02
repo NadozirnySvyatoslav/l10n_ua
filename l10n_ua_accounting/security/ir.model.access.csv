@@ -39,3 +39,7 @@ access_small_report_user,l10n_ua.small.report.user,model_l10n_ua_small_report,ac
 access_small_report_line_user,l10n_ua.small.report.line.user,model_l10n_ua_small_report_line,account.group_account_user,1,1,1,1
 access_notes_report_user,l10n_ua.notes.report.user,model_l10n_ua_notes_report,account.group_account_user,1,1,1,1
 access_notes_report_line_user,l10n_ua.notes.report.line.user,model_l10n_ua_notes_report_line,account.group_account_user,1,1,1,1
+access_trade_markup_user,l10n_ua.trade.markup.user,model_l10n_ua_trade_markup,account.group_account_user,1,1,1,1
+access_trade_markup_readonly,l10n_ua.trade.markup.readonly,model_l10n_ua_trade_markup,account.group_account_readonly,1,0,0,0
+access_trade_markup_line_user,l10n_ua.trade.markup.line.user,model_l10n_ua_trade_markup_line,account.group_account_user,1,1,1,1
+access_trade_markup_line_readonly,l10n_ua.trade.markup.line.readonly,model_l10n_ua_trade_markup_line,account.group_account_readonly,1,0,0,0

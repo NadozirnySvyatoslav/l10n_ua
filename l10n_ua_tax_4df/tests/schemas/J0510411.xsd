@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<xs:annotation>
-		<xs:documentation>Відомості про суми нарахованого доходу, утриманого та сплаченого податку на доходи фізичних осіб та військового збору. Додаток 4 ДФ до Податкового розрахунку сум доходу, нарахованого (сплаченого) на користь платників податків - фізичних осіб, і сум утриманого з них податку, а також сум нарахованого єдиного внеску (пункт 4 роділу ІV).
-		У редакції наказу Міністерства фінансів України від 24 січня 2025 року № 39, зі змінами, які внесені наказом Міністерства фінансів України від 30 січня 2025 року № 53.</xs:documentation>
+		<xs:documentation>Відомості про суми нарахованого доходу, утриманого та сплаченого податку на доходи фізичних осіб та військового збору. Додаток 4 ДФ до Податкового розрахунку сум доходу, 
+нарахованого (сплаченого) на користь платників податків – фізичних осіб, і сум утриманого з них податку, а також сум нарахованого єдиного внеску для податкових агентів, 
+крім фізичних осіб – підприємців та/або осіб, які провадять незалежну професійну діяльність (пункт 4 підрозділу 3  розділу ІІ ).</xs:documentation>
 	</xs:annotation>
 	<xs:include schemaLocation="common_types.xsd"/>
 	<xs:element name="DECLAR" type="DeclarContent"/>
@@ -116,9 +117,9 @@
 	<xs:complexType name="DHead">
 		<xs:sequence>
 			<xs:element name="TIN" type="DGLong"/>
-			<xs:element name="C_DOC" type="xs:string" fixed="F05"/>
+			<xs:element name="C_DOC" type="xs:string" fixed="J05"/>
 			<xs:element name="C_DOC_SUB" type="xs:string" fixed="104"/>
-			<xs:element name="C_DOC_VER" type="xs:string" fixed="10"/>
+			<xs:element name="C_DOC_VER" type="xs:string" fixed="11"/>
 			<xs:element name="C_DOC_TYPE" type="xs:nonNegativeInteger"/>
 			<xs:element name="C_DOC_CNT" type="xs:nonNegativeInteger"/>
 			<xs:element name="C_REG" type="DGsti"/>
@@ -169,7 +170,7 @@
 			<xs:element name="HZM" type="DGMonth"/>
 			<xs:element name="HNUM" type="DGI4nom"/>
 			<xs:element name="HNAME" type="DGHNAME"/>
-			<xs:element name="HTIN" type="DGHTINF"/>
+			<xs:element name="HTIN" type="DGHTINJ"/>
 			<xs:element name="HKATOTTG" type="DGKATOTTG"/>
 			<xs:element name="R00G01I" type="xs:nonNegativeInteger" nillable="true" minOccurs="0"/>
 			<xs:element name="R00G02I" type="xs:nonNegativeInteger" nillable="true" minOccurs="0"/>
@@ -228,6 +229,18 @@
 			<xs:element name="R0206G04" type="DGdecimal2" nillable="true" minOccurs="0"/>
 			<xs:element name="R0206G5A" type="DGdecimal2" nillable="true" minOccurs="0"/>
 			<xs:element name="R0206G5" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0207G03A" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0207G03" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0207G04A" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0207G04" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0207G5A" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0207G5" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0208G03A" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0208G03" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0208G04A" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0208G04" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0208G5A" type="DGdecimal2" nillable="true" minOccurs="0"/>
+			<xs:element name="R0208G5" type="DGdecimal2" nillable="true" minOccurs="0"/>
 			<!--TABLE №3-->
 			<xs:element name="T3RXXXXG02S" type="TinColumn" nillable="true" minOccurs="0" maxOccurs="999999"/>
 			<xs:element name="T3RXXXXG03S" type="StrColumn" nillable="true" minOccurs="0" maxOccurs="999999"/>
@@ -243,9 +256,6 @@
 			<xs:element name="T3RXXXXG10" type="Decimal2Column" nillable="true" minOccurs="0" maxOccurs="999999"/>
 			<xs:element name="T3RXXXXG11" type="OznColumn" nillable="true" minOccurs="0" maxOccurs="999999"/>
 			<!--/TABLE №3-->
-			<xs:element name="R02G01I" type="xs:nonNegativeInteger" nillable="true" minOccurs="0"/>
-			<xs:element name="R02G02I" type="xs:nonNegativeInteger" nillable="true" minOccurs="0"/>
-			<xs:element name="R02G03I" type="xs:nonNegativeInteger" nillable="true" minOccurs="0"/>
 			<!--FOOTER-->
 			<xs:element name="HFILL" type="DGDate"/>
 			<xs:element name="HKBOS" type="DGDRFO_10"/>
