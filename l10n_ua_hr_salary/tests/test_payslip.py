@@ -261,41 +261,52 @@ class TestPayslipPSPPlaceOfApplication(TestPayslip):
         self.assertEqual(payslip.psp_type, 'standard')
         self.assertEqual(payslip.psp_amount, 1514)
 
-    def test_external_secondary_job_has_no_psp(self):
-        self.version.employment_type_ua = 'external'
+    def test_secondary_job_without_application_has_no_psp(self):
+        """Сумісництво (інша картка працівника) без окремої заяви не має ПСП."""
+        secondary_employee = self.env['hr.employee'].create({
+            'name': 'Петренко Олександр (Сумісник)',
+            'rnokpp': '2822345674',
+            'company_id': self.company.id,
+        })
+        secondary_version = self.env['hr.version'].create({
+            'employee_id': secondary_employee.id,
+            'contract_date_start': date(2024, 1, 15),
+            'date_version': date(2024, 1, 15),
+            'wage': 25000,
+            'contract_type_ua': 'permanent',
+            'employment_type_ua': 'external',
+            'company_id': self.company.id,
+        })
+        secondary_employee.write({'current_version_id': secondary_version.id})
+        self.assertFalse(secondary_version.psp_application)
+        payslip = self.env['hr.payslip'].create({
+            'employee_id': secondary_employee.id,
+            'company_id': self.company.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+        })
+        self.env['hr.payslip.accrual'].create({
+            'payslip_id': payslip.id,
+            'accrual_type_id': self.accrual_wage.id,
+            'amount': 3000,
+        })
+        payslip._compute_amounts()
+        payslip._compute_psp_type()
+        payslip._compute_psp()
+        self._assert_no_psp(payslip)
+
+    def test_application_withdrawn_at_primary_job(self):
+        """Заяву відкликано / припинено — на основному місці пільги немає."""
+        self.psp_application.state = 'draft'
         self.assertFalse(self.version.psp_application)
         self._assert_no_psp(self._create_payslip_with_accrual(3000))
 
-    def test_internal_secondary_job_has_no_psp(self):
-        self.version.employment_type_ua = 'internal'
-        self._assert_no_psp(self._create_payslip_with_accrual(3000))
-
-    def test_secondary_job_disabled_employee_has_no_psp(self):
-        """Підвищена пільга теж лише за місцем заяви."""
-        self.employee.disability_group = '1'
-        self.version.employment_type_ua = 'external'
-        self._assert_no_psp(self._create_payslip_with_accrual(3000))
-
-    def test_application_filed_at_secondary_job(self):
-        """Заяву подано за сумісництвом — пільга застосовується тут."""
-        self.version.employment_type_ua = 'external'
-        self.version.psp_application = True
-        payslip = self._create_payslip_with_accrual(3000)
-        self.assertEqual(payslip.psp_type, 'standard')
-        self.assertEqual(payslip.psp_amount, 1514)
-
-    def test_application_withdrawn_at_primary_job(self):
-        """Заяву подано іншому роботодавцю — на основному місці пільги немає."""
-        self.version.psp_application = False
-        self._assert_no_psp(self._create_payslip_with_accrual(3000))
-
     def test_civil_contract_never_has_psp(self):
-        """ЦПХ — не заробітна плата (ПК п. 169.1.1), навіть з позначкою заяви."""
+        """ЦПХ — не заробітна плата (ПК п. 169.1.1), навіть з активною заявою."""
         for contract_type in ('civil', 'gig', 'author'):
             with self.subTest(contract_type=contract_type):
                 self.version.contract_type_ua = contract_type
                 self.assertFalse(self.version.psp_application)
-                self.version.psp_application = True
                 payslip = self._create_payslip_with_accrual(3000)
                 self.assertEqual(payslip.psp_type, 'none')
                 self.assertEqual(payslip.psp_amount, 0)
@@ -1180,7 +1191,7 @@ class TestPayslipClosedMonth(SalaryTestCase):
         self.assertEqual(before['psp_type'], 'standard')
 
         self.employee.disability_group = '1'
-        self.version.psp_application = False
+        self.psp_application.state = 'draft'
         self.env.flush_all()
         self.assertEqual(self._snapshot(payslip), before)
 

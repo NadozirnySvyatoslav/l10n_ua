@@ -1,10 +1,31 @@
 from dateutil.relativedelta import relativedelta
 
-from odoo import models
+from odoo import fields, models
 
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
+
+    psp_application_ids = fields.One2many(
+        'hr.psp.application',
+        'employee_id',
+        string='Заяви про застосування ПСП',
+    )
+    psp_application_count = fields.Integer(
+        string='Кількість заяв ПСП',
+        compute='_compute_psp_application_count',
+    )
+
+    def _compute_psp_application_count(self):
+        for employee in self:
+            employee.psp_application_count = len(employee.psp_application_ids)
+
+    def action_open_psp_applications(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id('l10n_ua_hr_salary.action_hr_psp_application')
+        action['domain'] = [('employee_id', '=', self.id)]
+        action['context'] = {'default_employee_id': self.id}
+        return action
 
     def _l10n_ua_month_norm(self, company, on_date, version=None):
         """The working time norm of the month of `on_date`: (days, hours).

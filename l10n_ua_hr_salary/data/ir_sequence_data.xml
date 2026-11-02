@@ -26,5 +26,13 @@
             <field name="company_id" eval="False"/>
         </record>
         
+        <record id="seq_hr_psp_application" model="ir.sequence">
+            <field name="name">PSP Application</field>
+            <field name="code">hr.psp.application</field>
+            <field name="prefix">ПСП/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
     </data>
 </odoo>

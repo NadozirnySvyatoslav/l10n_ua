@@ -142,6 +142,14 @@ class HrPayslip(models.Model):
         compute='_compute_psp',
         store=True
     )
+    psp_application_id = fields.Many2one(
+        'hr.psp.application',
+        string='Заява про застосування ПСП',
+        compute='_compute_psp_type',
+        store=True,
+        readonly=True,
+        help='Чинна заява про застосування ПСП, що діє в розрахунковому місяці'
+    )
     psp_type = fields.Selection([
         ('none', 'None'),
         ('standard', 'Standard (50%)'),
@@ -329,84 +337,92 @@ class HrPayslip(models.Model):
             payslip.is_diia_city = is_diia_city
 
     @api.depends('employee_id',
+                 'employee_id.psp_application_ids.state',
+                 'employee_id.psp_application_ids.date_from',
+                 'employee_id.psp_application_ids.date_to',
+                 'employee_id.psp_application_ids.psp_type',
                  'employee_id.disability_group',
                  'employee_id.chornobyl_category',
                  'employee_id.veteran_status',
                  'employee_id.is_single_parent',
                  'employee_id.dependents_count',
                  'employee_id.benefit_ids',
-                 'version_id.psp_application',
+                 'date_from',
+                 'date_to',
                  'version_id.contract_type_ua')
     def _compute_psp_type(self):
-        """Determine PSP type per ПК ст. 169.
+        """Determine PSP type per ПК ст. 169 based on active hr.psp.application.
 
-        Priority (highest wins): 200% > 150% > standard > none
-
-        200% applies to (ст. 169.1.4):
-        - Disability group I
-        - Chornobyl categories 1, 2
-        - Combat / war veterans
-
-        150% applies to (ст. 169.1.3):
-        - Disability groups II, III
-        - Chornobyl categories 3, 4
-        - Single parents with at least 1 dependent
-        - Any explicit benefit marked psp_type='150'
-
-        Standard applies to (ст. 169.1.1) any employee meeting income threshold.
-
-        Final PSP type is the maximum of all applicable rules + any benefit's
-        own psp_type setting.
-
-        None at all, before any of these (#322):
-        - the version is not the place the employee applied for the benefit
-          (ПК п. 169.2.1-169.2.2: one place of income, by the application;
-          a secondary job has no application by default);
-        - the contract is civil-law, gig or author's: its pay is not a salary
-          (ПК п. 169.1.1).
+        - Civil-law, gig and author contracts never carry PSP (пп. 169.1.1 ПКУ).
+        - Active application (state='active') filed on or before payslip period:
+          date_from <= payslip.date_to.
+        - In the month of date_to, PSP is no longer applied (пп. 169.2.3 ПКУ):
+          not date_to or date_to.replace(day=1) > payslip.date_to.
+        - Fixed psp_type from application ('standard', '150', '200') is applied.
         """
         from .hr_version import PSP_NON_SALARY_CONTRACT_TYPES
-        psp_priority = {'none': 0, 'standard': 1, '150': 2, '200': 3}
         for payslip in self:
             if payslip._is_closed():
                 continue
             employee = payslip.employee_id
-            if not employee:
+            if not employee or not payslip.date_from or not payslip.date_to:
                 payslip.psp_type = 'none'
+                payslip.psp_application_id = False
                 continue
 
             version = payslip.version_id or employee.current_version_id
-            if version and (
-                    version.contract_type_ua in PSP_NON_SALARY_CONTRACT_TYPES
-                    or not version.psp_application):
+            if version and version.contract_type_ua in PSP_NON_SALARY_CONTRACT_TYPES:
                 payslip.psp_type = 'none'
+                payslip.psp_application_id = False
                 continue
 
-            psp_type = 'standard'  # baseline — final eligibility checked in _compute_psp
+            apps = self.env['hr.psp.application'].search([
+                ('employee_id', '=', employee.id),
+                ('state', '=', 'active'),
+                ('date_from', '<=', payslip.date_to),
+                '|',
+                ('date_to', '=', False),
+                ('date_to', '>', payslip.date_to),
+            ], order='date_from desc, id desc')
 
-            # --- 200% rules (highest priority) ---
-            if employee.disability_group == '1':
-                psp_type = '200'
-            elif employee.chornobyl_category in ('1', '2'):
-                psp_type = '200'
-            elif employee.veteran_status in ('combat', 'war'):
-                psp_type = '200'
+            valid_app = False
+            for app in apps:
+                if app.date_to and app.date_to.replace(day=1) <= payslip.date_to:
+                    continue
+                valid_app = app
+                break
 
-            # --- 150% rules (only if not already 200%) ---
-            if psp_type != '200':
-                if employee.disability_group in ('2', '3'):
-                    psp_type = '150'
-                elif employee.chornobyl_category in ('3', '4'):
-                    psp_type = '150'
-                elif employee.is_single_parent and employee.dependents_count >= 1:
-                    psp_type = '150'
+            if valid_app:
+                payslip.psp_application_id = valid_app
+                psp_priority = {'none': 0, 'standard': 1, '150': 2, '200': 3}
+                psp_type = valid_app.psp_type
 
-            # --- Benefit-level overrides (catalog `psp_type`) ---
-            for benefit in employee.benefit_ids:
-                if benefit.psp_type and psp_priority.get(benefit.psp_type, 0) > psp_priority.get(psp_type, 0):
-                    psp_type = benefit.psp_type
+                # --- 200% rules (highest priority) ---
+                if employee.disability_group == '1':
+                    psp_type = '200'
+                elif employee.chornobyl_category in ('1', '2'):
+                    psp_type = '200'
+                elif employee.veteran_status in ('combat', 'war'):
+                    psp_type = '200'
 
-            payslip.psp_type = psp_type
+                # --- 150% rules (only if not already 200%) ---
+                if psp_type != '200':
+                    if employee.disability_group in ('2', '3'):
+                        psp_type = '150'
+                    elif employee.chornobyl_category in ('3', '4'):
+                        psp_type = '150'
+                    elif employee.is_single_parent and employee.dependents_count >= 1:
+                        psp_type = '150'
+
+                # --- Benefit-level overrides (catalog `psp_type`) ---
+                for benefit in employee.benefit_ids:
+                    if benefit.psp_type and psp_priority.get(benefit.psp_type, 0) > psp_priority.get(psp_type, 0):
+                        psp_type = benefit.psp_type
+
+                payslip.psp_type = psp_type
+            else:
+                payslip.psp_application_id = False
+                payslip.psp_type = 'none' 
 
     @api.depends('employee_id', 'date_from')
     def _compute_version_id(self):
@@ -625,6 +641,8 @@ class HrPayslip(models.Model):
             
             payslip._compute_working_days()
             payslip._generate_accruals()
+            payslip._compute_psp_type()
+            payslip._compute_psp()
             payslip._generate_deductions()
         
         return True

@@ -31,6 +31,13 @@
               sequence="30"
               groups="l10n_ua_hr_base.group_hr_ua_user"/>
 
+    <menuitem id="menu_hr_psp_application"
+              name="Заяви про застосування ПСП"
+              parent="menu_hr_payroll_root"
+              action="action_hr_psp_application"
+              sequence="32"
+              groups="l10n_ua_hr_base.group_hr_ua_user"/>
+
     <menuitem id="menu_hr_salary_advance_root"
               name="Advances"
               parent="menu_hr_payroll_root"
