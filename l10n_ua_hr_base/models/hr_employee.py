@@ -202,7 +202,8 @@ class HrEmployee(models.Model):
         compute='_compute_military_reservation_expired',
         store=True,
         help='True when reservation end date has passed. Recomputed daily by cron — '
-             'flags employees whose military booking must be renewed (CMU Resolution 1608).')
+             'flags employees whose military booking must be renewed (Порядок бронювання, ПКМУ № 76 '
+             'у редакції ПКМУ № 1328).')
     military_reservplus_id = fields.Char(string='Reserv+ ID',
                                           help='Ідентифікатор у системі Резерв+')
 
@@ -726,7 +727,8 @@ class HrEmployee(models.Model):
         The stored compute depends on (military_reservation, military_reservation_until)
         and won't refire on calendar advance, so the cron writes the flag directly.
         For newly-expired (False → True transition), notifies HR officers via email
-        and activity (ПКМУ № 1608 — обов'язок роботодавця контролювати ліміти).
+        and activity (Порядок бронювання, ПКМУ № 76 у редакції ПКМУ № 1328: роботодавець
+        сам контролює строки й ліміти бронювання; ліміт — res.company).
         """
         today = date.today()
         stale = self.search([
@@ -763,7 +765,8 @@ class HrEmployee(models.Model):
         for employee in self:
             # Render body from template if available, else use a default body
             body_html = _('<p>⚠️ Військове бронювання працівника <strong>%s</strong> '
-                          'прострочено (до %s). Згідно з ПКМУ № 1608 потрібне '
+                          'прострочено (до %s). За Порядком бронювання (ПКМУ № 76 '
+                          'у редакції ПКМУ № 1328) потрібне '
                           'переоформлення або зняття з обліку.</p>',
                           employee.name, employee.military_reservation_until)
             if template:
