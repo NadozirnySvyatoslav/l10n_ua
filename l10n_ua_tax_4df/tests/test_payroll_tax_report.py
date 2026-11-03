@@ -197,3 +197,117 @@ class TestPayrollTaxReport(TransactionCase):
         self.assertEqual(rec.d5_report_id.state, 'submitted')
         with self.assertRaises(UserError):
             rec.action_calculate()
+
+
+@tagged('post_install', '-at_install')
+class TestPayrollTaxReportFop(TransactionCase):
+    """ФОП-роботодавець: F0500111 за квартал, Д1 і Д4 на кожен місяць."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env['ir.config_parameter'].sudo().set_param('hr_ua.validate_rnokpp', 'False')
+        cls.company = cls.env.company
+        office = cls.env['l10n_ua.tax.office'].create({'code': '2650', 'name': 'ГУ ДПС у м. Києві'})
+        fop_form = cls.env['l10n_ua.legal.form'].search([('is_fop', '=', True)], limit=1)
+        cls.company.write({
+            'name': 'ФОП Бондаренко Марія Іванівна', 'l10n_ua_legal_form_id': fop_form.id,
+            'company_registry': '3012345678', 'edrpou': False, 'tax_office_code': '2650',
+            'l10n_ua_tax_office_id': office.id, 'katottg': 'UA80000000000093317',
+            'zip': '01001', 'city': 'Київ', 'street': 'вул. Хрещатик, 1',
+            'director_id': False,
+        })
+        cls.emp = cls.env['hr.employee'].create({
+            'name': 'Коваль Ольга Петрівна', 'rnokpp': '2222222222', 'gender': 'female'})
+        accrual_type = cls.env['hr.accrual.type'].search(
+            [('category', '=', 'wage')], limit=1) or cls.env['hr.accrual.type'].create({
+                'name': 'Тестова ЗП', 'code': 'TEST_WAGE_F', 'category': 'wage',
+                'is_taxable_pdfo': True, 'is_military_tax': True, 'is_esv_base': True})
+        # III квартал 2026: липень і серпень з нарахуваннями, вересень — порожній.
+        for month, gross in ((7, 10000.0), (8, 12000.0)):
+            slip = cls.env['hr.payslip'].create({
+                'employee_id': cls.emp.id, 'company_id': cls.company.id,
+                'date_from': date(2026, month, 1),
+                'date_to': date(2026, month, 28),
+                'accrual_ids': [(0, 0, {'accrual_type_id': accrual_type.id, 'amount': gross})],
+            })
+            slip.flush_recordset()
+            cls.env.cr.execute(
+                'UPDATE hr_payslip SET gross_salary=%s, net_salary=%s, pdfo_amount=%s, '
+                'military_tax_amount=%s, esv_base=%s, esv_amount=%s, state=%s WHERE id=%s',
+                (gross, gross * 0.77, gross * 0.18, gross * 0.05, gross, gross * 0.22,
+                 'done', slip.id))
+            slip.invalidate_recordset()
+
+    def _report(self):
+        rec = self.env['l10n_ua.payroll.tax.report'].create({'year': 2026, 'quarter': '3'})
+        rec.action_calculate()
+        return rec
+
+    def _xml(self, data):
+        return etree.fromstring(base64.b64decode(data))
+
+    def test_quarter_sets_month_and_name(self):
+        rec = self.env['l10n_ua.payroll.tax.report'].create({'year': 2026, 'quarter': '3'})
+        self.assertTrue(rec.is_fop)
+        self.assertEqual(rec.month, '9')
+        self.assertIn('3 кв. 2026', rec.name)
+
+    def test_calculate_per_month(self):
+        rec = self._report()
+        self.assertEqual(rec.month_ids.mapped('month_index'), [1, 2, 3])
+        self.assertEqual(rec.month_ids.d5_report_id.mapped('month'), ['7', '8', '9'])
+        self.assertEqual(sorted(rec.d4_line_ids.mapped('month_index')), [1, 2])
+        self.assertEqual(rec.month_ids.mapped('income'), [10000.0, 12000.0, 0.0])
+        self.assertAlmostEqual(rec.r01_income, 22000.0)
+
+    def test_package_validates_against_official_xsd(self):
+        rec = self._report()
+        rec.action_generate_xml()
+        _schema(os.path.join(SCHEMA_DIR, 'F0500111.xsd')).assertValid(self._xml(rec.xml_file))
+        d1 = _schema(file_path('l10n_ua_hr_reports/tests/schemas/F0510111.xsd'))
+        d4 = _schema(os.path.join(SCHEMA_DIR, 'F0510411.xsd'))
+        rows = rec.month_ids.sorted('month_index')
+        for row in rows[:2]:
+            d1.assertValid(self._xml(row.d1_xml_file))
+            d4.assertValid(self._xml(row.d4_xml_file))
+        self.assertFalse(rows[2].d1_xml_file)
+        self.assertFalse(rows[2].d4_xml_file)
+
+    def test_main_form_month_columns(self):
+        rec = self._report()
+        rec.action_generate_xml()
+        main = self._xml(rec.xml_file)
+        head = main.find('DECLARHEAD')
+        self.assertEqual(head.findtext('C_DOC'), 'F05')
+        self.assertEqual(head.findtext('PERIOD_TYPE'), '2')
+        self.assertEqual(head.findtext('PERIOD_MONTH'), '9')
+        body = main.find('DECLARBODY')
+        self.assertEqual(body.findtext('HZKV'), '3')
+        self.assertEqual(body.findtext('R061G4'), '2')
+        self.assertEqual(body.findtext('R064G4'), '2')
+        self.assertEqual(body.findtext('R0101G3'), '10000.00')
+        self.assertEqual(body.findtext('R0101G4'), '12000.00')
+        self.assertIsNone(body.find('R0101G5'))
+        self.assertEqual(body.findtext('R0107G4'), '2640.00')
+        self.assertEqual(body.findtext('R091G3'), '1')
+        # Підписує сам ФОП: його РНОКПП і ПІБ без «ФОП».
+        self.assertEqual(body.findtext('HKBOS'), '3012345678')
+        self.assertEqual(body.findtext('HBOS'), 'БОНДАРЕНКО МАРІЯ ІВАНІВНА')
+
+    def test_linked_docs_distinguish_months(self):
+        rec = self._report()
+        rec.action_generate_xml()
+        main = self._xml(rec.xml_file)
+        docs = main.xpath('//LINKED_DOCS/DOC')
+        self.assertEqual([d.findtext('C_DOC_SUB') for d in docs], ['101', '101', '104', '104'])
+        self.assertEqual([d.findtext('C_DOC_CNT') for d in docs], ['1', '2', '1', '2'])
+        files = [k for k in rec._attachment_files()]
+        self.assertEqual([k for k, _d, _f in files], ['d1_1', 'd1_2', 'd4_1', 'd4_2'])
+        names = [f.upper() for _k, _d, f in files]
+        self.assertEqual(len(set(names)), 4)
+        self.assertEqual([f.upper() for f in main.xpath('//LINKED_DOCS/DOC/FILENAME/text()')],
+                         names)
+        d1 = self._xml(rec.month_ids.sorted('month_index')[1].d1_xml_file)
+        self.assertEqual(d1.findtext('DECLARBODY/HNM'), '2')
+        self.assertEqual(d1.xpath('//T1RXXXXG101/text()'), ['8'])

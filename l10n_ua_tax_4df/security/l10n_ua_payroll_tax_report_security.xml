@@ -10,4 +10,9 @@
         <field name="model_id" ref="model_l10n_ua_payroll_tax_report_d4_line"/>
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
+    <record id="l10n_ua_payroll_tax_report_month_company_rule" model="ir.rule">
+        <field name="name">Податковий розрахунок ФОП, місяць: мультикомпанія</field>
+        <field name="model_id" ref="model_l10n_ua_payroll_tax_report_month"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
 </odoo>

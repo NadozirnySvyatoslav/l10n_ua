@@ -28,14 +28,17 @@
                         <group>
                             <field name="year" options="{'enable_formatting': false}"
                                    readonly="state != 'draft'"/>
-                            <field name="month" readonly="state != 'draft'"/>
+                            <field name="is_fop" invisible="1"/>
+                            <field name="month" readonly="state != 'draft'" invisible="is_fop"/>
+                            <field name="quarter" readonly="state != 'draft'" invisible="not is_fop"
+                                   required="is_fop"/>
                             <field name="number" readonly="state == 'submitted'"/>
                             <field name="company_id" groups="base.group_multi_company"
                                    readonly="state != 'draft'"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group>
-                            <field name="d5_report_id" invisible="not d5_report_id"/>
+                            <field name="d5_report_id" invisible="not d5_report_id or is_fop"/>
                             <field name="submission_date" invisible="not submission_date"/>
                             <field name="xml_file" filename="xml_filename" readonly="1"
                                    invisible="not xml_file"/>
@@ -50,8 +53,26 @@
                     </group>
                     <notebook>
                         <page string="Головна форма" name="main">
+                            <field name="month_ids" invisible="not is_fop"
+                                   readonly="state == 'submitted'">
+                                <list editable="bottom" create="0" delete="0">
+                                    <field name="month_index" column_invisible="1"/>
+                                    <field name="month_name"/>
+                                    <field name="d5_report_id"/>
+                                    <field name="headcount_avg"/>
+                                    <field name="headcount_disabled"/>
+                                    <field name="new_jobs"/>
+                                    <field name="income" sum="Усього"/>
+                                    <field name="esv" sum="Усього"/>
+                                    <field name="d1_xml_file" filename="d1_xml_filename" readonly="1"/>
+                                    <field name="d1_xml_filename" column_invisible="1"/>
+                                    <field name="d4_xml_file" filename="d4_xml_filename" readonly="1"/>
+                                    <field name="d4_xml_filename" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                            </field>
                             <group>
-                                <group string="Кількість працівників">
+                                <group string="Кількість працівників" invisible="is_fop">
                                     <field name="headcount_avg" readonly="state == 'submitted'"/>
                                     <field name="headcount_disabled" readonly="state == 'submitted'"/>
                                     <field name="r092_count"/>
@@ -83,6 +104,7 @@
                         <page string="Додаток 4ДФ (Д4)" name="d4">
                             <field name="d4_line_ids" readonly="state == 'submitted'">
                                 <list editable="bottom">
+                                    <field name="month_index" column_invisible="not parent.is_fop"/>
                                     <field name="employee_id"/>
                                     <field name="rnokpp"/>
                                     <field name="income_code"/>
@@ -149,8 +171,9 @@
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Створіть Податковий розрахунок за місяць</p>
             <p>
-                Щомісячний розрахунок ПДФО, військового збору та ЄСВ (форма J0500111,
-                версія 11) з додатками Д1 і Д4 — одним пакетом до ДПС.
+                Розрахунок ПДФО, військового збору та ЄСВ (версія 11) з додатками Д1 і Д4 —
+                одним пакетом до ДПС: юрособа — щомісяця (J0500111), ФОП — щокварталу
+                (F0500111, Д1 і Д4 на кожен місяць).
             </p>
         </field>
     </record>
