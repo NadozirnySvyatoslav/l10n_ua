@@ -160,10 +160,20 @@ class TestPspParametersCompanyScope(TransactionCase):
         })
         self.assertEqual(
             self.Params.get_parameters(date(2031, 6, 1), self.company_b.id), own_b)
-        # Company A falls back to its own open-ended 2026 record, never to B's.
+        # Company A falls back to its own open-ended latest record, never to B's.
         self.assertEqual(
             self.Params.get_parameters(date(2031, 6, 1), self.company_a.id),
-            self._own(self.company_a, '2026-01-01'))
+            self._own(self.company_a, '2027-01-01'))
+
+    def test_2027_period(self):
+        """#351: 2026 закрито, з 01.01.2027 — мінзарплата 9546, ПМ 3691."""
+        params_2026 = self.Params.get_parameters(date(2026, 12, 31), self.company_a.id)
+        params_2027 = self.Params.get_parameters(date(2027, 1, 1), self.company_a.id)
+        self.assertEqual(params_2026.date_to, date(2026, 12, 31))
+        self.assertEqual(params_2026.min_wage, 8647)
+        self.assertEqual(params_2027.min_wage, 9546)
+        self.assertEqual(params_2027.subsistence_minimum, 3691)
+        self.assertEqual(params_2027.min_hourly_wage, 57.5)
 
     def test_default_company_is_the_active_one(self):
         Params = self.env['hr.psp.parameters'].with_company(self.company_b)
