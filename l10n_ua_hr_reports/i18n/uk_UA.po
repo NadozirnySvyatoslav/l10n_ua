@@ -817,6 +817,7 @@ msgstr "Експорт XLSX"
 
 #. module: l10n_ua_hr_reports
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_reports.hr_report_d5_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_reports.hr_report_labor_view_form
 msgid "Export XML"
 msgstr "Експорт XML"
 
@@ -2352,6 +2353,7 @@ msgstr "Відпрацьовано годин"
 
 #. module: l10n_ua_hr_reports
 #: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_hire_notice__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_labor__xml_file
 msgid "XML File"
 msgstr "XML-файл"
 
@@ -2640,3 +2642,23 @@ msgstr "Доплата до мінімальної зарплати"
 #: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_d5_line__unpaid_days
 msgid "Unpaid Leave Days"
 msgstr "Дні відпустки без збереження зарплати"
+
+#. module: l10n_ua_hr_reports
+#: model_terms:ir.ui.view,arch_db:l10n_ua_hr_reports.hr_report_labor_view_form
+msgid "Submit to Statistics"
+msgstr "Подати до органів статистики"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_labor__xml_filename
+msgid "XML File Name"
+msgstr "Ім'я файлу XML"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_hr_report_labor__submission_date
+msgid "Submitted On"
+msgstr "Дата подання"
+
+#. module: l10n_ua_hr_reports
+#: model:ir.model.fields,field_description:l10n_ua_hr_reports.field_res_company__l10n_ua_stat_district_code
+msgid "Statistics District Code"
+msgstr "Код району органу статистики"

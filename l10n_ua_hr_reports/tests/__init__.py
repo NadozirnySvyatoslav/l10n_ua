@@ -6,3 +6,4 @@ from . import test_multicompany
 from . import test_headcount_staffing_period
 from . import test_hire_notice
 from . import test_report_labor
+from . import test_report_labor_xml

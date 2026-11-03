@@ -5,8 +5,9 @@ Both forms are approved by наказ Держстату від 15.04.2024 № 1
 report for January 2025 (monthly) and for Q1 2025 (quarterly). The row codes,
 row names and columns below are those of the forms annexed to the order
 (117_mis.pdf, 117_kv.pdf). Both are due no later than the 7th day of the month
-after the period and are filed only electronically, through the «Кабінет
-респондента» of Держстат (https://statzvit.ukrstat.gov.ua) with a КЕП.
+after the period and are filed only electronically with a КЕП: through the
+«Кабінет респондента» of Держстат (https://statzvit.ukrstat.gov.ua) or, as
+this module does, through the Електронний кабінет ДПС (hr_report_labor_xml).
 
 Every row is a line of the report. A line computed from Odoo data can be
 overridden by hand, and the override survives a recompute; a row Odoo has no

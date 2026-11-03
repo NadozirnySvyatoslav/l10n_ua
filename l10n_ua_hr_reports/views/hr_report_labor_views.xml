@@ -15,8 +15,13 @@
                             invisible="not computed_on"/>
                     <button name="action_export_xlsx" string="Export XLSX" type="object"
                             invisible="not computed_on"/>
+                    <button name="action_export_xml" string="Export XML" type="object"
+                            invisible="not computed_on or submission_date"/>
+                    <button name="action_kep_submit" string="Submit to Statistics" type="object"
+                            class="btn-primary"
+                            invisible="state != 'done' or not computed_on or submission_date"/>
                     <button name="action_draft" string="Set to Draft" type="object"
-                            invisible="state == 'draft'"/>
+                            invisible="state == 'draft' or submission_date"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
                 </header>
                 <sheet>
@@ -46,6 +51,10 @@
                                    readonly="id"/>
                             <field name="date_deadline"/>
                             <field name="computed_on"/>
+                            <field name="xml_file" filename="xml_filename"
+                                   invisible="not xml_file"/>
+                            <field name="xml_filename" invisible="1"/>
+                            <field name="submission_date" invisible="not submission_date"/>
                         </group>
                     </group>
                     <notebook>
@@ -83,6 +92,17 @@
                 </sheet>
                 <chatter/>
             </form>
+        </field>
+    </record>
+
+    <record id="view_company_form_stat_district" model="ir.ui.view">
+        <field name="name">res.company.form.l10n_ua.stat.district</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="l10n_ua_company_base.view_company_form_inherit_ua"/>
+        <field name="arch" type="xml">
+            <field name="katottg" position="after">
+                <field name="l10n_ua_stat_district_code" placeholder="напр. 007"/>
+            </field>
         </field>
     </record>
 
