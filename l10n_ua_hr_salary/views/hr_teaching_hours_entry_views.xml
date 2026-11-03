@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_hr_teaching_hours_entry_form" model="ir.ui.view">
+        <field name="name">hr.teaching.hours.entry.form</field>
+        <field name="model">hr.teaching.hours.entry</field>
+        <field name="arch" type="xml">
+            <form string="Години навчальних занять">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="date"/>
+                            <field name="name"/>
+                            <field name="hours"/>
+                        </group>
+                        <group>
+                            <field name="pay_scheme_line_id" options="{'no_create': True}"/>
+                            <field name="academician" invisible="not pay_scheme_line_id"/>
+                            <field name="hourly_rate" readonly="pay_scheme_line_id"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hr_teaching_hours_entry_list" model="ir.ui.view">
+        <field name="name">hr.teaching.hours.entry.list</field>
+        <field name="model">hr.teaching.hours.entry</field>
+        <field name="arch" type="xml">
+            <list string="Години навчальних занять" editable="bottom">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="name"/>
+                <field name="hours" sum="Разом"/>
+                <field name="pay_scheme_line_id" options="{'no_create': True}" optional="show"/>
+                <field name="academician" optional="hide"/>
+                <field name="hourly_rate" readonly="pay_scheme_line_id"/>
+                <field name="amount" sum="Разом"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hr_teaching_hours_entry_search" model="ir.ui.view">
+        <field name="name">hr.teaching.hours.entry.search</field>
+        <field name="model">hr.teaching.hours.entry</field>
+        <field name="arch" type="xml">
+            <search string="Години навчальних занять">
+                <field name="employee_id"/>
+                <field name="name"/>
+                <filter string="Цей місяць" name="filter_this_month"
+                        domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter string="Працівник" name="groupby_employee" domain="[]"
+                            context="{'group_by': 'employee_id'}"/>
+                    <filter string="Дата" name="groupby_date" domain="[]"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hr_teaching_hours_entry" model="ir.actions.act_window">
+        <field name="name">Години навчальних занять</field>
+        <field name="res_model">hr.teaching.hours.entry</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_this_month': 1, 'search_default_groupby_employee': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Внесіть години навчальних занять</p>
+            <p>Погодинна оплата за проведення навчальних занять: години × ставка. З 01.01.2027
+               ставку бере зі ставок ПКМУ № 1078 (відсоток базової величини), раніше — вручну.
+               Під час розрахунку зарплати години місяця стають нарахуванням.</p>
+        </field>
+    </record>
+
+</odoo>

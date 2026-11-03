@@ -142,3 +142,40 @@ class TestPayScheme(TransactionCase):
             self.assertEqual(form.pay_scheme_salary, 15020.0)
             self.assertEqual(form.wage, 15020.0)
         self.assertEqual(employee.version_id.wage, 15020.0)
+
+    # --- Похідні оклади (#417) ---
+
+    def test_assistant_educator_10_percent_below_specialist(self):
+        """Примітка 4: оклад помічника вихователя — на 10 % нижче окладу
+        вихователя-спеціаліста. Від округленого окладу 13 865 (0,48): 12 478,50 →
+        12 479. Коефіцієнт 0,432 дав би 12 478 — інший оклад, ніж за приміткою."""
+        line = self._staffing(date(2026, 9, 1), pay_scheme_line_id=self.teacher_none.id,
+                              pay_scheme_reduction=10.0)
+        self.assertEqual(line.salary, 12479.0)
+        self.assertEqual(line.pay_scheme_salary, 12479.0)
+
+    def test_deputy_reduction_chosen_by_employer(self):
+        line = self._staffing(date(2026, 9, 1), pay_scheme_line_id=self.teacher_top.id)
+        self.assertEqual(line.salary, 15020.0)
+        # Заступник: на 7 % нижче — 13 968,60 → 13 969.
+        line.pay_scheme_reduction = 7.0
+        self.assertEqual(line.salary, 13969.0)
+
+    def test_version_reduction(self):
+        employee = self.env['hr.employee'].create({
+            'name': 'Мельник Ганна', 'company_id': self.company.id})
+        employee.version_id.write({'date_version': date(2026, 1, 1),
+                                   'contract_date_start': date(2026, 1, 1)})
+        new = employee.create_version({
+            'date_version': date(2026, 9, 1),
+            'pay_scheme_line_id': self.teacher_none.id,
+            'pay_scheme_reduction': 10.0,
+        })
+        self.assertEqual(new.wage, 12479.0)
+        new.pay_scheme_reduction = 0.0
+        self.assertEqual(new.wage, 13865.0)
+
+    def test_reduction_range(self):
+        with self.assertRaises(Exception), self.cr.savepoint():
+            self._staffing(date(2026, 9, 1), pay_scheme_line_id=self.teacher_top.id,
+                           pay_scheme_reduction=100.0)

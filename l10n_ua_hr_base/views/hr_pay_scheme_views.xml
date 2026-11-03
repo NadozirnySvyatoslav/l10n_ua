@@ -108,6 +108,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='salary']" position="before">
                 <field name="pay_scheme_line_id" options="{'no_create': True}"/>
+                <field name="pay_scheme_reduction" invisible="not pay_scheme_line_id"/>
                 <field name="pay_scheme_salary" invisible="not pay_scheme_line_id"/>
             </xpath>
         </field>
@@ -122,6 +123,8 @@
             <xpath expr="//div[@name='wage']" position="after">
                 <field name="pay_scheme_line_id" options="{'no_create': True}"
                        groups="hr.group_hr_manager"/>
+                <field name="pay_scheme_reduction" groups="hr.group_hr_manager"
+                       invisible="not pay_scheme_line_id"/>
                 <field name="pay_scheme_salary" groups="hr.group_hr_manager"
                        invisible="not pay_scheme_line_id"/>
             </xpath>

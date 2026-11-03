@@ -2970,3 +2970,31 @@ msgstr ""
 #: model:hr.pay.scheme,name:l10n_ua_hr_base.pay_scheme_1078_pedagogical
 msgid "Схема посадових окладів педагогічних працівників (ПКМУ № 1078)"
 msgstr "Схема посадових окладів педагогічних працівників (ПКМУ № 1078)"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_employee__pay_scheme_reduction
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_staffing_table__pay_scheme_reduction
+#: model:ir.model.fields,field_description:l10n_ua_hr_base.field_hr_version__pay_scheme_reduction
+msgid "Below Scheme Position, %"
+msgstr "Нижче окладу посади за схемою, %"
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_employee__pay_scheme_reduction
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_staffing_table__pay_scheme_reduction
+#: model:ir.model.fields,help:l10n_ua_hr_base.field_hr_version__pay_scheme_reduction
+msgid ""
+"For a salary set below the salary of the chosen position: a deputy head "
+"5–10 / 20–30 / 30–40 % below the head (the employer picks the figure within "
+"the range), an assistant educator 10 % below an educator-specialist. The "
+"reduced salary is rounded to a whole hryvnia."
+msgstr ""
+"Для окладу, нижчого за оклад обраної посади: заступник керівника — на "
+"5–10 / 20–30 / 30–40 % нижче окладу керівника (конкретний відсоток у межах "
+"діапазону визначає роботодавець), помічник вихователя — на 10 % нижче окладу "
+"вихователя-спеціаліста. Знижений оклад округлюється до гривні."
+
+#. module: l10n_ua_hr_base
+#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_staffing_table_pay_scheme_reduction_range
+#: model:ir.model.constraint,message:l10n_ua_hr_base.constraint_hr_version_pay_scheme_reduction_range
+msgid "The reduction below the scheme position must be from 0 to 100 %."
+msgstr "Зниження від окладу посади за схемою має бути від 0 до 100 %."

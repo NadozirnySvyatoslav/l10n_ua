@@ -247,5 +247,21 @@
             <field name="sequence">99</field>
         </record>
 
+        <!-- Погодинна оплата за проведення навчальних занять (#417): ставки
+             ПКМУ № 1078 включають оплату за дні відпустки (примітка 4), але
+             це заробітна плата за п. 3 Порядку № 100 — входить у середню. -->
+        <record id="accrual_type_teaching_hourly" model="hr.accrual.type">
+            <field name="name">Погодинна оплата за навчальні заняття</field>
+            <field name="code">TEACH_HOURLY</field>
+            <field name="category">wage</field>
+            <field name="calculation_method">fixed</field>
+            <field name="is_basic_salary">True</field>
+            <field name="is_taxable_pdfo">True</field>
+            <field name="is_military_tax">True</field>
+            <field name="is_esv_base">True</field>
+            <field name="d4_income_type">101</field>
+            <field name="sequence">100</field>
+        </record>
+
     </data>
 </odoo>

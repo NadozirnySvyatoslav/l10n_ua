@@ -1460,6 +1460,9 @@ class HrPayslip(models.Model):
         # Надбавка за вислугу років — #143.
         self._generate_seniority(segments, params, several, versions)
 
+        # Погодинна оплата за навчальні заняття — #417.
+        self._generate_teaching_hours()
+
         # The norm is the month's, so the salary pays only the days worked;
         # the days away are paid by what pays for them.
         self._generate_absence_pay()
@@ -1756,6 +1759,41 @@ class HrPayslip(models.Model):
             'amount': total_amount,
             'is_auto_generated': True,
             'notes': _('Відрядна оплата: %d наряд(ів)') % len(entries),
+        })
+
+    def _generate_teaching_hours(self):
+        """Нарахування «Погодинна оплата за навчальні заняття» за години періоду.
+
+        Підсумовує записи hr.teaching.hours.entry працівника з датою в періоді
+        листка. Окремо від форми оплати основної роботи: погодинна оплата
+        педагога йде понад оклад. Кількість — години, ставка — середня, якщо
+        протягом місяця вона змінювалась.
+        """
+        self.ensure_one()
+        acc_type = self.env['hr.accrual.type'].search(
+            [('code', '=', 'TEACH_HOURLY')], limit=1)
+        if not acc_type:
+            return
+        entries = self.env['hr.teaching.hours.entry'].search([
+            ('employee_id', '=', self.employee_id.id),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('company_id', '=', self.company_id.id),
+        ])
+        hours = sum(entries.mapped('hours'))
+        amount = round(sum(entries.mapped('amount')), 2)
+        if amount <= 0:
+            return
+        rates = set(entries.filtered('hours').mapped('hourly_rate'))
+        self.env['hr.payslip.accrual'].create({
+            'payslip_id': self.id,
+            'accrual_type_id': acc_type.id,
+            'quantity': hours,
+            'rate': rates.pop() if len(rates) == 1 else round(amount / hours, 4),
+            'amount': amount,
+            'is_auto_generated': True,
+            'notes': _('Навчальні заняття: %(hours)s год за %(count)d записами',
+                       hours=f'{hours:g}', count=len(entries)),
         })
 
     def _generate_seniority(self, segments, params, several=False, versions=False):
