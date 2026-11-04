@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Номер медичної карти стаціонарного хворого (ф. 003/о).
+             Спільна послідовність (company_id = False), як і для декларацій;
+             для окремої нумерації по закладу створіть копію з company_id. -->
+        <record id="seq_admission" model="ir.sequence">
+            <field name="name">Карта стаціонарного хворого (ф. 003/о)</field>
+            <field name="code">l10n_ua.medecin.admission</field>
+            <field name="prefix">СТ-%(year)s-</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
