@@ -24,11 +24,11 @@
                             <tr><td>SHA-256 файлу</td><td style="font-family: monospace; font-size: 8pt;" t-out="o._kep_original_sha256()"/></tr>
                             <tr>
                                 <td t-out="'Відправник' if o.direction == 'out' else 'Отримувач'"/>
-                                <td><t t-out="o.company_id.name"/> <t t-if="o.account_id.edrpou">(ЄДРПОУ <t t-out="o.account_id.edrpou"/>)</t></td>
+                                <td><t t-out="o.company_id.name"/> <t t-if="o.account_id.edrpou">(<t t-out="'РНОКПП' if len(o.account_id.edrpou) == 10 else 'ЄДРПОУ'"/> <t t-out="o.account_id.edrpou"/>)</t></td>
                             </tr>
                             <tr>
                                 <td t-out="'Отримувач' if o.direction == 'out' else 'Відправник'"/>
-                                <td><t t-out="o.counterparty_name or o.partner_id.name or '—'"/> <t t-if="o.counterparty_edrpou">(ЄДРПОУ <t t-out="o.counterparty_edrpou"/>)</t></td>
+                                <td><t t-out="o.counterparty_name or o.partner_id.name or '—'"/> <t t-if="o.counterparty_edrpou">(<t t-out="'РНОКПП' if len(o.counterparty_edrpou) == 10 else 'ЄДРПОУ'"/> <t t-out="o.counterparty_edrpou"/>)</t></td>
                             </tr>
                             <tr t-if="o.kep_rejected"><td>Відхилено</td><td t-out="o.kep_reject_reason or '—'"/></tr>
                         </table>

@@ -151,10 +151,10 @@ class L10nUaEdoDocument(models.Model):
                     edrpou=self.counterparty_edrpou))
             if not self.counterparty_edrpou:
                 code = info['edrpou'] or info['drfo']
-                partner = self.partner_id or self._find_partner(code)
+                partner = self.partner_id or self._find_partner(code) or self._kep_partner_by_email()
                 self.write({
                     'counterparty_edrpou': code,
-                    'counterparty_name': info['organization'] or info['signer_name'],
+                    'counterparty_name': info['organization'] or partner.name or info['signer_name'],
                     'partner_id': partner.id or False,
                 })
         party = self._kep_own_party() if own else self._kep_their_party()
@@ -179,6 +179,14 @@ class L10nUaEdoDocument(models.Model):
             self._kep_rebuild_archive()  # one more signature (a seal) after all signed
         self._kep_refresh()
         return signature
+
+    def _kep_partner_by_email(self):
+        """The partner of the address the document came from / goes to (one match only)."""
+        emails = email_split(self.kep_recipient_emails or '')
+        if not emails:
+            return self.env['res.partner']
+        partners = self.env['res.partner'].search([('email', '=ilike', emails[0])], limit=2)
+        return partners if len(partners) == 1 else self.env['res.partner']
 
     def _kep_add_signature_b64(self, signature_b64, expect=None):
         return self._kep_add_signature(base64.b64decode(signature_b64), expect=expect)

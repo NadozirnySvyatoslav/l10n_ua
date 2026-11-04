@@ -23,6 +23,9 @@ class KepSignatureError(ValueError):
     """Not a detached CAdES signature with the signer's certificate."""
 
 
+# What the ЦСК put into O= of the certificate of a person / ФОП
+PERSON_ORGANIZATIONS = {'ФІЗИЧНА ОСОБА', 'ФІЗИЧНА ОСОБА-ПІДПРИЄМЕЦЬ', 'ФІЗИЧНА ОСОБА - ПІДПРИЄМЕЦЬ'}
+
 def _code(value, prefix):
     match = re.fullmatch(rf'{prefix}-?(\d+)', (value or '').strip())
     return match.group(1) if match else False
@@ -116,6 +119,9 @@ def parse_signature(data, attached=False):
     if not drfo and not edrpou and re.fullmatch(r'\d{8}', subject.get('serial_number') or ''):
         edrpou = subject['serial_number']
     person = subject.get('surname') or subject.get('given_name') or drfo
+    organization = subject.get('organization_name') or False
+    if organization and not edrpou and organization.strip().upper() in PERSON_ORGANIZATIONS:
+        organization = False  # a ФОП / person: «ФІЗИЧНА ОСОБА» is not a name
 
     signing_time = False
     for attr in signer['signed_attrs'] or []:
@@ -124,7 +130,7 @@ def parse_signature(data, attached=False):
     return {
         'signer_name': subject.get('common_name') or '',
         'signer_title': subject.get('title') or False,
-        'organization': subject.get('organization_name') or False,
+        'organization': organization,
         'drfo': drfo or False,
         'edrpou': edrpou or False,
         'is_stamp': not person,

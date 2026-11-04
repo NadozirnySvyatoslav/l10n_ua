@@ -119,6 +119,17 @@ class TestKep(TransactionCase):
         self.assertEqual(embedded_content(sign(PDF, self.director, attached=True)), PDF)
         self.assertIsNone(embedded_content(sign(PDF, self.director)))
 
+    def test_fop_key_says_fizychna_osoba(self):
+        """A ФОП key has O=«ФІЗИЧНА ОСОБА»: the name comes from the partner of the sender."""
+        fop = make_key('КРАВЕЦЬ ЯРОСЛАВ АНАТОЛІЙОВИЧ', drfo='3333333333', organization='ФІЗИЧНА ОСОБА')
+        self.assertFalse(parse_signature(sign(PDF, fop))['organization'])
+        partner = self.env['res.partner'].create({'name': 'ФОП Кравець Ярослав Анатолійович',
+                                                  'email': 'yar@fop.example'})
+        doc = self._receive([('Dohovir.pdf', PDF), ('Dohovir.pdf.p7s', sign(PDF, fop))],
+                            subject='Договір ФОП', sender='yar@fop.example')
+        self.assertEqual((doc.counterparty_edrpou, doc.counterparty_name, doc.partner_id),
+                         ('3333333333', 'ФОП Кравець Ярослав Анатолійович', partner))
+
     # ── Outgoing ────────────────────────────────────────────
 
     def test_outgoing_signed_in_odoo_then_on_the_portal(self):
@@ -249,13 +260,14 @@ class TestKep(TransactionCase):
 
     # ── Incoming by e-mail ──────────────────────────────────
 
-    def _receive(self, attachments, subject='Акт за жовтень', delivered_to=None):
+    def _receive(self, attachments, subject='Акт за жовтень', delivered_to=None,
+                 sender='Покупець <buh@customer.example>'):
         if not self.account.alias_name:
             domain = self.env['mail.alias.domain'].search([('name', '=', 'edo.test.example')]) \
                 or self.env['mail.alias.domain'].create({'name': 'edo.test.example'})
             self.account.write({'alias_name': 'edo', 'alias_domain_id': domain.id})
         message = EmailMessage()
-        message['From'] = 'Покупець <buh@customer.example>'
+        message['From'] = sender
         message['To'] = 'edo@edo.test.example'
         message['Subject'] = subject
         if delivered_to:
