@@ -16,3 +16,4 @@ from . import test_staffing_currency
 from . import test_tariff_grade
 from . import test_work_time_helpers
 from . import test_department_company
+from . import test_reservation_limit

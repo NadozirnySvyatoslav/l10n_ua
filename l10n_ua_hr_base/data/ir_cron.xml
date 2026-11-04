@@ -44,5 +44,17 @@
             <field name="interval_type">days</field>
             <field name="active" eval="True"/>
         </record>
+
+        <!-- Порядок бронювання (ПКМУ № 76 у редакції ПКМУ № 1328): ліміт
+             заброньованих, строки збільшеного ліміту і критичності. -->
+        <record id="ir_cron_check_reservation_limits" model="ir.cron">
+            <field name="name">HR UA: Контроль ліміту бронювання</field>
+            <field name="model_id" ref="base.model_res_company"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_reservation_limits()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
     </data>
 </odoo>
