@@ -3,3 +3,7 @@ access_admission_user,access.admission.user,model_l10n_ua_medecin_admission,l10n
 access_admission_mgr,access.admission.mgr,model_l10n_ua_medecin_admission,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1
 access_department_user,access.department.user,model_l10n_ua_medecin_department,l10n_ua_medecin_base.group_ua_medecin_user,1,0,0,0
 access_department_mgr,access.department.mgr,model_l10n_ua_medecin_department,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1
+access_procedure_user,access.procedure.user,model_l10n_ua_medecin_procedure,l10n_ua_medecin_base.group_ua_medecin_user,1,1,1,1
+access_procedure_mgr,access.procedure.mgr,model_l10n_ua_medecin_procedure,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1
+access_procedure_type_user,access.procedure.type.user,model_l10n_ua_medecin_procedure_type,l10n_ua_medecin_base.group_ua_medecin_user,1,0,0,0
+access_procedure_type_mgr,access.procedure.type.mgr,model_l10n_ua_medecin_procedure_type,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1

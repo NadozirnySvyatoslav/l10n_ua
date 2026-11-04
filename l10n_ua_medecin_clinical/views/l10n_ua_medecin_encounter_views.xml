@@ -59,7 +59,10 @@
                                     <field name="sequence" widget="handle"/>
                                     <field name="icd10_id"/>
                                     <field name="icd10_code" readonly="1"/>
-                                    <field name="is_primary"/>
+                                    <field name="diagnosis_type"/>
+                                    <field name="is_primary" optional="hide"/>
+                                    <field name="is_first_detected"/>
+                                    <field name="date_established" optional="show"/>
                                     <field name="is_chronic"/>
                                     <field name="note"/>
                                 </list>
@@ -219,7 +222,10 @@
                 <field name="icd10_id"/>
                 <field name="patient_id"/>
                 <field name="doctor_id"/>
-                <field name="is_primary"/>
+                <field name="diagnosis_type"/>
+                <field name="is_primary" optional="hide"/>
+                <field name="is_first_detected" optional="show"/>
+                <field name="date_established" optional="hide"/>
                 <field name="is_chronic"/>
                 <field name="note" optional="hide"/>
                 <field name="encounter_id" optional="hide"/>
@@ -237,11 +243,18 @@
                 <field name="icd10_code"/>
                 <field name="patient_id"/>
                 <field name="doctor_id"/>
-                <filter string="Основні" name="filter_primary" domain="[('is_primary', '=', True)]"/>
-                <filter string="Хронічні" name="filter_chronic" domain="[('is_chronic', '=', True)]"/>
+                <filter string="Основні (заключні)" name="filter_primary" domain="[('is_primary', '=', True)]"/>
+                <filter string="Супутні" name="filter_concomitant" domain="[('diagnosis_type', '=', 'concomitant')]"/>
+                <filter string="Ускладнення" name="filter_complication" domain="[('diagnosis_type', '=', 'complication')]"/>
                 <separator/>
-                <filter string="Дата прийому" name="filter_date_start" date="date_start"/>
+                <filter string="Хронічні" name="filter_chronic" domain="[('is_chronic', '=', True)]"/>
+                <filter string="Виявлені вперше" name="filter_first_detected" domain="[('is_first_detected', '=', True)]"/>
+                <separator/>
+                <filter string="Дата прийому / госпіталізації" name="filter_date_start" date="date_start"/>
+                <filter string="Дата встановлення" name="filter_date_established" date="date_established"/>
                 <group>
+                    <filter string="Тип діагнозу" name="groupby_type" domain="[]"
+                            context="{'group_by': 'diagnosis_type'}"/>
                     <filter string="Код МКХ-10" name="groupby_icd10" domain="[]"
                             context="{'group_by': 'icd10_id'}"/>
                     <filter string="Пацієнт" name="groupby_patient" domain="[]"
