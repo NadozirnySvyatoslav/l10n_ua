@@ -267,6 +267,11 @@ class HrReportD5(models.Model):
         self.ensure_one()
         company = self.company_id
         edrpou = re.sub(r'\D', '', company.edrpou or '')
+        if company.l10n_ua_is_fop:
+            # РНОКПП ФОП (10 цифр) у 8-символьне ЄДРПОУ не вміщується.
+            edrpou = next((d for d in (re.sub(r'\D', '', v or '') for v in (
+                company.company_registry, company.vat, company.edrpou)) if len(d) == 10),
+                edrpou)
         office = company.tax_office_code or ''
         director = company.director_id
         director_rnokpp = re.sub(
@@ -274,6 +279,10 @@ class HrReportD5(models.Model):
         accountant = company.accountant_id
         accountant_rnokpp = re.sub(
             r'\D', '', (accountant.rnokpp or '') if accountant else '')
+        signer_name = director.name if director else ''
+        if company.l10n_ua_is_fop and not director_rnokpp:
+            # ФОП підписує розрахунок сам: РНОКПП — його ж податковий номер.
+            director_rnokpp, signer_name = edrpou, company._l10n_ua_dps_name()
 
         missing = []
         if not edrpou:
@@ -282,7 +291,7 @@ class HrReportD5(models.Model):
             missing.append(_('код ДПІ компанії (tax_office_code)'))
         if not director_rnokpp:
             missing.append(_('РНОКПП керівника (director_id)'))
-        if not (director and director.name):
+        if not signer_name:
             missing.append(_('ПІБ керівника (director_id)'))
         if missing:
             raise UserError(_(
@@ -328,7 +337,7 @@ class HrReportD5(models.Model):
             'htin': edrpou,
             'hfill': date.today().strftime('%d%m%Y'),
             'hkbos': director_rnokpp,
-            'hbos': director.name or '',
+            'hbos': signer_name or '',
             'hkbuh': accountant_rnokpp,
             'hbuh': (accountant.name or '') if accountant else '',
             'persons': persons,
@@ -339,7 +348,9 @@ class HrReportD5(models.Model):
         """Рендер XML Додатка Д1 (J0510111 v11) з dict значень.
 
         Стейтлес (лише ``vals``) — щоб валідацію проти офіційного XSD можна
-        було проганяти без записів. Графи таблиці (column-major, ROWNUM — номер
+        було проганяти без записів. ФОП (``prefix`` F05, F0510111): замість
+        HZM — квартал HZKV, номер місяця в кварталі HNM і номер розрахунку
+        HNUM1; ``hzm`` лишається календарним місяцем для гр. 10. Графи таблиці (column-major, ROWNUM — номер
         запису): 05 громадянин України, 06 стать, 07 РНОКПП, 08 категорія ЗО,
         09 код типу нарахувань (лише у випадках 1–15), 10 місяць/рік,
         11 ПІБ, 12 дні непрацездатності, 13 дні без збереження зарплати,
@@ -359,6 +370,7 @@ class HrReportD5(models.Model):
         def i(v):  # цілі колонки — 0 має рендеритись як «0»
             return str(int(v))
 
+        prefix = vals.get('prefix') or D1_C_DOC
         persons = vals.get('persons') or []
         for p in persons:
             p.setdefault('month', vals['hzm'])
@@ -420,10 +432,10 @@ class HrReportD5(models.Model):
         parts = [
             '<?xml version="1.0" encoding="windows-1251"?>',
             '<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
-            ' xsi:noNamespaceSchemaLocation="J0510111.xsd">',
+            ' xsi:noNamespaceSchemaLocation="%s0510111.xsd">' % prefix[0],
             '    <DECLARHEAD>',
             '        <TIN>%s</TIN>' % esc(vals['tin']),
-            '        <C_DOC>%s</C_DOC>' % D1_C_DOC,
+            '        <C_DOC>%s</C_DOC>' % prefix,
             '        <C_DOC_SUB>%s</C_DOC_SUB>' % D1_C_DOC_SUB,
             '        <C_DOC_VER>%s</C_DOC_VER>' % D1_C_DOC_VER,
             '        <C_DOC_TYPE>%s</C_DOC_TYPE>' % vals.get('doc_type', 0),
@@ -446,7 +458,16 @@ class HrReportD5(models.Model):
             '    <DECLARBODY>',
             '        <HZ>1</HZ>',
             '        <HZY>%s</HZY>' % vals['hzy'],
-            '        <HZM>%s</HZM>' % vals['hzm'],
+        ]
+        if prefix == 'F05':
+            parts += [
+                '        <HZKV>%s</HZKV>' % vals['hzkv'],
+                '        <HNM>%s</HNM>' % vals['hnm'],
+                '        <HNUM1>%s</HNUM1>' % vals.get('hnum1', 1),
+            ]
+        else:
+            parts.append('        <HZM>%s</HZM>' % vals['hzm'])
+        parts += [
             '        <HNAME>%s</HNAME>' % esc(vals['hname']),
             '        <HTIN>%s</HTIN>' % esc(vals['htin']),
         ]

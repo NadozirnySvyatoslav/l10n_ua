@@ -11,7 +11,11 @@
 листів. Головна форма рахується з рядків Д1, щоб розділ I збігався з
 підсумками додатка.
 
-ФОП-роботодавець (F0500111, квартал із колонками по місяцях) — окремий крок.
+ФОП-роботодавець подає F0500111 щокварталу: головна форма має колонки за
+три місяці кварталу (G3/G4/G5), а Д1 (F0510111) і Д4 (F0510411) подаються
+окремо на кожен місяць (HNM 1–3) — до шести додатків в одному пакеті. Дані
+кожного місяця — у рядку «місяць кварталу» (l10n_ua.payroll.tax.report.month)
+зі своїм Д5.
 """
 import base64
 import re
@@ -28,6 +32,9 @@ SOFTWARE = 'Odoo l10n_ua'
 MAIN_FORM = ('J05', '001', '11')
 D1_FORM = ('J05', '101', '11')
 D4_FORM = ('J05', '104', '11')
+FOP_MAIN_FORM = ('F05', '001', '11')
+FOP_D1_FORM = ('F05', '101', '11')
+FOP_D4_FORM = ('F05', '104', '11')
 
 # Категорія рядка Д5 -> ставка ЄСВ для розділу I головної форми.
 # '3' — працівник з інвалідністю (8,41 %, рядки 2.2/3.2), решта — 22 %.
@@ -55,19 +62,35 @@ def dps_filename(head):
         str(head['c_sti_orig']).zfill(4))
 
 
+def fop_tin(company):
+    """РНОКПП ФОП: 10 цифр із реєстраційного номера чи ПДВ-номера компанії.
+
+    Поле ЄДРПОУ — на 8 символів, РНОКПП туди не вміщується; декларація ФОП
+    бере податковий номер так само (company_registry / vat).
+    """
+    for value in (company.company_registry, company.vat, company.edrpou):
+        digits = re.sub(r'\D', '', value or '')
+        if len(digits) == 10:
+            return digits
+    return ''
+
+
 def linked_docs_xml(linked):
     """LINKED_DOCS для DECLARHEAD: ``linked`` — [(form, filename, TYPE)].
 
     TYPE 1 — додаток до цього документа, 2 — головний документ пакета.
+    Четвертий елемент (необов'язковий) — C_DOC_CNT: ФОП подає по Д1 і Д4 на
+    кожен місяць кварталу, і однакові форми в пакеті розрізняє лише він.
     """
     if not linked:
         return ''
     return '<LINKED_DOCS>%s</LINKED_DOCS>' % ''.join(
         '<DOC NUM="%s" TYPE="%s"><C_DOC>%s</C_DOC><C_DOC_SUB>%s</C_DOC_SUB>'
-        '<C_DOC_VER>%s</C_DOC_VER><C_DOC_TYPE>0</C_DOC_TYPE><C_DOC_CNT>1</C_DOC_CNT>'
+        '<C_DOC_VER>%s</C_DOC_VER><C_DOC_TYPE>0</C_DOC_TYPE><C_DOC_CNT>%s</C_DOC_CNT>'
         '<C_DOC_STAN>1</C_DOC_STAN><FILENAME>%s</FILENAME></DOC>'
-        % (num, link_type, form[0], form[1], form[2], fname[:-4] + '.XML')
-        for num, (form, fname, link_type) in enumerate(linked, 1))
+        % (num, item[2], item[0][0], item[0][1], item[0][2],
+           item[3] if len(item) > 3 else 1, item[1][:-4] + '.XML')
+        for num, item in enumerate(linked, 1))
 
 
 class L10nUaPayrollTaxReport(models.Model):
@@ -88,6 +111,12 @@ class L10nUaPayrollTaxReport(models.Model):
         [(str(m), str(m)) for m in range(1, 13)], string='Місяць', required=True,
         default=lambda self: str((fields.Date.today().replace(day=1) - timedelta(days=1)).month),
         tracking=True)
+    is_fop = fields.Boolean(related='company_id.l10n_ua_is_fop', string='ФОП')
+    quarter = fields.Selection(
+        [(str(q), str(q)) for q in range(1, 5)], string='Квартал',
+        default=lambda self: str((((fields.Date.today().month - 1) // 3 - 1) % 4) + 1),
+        help='ФОП подає розрахунок щокварталу; місяць документа — останній '
+             'місяць кварталу.')
     number = fields.Integer(
         string='Номер розрахунку', default=1, required=True,
         help='Порядковий номер Розрахунку за цей звітний період у хронологічному '
@@ -102,6 +131,9 @@ class L10nUaPayrollTaxReport(models.Model):
         'hr.report.d5', string='Відомість Д1 (ЄСВ)', copy=False, readonly=True,
         help='Документ «Д5» того ж місяця — з нього береться додаток Д1. '
              'Дні лікарняних і відпусток правте в ньому.')
+    month_ids = fields.One2many(
+        'l10n_ua.payroll.tax.report.month', 'report_id', string='Місяці кварталу',
+        copy=False, help='ФОП: дані кожного місяця кварталу — Д1, чисельність, файли.')
     d4_line_ids = fields.One2many(
         'l10n_ua.payroll.tax.report.d4.line', 'report_id', string='Додаток 4ДФ (Д4)',
         copy=False)
@@ -147,30 +179,67 @@ class L10nUaPayrollTaxReport(models.Model):
         'Розрахунок з таким номером за цей місяць уже є.',
     )
 
-    @api.depends('year', 'month', 'number')
+    @api.depends('year', 'month', 'number', 'quarter', 'company_id.l10n_ua_is_fop')
     def _compute_name(self):
         for rec in self:
-            rec.name = _('Податковий розрахунок %(month)s.%(year)s №%(num)s',
-                         month=(rec.month or '').zfill(2), year=rec.year, num=rec.number)
+            if rec.is_fop:
+                rec.name = _('Податковий розрахунок ФОП %(q)s кв. %(year)s №%(num)s',
+                             q=rec.quarter, year=rec.year, num=rec.number)
+            else:
+                rec.name = _('Податковий розрахунок %(month)s.%(year)s №%(num)s',
+                             month=(rec.month or '').zfill(2), year=rec.year, num=rec.number)
+
+    @api.model
+    def _fop_month_vals(self, vals, company):
+        """ФОП: місяць документа — останній місяць обраного кварталу."""
+        if company.l10n_ua_is_fop and vals.get('quarter'):
+            vals['month'] = str(int(vals['quarter']) * 3)
+        return vals
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            company = self.env['res.company'].browse(
+                vals.get('company_id') or self.env.company.id)
+            if company.l10n_ua_is_fop:
+                vals.setdefault('quarter', self._fields['quarter'].default(self))
+            self._fop_month_vals(vals, company)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'quarter' in vals:
+            for rec in self:
+                super(L10nUaPayrollTaxReport, rec).write(
+                    self._fop_month_vals(dict(vals), rec.company_id))
+            return True
+        return super().write(vals)
+
+    def _quarter_months(self):
+        """[(номер місяця в кварталі, календарний місяць)] — для ФОП."""
+        self.ensure_one()
+        first = (int(self.quarter) - 1) * 3
+        return [(i, first + i) for i in (1, 2, 3)]
 
     # ------------------------------------------------------------------ дані
 
-    def _period(self):
+    def _period(self, month=None):
         """(перший день місяця, перший день наступного) — як у пошуку Д5."""
         self.ensure_one()
-        date_from = date(self.year, int(self.month), 1)
+        date_from = date(self.year, int(month or self.month), 1)
         date_to = (date_from + timedelta(days=32)).replace(day=1)
         return date_from, date_to
 
-    def _section1(self):
-        """Розділ I головної форми з рядків Д1.
+    def _section1(self, lines=None):
+        """Розділ I головної форми з рядків Д1 (за замовчуванням — усього документа).
 
         Рядок 3 дорівнює сумі гр. 20 Д1 (ЄСВ по особах), а не добутку бази на
         ставку: так розрахунок не розходиться з додатком на копійки
         округлення по кожній особі.
         """
         self.ensure_one()
-        lines = self.d5_report_id.line_ids
+        if lines is None:
+            lines = (self.month_ids.d5_report_id.line_ids if self.is_fop
+                     else self.d5_report_id.line_ids)
         res = dict.fromkeys(('salary', 'civil', 'base22', 'base841', 'extra',
                              'esv22', 'esv841', 'esv_extra'), 0.0)
         employees = set()
@@ -199,7 +268,7 @@ class L10nUaPayrollTaxReport(models.Model):
         res['count'] = len(employees)
         return res
 
-    @api.depends('d5_report_id.line_ids')
+    @api.depends('d5_report_id.line_ids', 'month_ids.d5_report_id.line_ids')
     def _compute_section1(self):
         for rec in self:
             s = rec._section1()
@@ -224,45 +293,71 @@ class L10nUaPayrollTaxReport(models.Model):
         for rec in self:
             if rec.state == 'submitted':
                 raise UserError(_('Поданий розрахунок не перераховується.'))
-            rec._calculate_d1()
-            rec._calculate_d4()
             vals = {'state': 'calculated', 'xml_file': False, 'xml_filename': False,
                     'd1_xml_file': False, 'd1_xml_filename': False,
                     'd4_xml_file': False, 'd4_xml_filename': False}
+            if rec.is_fop:
+                rec._calculate_fop()
+                rec.write(vals)
+                continue
+            rec.d5_report_id = rec._calculate_d1()
+            rec.d4_line_ids.unlink()
+            rec._calculate_d4()
             if not rec.headcount_avg:
                 vals['headcount_avg'] = rec._section1()['count']
             rec.write(vals)
         return True
 
-    def _calculate_d1(self):
+    def _calculate_fop(self):
+        """ФОП: Д5, Д4 і чисельність окремо на кожен місяць кварталу.
+
+        Чисельність, уже введена вручну в рядку місяця, не перетирається.
+        """
+        self.ensure_one()
+        self.d4_line_ids.unlink()
+        Month = self.env['l10n_ua.payroll.tax.report.month']
+        for index, month in self._quarter_months():
+            row = self.month_ids.filtered(lambda m: m.month_index == index)
+            if not row:
+                row = Month.create({'report_id': self.id, 'month_index': index})
+            d5 = self._calculate_d1(month, row.d5_report_id)
+            vals = {'d5_report_id': d5.id, 'd1_xml_file': False, 'd1_xml_filename': False,
+                    'd4_xml_file': False, 'd4_xml_filename': False}
+            if not row.headcount_avg:
+                vals['headcount_avg'] = self._section1(d5.line_ids)['count']
+            row.write(vals)
+            self._calculate_d4(month, index)
+
+    def _calculate_d1(self, month=None, d5=None):
         """Знайти або створити Д5 місяця і перегенерувати його рядки.
 
         Д5 належить кадровому модулю, права на нього — у кадровиків; бухгалтер,
         який формує розрахунок, лише запускає збір даних, тож sudo.
         """
         self.ensure_one()
+        month = str(month or self.month)
         D5 = self.env['hr.report.d5'].sudo()
-        d5 = self.d5_report_id.sudo() or D5.search([
+        d5 = (d5 if d5 is not None else self.d5_report_id).sudo() or D5.search([
             ('company_id', '=', self.company_id.id),
-            ('year', '=', self.year), ('month', '=', self.month),
+            ('year', '=', self.year), ('month', '=', month),
         ], limit=1)
         if not d5:
             d5 = D5.create({'company_id': self.company_id.id,
-                            'year': self.year, 'month': self.month})
+                            'year': self.year, 'month': month})
         if d5.state == 'submitted':
-            raise UserError(_('Відомість Д5 за цей місяць уже позначена поданою.'))
+            raise UserError(_('Відомість Д5 за %s.%s уже позначена поданою.')
+                            % (month.zfill(2), self.year))
         d5.action_generate()
-        self.d5_report_id = d5
+        return d5
 
-    def _calculate_d4(self):
+    def _calculate_d4(self, month=None, month_index=1):
         """Д4 помісячно: дохід, ПДФО і ВЗ по фізособах з проведених листів.
 
         Виплачені суми прирівнюються до нарахованих (зарплату виплачено у
         звітному місяці); інший випадок правиться в рядках вручну.
         """
         self.ensure_one()
-        self.d4_line_ids.unlink()
-        date_from, date_to = self._period()
+        date_from, date_to = self._period(month)
         payslips = self.env['hr.payslip'].search([
             ('company_id', '=', self.company_id.id),
             ('date_from', '>=', date_from),
@@ -286,7 +381,7 @@ class L10nUaPayrollTaxReport(models.Model):
             date_hire, date_term = Report4df._employee_period_dates(
                 employee, date_from, month_end)
             lines.append({
-                'report_id': self.id, 'employee_id': emp_id,
+                'report_id': self.id, 'employee_id': emp_id, 'month_index': month_index,
                 'rnokpp': employee.rnokpp or '', 'income_code': code,
                 'income_accrued': d['income'], 'income_paid': d['income'],
                 'pdfo_accrued': d['pdfo'], 'pdfo_paid': d['pdfo'],
@@ -302,21 +397,37 @@ class L10nUaPayrollTaxReport(models.Model):
     # ------------------------------------------------------------------ XML
 
     def _tin(self):
-        return re.sub(r'\D', '', self.company_id.edrpou or self.company_id.company_registry or '')
+        company = self.company_id
+        if self.is_fop:
+            return fop_tin(company)
+        return re.sub(r'\D', '', company.edrpou or company.company_registry or '')
 
     def _office_code(self):
         company = self.company_id
         office = company.l10n_ua_tax_office_id
         return re.sub(r'\D', '', (office.code if office else '') or company.tax_office_code or '')
 
-    def _head(self, form):
+    def _head(self, form, cnt=1):
         office = self._office_code()
         return {
             'form': form, 'tin': self._tin(),
-            'c_doc_type': 0, 'c_doc_cnt': 1, 'c_doc_stan': 1,
+            'c_doc_type': 0, 'c_doc_cnt': cnt, 'c_doc_stan': 1,
             'c_reg': office[:2], 'c_raj': office[2:4], 'c_sti_orig': office,
-            'period_type': 1, 'period_month': int(self.month), 'period_year': self.year,
+            # ФОП — квартальний: PERIOD_TYPE 2, місяць — останній у кварталі.
+            'period_type': 2 if self.is_fop else 1,
+            'period_month': int(self.month), 'period_year': self.year,
         }
+
+    def _signer(self):
+        """(РНОКПП, ПІБ) підписанта: керівник, а за ФОП без нього — сам ФОП."""
+        self.ensure_one()
+        director = self.company_id.director_id
+        rnokpp = re.sub(r'\D', '', (director.rnokpp or '') if director else '')
+        if director and director.name and rnokpp:
+            return rnokpp, director.name
+        if self.is_fop:
+            return self._tin(), self.company_id._l10n_ua_dps_name()
+        return '', ''
 
     def _xml_problems(self):
         self.ensure_one()
@@ -324,7 +435,9 @@ class L10nUaPayrollTaxReport(models.Model):
         problems = []
         if self.state == 'draft':
             problems.append(_('розрахунок не розраховано (кнопка «Розрахувати»)'))
-        if not self._tin():
+        if self.is_fop and len(self._tin()) != 10:
+            problems.append(_('РНОКПП ФОП (10 цифр у полі «Реєстраційний номер компанії»)'))
+        elif not self._tin():
             problems.append(_('код ЄДРПОУ компанії'))
         if len(self._office_code()) != 4:
             problems.append(_('код ДПІ компанії (4 цифри)'))
@@ -334,11 +447,8 @@ class L10nUaPayrollTaxReport(models.Model):
             problems.append(_('поштовий індекс компанії (5 цифр)'))
         if not company.l10n_ua_tax_office_id:
             problems.append(_('податковий орган компанії (куди подається розрахунок)'))
-        director = company.director_id
-        if not (director and director.name and re.sub(r'\D', '', director.rnokpp or '')):
+        if not self._signer()[0]:
             problems.append(_('керівник компанії з РНОКПП (director_id)'))
-        if company.l10n_ua_is_fop:
-            problems.append(_('ФОП подає квартальний F0500111 — цей документ лише для юросіб'))
         return problems
 
     def action_generate_xml(self):
@@ -347,6 +457,9 @@ class L10nUaPayrollTaxReport(models.Model):
             if problems:
                 raise UserError(_('Неможливо сформувати Податковий розрахунок:\n• %s')
                                 % '\n• '.join(problems))
+            if rec.is_fop:
+                rec._generate_fop_xml()
+                continue
             main_head = rec._head(MAIN_FORM)
             main_name = dps_filename(main_head)
             back = [(MAIN_FORM, main_name, 2)]
@@ -372,19 +485,60 @@ class L10nUaPayrollTaxReport(models.Model):
             rec.write(vals)
         return True
 
-    def _render_d1(self, linked):
-        d5 = self.d5_report_id.sudo()
+    def _generate_fop_xml(self):
+        """Пакет ФОП: F0500111 + Д1 і Д4 на кожен місяць кварталу з даними."""
+        self.ensure_one()
+        main_name = dps_filename(self._head(FOP_MAIN_FORM))
+        back = [(FOP_MAIN_FORM, main_name, 2)]
+        annexes = []  # (рядок місяця, ключ, форма, ім'я, xml, C_DOC_CNT)
+        counters = {'d1': 0, 'd4': 0}
+        for kind, form in (('d1', FOP_D1_FORM), ('d4', FOP_D4_FORM)):
+            for row in self.month_ids.sorted('month_index'):
+                if kind == 'd1' and not row.d5_report_id.line_ids:
+                    continue
+                d4_lines = self.d4_line_ids.filtered(
+                    lambda l: l.month_index == row.month_index)
+                if kind == 'd4' and not d4_lines:
+                    continue
+                counters[kind] += 1
+                cnt = counters[kind]
+                fname = dps_filename(self._head(form, cnt))
+                if kind == 'd1':
+                    xml = self._render_d1(back, row.d5_report_id, row.month_index, cnt)
+                else:
+                    xml = self._render_d4(back, d4_lines, row.month_index, cnt)
+                annexes.append((row, kind, form, fname, xml, cnt))
+        if not annexes:
+            raise UserError(_('Немає даних для додатків: за квартал не знайдено '
+                              'проведених розрахункових листів.'))
+        linked = [(form, fname, 1, cnt) for _r, _k, form, fname, _x, cnt in annexes]
+        main_xml = self._render_main_fop(linked, counters)
+        self.month_ids.write({'d1_xml_file': False, 'd1_xml_filename': False,
+                              'd4_xml_file': False, 'd4_xml_filename': False})
+        for row, kind, _form, fname, xml, _cnt in annexes:
+            row.write({f'{kind}_xml_file': base64.b64encode(xml),
+                       f'{kind}_xml_filename': dps_standard_filename(xml) or fname})
+        self.write({'xml_file': base64.b64encode(main_xml),
+                    'xml_filename': dps_standard_filename(main_xml) or main_name})
+
+    def _render_d1(self, linked, d5=None, month_index=None, cnt=1):
+        d5 = (d5 or self.d5_report_id).sudo()
         vals = d5._d1_vals()
         office = self._office_code()
         # Реквізити шапки — ті самі, з яких рахувалося ім'я файлу в LINKED_DOCS.
         vals.update(tin=self._tin(), c_reg=office[:2], c_raj=office[2:4], c_sti_orig=office,
                     linked_xml=linked_docs_xml(linked))
+        if self.is_fop:
+            vals.update(prefix='F05', hzkv=int(self.quarter), hnm=month_index,
+                        hnum1=self.number, doc_cnt=cnt, period_type=2,
+                        period_month=int(self.month))
         return d5._render_d1_xml(vals).encode('windows-1251', errors='xmlcharrefreplace')
 
-    def _render_d4(self, linked):
+    def _render_d4(self, linked, lines=None, month_index=None, cnt=1):
         company = self.company_id
-        director = company.director_id
         office = self._office_code()
+        lines = self.d4_line_ids if lines is None else lines
+        signer_rnokpp, signer_name = self._signer()
         persons = [{
             'rnokpp': re.sub(r'\D', '', line.rnokpp or ''),
             'income_accrued': line.income_accrued, 'income_paid': line.income_paid,
@@ -393,16 +547,19 @@ class L10nUaPayrollTaxReport(models.Model):
             'income_code': re.sub(r'\D', '', line.income_code or '101'),
             'date_hire': line.date_hire, 'date_term': line.date_term,
             'ozn': '0',
-        } for line in self.d4_line_ids]
+        } for line in lines]
         vals = {
-            'prefix': 'J05', 'tin': self._tin(), 'doc_type': 0, 'doc_cnt': 1,
+            'prefix': 'F05' if self.is_fop else 'J05', 'tin': self._tin(),
+            'doc_type': 0, 'doc_cnt': cnt,
             'c_reg': office[:2], 'c_raj': office[2:4], 'c_sti_orig': office,
-            'period_month': int(self.month), 'period_type': 1, 'period_year': self.year,
+            'period_month': int(self.month), 'period_type': 2 if self.is_fop else 1,
+            'period_year': self.year,
             'doc_stan': 1, 'd_fill': date.today().strftime('%d%m%Y'),
             'hzy': self.year, 'hzm': int(self.month), 'hnum': self.number,
+            'hzkv': int(self.quarter or 1), 'hnm': month_index,
             'hname': company._l10n_ua_dps_name(), 'htin': self._tin(),
             'hkatottg': company.katottg,
-            'hkbos': re.sub(r'\D', '', director.rnokpp or ''), 'hbos': director.name or '',
+            'hkbos': signer_rnokpp, 'hbos': signer_name,
             'persons': persons,
             'linked_xml': linked_docs_xml(linked),
         }
@@ -417,27 +574,14 @@ class L10nUaPayrollTaxReport(models.Model):
         """
         self.ensure_one()
         company = self.company_id
-        director = company.director_id
-        accountant = company.accountant_id if 'accountant_id' in company._fields else False
         head = self._head(MAIN_FORM)
         s = self._section1()
-        address = ', '.join(filter(None, [company.zip, company.state_id.name, company.city,
-                                          company.street, company.street2]))
 
         def tag(name, value):
             return f'<{name}>{value}</{name}>'
 
-        body = [
-            tag('HZ', 1), tag('HZY', self.year), tag('HZM', int(self.month)),
-            tag('HNUM', self.number), tag('HNAME', escape(company._l10n_ua_dps_name())),
-            tag('HTIN', self._tin()), tag('HKATOTTG', escape(company.katottg)),
-            tag('HLOC', escape(address)), tag('HZIP', company.zip),
-        ]
-        if company.phone:
-            body.append(tag('HTEL', escape(company.phone)))
-        if company.email:
-            body.append(tag('HEMAIL', escape(company.email)))
-        body.append(tag('HSTI', escape(company.l10n_ua_tax_office_id.name)))
+        body = [tag('HZ', 1), tag('HZY', self.year), tag('HZM', int(self.month)),
+                tag('HNUM', self.number)] + self._address_body()
         if 'd1' in keys:
             body.append(tag('R061G3', 1))
         if 'd4' in keys:
@@ -457,19 +601,30 @@ class L10nUaPayrollTaxReport(models.Model):
         ]
         body += [tag(name, _dec2(value)) for name, value in rows
                  if float_round(value or 0.0, precision_digits=2)]
-        body += [tag('HFILL', date.today().strftime('%d%m%Y')),
-                 tag('HKBOS', re.sub(r'\D', '', director.rnokpp or '')),
-                 tag('HBOS', escape(director.name or ''))]
+        return self._wrap_main(MAIN_FORM, head, linked, body)
+
+    def _footer(self):
+        """HFILL і підписанти — однаково для J і F."""
+        company = self.company_id
+        accountant = company.accountant_id if 'accountant_id' in company._fields else False
+        rnokpp, name = self._signer()
+        body = [f'<HFILL>{date.today():%d%m%Y}</HFILL>', f'<HKBOS>{rnokpp}</HKBOS>',
+                f'<HBOS>{escape(name or "")}</HBOS>']
         acc_rnokpp = re.sub(r'\D', '', (accountant.rnokpp or '') if accountant else '')
         if accountant and accountant.name and acc_rnokpp:
-            body += [tag('HKBUH', acc_rnokpp), tag('HBUH', escape(accountant.name))]
+            body += [f'<HKBUH>{acc_rnokpp}</HKBUH>', f'<HBUH>{escape(accountant.name)}</HBUH>']
+        return body
+
+    def _wrap_main(self, form, head, linked, body):
+        body = body + self._footer()
         head_xml = (
             '<DECLARHEAD>'
-            f'<TIN>{head["tin"]}</TIN><C_DOC>{MAIN_FORM[0]}</C_DOC>'
-            f'<C_DOC_SUB>{MAIN_FORM[1]}</C_DOC_SUB><C_DOC_VER>{MAIN_FORM[2]}</C_DOC_VER>'
+            f'<TIN>{head["tin"]}</TIN><C_DOC>{form[0]}</C_DOC>'
+            f'<C_DOC_SUB>{form[1]}</C_DOC_SUB><C_DOC_VER>{form[2]}</C_DOC_VER>'
             f'<C_DOC_TYPE>0</C_DOC_TYPE><C_DOC_CNT>1</C_DOC_CNT>'
             f'<C_REG>{head["c_reg"]}</C_REG><C_RAJ>{head["c_raj"]}</C_RAJ>'
-            f'<PERIOD_MONTH>{head["period_month"]}</PERIOD_MONTH><PERIOD_TYPE>1</PERIOD_TYPE>'
+            f'<PERIOD_MONTH>{head["period_month"]}</PERIOD_MONTH>'
+            f'<PERIOD_TYPE>{head["period_type"]}</PERIOD_TYPE>'
             f'<PERIOD_YEAR>{head["period_year"]}</PERIOD_YEAR>'
             f'<C_STI_ORIG>{head["c_sti_orig"]}</C_STI_ORIG><C_DOC_STAN>1</C_DOC_STAN>'
             f'{linked_docs_xml(linked)}'
@@ -477,12 +632,83 @@ class L10nUaPayrollTaxReport(models.Model):
             '</DECLARHEAD>')
         xml = ('<?xml version="1.0" encoding="windows-1251"?>'
                '<DECLAR xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
-               f'xsi:noNamespaceSchemaLocation="{"".join(MAIN_FORM)}.xsd">'
+               f'xsi:noNamespaceSchemaLocation="{"".join(form)}.xsd">'
                f'{head_xml}<DECLARBODY>{"".join(body)}</DECLARBODY></DECLAR>')
         return xml.encode('windows-1251', errors='xmlcharrefreplace')
 
-    def _attachment_files(self):
+    def _address_body(self):
+        company = self.company_id
+        address = ', '.join(filter(None, [company.zip, company.state_id.name, company.city,
+                                          company.street, company.street2]))
+        body = [f'<HNAME>{escape(company._l10n_ua_dps_name())}</HNAME>',
+                f'<HTIN>{self._tin()}</HTIN>',
+                f'<HKATOTTG>{escape(company.katottg)}</HKATOTTG>',
+                f'<HLOC>{escape(address)}</HLOC>', f'<HZIP>{company.zip}</HZIP>']
+        if company.phone:
+            body.append(f'<HTEL>{escape(company.phone)}</HTEL>')
+        if company.email:
+            body.append(f'<HEMAIL>{escape(company.email)}</HEMAIL>')
+        body.append(f'<HSTI>{escape(company.l10n_ua_tax_office_id.name)}</HSTI>')
+        return body
+
+    def _render_main_fop(self, linked, counters):
+        """Головна форма F0500111: колонки G3/G4/G5 — місяці кварталу.
+
+        Розділ I ФОП-бланка коротший за юрособу: 2.3 — доплата бази до
+        мінімальної, 3.3 — ЄСВ на неї; рядків 2.5/3.5 тут немає. Порядок
+        тегів — як у xs:sequence схеми: усі колонки рядка поспіль.
+        """
         self.ensure_one()
+        cols = {'1': 'G3', '2': 'G4', '3': 'G5'}
+        rows_by_month = {row.month_index: row for row in self.month_ids}
+        sections = {i: self._section1(rows_by_month[i].d5_report_id.line_ids)
+                    if i in rows_by_month else None for i in (1, 2, 3)}
+        body = [f'<HZ>1</HZ><HZY>{self.year}</HZY><HZKV>{int(self.quarter)}</HZKV>'
+                f'<HNUM>{self.number}</HNUM>'] + self._address_body()
+        if counters['d1']:
+            body.append(f'<R061G3>1</R061G3><R061G4>{counters["d1"]}</R061G4>')
+        if counters['d4']:
+            body.append(f'<R064G3>1</R064G3><R064G4>{counters["d4"]}</R064G4>')
+        body.append('<R081G3>1</R081G3>')
+
+        def per_month(code, getter, fmt):
+            out = []
+            for i in (1, 2, 3):
+                value = getter(i)
+                if value:
+                    out.append(f'<{code}{cols[str(i)]}>{fmt(value)}</{code}{cols[str(i)]}>')
+            return out
+
+        def row_attr(field):
+            return lambda i: rows_by_month[i][field] if i in rows_by_month else 0
+
+        def sec(key):
+            return lambda i: (float_round(sections[i][key] or 0.0, precision_digits=2)
+                              if sections[i] else 0.0)
+
+        body += per_month('R091', row_attr('headcount_avg'), str)
+        body += per_month('R0911', row_attr('headcount_disabled'), str)
+        body += per_month('R092', lambda i: sections[i]['count'] if sections[i] else 0, str)
+        body += per_month('R101', row_attr('new_jobs'), str)
+        for code, key in (('R0101', 'income'), ('R01011', 'salary'), ('R01012', 'civil'),
+                          ('R0102', 'base'), ('R01021', 'base22'), ('R01022', 'base841'),
+                          ('R01023', 'extra'), ('R0103', 'esv'), ('R01031', 'esv22'),
+                          ('R01032', 'esv841')):
+            body += per_month(code, sec(key), _dec2)
+        body += per_month('R010321', lambda i: float_round(
+            sec('base841')(i) * ESV_RATE, precision_digits=2), _dec2)
+        body += per_month('R01033', sec('esv_extra'), _dec2)
+        body += per_month('R0107', sec('esv'), _dec2)
+        return self._wrap_main(FOP_MAIN_FORM, self._head(FOP_MAIN_FORM), linked, body)
+
+    def _attachment_files(self):
+        """[(ключ, дані, ім'я файлу)] додатків — у порядку LINKED_DOCS."""
+        self.ensure_one()
+        if self.is_fop:
+            rows = self.month_ids.sorted('month_index')
+            return [(f'{key}_{row.month_index}', row[f'{key}_xml_file'],
+                     row[f'{key}_xml_filename'])
+                    for key in ('d1', 'd4') for row in rows if row[f'{key}_xml_file']]
         return [(key, self[f'{key}_xml_file'], self[f'{key}_xml_filename'])
                 for key in ('d1', 'd4') if self[f'{key}_xml_file']]
 
@@ -535,8 +761,8 @@ class L10nUaPayrollTaxReport(models.Model):
 
     def _dps_on_submitted(self, receipt):
         self.write({'state': 'submitted', 'submission_date': fields.Date.context_today(self)})
-        if self.d5_report_id:
-            self.d5_report_id.sudo()._dps_on_submitted(receipt)
+        for d5 in (self.d5_report_id | self.month_ids.d5_report_id).sudo():
+            d5._dps_on_submitted(receipt)
         self.message_post(body=_('Подано до ДПС. Квитанція: %s') % (receipt or '—'))
 
 
@@ -559,5 +785,54 @@ class L10nUaPayrollTaxReportD4Line(models.Model):
     pdfo_paid = fields.Monetary(string='ПДФО перерахований')
     mil_accrued = fields.Monetary(string='ВЗ нарахований')
     mil_paid = fields.Monetary(string='ВЗ перерахований')
+    month_index = fields.Integer(
+        string='Місяць кварталу', default=1,
+        help='ФОП: номер місяця в кварталі (1–3), до якого Д4 належить рядок.')
     date_hire = fields.Date(string='Дата прийняття')
     date_term = fields.Date(string='Дата звільнення')
+
+
+class L10nUaPayrollTaxReportMonth(models.Model):
+    """ФОП: один місяць кварталу — Д1 (через Д5), чисельність, файли додатків."""
+    _name = 'l10n_ua.payroll.tax.report.month'
+    _description = 'Податковий розрахунок ФОП: місяць кварталу'
+    _order = 'report_id, month_index'
+
+    report_id = fields.Many2one(
+        'l10n_ua.payroll.tax.report', required=True, ondelete='cascade', index=True)
+    company_id = fields.Many2one(related='report_id.company_id', store=True)
+    currency_id = fields.Many2one(related='report_id.currency_id')
+    month_index = fields.Integer(string='№ місяця в кварталі', required=True)
+    month_name = fields.Char(string='Місяць', compute='_compute_month_name')
+    d5_report_id = fields.Many2one('hr.report.d5', string='Відомість Д1 (ЄСВ)',
+                                   readonly=True)
+    headcount_avg = fields.Integer(string='091 Середньооблікова кількість')
+    headcount_disabled = fields.Integer(string='091.1 з інвалідністю')
+    new_jobs = fields.Integer(string='101 Нові робочі місця')
+    income = fields.Monetary(string='Нараховано доходу', compute='_compute_totals')
+    esv = fields.Monetary(string='Нараховано ЄСВ', compute='_compute_totals')
+    d1_xml_file = fields.Binary(string='XML Д1', attachment=True, copy=False)
+    d1_xml_filename = fields.Char(copy=False)
+    d4_xml_file = fields.Binary(string='XML Д4', attachment=True, copy=False)
+    d4_xml_filename = fields.Char(copy=False)
+
+    _unique_month = models.Constraint(
+        'unique(report_id, month_index)', 'Місяць кварталу вже є в розрахунку.')
+
+    @api.depends('month_index', 'report_id.quarter', 'report_id.year')
+    def _compute_month_name(self):
+        for row in self:
+            report = row.report_id
+            if report.quarter and row.month_index:
+                month = (int(report.quarter) - 1) * 3 + row.month_index
+                row.month_name = '%02d.%s' % (month, report.year)
+            else:
+                row.month_name = False
+
+    @api.depends('d5_report_id.line_ids')
+    def _compute_totals(self):
+        for row in self:
+            s = row.report_id._section1(row.d5_report_id.line_ids) if row.report_id \
+                else {'income': 0.0, 'esv': 0.0}
+            row.income = s['income']
+            row.esv = s['esv']
