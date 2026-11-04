@@ -8,6 +8,11 @@
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="inside">
+                <group string="Фінансова звітність (UA)">
+                    <group>
+                        <field name="l10n_ua_enterprise_size"/>
+                    </group>
+                </group>
                 <group string="Затвердження платежів (UA)">
                     <group>
                         <field name="l10n_ua_payment_approval_enabled"/>

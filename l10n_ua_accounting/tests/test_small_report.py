@@ -137,3 +137,10 @@ class TestSmallReport(AccountingTestCase):
             'l10n_ua_accounting.report_small_document', report.ids)[0].decode()
         self.assertIn('Форма № 1-мс', html)
         self.assertIn('(3.2)', html)
+
+    def test_kind_defaults_to_company_size(self):
+        Report = self.env['l10n_ua.small.report']
+        self.company.l10n_ua_enterprise_size = 'micro'
+        self.assertEqual(Report.create({'company_id': self.company.id}).kind, 'micro')
+        self.company.l10n_ua_enterprise_size = 'small'
+        self.assertEqual(Report.create({'company_id': self.company.id}).kind, 'small')
