@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_007o" model="ir.actions.report">
+        <field name="name">Ф. 007/о — рух хворих і ліжковий фонд</field>
+        <field name="model">l10n_ua.medecin.report.007o</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_medecin_inpatient.report_007o</field>
+        <field name="report_file">l10n_ua_medecin_inpatient.report_007o</field>
+        <field name="print_report_name">'007o_%s' % object.date</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <template id="report_007o">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="report">
+                <t t-call="web.basic_layout">
+                    <t t-set="cell" t-value="'border: 1px solid #000; padding: 3px; text-align: center;'"/>
+                    <div class="page" style="font-family: 'Times New Roman', serif; font-size: 10pt;">
+                        <table style="width: 100%; margin-bottom: 8px;">
+                            <tr>
+                                <td style="width: 60%;">
+                                    <div>Найменування закладу охорони здоров'я:</div>
+                                    <strong t-esc="report.company_id.name"/>
+                                </td>
+                                <td style="text-align: right; font-size: 8pt;">
+                                    <div>Медична документація</div>
+                                    <div><strong>Форма первинної облікової документації № 007/о</strong></div>
+                                    <div>Затверджено наказом МОЗ України 14.02.2012 № 110</div>
+                                </td>
+                            </tr>
+                        </table>
+                        <h4 style="text-align: center; margin: 4px 0;">
+                            ЛИСТОК ОБЛІКУ РУХУ ХВОРИХ І ЛІЖКОВОГО ФОНДУ СТАЦІОНАРУ
+                        </h4>
+                        <p style="text-align: center;">
+                            за <span t-esc="report.date.strftime('%d.%m.%Y')"/>
+                        </p>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+                            <thead>
+                                <tr>
+                                    <th t-att-style="cell" rowspan="2">Відділення</th>
+                                    <th t-att-style="cell" rowspan="2">Ліжок (фонд)</th>
+                                    <th t-att-style="cell" rowspan="2">Хворих на початок доби</th>
+                                    <th t-att-style="cell" colspan="2">Поступило</th>
+                                    <th t-att-style="cell" colspan="3">Вибуло</th>
+                                    <th t-att-style="cell" rowspan="2">Хворих на кінець доби</th>
+                                    <th t-att-style="cell" rowspan="2">Вільних ліжок</th>
+                                    <th t-att-style="cell" rowspan="2">Проведено ліжко-днів</th>
+                                </tr>
+                                <tr>
+                                    <th t-att-style="cell">у стаціонар</th>
+                                    <th t-att-style="cell">з інших відділень</th>
+                                    <th t-att-style="cell">виписано</th>
+                                    <th t-att-style="cell">в інші відділення</th>
+                                    <th t-att-style="cell">померло</th>
+                                </tr>
+                                <tr>
+                                    <t t-foreach="range(1, 12)" t-as="col">
+                                        <th t-att-style="cell + ' font-size: 7pt;'" t-esc="col"/>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="report.line_ids" t-as="line"
+                                    t-att-style="line.is_total and 'font-weight: bold;' or ''">
+                                    <td t-att-style="cell + ' text-align: left;'" t-esc="line.display_name"/>
+                                    <td t-att-style="cell" t-esc="line.bed_count"/>
+                                    <td t-att-style="cell" t-esc="line.count_start"/>
+                                    <td t-att-style="cell" t-esc="line.admitted"/>
+                                    <td t-att-style="cell" t-esc="line.transferred_in"/>
+                                    <td t-att-style="cell" t-esc="line.discharged"/>
+                                    <td t-att-style="cell" t-esc="line.transferred_out"/>
+                                    <td t-att-style="cell" t-esc="line.died"/>
+                                    <td t-att-style="cell" t-esc="line.count_end"/>
+                                    <td t-att-style="cell" t-esc="line.bed_free"/>
+                                    <td t-att-style="cell" t-esc="line.bed_days"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="font-size: 8pt; margin-top: 6px;">
+                            Гр. 9 = гр. 3 + гр. 4 + гр. 5 − гр. 6 − гр. 7 − гр. 8.
+                            Доба — календарний день у часовому поясі закладу.
+                        </p>
+                        <table style="width: 100%; margin-top: 30px;">
+                            <tr>
+                                <td style="width: 50%;">Медична сестра _______________________</td>
+                                <td>Завідувач відділення _______________________</td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
