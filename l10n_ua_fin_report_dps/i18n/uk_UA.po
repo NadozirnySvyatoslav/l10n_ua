@@ -1,0 +1,84 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_fin_report_dps
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+
+#. module: l10n_ua_fin_report_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_balance_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_pnl_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_cashflow_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_equity_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_small_report_form_dps
+msgid "DPS XML"
+msgstr "XML для ДПС"
+
+#. module: l10n_ua_fin_report_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_balance_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_pnl_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_cashflow_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_equity_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_small_report_form_dps
+msgid "Submit to DPS"
+msgstr "Подати до ДПС"
+
+#. module: l10n_ua_fin_report_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_balance_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_pnl_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_cashflow_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_equity_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_small_report_form_dps
+msgid "DPS"
+msgstr "ДПС"
+
+#. module: l10n_ua_fin_report_dps
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_balance_report__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_pnl_report__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_cashflow_report__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_equity_report__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_small_report__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_fin_report_dps_mixin__xml_file
+msgid "XML File"
+msgstr "Файл XML"
+
+#. module: l10n_ua_fin_report_dps
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_balance_report__xml_filename
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_pnl_report__xml_filename
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_cashflow_report__xml_filename
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_equity_report__xml_filename
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_small_report__xml_filename
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_fin_report_dps_mixin__xml_filename
+msgid "XML File Name"
+msgstr "Ім'я файлу XML"
+
+#. module: l10n_ua_fin_report_dps
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_balance_report__submission_date
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_pnl_report__submission_date
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_cashflow_report__submission_date
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_equity_report__submission_date
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_small_report__submission_date
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_fin_report_dps_mixin__submission_date
+msgid "Submitted On"
+msgstr "Дата подання"
+
+#. module: l10n_ua_fin_report_dps
+#: model:ir.ui.menu,name:l10n_ua_fin_report_dps.menu_dps_balance_report
+msgid "Balance (Form 1)"
+msgstr "Баланс (форма № 1)"
+
+#. module: l10n_ua_fin_report_dps
+#: model:ir.ui.menu,name:l10n_ua_fin_report_dps.menu_dps_pnl_report
+msgid "Financial Results (Form 2)"
+msgstr "Звіт про фінансові результати (форма № 2)"
+
+#. module: l10n_ua_fin_report_dps
+#: model:ir.ui.menu,name:l10n_ua_fin_report_dps.menu_dps_small_report
+msgid "Small and Micro Enterprise Statements"
+msgstr "Фінзвітність малого та мікропідприємства"

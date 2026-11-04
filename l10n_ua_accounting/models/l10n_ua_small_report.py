@@ -197,7 +197,9 @@ class L10nUaSmallReport(models.Model):
     name = fields.Char(compute='_compute_name', store=True)
     kind = fields.Selection(
         [('small', 'Small Enterprise (1-m, 2-m)'), ('micro', 'Micro Enterprise (1-ms, 2-ms)')],
-        string='Kind', required=True, default='small', tracking=True,
+        string='Kind', required=True, tracking=True,
+        default=lambda self: 'micro' if self.env.company.l10n_ua_enterprise_size == 'micro'
+        else 'small',
     )
     company_id = fields.Many2one(
         'res.company', string='Company', required=True, default=lambda self: self.env.company)
