@@ -21,6 +21,34 @@
                             <field name="wage_from_staffing"/>
                         </group>
                     </group>
+                    <group string="Бронювання військовозобов'язаних" name="ua_reservation">
+                        <group>
+                            <field name="l10n_ua_critical_enterprise"/>
+                            <field name="l10n_ua_critical_authority"
+                                   invisible="not l10n_ua_critical_enterprise"/>
+                            <field name="l10n_ua_critical_decision"
+                                   invisible="not l10n_ua_critical_enterprise"/>
+                            <field name="l10n_ua_critical_until"
+                                   invisible="not l10n_ua_critical_enterprise"/>
+                        </group>
+                        <group invisible="not l10n_ua_critical_enterprise">
+                            <field name="l10n_ua_reservation_limit"/>
+                            <field name="l10n_ua_reservation_limit_until"/>
+                            <field name="l10n_ua_reservation_base"
+                                   invisible="l10n_ua_critical_authority == 'other'"/>
+                            <field name="l10n_ua_liable_count"/>
+                            <field name="l10n_ua_reserved_count"/>
+                            <field name="l10n_ua_reservation_share"
+                                   decoration-danger="l10n_ua_reservation_exceeded"/>
+                            <field name="l10n_ua_reservation_exceeded" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not l10n_ua_reservation_exceeded">
+                        Частка заброньованих перевищує граничну. Протягом 10 робочих днів
+                        подайте через «Дію» заяву про анулювання бронювання зайвих працівників
+                        (Порядок № 76 у редакції ПКМУ № 1328).
+                    </div>
                 </page>
             </xpath>
         </field>
