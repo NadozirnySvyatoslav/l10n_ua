@@ -61,6 +61,9 @@
                             <field name="partner_id"/>
                             <field name="partner_ipn"/>
                             <field name="move_id"/>
+                            <field name="payment_move_id" invisible="not payment_move_id"/>
+                            <field name="partial_reconcile_id" groups="base.group_no_one"
+                                   invisible="not partial_reconcile_id"/>
                             <field name="erpn_number"
                                    required="state == 'submitted'"/>
                             <field name="erpn_submitted_date" invisible="not erpn_submitted_date"/>
