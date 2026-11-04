@@ -1,3 +1,5 @@
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 
@@ -245,6 +247,32 @@ class HrSickLeave(models.Model):
         return True
 
     def _calculate_average_salary(self):
+        """Average daily salary for the sick leave, within the cap of
+        Порядок № 1266, п. 4 (``_l10n_ua_average_cap``)."""
+        self.ensure_one()
+        average = self._calculate_average_salary_uncapped()
+        cap = self._l10n_ua_average_cap()
+        return min(average, cap) if cap else average
+
+    def _l10n_ua_average_cap(self):
+        """The ceiling of the average daily salary, or 0 when unknown.
+
+        Порядок № 1266, п. 4: the average daily salary cannot exceed the
+        maximum base of the unified social contribution per calendar day —
+        the maximum base of the last month of the calculation period divided
+        by the average number of calendar days in a month, 30.44.
+        """
+        self.ensure_one()
+        if 'hr.psp.parameters' not in self.env or not self.date_from:
+            return 0.0
+        last_day = self.date_from.replace(day=1) - relativedelta(days=1)
+        company = self.employee_id.company_id or self.env.company
+        params = self.env['hr.psp.parameters'].get_parameters(last_day, company.id)
+        if not params or not params.max_esv_base:
+            return 0.0
+        return round(params.max_esv_base / 30.44, 2)
+
+    def _calculate_average_salary_uncapped(self):
         """Calculate average daily salary for sick leave.
 
         Based on earnings in billing period (12 months before sick leave),

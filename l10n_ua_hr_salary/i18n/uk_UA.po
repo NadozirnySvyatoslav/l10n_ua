@@ -1238,6 +1238,7 @@ msgstr "Мінімальна зарплата"
 
 #. module: l10n_ua_hr_salary
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_cpi_index__month
+#: model:ir.model.fields.selection,name:l10n_ua_hr_salary.selection__hr_accrual_type__l10n_ua_bonus_months__1
 msgid "Month"
 msgstr "Місяць"
 
@@ -2236,6 +2237,7 @@ msgstr "XML"
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters__year
 #: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_psp_parameters_template__year
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary.hr_cpi_index_view_search
+#: model:ir.model.fields.selection,name:l10n_ua_hr_salary.selection__hr_accrual_type__l10n_ua_bonus_months__12
 msgid "Year"
 msgstr "Рік"
 
@@ -3691,3 +3693,33 @@ msgstr "Аванс згідно фактично відпрацьованих д
 #: code:addons/l10n_ua_hr_salary/models/hr_salary_advance_run.py:0
 msgid "The advances cannot be computed for %(date)s: the timesheet of every employee must be approved, at least partially, up to the payment date. Fix the following and generate the advances again:\n%(problems)s"
 msgstr "Аванс на %(date)s не можна розрахувати: табель кожного працівника має бути затверджений, хоча б частково, щонайменше по дату виплати. Виправте наведене нижче й повторіть нарахування:\n%(problems)s"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_accrual_type__l10n_ua_bonus_months
+msgid "Bonus Period"
+msgstr "Період премії"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_accrual__l10n_ua_bonus_period_to
+msgid "Bonus For Period Ending"
+msgstr "Премія за період, що закінчується"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields.selection,name:l10n_ua_hr_salary.selection__hr_accrual_type__l10n_ua_bonus_months__3
+msgid "Quarter"
+msgstr "Квартал"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields.selection,name:l10n_ua_hr_salary.selection__hr_accrual_type__l10n_ua_bonus_months__6
+msgid "Half-Year"
+msgstr "Півріччя"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_accrual_type__l10n_ua_bonus_months
+msgid "For a bonus: the period it is paid for. A bonus for a quarter, half-year or year counts in the average salary for vacations spread over as many months, counting back from the month it is accrued in, pro rata to the working days worked (Порядок № 100, п. 3, абз. 3)."
+msgstr "Для премії — період, за який її нараховано. Премія за квартал, півріччя чи рік входить у середню зарплату для відпусток частками за стільки ж місяців, рахуючи від місяця нарахування, пропорційно відпрацьованим робочим дням (Порядок № 100, п. 3, абз. 3)."
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_payslip_accrual__l10n_ua_bonus_period_to
+msgid "For a bonus for a quarter, half-year or year: the last month of the period it is for, when that is not the month of the payslip (a bonus for the first quarter accrued in April: March). The average salary divides the bonus by the working days worked in that period (Порядок № 100, п. 3, абз. 3)."
+msgstr "Для премії за квартал, півріччя чи рік — останній місяць періоду, за який її нараховано, якщо це не місяць листка (премія за I квартал, нарахована у квітні, — березень). Середня зарплата ділить премію на робочі дні, відпрацьовані в цьому періоді (Порядок № 100, п. 3, абз. 3)."
