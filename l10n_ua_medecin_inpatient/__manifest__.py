@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin Inpatient',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.2.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Стаціонар: епізод стаціонарного лікування (пролікований випадок), ліжко-дні',
     'description': """
@@ -13,6 +13,12 @@ Medecin Inpatient
 * Номер медичної карти стаціонарного хворого (ф. 003/о) — автонумерація
 * Відділення стаціонару — l10n_ua.medecin.department (мінімальний довідник;
   ліжковий фонд і ф. 007/о — окремою задачею)
+* Типізовані діагнози епізоду (при госпіталізації, клінічний, заключний,
+  патолого-анатомічний, супутні, ускладнення); рівно один заключний
+  діагноз у виписаного епізоду
+* Медичні (хірургічні) втручання — l10n_ua.medecin.procedure: дата, хірург,
+  анестезіолог, вид знеболення, екстреність, ускладнення; довідник кодів
+  втручань l10n_ua.medecin.procedure.type (під НК 026:2021 / АКМВ)
 
 Регуляторна база:
 
@@ -32,6 +38,8 @@ Medecin Inpatient
         'views/l10n_ua_medecin_department_views.xml',
         'views/l10n_ua_medecin_admission_views.xml',
         'views/menu_views.xml',
+        'views/l10n_ua_medecin_diagnosis_views.xml',
+        'views/l10n_ua_medecin_procedure_views.xml',
     ],
     'demo': [],
     'images': ['static/description/icon.png'],

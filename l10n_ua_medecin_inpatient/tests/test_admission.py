@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo import Command
 from odoo.tests import TransactionCase, tagged, new_test_user
 
 
@@ -26,6 +27,8 @@ class TestMedecinAdmission(TransactionCase):
             'company_id': cls.company.id,
         })
         cls.Admission = cls.env['l10n_ua.medecin.admission']
+        cls.icd10 = cls.env['l10n_ua.medecin.icd10'].search(
+            [('is_selectable', '=', True)], limit=1)
 
     def _admission(self, **vals):
         base = {
@@ -34,6 +37,9 @@ class TestMedecinAdmission(TransactionCase):
             'department_id': self.department.id,
             'company_id': self.company.id,
             'date_admission': datetime(2026, 3, 10, 8, 0),
+            # Виписка вимагає заключного діагнозу (#225).
+            'diagnosis_ids': [Command.create({
+                'icd10_id': self.icd10.id, 'diagnosis_type': 'final'})],
         }
         base.update(vals)
         return self.Admission.create(base)
