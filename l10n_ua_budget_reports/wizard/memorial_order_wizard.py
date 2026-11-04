@@ -68,7 +68,6 @@ class MemorialOrderWizard(models.TransientModel):
             'mo_label': dict(self._fields['mo_kind'].selection).get(self.mo_kind),
             'date_from': fields.Date.to_string(self.date_from),
             'date_to': fields.Date.to_string(self.date_to),
-            'company_id': self.company_id.id,
         }
         report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
         return report.report_action(self, data=data)
@@ -132,7 +131,7 @@ class MemorialOrderWizard(models.TransientModel):
             sum_d += ln.debit
             sum_c += ln.credit
 
-        rows.sort(key=lambda r: (r['date'] or fields.Date.today(), r['move_name'] or ''))
+        rows.sort(key=lambda r: (fields.Date.to_date(r['date']) or fields.Date.today(), r['move_name'] or ''))
         return {
             'rows': rows,
             'sum_debit': sum_d,

@@ -110,7 +110,7 @@ class TestBudgetReports(TransactionCase):
         if not offbalance_acc:
             offbalance_acc = Account.create({
                 'name': 'Орендовані необоротні активи',
-                'code': '011_test',
+                'code': '011test',
                 'account_type': 'off_balance',
                 'company_ids': [(6, 0, [self.env.company.id])],
             })
@@ -150,7 +150,7 @@ class TestBudgetReports(TransactionCase):
         self.env.company.external_report_layout_id = self.env.ref('web.external_layout_standard')
         action_dict = wizard.action_print()
         report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
-        html, _ = report._render_qweb_html(report.report_name, [wizard.id], data={'data': action_dict.get('data')})
+        html, _ = report._render_qweb_html(report.report_name, [wizard.id], data=action_dict.get('data'))
         html_str = html.decode() if isinstance(html, bytes) else html
         self.assertIn('Орендована будівля', html_str)
         self.assertIn('150 000.00', html_str)
