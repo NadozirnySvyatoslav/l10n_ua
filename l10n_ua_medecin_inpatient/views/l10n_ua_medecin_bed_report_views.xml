@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ф. 007/о -->
+    <record id="view_report_007o_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.report.007o.form</field>
+        <field name="model">l10n_ua.medecin.report.007o</field>
+        <field name="arch" type="xml">
+            <form string="Листок обліку руху хворих і ліжкового фонду (ф. 007/о)">
+                <header>
+                    <button name="action_compute" string="Сформувати" type="object" class="btn-primary"/>
+                    <button name="action_print" string="Друк ф. 007/о" type="object" icon="fa-print"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="department_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="1" nolabel="1">
+                        <list decoration-bf="is_total">
+                            <field name="is_total" column_invisible="1"/>
+                            <field name="display_name" string="Відділення"/>
+                            <field name="bed_count"/>
+                            <field name="count_start"/>
+                            <field name="admitted"/>
+                            <field name="transferred_in"/>
+                            <field name="transferred_out"/>
+                            <field name="discharged"/>
+                            <field name="died"/>
+                            <field name="count_end"/>
+                            <field name="bed_free"/>
+                            <field name="bed_days"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_report_007o_wizard" model="ir.actions.act_window">
+        <field name="name">Рух хворих (ф. 007/о)</field>
+        <field name="res_model">l10n_ua.medecin.report.007o</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <!-- Показники ліжкового фонду -->
+    <record id="view_bed_indicators_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.bed.indicators.form</field>
+        <field name="model">l10n_ua.medecin.bed.indicators</field>
+        <field name="arch" type="xml">
+            <form string="Показники використання ліжкового фонду">
+                <header>
+                    <button name="action_compute" string="Розрахувати" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="department_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" readonly="1" nolabel="1">
+                        <list decoration-bf="is_total">
+                            <field name="is_total" column_invisible="1"/>
+                            <field name="display_name" string="Відділення"/>
+                            <field name="avg_beds"/>
+                            <field name="admitted"/>
+                            <field name="transferred_in" optional="show"/>
+                            <field name="transferred_out" optional="show"/>
+                            <field name="discharged"/>
+                            <field name="died"/>
+                            <field name="departed"/>
+                            <field name="bed_days"/>
+                            <field name="occupancy_days" optional="hide"/>
+                            <field name="occupancy_days_year"/>
+                            <field name="occupancy_pct" optional="show"/>
+                            <field name="bed_turnover"/>
+                            <field name="avg_stay"/>
+                            <field name="mortality"/>
+                        </list>
+                    </field>
+                    <div class="text-muted small">
+                        <p>Формули: днів зайнятості ліжка на рік = ліжко-дні / середнє число
+                            ліжок × 365 / днів у періоді; обіг ліжка = вибуло / середнє число
+                            ліжок; середня тривалість перебування = ліжко-дні / вибуло;
+                            летальність = померло / (виписано + померло) × 100%.</p>
+                        <p>Вибуло: для відділення — виписано + померло + переведено в інші
+                            відділення; для стаціонару в цілому — виписано + померло.
+                            Середнє число ліжок — середнє за днями періоду число розгорнутих ліжок.</p>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_bed_indicators_wizard" model="ir.actions.act_window">
+        <field name="name">Показники ліжкового фонду</field>
+        <field name="res_model">l10n_ua.medecin.bed.indicators</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>
