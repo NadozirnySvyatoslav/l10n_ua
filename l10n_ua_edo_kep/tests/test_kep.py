@@ -249,7 +249,7 @@ class TestKep(TransactionCase):
 
     # ── Incoming by e-mail ──────────────────────────────────
 
-    def _receive(self, attachments, subject='Акт за жовтень'):
+    def _receive(self, attachments, subject='Акт за жовтень', delivered_to=None):
         if not self.account.alias_name:
             domain = self.env['mail.alias.domain'].search([('name', '=', 'edo.test.example')]) \
                 or self.env['mail.alias.domain'].create({'name': 'edo.test.example'})
@@ -258,6 +258,8 @@ class TestKep(TransactionCase):
         message['From'] = 'Покупець <buh@customer.example>'
         message['To'] = 'edo@edo.test.example'
         message['Subject'] = subject
+        if delivered_to:
+            message['Delivered-To'] = delivered_to
         message['Message-Id'] = f'<{subject.encode().hex()}@customer.example>'
         message.set_content('Підписаний документ у вкладенні.')
         for name, content in attachments:
@@ -284,6 +286,18 @@ class TestKep(TransactionCase):
         mail = self._mails(doc).filtered(lambda m: m.attachment_ids)
         self.assertIn('buh@customer.example', mail.email_to)
         self.assertEqual(len(self._zip_names(doc.archive_attachment_id)), 5)
+
+    def test_hosting_alias_does_not_route_to_the_mailbox_too(self):
+        """edo@ is a hosting alias of info@: the message has ``Delivered-To: info@``."""
+        self._receive([('Akt_16.pdf', PDF)], subject='Підготовка')  # creates the edo alias
+        info = self.env['mail.alias'].create({
+            'alias_name': 'info', 'alias_domain_id': self.account.alias_domain_id.id,
+            'alias_model_id': self.env['ir.model']._get_id('res.partner')})
+        partners = self.env['res.partner'].search_count([])
+        doc = self._receive([('Akt_17.pdf', PDF), ('Akt_17.pdf.p7s', sign(PDF, self.customer_key))],
+                            subject='Акт 17', delivered_to=info.alias_full_name)
+        self.assertEqual(doc.name, 'Akt_17')
+        self.assertEqual(self.env['res.partner'].search_count([]), partners)
 
     def test_incoming_archive_of_a_service_and_an_attached_signature(self):
         archive = io.BytesIO()
