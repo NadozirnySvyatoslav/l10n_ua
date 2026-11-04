@@ -64,6 +64,13 @@
               sequence="35"
               groups="l10n_ua_hr_base.group_hr_ua_user"/>
 
+    <menuitem id="menu_hr_teaching_hours_entry"
+              name="Години навчальних занять"
+              parent="menu_hr_payroll_root"
+              action="action_hr_teaching_hours_entry"
+              sequence="36"
+              groups="l10n_ua_hr_base.group_hr_ua_user"/>
+
     <menuitem id="menu_hr_payroll_config"
               name="Configuration"
               parent="menu_hr_payroll_root"

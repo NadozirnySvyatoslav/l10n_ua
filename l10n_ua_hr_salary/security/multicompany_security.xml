@@ -57,4 +57,9 @@
         </record>
 
     </data>
+    <record id="hr_teaching_hours_entry_company_rule" model="ir.rule">
+        <field name="name">Години навчальних занять: мультикомпанія</field>
+        <field name="model_id" ref="model_hr_teaching_hours_entry"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
 </odoo>

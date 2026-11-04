@@ -133,17 +133,27 @@ class HrPaySchemeLine(models.Model):
                 else line.name or ''
             line.display_name = f'{label} ({line.coefficient:g})'
 
-    def _amount_from(self, base_value):
+    def _amount_from(self, base_value, reduction=0.0):
         """Base value × coefficient, to a whole hryvnia.
 
         The notes to the schemes: below 0.5 is dropped, 0.5 and above is
         rounded up to one hryvnia — half up, not the banker's rounding.
+
+        `reduction` (per cent) gives a salary set below the salary of this
+        position: a deputy 5–10 / 20–30 / 30–40 % below the head (пп. 2 п. 2
+        of No 1078), an assistant educator 10 % below an educator-specialist
+        (note 4). It is taken from the rounded salary of the position and
+        rounded again — a coefficient would be off by a hryvnia.
         """
         self.ensure_one()
-        return float_round(base_value.amount * self.coefficient,
-                           precision_digits=0, rounding_method='HALF-UP')
+        amount = float_round(base_value.amount * self.coefficient,
+                             precision_digits=0, rounding_method='HALF-UP')
+        if reduction:
+            amount = float_round(amount * (1 - reduction / 100.0),
+                                 precision_digits=0, rounding_method='HALF-UP')
+        return amount
 
-    def _amount_on(self, on_date):
+    def _amount_on(self, on_date, reduction=0.0):
         """The salary (or the hourly rate) of this position on `on_date`.
 
         Refuses a date before the scheme applies, and a date with no base
@@ -158,7 +168,7 @@ class HrPaySchemeLine(models.Model):
                 'No base value is in force on %(date)s. Enter it in Base '
                 'Values before using the scheme %(scheme)s.',
                 date=on_date, scheme=self.scheme_id.name))
-        return self._amount_from(value)
+        return self._amount_from(value, reduction)
 
     def _check_applies_on(self, on_date, what=None):
         self.ensure_one()
@@ -181,12 +191,24 @@ class HrStaffingTable(models.Model):
              'Resolution No 1078). The salary of the line is filled with the '
              'base value in force on its start date × the coefficient. A line '
              'before the scheme applies keeps the tariff-grid salary.')
+    pay_scheme_reduction = fields.Float(
+        string='Below Scheme Position, %', digits=(5, 2), tracking=True,
+        help='For a salary set below the salary of the chosen position: a '
+             'deputy head 5–10 / 20–30 / 30–40 % below the head (the employer '
+             'picks the figure within the range), an assistant educator 10 % '
+             'below an educator-specialist. The reduced salary is rounded to a '
+             'whole hryvnia.')
     pay_scheme_salary = fields.Monetary(
         string='Scheme Salary', currency_field='currency_id',
         compute='_compute_pay_scheme_salary',
         help='Base value in force on the start date × coefficient.')
 
-    @api.depends('pay_scheme_line_id', 'date_from')
+    _pay_scheme_reduction_range = models.Constraint(
+        'CHECK(pay_scheme_reduction >= 0 AND pay_scheme_reduction < 100)',
+        'The reduction below the scheme position must be from 0 to 100 %.',
+    )
+
+    @api.depends('pay_scheme_line_id', 'pay_scheme_reduction', 'date_from')
     def _compute_pay_scheme_salary(self):
         Base = self.env['hr.pay.base.value']
         for line in self:
@@ -194,17 +216,18 @@ class HrStaffingTable(models.Model):
             value = Base._value_on(line.date_from) if scheme else Base
             ok = value and not (scheme.date_from and line.date_from
                                 and line.date_from < scheme.date_from)
-            line.pay_scheme_salary = scheme._amount_from(value) if ok else 0.0
+            line.pay_scheme_salary = scheme._amount_from(
+                value, line.pay_scheme_reduction) if ok else 0.0
 
-    @api.onchange('pay_scheme_line_id', 'date_from')
+    @api.onchange('pay_scheme_line_id', 'pay_scheme_reduction', 'date_from')
     def _onchange_pay_scheme_line_id(self):
         if self.pay_scheme_line_id and self.pay_scheme_salary:
             self.salary = self.pay_scheme_salary
 
     @api.model
-    def _fill_scheme_salary(self, vals, scheme_line, date_from):
+    def _fill_scheme_salary(self, vals, scheme_line, date_from, reduction=0.0):
         if scheme_line and 'salary' not in vals:
-            vals['salary'] = scheme_line._amount_on(date_from)
+            vals['salary'] = scheme_line._amount_on(date_from, reduction)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -214,18 +237,22 @@ class HrStaffingTable(models.Model):
                 self._fill_scheme_salary(
                     vals, SchemeLine.browse(vals['pay_scheme_line_id']),
                     fields.Date.to_date(vals.get('date_from'))
-                    or fields.Date.context_today(self))
+                    or fields.Date.context_today(self),
+                    vals.get('pay_scheme_reduction') or 0.0)
         return super().create(vals_list)
 
     def write(self, vals):
-        if vals.get('pay_scheme_line_id') and 'salary' not in vals:
-            scheme_line = self.env['hr.pay.scheme.line'].browse(
-                vals['pay_scheme_line_id'])
+        refill = vals.get('pay_scheme_line_id') or 'pay_scheme_reduction' in vals
+        if refill and 'salary' not in vals:
+            SchemeLine = self.env['hr.pay.scheme.line']
             for line in self:
+                scheme_line = SchemeLine.browse(vals['pay_scheme_line_id']) \
+                    if vals.get('pay_scheme_line_id') else line.pay_scheme_line_id
                 line_vals = dict(vals)
                 self._fill_scheme_salary(
                     line_vals, scheme_line,
-                    fields.Date.to_date(vals.get('date_from')) or line.date_from)
+                    fields.Date.to_date(vals.get('date_from')) or line.date_from,
+                    vals.get('pay_scheme_reduction', line.pay_scheme_reduction) or 0.0)
                 super(HrStaffingTable, line).write(line_vals)
             return True
         return super().write(vals)
@@ -249,12 +276,25 @@ class HrVersion(models.Model):
              'the base value in force on the version date × the coefficient. '
              'A version dated before the scheme applies keeps the tariff-grid '
              'wage.')
+    pay_scheme_reduction = fields.Float(
+        string='Below Scheme Position, %', digits=(5, 2), tracking=True,
+        groups='hr.group_hr_manager',
+        help='For a salary set below the salary of the chosen position: a '
+             'deputy head 5–10 / 20–30 / 30–40 % below the head (the employer '
+             'picks the figure within the range), an assistant educator 10 % '
+             'below an educator-specialist. The reduced salary is rounded to a '
+             'whole hryvnia.')
     pay_scheme_salary = fields.Monetary(
         string='Scheme Salary', currency_field='currency_id',
         compute='_compute_pay_scheme_salary', groups='hr.group_hr_manager',
         help='Base value in force on the version date × coefficient.')
 
-    @api.depends('pay_scheme_line_id', 'date_version')
+    _pay_scheme_reduction_range = models.Constraint(
+        'CHECK(pay_scheme_reduction >= 0 AND pay_scheme_reduction < 100)',
+        'The reduction below the scheme position must be from 0 to 100 %.',
+    )
+
+    @api.depends('pay_scheme_line_id', 'pay_scheme_reduction', 'date_version')
     def _compute_pay_scheme_salary(self):
         Base = self.env['hr.pay.base.value']
         for version in self:
@@ -262,9 +302,10 @@ class HrVersion(models.Model):
             value = Base._value_on(version.date_version) if scheme else Base
             ok = value and not (scheme.date_from and version.date_version
                                 and version.date_version < scheme.date_from)
-            version.pay_scheme_salary = scheme._amount_from(value) if ok else 0.0
+            version.pay_scheme_salary = scheme._amount_from(
+                value, version.pay_scheme_reduction) if ok else 0.0
 
-    @api.onchange('pay_scheme_line_id', 'date_version')
+    @api.onchange('pay_scheme_line_id', 'pay_scheme_reduction', 'date_version')
     def _onchange_pay_scheme_line_id(self):
         if self.pay_scheme_line_id and self.pay_scheme_salary:
             self.wage = self.pay_scheme_salary
@@ -277,18 +318,25 @@ class HrVersion(models.Model):
                 vals['wage'] = SchemeLine.browse(
                     vals['pay_scheme_line_id'])._amount_on(
                         fields.Date.to_date(vals.get('date_version'))
-                        or fields.Date.context_today(self))
+                        or fields.Date.context_today(self),
+                        vals.get('pay_scheme_reduction') or 0.0)
         return super().create(vals_list)
 
     def write(self, vals):
-        if vals.get('pay_scheme_line_id') and 'wage' not in vals:
-            scheme_line = self.env['hr.pay.scheme.line'].browse(
-                vals['pay_scheme_line_id'])
+        refill = vals.get('pay_scheme_line_id') or 'pay_scheme_reduction' in vals
+        if refill and 'wage' not in vals:
+            SchemeLine = self.env['hr.pay.scheme.line']
             for version in self:
+                scheme_line = SchemeLine.browse(vals['pay_scheme_line_id']) \
+                    if vals.get('pay_scheme_line_id') else version.pay_scheme_line_id
+                if not scheme_line:
+                    super(HrVersion, version).write(vals)
+                    continue
                 on_date = fields.Date.to_date(vals.get('date_version')) \
                     or version.date_version
+                reduction = vals.get('pay_scheme_reduction', version.pay_scheme_reduction)
                 super(HrVersion, version).write(
-                    dict(vals, wage=scheme_line._amount_on(on_date)))
+                    dict(vals, wage=scheme_line._amount_on(on_date, reduction or 0.0)))
             return True
         return super().write(vals)
 
@@ -307,11 +355,14 @@ class HrEmployee(models.Model):
     pay_scheme_line_id = fields.Many2one(
         related='version_id.pay_scheme_line_id', inherited=True,
         readonly=False, groups='hr.group_hr_manager')
+    pay_scheme_reduction = fields.Float(
+        related='version_id.pay_scheme_reduction', inherited=True,
+        readonly=False, groups='hr.group_hr_manager')
     pay_scheme_salary = fields.Monetary(
         related='version_id.pay_scheme_salary', inherited=True,
         groups='hr.group_hr_manager')
 
-    @api.onchange('pay_scheme_line_id', 'date_version')
+    @api.onchange('pay_scheme_line_id', 'pay_scheme_reduction', 'date_version')
     def _onchange_pay_scheme_line_id(self):
         if self.pay_scheme_line_id and self.pay_scheme_salary:
             self.wage = self.pay_scheme_salary
