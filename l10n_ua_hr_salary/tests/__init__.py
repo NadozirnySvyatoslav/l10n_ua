@@ -28,3 +28,4 @@ from . import test_advance_worked_days
 from . import test_sick_pfu_rename
 from . import test_psp_application
 from . import test_teaching_hours
+from . import test_severance

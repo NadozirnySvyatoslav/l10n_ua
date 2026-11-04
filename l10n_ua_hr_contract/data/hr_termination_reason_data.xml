@@ -37,7 +37,7 @@
             <field name="category">circumstances</field>
             <field name="full_text">у зв'язку з призовом або вступом на військову службу, п. 3 ст. 36 КЗпП України</field>
             <field name="requires_compensation">True</field>
-            <field name="compensation_amount">two_months</field>
+            <field name="compensation_amount">two_min_wages</field>
             <field name="notice_days">0</field>
             <field name="sequence">30</field>
         </record>
@@ -90,6 +90,7 @@
             <field name="full_text">у зв'язку зі змінами в організації виробництва і праці, в тому числі ліквідацією, реорганізацією, скороченням чисельності або штату працівників, п. 1 ст. 40 КЗпП України</field>
             <field name="requires_compensation">True</field>
             <field name="compensation_amount">one_month</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">60</field>
             <field name="sequence">60</field>
         </record>
@@ -104,6 +105,7 @@
             <field name="full_text">у зв'язку зі скороченням чисельності або штату працівників, п. 1 ст. 40 КЗпП України</field>
             <field name="requires_compensation">True</field>
             <field name="compensation_amount">one_month</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">60</field>
             <field name="sequence">61</field>
             <field name="description">Скорочення штату відповідно до п. 1 ст. 40 КЗпП</field>
@@ -119,6 +121,7 @@
             <field name="full_text">у зв'язку з ліквідацією підприємства, установи, організації, п. 1 ст. 40 КЗпП України</field>
             <field name="requires_compensation">True</field>
             <field name="compensation_amount">one_month</field>
+            <field name="requires_union_consent">False</field>
             <field name="notice_days">60</field>
             <field name="sequence">62</field>
         </record>
@@ -133,6 +136,7 @@
             <field name="full_text">у зв'язку з виявленою невідповідністю працівника займаній посаді або виконуваній роботі внаслідок недостатньої кваліфікації або стану здоров'я, п. 2 ст. 40 КЗпП України</field>
             <field name="requires_compensation">True</field>
             <field name="compensation_amount">one_month</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">70</field>
         </record>
@@ -146,6 +150,7 @@
             <field name="category">employer_initiative</field>
             <field name="full_text">за систематичне невиконання працівником без поважних причин обов'язків, покладених на нього трудовим договором або правилами внутрішнього трудового розпорядку, п. 3 ст. 40 КЗпП України</field>
             <field name="requires_compensation">False</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">80</field>
         </record>
@@ -159,6 +164,7 @@
             <field name="category">employer_initiative</field>
             <field name="full_text">за прогул (в тому числі відсутність на роботі більше трьох годин протягом робочого дня) без поважних причин, п. 4 ст. 40 КЗпП України</field>
             <field name="requires_compensation">False</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">90</field>
         </record>
@@ -171,8 +177,9 @@
             <field name="paragraph">п. 5</field>
             <field name="category">employer_initiative</field>
             <field name="full_text">у зв'язку з нез'явленням на роботу протягом більш як чотирьох місяців підряд внаслідок тимчасової непрацездатності, п. 5 ст. 40 КЗпП України</field>
-            <field name="requires_compensation">True</field>
-            <field name="compensation_amount">one_month</field>
+            <field name="requires_compensation">False</field>
+            <field name="compensation_amount">none</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">100</field>
         </record>
@@ -200,6 +207,7 @@
             <field name="category">employer_initiative</field>
             <field name="full_text">за появу на роботі в нетверезому стані, у стані наркотичного або токсичного сп'яніння, п. 7 ст. 40 КЗпП України</field>
             <field name="requires_compensation">False</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">120</field>
         </record>
@@ -239,6 +247,7 @@
             <field name="category">employer_initiative</field>
             <field name="full_text">у зв'язку з втратою довіри з боку власника до працівника, який обслуговує грошові або товарні цінності, п. 2 ст. 41 КЗпП України</field>
             <field name="requires_compensation">False</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">150</field>
         </record>
@@ -372,6 +381,7 @@
             <field name="category">employer_initiative</field>
             <field name="full_text">за вчинення працівником, який виконує виховні функції, аморального проступку, не сумісного з продовженням даної роботи, п. 3 ст. 41 КЗпП України</field>
             <field name="requires_compensation">False</field>
+            <field name="requires_union_consent">True</field>
             <field name="notice_days">0</field>
             <field name="sequence">290</field>
         </record>
