@@ -10,7 +10,9 @@
 |--------|--------|--------|-------------|
 | `l10n_ua_bank_sync` | 19.0.1.0.0 | 🟢 | Базова синхронізація з банками (конфіг, завдання, виписки, транзакції, правила співставлення) |
 | `l10n_ua_bank_privat` | 19.0.1.0.0 | 🟢 | ПриватБанк (Автоклієнт Privat24 Business + legacy Merchant API) |
-| `l10n_ua_bank_mono` | 19.0.1.0.0 | 🟢 | monobank (Personal Statement API) |
+| `l10n_ua_bank_mono` | 19.0.1.2.0 | 🟢 | monobank (Personal API для ФОП + Corporate API для юросіб) |
+| `l10n_ua_bank_mono_payment` | 19.0.1.0.0 | 🟡 | monobank Corporate API: платіжні доручення на підпис у застосунку |
+| `l10n_ua_bank_mono_hr` | 19.0.1.0.0 | 🟡 | monobank Corporate API: зарплатні відомості, зарплатні контакти, розрахункові листи |
 | `l10n_ua_bank_vst` | 19.0.1.0.0 | ✅ | VST Bank / Банк Восток (імпорт виписки iBank 2 UA CSV) + тести |
 | `l10n_ua_bank_novapay` | 19.0.1.0.0 | ✅ | NovaPay (API бізнес-кабінету, виписка рахунку) + тести |
 | `l10n_ua_bank_currency_sync` | 19.0.1.0.0 | ✅ | Курси валют (НБУ, ПриватБанк, monobank) + тести |
@@ -85,6 +87,32 @@
 ⚠️ Webhook: поле `mono_webhook_url` обчислюється (`/l10n_ua_bank_mono/webhook/<id>`) і є прапорець `mono_webhook_active`, але **контролер webhook у модулі не реалізований** — real-time оновлення поки заглушка. Синхронізація працює через опитування (fetch job).
 
 Тести: відсутні.
+
+---
+
+## l10n_ua_bank_mono_payment — платежі через monobank Corporate API (#352)
+
+Залежності: `l10n_ua_bank_mono`, `l10n_ua_bank_payment` (auto_install).
+
+У платіжному дорученні (`l10n_ua.bank.payment`) з'являється «Спосіб передачі»: файл із КЕП (як було) або **monobank API**. Підключення Corporate API визначається за IBAN рахунку платника. «Надіслати в monobank» викликає `POST /ext/v1/payment/prepare` для кожного рядка: `externalReference` — ідентифікатор рядка в цій базі, `idempotency-key` — UUID v5 від референсу й тіла платежу (повтор після таймауту не створить дубль). Платіж підписує директор у застосунку або web-кабінеті monobank, КЕП в Odoo не потрібен.
+
+- Бюджетні платежі: код виду сплати (`payCode`), додаткова інформація, фактичний платник (`ultimateDebit`); призначення формується за форматом документації `{payCode} {additionalInfo} ЄДРПОУ {ЄДРПОУ компанії}`.
+- Помилка банку по рядку зберігається на рядку, решта платежів лишаються підготовленими; повторне надсилання відправляє лише невідправлені.
+- Стан (`GET /ext/v1/payment/{id}/state`): `DRAFT` → очікує підпису, `DECLINED` → відхилено, `IN_STATEMENT` → у виписці. Рядок виписки з тим самим `externalReference` прив'язується до платежу автоматично (під час імпорту виписки або оновлення стану). Cron щогодини.
+
+**Тести:** `tests/test_mono_payment.py` (моки `requests`).
+
+---
+
+## l10n_ua_bank_mono_hr — зарплата через monobank Corporate API (#352)
+
+Залежності: `l10n_ua_bank_mono`, `l10n_ua_hr_salary` (auto_install).
+
+- **Зарплатна відомість.** У майстрі «Зарплатний файл у банк» формат «monobank API» створює чернетку `l10n_ua.mono.salary.registry` (тип — зі списку `/ext/v1/payments/salary/registries/types`). «Надіслати в monobank» відправляє одержувачів пакетами по 1000 (`POST /ext/v2/payments/salary/registries`, один `registryReference`), потім `…/finalize`. Невдалий пакет зупиняє відправку без втрати попередніх: наступна спроба продовжує з нього. Статус (`SAVED` … `SUCCEEDED`/`FAILED`) опитує cron, `declineReason` пишеться в чатер.
+- **Зарплатні контакти.** Кнопка «Синхронізувати зарплатні контакти»: пошук за РНОКПП/номером паспорта (`/salary-contacts/search`), створення відсутніх, звіт про розбіжність IBAN (не перезаписується).
+- **Розрахункові листи в застосунку.** `l10n_ua.mono.payslip.import` (кнопка «Листи в monobank» у відомості): нарахування, ПДФО, ВЗ, утримання, до виплати — як `attributes` у `/ext/v1/payslips/batch` пакетами по 1000; «Опублікувати працівникам» (`/payslip-imports/send`); `CONTACT_NOT_FOUND` показуються списком; PDF листа — кнопкою в рядку листка.
+
+**Тести:** `tests/test_mono_hr.py` (моки `requests`).
 
 ---
 
