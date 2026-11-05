@@ -1060,74 +1060,62 @@ class HrLeave(models.Model):
         return True
 
     def _calculate_average_salary(self):
-        """Calculate average daily salary for vacation pay.
+        """Average daily salary for the vacation pay (Порядок № 100).
 
-        According to Resolution of CMU No. 100 from 08.02.1995:
-        Formula: Total earnings / Calendar days in period
+        The calculation period is the 12 calendar months before the month
+        of the vacation (п. 2).
+        """
+        self.ensure_one()
+        date_to = self.date_from.date() - relativedelta(days=1)
+        date_from = date_to - relativedelta(months=12) + relativedelta(days=1)
+        return self._l10n_ua_vacation_average(self.employee_id, date_from, date_to)
+
+    @api.model
+    def _l10n_ua_vacation_average(self, employee, date_from, date_to):
+        """Average daily salary of Порядок № 100 over [date_from, date_to].
+
+        Formula: earnings / (calendar days − public holidays − days without
+        pay). The same base serves the vacation pay and the vacation reserve
+        (l10n_ua_hr_vacation_reserve).
 
         Include:
         - Accrual types marked as is_basic_salary (п. 3, less п. 4)
         - Vacation pay and sickness benefits (п. 3, last paragraph)
 
         Exclude periods:
-        - Sick leave
         - Unpaid leave
-        - Idle time
+        - Days of the maternity benefit
         """
-        self.ensure_one()
-
-        date_to = self.date_from.date() - relativedelta(days=1)
-        date_from = date_to - relativedelta(months=12) + relativedelta(days=1)
-
-        # Get payslips for the period
         # Розрахунковий листок дає `l10n_ua_hr_salary`, якого цей модуль не
         # вимагає, — перевіряємо модель, а не поля на ній (див. hr_sick_leave).
-        payslips = self.env['hr.payslip'].search([
-            ('employee_id', '=', self.employee_id.id),
-            ('date_from', '>=', date_from),
-            ('date_to', '<=', date_to),
-            ('state', '=', 'done'),
-        ]) if 'hr.payslip' in self.env else None
+        if 'hr.payslip' not in self.env:
+            payslips = None
+        else:
+            payslips = self.env['hr.payslip'].search([
+                ('employee_id', '=', employee.id),
+                ('date_from', '>=', date_from),
+                ('date_to', '<=', date_to),
+                ('state', '=', 'done'),
+            ])
 
         if not payslips:
             # Fallback to version wage (Odoo 19 uses version_ids instead of contract_id)
             # The wage may be in a foreign currency: the rate of the leave start.
-            wage = self.employee_id._l10n_ua_fallback_wage(date_to)
+            wage = employee._l10n_ua_fallback_wage(date_to)
             return round(wage / 29.3, 2) if wage else 0.0
 
-        # Calculate total earnings from payslip lines
-        total_earnings = 0.0
-        excluded_days = 0
-
-        for payslip in payslips:
-            # The earnings are the lines of the types marked
-            # `is_basic_salary` — the wage of п. 3 of Порядок № 100, less the
-            # payments of п. 4 (одноразові виплати, матеріальна допомога,
-            # соціальні виплати...). For a vacation or its compensation п. 3
-            # also counts the pay of the days the average was kept (an
-            # earlier vacation, a business trip) and the sickness benefit:
-            # those types go in by their category, with their days. The
-            # maternity benefit is a social payment (п. 4 «е»), and its days
-            # are days without pay (п. 2), so both go.
-            earnings = payslip.accrual_ids.filtered(
-                lambda line: line.accrual_type_id.is_basic_salary
-                or line.accrual_type_id.category in ('vacation', 'sick'))
-            total_earnings += sum(earnings.mapped('amount'))
-            maternity = payslip.accrual_ids.filtered(
-                lambda line: line.accrual_type_id.category == 'maternity')
-            excluded_days += sum(maternity.mapped('quantity'))
+        total_earnings, excluded_days = self._l10n_ua_vacation_earnings(
+            employee, payslips, date_from, date_to)
 
         # Days of unpaid leave in the period: no pay was kept for them. Sick
         # days are not among them, since their benefit is in the earnings.
         unpaid_leave_type = self.env['hr.leave.type'].search([
             ('ua_leave_category', 'in', UNPAID_LEAVE_CATEGORIES)
         ])
-
-        excluded_leave_types = unpaid_leave_type.ids
-        if excluded_leave_types:
+        if unpaid_leave_type:
             excluded_leaves = self.env['hr.leave'].search([
-                ('employee_id', '=', self.employee_id.id),
-                ('holiday_status_id', 'in', excluded_leave_types),
+                ('employee_id', '=', employee.id),
+                ('holiday_status_id', 'in', unpaid_leave_type.ids),
                 ('state', '=', 'validate'),
                 ('date_from', '>=', date_from),
                 ('date_to', '<=', date_to),
@@ -1141,10 +1129,120 @@ class HrLeave(models.Model):
             ('date_to', '<=', date_to),
         ])
 
-        # Calculate calendar days in period (excluding public holidays and excluded periods)
-        # Formula per CMU Resolution No. 100: earnings / (calendar days - public holidays - excluded days)
         calendar_days = (date_to - date_from).days + 1 - public_holidays - excluded_days
-
         if calendar_days > 0:
             return round(total_earnings / calendar_days, 2)
         return 0.0
+
+    @api.model
+    def _l10n_ua_vacation_earnings(self, employee, payslips, date_from, date_to):
+        """(earnings, days without pay) of the payslips of the period.
+
+        The earnings are the lines of the types marked `is_basic_salary` —
+        the wage of п. 3 of Порядок № 100, less the payments of п. 4
+        (одноразові виплати, матеріальна допомога, соціальні виплати...).
+        For a vacation or its compensation п. 3 also counts the pay of the
+        days the average was kept (an earlier vacation, a business trip) and
+        the sickness benefit: those types go in by their category, with their
+        days. The maternity benefit is a social payment (п. 4 «е»), and its
+        days are days without pay (п. 2), so both go.
+
+        Each amount counts in the month it is for (п. 3, абз. 2):
+
+        * a recalculation (RETRO) counts in the month it corrects, not in
+          the month it was accrued: it is left out when that month is
+          before the period, and one accrued after the period for a month
+          inside it is added;
+        * a bonus for a quarter, half-year or year (п. 3, абз. 3) is spread
+          over as many months as it is for, counting back from the month it
+          was accrued in, pro rata to the working days worked; only the
+          share of the months inside the period counts.
+        """
+        Retro = self.env['hr.payslip.retro'] if 'hr.payslip.retro' in self.env else None
+        start = date_from.replace(day=1)
+        end = date_to.replace(day=1)
+        retro_month = {}
+        if Retro is not None:
+            for retro in Retro.search([('target_payslip_id', 'in', payslips.ids)]):
+                if retro.accrual_line_id and retro.source_payslip_id.date_from:
+                    retro_month[retro.accrual_line_id.id] = \
+                        retro.source_payslip_id.date_from.replace(day=1)
+
+        worked = self._l10n_ua_worked_days_by_month(
+            employee, (start - relativedelta(months=11)), date_to)
+
+        total_earnings = 0.0
+        excluded_days = 0
+        for payslip in payslips:
+            earnings = payslip.accrual_ids.filtered(
+                lambda line: line.accrual_type_id.is_basic_salary
+                or line.accrual_type_id.category in ('vacation', 'sick'))
+            for line in earnings:
+                month = retro_month.get(line.id)
+                if month is not None:
+                    if start <= month <= end:
+                        total_earnings += line.amount
+                    continue
+                total_earnings += self._l10n_ua_bonus_share(
+                    line, payslip, worked, start, end)
+            maternity = payslip.accrual_ids.filtered(
+                lambda line: line.accrual_type_id.category == 'maternity')
+            excluded_days += sum(maternity.mapped('quantity'))
+
+        # A recalculation accrued after the period for one of its months.
+        if Retro is not None:
+            later = Retro.search([
+                ('source_payslip_id', 'in', payslips.ids),
+                ('target_payslip_id.state', '=', 'done'),
+                ('target_payslip_id.date_from', '>', date_to),
+            ])
+            for retro in later:
+                line = retro.accrual_line_id
+                if line and (line.accrual_type_id.is_basic_salary
+                             or line.accrual_type_id.category in ('vacation', 'sick')):
+                    total_earnings += line.amount
+        return total_earnings, excluded_days
+
+    @api.model
+    def _l10n_ua_worked_days_by_month(self, employee, date_from, date_to):
+        """{first day of month: working days worked} from the closed payslips."""
+        worked = {}
+        for slip in self.env['hr.payslip'].search([
+                ('employee_id', '=', employee.id),
+                ('date_from', '>=', date_from),
+                ('date_to', '<=', date_to),
+                ('state', '=', 'done')]):
+            month = slip.date_from.replace(day=1)
+            worked[month] = worked.get(month, 0) + (slip.worked_days or 0)
+        return worked
+
+    @api.model
+    def _l10n_ua_bonus_share(self, line, payslip, worked, start, end):
+        """The part of an accrual line that counts in the period [start, end].
+
+        Порядок № 100, п. 3, абз. 3: a bonus for a period counts in the
+        earnings of as many months as it is for, starting from the month it
+        was accrued in. Each of those months inside the calculation period
+        gets the bonus divided by the working days worked in the period the
+        bonus is for, times the working days worked in that month; in total
+        no more than the bonus itself.
+
+        A monthly bonus and every other line count whole in their month.
+        """
+        accrual_month = payslip.date_from.replace(day=1)
+        months_count = int(line.accrual_type_id.l10n_ua_bonus_months or '1') \
+            if line.accrual_type_id.category == 'bonus' else 1
+        if months_count <= 1:
+            return line.amount if start <= accrual_month <= end else 0.0
+        window = [accrual_month - relativedelta(months=k) for k in range(months_count)]
+        period_end = (line.l10n_ua_bonus_period_to or accrual_month).replace(day=1)
+        bonus_period = [period_end - relativedelta(months=k) for k in range(months_count)]
+        period_days = sum(worked.get(month, 0) for month in bonus_period)
+        if not period_days:
+            # The days worked are unknown (payslips closed without them):
+            # spread the bonus evenly over the months it is for.
+            inside = sum(1 for month in window if start <= month <= end)
+            return line.amount * inside / months_count
+        share = line.amount * sum(
+            worked.get(month, 0) for month in window if start <= month <= end) / period_days
+        return min(share, line.amount)

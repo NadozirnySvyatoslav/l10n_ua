@@ -42,6 +42,14 @@ class L10nUaTaxInvoice(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'l10n_ua.dps.submit.mixin']
     _order = 'date desc, number desc'
 
+    # Страховка від дубля на рівні БД: одне надходження — одна чинна ПН.
+    # Скасовану можна замінити новою, тому скасовані з умови виключено.
+    _partial_reconcile_uniq = models.UniqueIndex(
+        "(partial_reconcile_id) WHERE partial_reconcile_id IS NOT NULL "
+        "AND state != 'cancelled'",
+        'На це надходження вже складено чинну податкову накладну.',
+    )
+
     name = fields.Char(
         string='Назва',
         compute='_compute_name',
@@ -115,6 +123,29 @@ class L10nUaTaxInvoice(models.Model):
     move_id = fields.Many2one(
         'account.move',
         string='Пов\'язаний рахунок',
+    )
+    # Касовий метод (п. 187.10 ПКУ): ПН складається на кожне надходження, тож
+    # документ має кілька ПН, і кожна прив'язана до свого погашення. Саме за
+    # цим зв'язком повторне «Створити ПН» знає, які надходження вже покриті.
+    partial_reconcile_id = fields.Many2one(
+        'account.partial.reconcile',
+        string='Погашення',
+        readonly=True,
+        copy=False,
+        index='btree_not_null',
+        ondelete='set null',
+        help='Зіставлення рахунка з надходженням, на суму якого складено ПН '
+             'за касовим методом. Порожнє, якщо зіставлення скасовано.',
+    )
+    payment_move_id = fields.Many2one(
+        'account.move',
+        string='Надходження',
+        readonly=True,
+        copy=False,
+        ondelete='set null',
+        help='Документ оплати (платіж, виписка, залік), на суму якого '
+             'складено ПН за касовим методом. Лишається й після скасування '
+             'зіставлення, щоб було видно, яке надходження ПН описувала.',
     )
     # RK (correction) fields
     original_invoice_id = fields.Many2one(

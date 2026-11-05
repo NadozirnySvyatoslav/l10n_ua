@@ -24,9 +24,11 @@ Accounting & Tax
 ----------------
 * Ukrainian chart of accounts
 * VAT accounting and reporting
+* Foreign trade: export and import customs declarations
 * Fixed assets management
 * Tax Cabinet integration
 * FOP (sole proprietor) support
+* Commercial budgeting (income & expense, cash flow budgets)
 
 Banking
 -------
@@ -52,7 +54,7 @@ PRRO (Cash Registers)
 ---------------------
 * Checkbox integration
     """,
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localizations',
     'author': 'Many2one',
     'website': 'https://many2one.online',
@@ -72,14 +74,17 @@ PRRO (Cash Registers)
         # Accounting & Tax
         'l10n_ua_accounting',
         'l10n_ua_account_vat',
+        'l10n_ua_import',
         'l10n_ua_assets',
         'l10n_ua_tax',
         'l10n_ua_tax_cabinet',
         'l10n_ua_tax_F0103309',
         'l10n_ua_fin_report_dps',
+        'l10n_ua_profit_tax',
         'l10n_ua_fop',
         'l10n_ua_single_tax_legal',
         'l10n_ua_doc_reports',
+        'l10n_ua_budget_commercial',
         # Banking
         'l10n_ua_bank_sync',
         'l10n_ua_bank_privat',

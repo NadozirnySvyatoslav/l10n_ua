@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_import_declaration_readonly,l10n_ua.import.declaration.readonly,model_l10n_ua_import_declaration,account.group_account_readonly,1,0,0,0
+access_import_declaration_invoice,l10n_ua.import.declaration.invoice,model_l10n_ua_import_declaration,account.group_account_invoice,1,1,1,0
+access_import_declaration_manager,l10n_ua.import.declaration.manager,model_l10n_ua_import_declaration,account.group_account_manager,1,1,1,1

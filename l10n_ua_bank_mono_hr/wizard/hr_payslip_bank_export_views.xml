@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="hr_payslip_bank_export_view_form_mono" model="ir.ui.view">
+        <field name="name">hr.payslip.bank.export.form.mono</field>
+        <field name="model">hr.payslip.bank.export</field>
+        <field name="inherit_id" ref="l10n_ua_hr_salary.hr_payslip_bank_export_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payer_account_id']" position="after">
+                <field name="mono_config_id"
+                       invisible="file_format != 'mono_api'"
+                       required="file_format == 'mono_api'"/>
+                <label for="mono_registry_type_id" invisible="file_format != 'mono_api'"/>
+                <div class="o_row" invisible="file_format != 'mono_api'">
+                    <field name="mono_registry_type_id" options="{'no_create': True}"
+                           required="file_format == 'mono_api'"/>
+                    <button name="action_mono_fetch_types" type="object"
+                            string="Fetch from monobank" class="btn-link"
+                            invisible="not mono_config_id"/>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='action_generate']" position="attributes">
+                <attribute name="invisible">state == 'done' or file_format == 'mono_api'</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_generate']" position="after">
+                <button name="action_generate" string="Створити відомість monobank"
+                        type="object" class="btn-primary"
+                        invisible="state == 'done' or file_format != 'mono_api'"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

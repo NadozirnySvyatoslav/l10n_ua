@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_l10n_ua_import"
+              name="Import"
+              parent="account.menu_finance_payables"
+              groups="account.group_account_invoice"
+              sequence="80"/>
+    <menuitem id="menu_l10n_ua_import_declarations"
+              name="Import Customs Declarations"
+              parent="menu_l10n_ua_import"
+              action="l10n_ua_import_declaration_action"
+              sequence="10"/>
+</odoo>

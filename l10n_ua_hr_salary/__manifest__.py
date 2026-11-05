@@ -1,11 +1,10 @@
 {
     'name': 'Ukraine - HR Salary',
-    'version': '19.0.1.6.2',
+    'version': '19.0.1.7.1',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian salary calculation',
     'description': """
 Ukraine HR Salary Module
-========================
 
 Payroll calculation for Ukrainian localization:
 

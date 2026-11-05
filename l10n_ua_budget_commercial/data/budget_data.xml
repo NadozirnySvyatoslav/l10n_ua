@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Стартовий довідник статей для плану рахунків НП(С)БО (класи 6–9).
+         Рахунки задані префіксами кодів, тож статті спільні для всіх компаній.
+         noupdate: користувач може змінювати й доповнювати довідник. -->
+    <data noupdate="1">
+        <record id="budget_item_pnl_sales" model="l10n_ua.budget.item">
+            <field name="code">Д01</field>
+            <field name="name">Дохід від реалізації продукції (товарів, робіт, послуг)</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">70</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="budget_item_pnl_other_op_income" model="l10n_ua.budget.item">
+            <field name="code">Д02</field>
+            <field name="name">Інші операційні доходи</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">71</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="budget_item_pnl_fin_income" model="l10n_ua.budget.item">
+            <field name="code">Д03</field>
+            <field name="name">Фінансові та інші доходи</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">72, 73, 74</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="budget_item_pnl_cogs" model="l10n_ua.budget.item">
+            <field name="code">В01</field>
+            <field name="name">Собівартість реалізації</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">90</field>
+            <field name="sequence">110</field>
+        </record>
+        <record id="budget_item_pnl_admin" model="l10n_ua.budget.item">
+            <field name="code">В02</field>
+            <field name="name">Адміністративні витрати</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">92</field>
+            <field name="sequence">120</field>
+        </record>
+        <record id="budget_item_pnl_selling" model="l10n_ua.budget.item">
+            <field name="code">В03</field>
+            <field name="name">Витрати на збут</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">93</field>
+            <field name="sequence">130</field>
+        </record>
+        <record id="budget_item_pnl_other_op" model="l10n_ua.budget.item">
+            <field name="code">В04</field>
+            <field name="name">Інші операційні витрати</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">94</field>
+            <field name="sequence">140</field>
+        </record>
+        <record id="budget_item_pnl_fin_exp" model="l10n_ua.budget.item">
+            <field name="code">В05</field>
+            <field name="name">Фінансові витрати</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">95</field>
+            <field name="sequence">150</field>
+        </record>
+        <record id="budget_item_pnl_other_exp" model="l10n_ua.budget.item">
+            <field name="code">В06</field>
+            <field name="name">Інші витрати</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">97</field>
+            <field name="sequence">160</field>
+        </record>
+        <record id="budget_item_pnl_tax" model="l10n_ua.budget.item">
+            <field name="code">В07</field>
+            <field name="name">Витрати з податку на прибуток</field>
+            <field name="budget_type">pnl</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">98</field>
+            <field name="sequence">170</field>
+        </record>
+        <record id="budget_item_cash_customers" model="l10n_ua.budget.item">
+            <field name="code">Н01</field>
+            <field name="name">Надходження від покупців</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">36, 681</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="budget_item_cash_tax_refund" model="l10n_ua.budget.item">
+            <field name="code">Н02</field>
+            <field name="name">Повернення податків і зборів</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">64</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="budget_item_cash_loans_in" model="l10n_ua.budget.item">
+            <field name="code">Н03</field>
+            <field name="name">Отримання позик і кредитів</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">50, 60</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="budget_item_cash_equity_in" model="l10n_ua.budget.item">
+            <field name="code">Н04</field>
+            <field name="name">Внески до власного капіталу</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">income</field>
+            <field name="account_codes">40, 46</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="budget_item_cash_suppliers" model="l10n_ua.budget.item">
+            <field name="code">П01</field>
+            <field name="name">Оплата постачальникам товарів, робіт, послуг</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">63, 371</field>
+            <field name="sequence">110</field>
+        </record>
+        <record id="budget_item_cash_wages" model="l10n_ua.budget.item">
+            <field name="code">П02</field>
+            <field name="name">Виплата заробітної плати</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">66</field>
+            <field name="sequence">120</field>
+        </record>
+        <record id="budget_item_cash_social" model="l10n_ua.budget.item">
+            <field name="code">П03</field>
+            <field name="name">Сплата ЄСВ та інших соціальних внесків</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">65</field>
+            <field name="sequence">130</field>
+        </record>
+        <record id="budget_item_cash_taxes" model="l10n_ua.budget.item">
+            <field name="code">П04</field>
+            <field name="name">Сплата податків і зборів</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">64</field>
+            <field name="sequence">140</field>
+        </record>
+        <record id="budget_item_cash_loans_out" model="l10n_ua.budget.item">
+            <field name="code">П05</field>
+            <field name="name">Погашення позик і кредитів</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">50, 60</field>
+            <field name="sequence">150</field>
+        </record>
+        <record id="budget_item_cash_capex" model="l10n_ua.budget.item">
+            <field name="code">П06</field>
+            <field name="name">Придбання необоротних активів</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">15</field>
+            <field name="sequence">160</field>
+        </record>
+        <record id="budget_item_cash_dividends" model="l10n_ua.budget.item">
+            <field name="code">П07</field>
+            <field name="name">Виплата дивідендів</field>
+            <field name="budget_type">cash</field>
+            <field name="item_type">expense</field>
+            <field name="account_codes">671</field>
+            <field name="sequence">170</field>
+        </record>
+
+        <record id="ir_cron_budget_refresh_actuals" model="ir.cron">
+            <field name="name">Бюджетування: оновлення факту затверджених бюджетів</field>
+            <field name="model_id" ref="model_l10n_ua_budget_plan"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_refresh_actuals()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_budget_plan_list" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.plan.list</field>
+        <field name="model">l10n_ua.budget.plan</field>
+        <field name="arch" type="xml">
+            <list string="Budgets" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="budget_type"/>
+                <field name="scenario"/>
+                <field name="level" optional="show"/>
+                <field name="parent_id" optional="show"/>
+                <field name="analytic_account_id" optional="show"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="amount_planned"/>
+                <field name="amount_actual"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'approved'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_budget_plan_form" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.plan.form</field>
+        <field name="model">l10n_ua.budget.plan</field>
+        <field name="arch" type="xml">
+            <form string="Budget">
+                <header>
+                    <button name="action_generate_lines" type="object" string="Generate Lines"
+                            invisible="state != 'draft'"
+                            help="Add an empty line for each budget item of this type and each period"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary"
+                            invisible="state != 'draft'" groups="account.group_account_manager"/>
+                    <button name="action_refresh_actuals" type="object" string="Update Actuals"
+                            invisible="state == 'closed'"/>
+                    <button name="action_close" type="object" string="Close"
+                            invisible="state != 'approved'" groups="account.group_account_manager"/>
+                    <button name="action_reset_draft" type="object" string="Reset to Draft"
+                            invisible="state == 'draft'" groups="account.group_account_manager"/>
+                    <button name="%(action_budget_copy_wizard)d" type="action" string="Copy to Scenario / Period"/>
+                    <button name="%(action_budget_xlsx_export)d" type="action" string="Export to Excel"/>
+                    <button name="%(action_budget_xlsx_import)d" type="action" string="Import from Excel"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_lines" type="object" class="oe_stat_button" icon="fa-bar-chart">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Analysis</span>
+                            </div>
+                        </button>
+                        <button name="action_open_children" type="object" class="oe_stat_button" icon="fa-sitemap">
+                            <field name="child_count" widget="statinfo" string="Sub-budgets"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Budget 2027" readonly="state == 'closed'"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="budget_type" readonly="state != 'draft'"/>
+                            <field name="scenario" readonly="state != 'draft'"/>
+                            <field name="level" readonly="state != 'draft'"/>
+                            <field name="parent_id" readonly="state != 'draft'"
+                                   domain="[('budget_type', '=', budget_type), ('id', '!=', id)]"/>
+                            <field name="analytic_account_id" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <label for="date_from" string="Period"/>
+                            <div class="o_row">
+                                <field name="date_from" readonly="state != 'draft'"/> –
+                                <field name="date_to" readonly="state != 'draft'"/>
+                            </div>
+                            <field name="period_type" readonly="state != 'draft'"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                            <field name="source_plan_id" invisible="not source_plan_id"/>
+                            <field name="actuals_date"/>
+                        </group>
+                    </group>
+                    <group class="oe_subtotal_footer">
+                        <field name="currency_id" invisible="1"/>
+                        <field name="amount_planned" string="Planned result"/>
+                        <field name="amount_actual" string="Actual result"/>
+                        <field name="amount_remaining"/>
+                        <field name="execution_pct" widget="percentage_text" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Lines" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'"
+                                   context="{'default_date_from': date_from, 'default_date_to': date_to}">
+                                <list editable="bottom" decoration-danger="is_over_budget">
+                                    <field name="item_id"/>
+                                    <field name="item_type" optional="hide"/>
+                                    <field name="analytic_account_id" optional="show"/>
+                                    <field name="date_from"/>
+                                    <field name="date_to"/>
+                                    <field name="planned_amount" sum="Total"/>
+                                    <field name="actual_amount" sum="Total"/>
+                                    <field name="variance_amount" sum="Total" optional="show"/>
+                                    <field name="execution_pct" widget="progressbar" optional="show"/>
+                                    <field name="note" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="budget_type" column_invisible="1"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                    <field name="is_over_budget" column_invisible="1"/>
+                                    <button name="action_open_journal_items" type="object" icon="fa-list"
+                                            title="Journal Items"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Sub-budgets" name="children">
+                            <field name="child_ids" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="level"/>
+                                    <field name="analytic_account_id"/>
+                                    <field name="amount_planned"/>
+                                    <field name="amount_actual"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_budget_plan_search" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.plan.search</field>
+        <field name="model">l10n_ua.budget.plan</field>
+        <field name="arch" type="xml">
+            <search string="Budgets">
+                <field name="name"/>
+                <field name="analytic_account_id"/>
+                <field name="parent_id"/>
+                <field name="user_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Approved" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Income &amp; Expense Budget" name="filter_pnl" domain="[('budget_type', '=', 'pnl')]"/>
+                <filter string="Cash Flow Budget" name="filter_cash" domain="[('budget_type', '=', 'cash')]"/>
+                <separator/>
+                <filter string="Top-level Budgets" name="filter_top" domain="[('parent_id', '=', False)]"/>
+                <group>
+                    <filter string="Budget Type" name="groupby_budget_type" domain="[]" context="{'group_by': 'budget_type'}"/>
+                    <filter string="Scenario" name="groupby_scenario" domain="[]" context="{'group_by': 'scenario'}"/>
+                    <filter string="Level" name="groupby_level" domain="[]" context="{'group_by': 'level'}"/>
+                    <filter string="Status" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_budget_plan" model="ir.actions.act_window">
+        <field name="name">Budgets</field>
+        <field name="res_model">l10n_ua.budget.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a budget</p>
+            <p>Plan income and expenses (accrual) or cash flows (cash basis) by budget items,
+                periods and responsibility centres, then compare with actuals from accounting.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="l10n_ua_import_declaration_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.import.declaration.list</field>
+        <field name="model">l10n_ua.import.declaration</field>
+        <field name="arch" type="xml">
+            <list string="Import Customs Declarations" decoration-muted="state == 'cancel'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="customs_office_id" optional="show"/>
+                <field name="agreement_id" optional="show"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="company_currency_id" column_invisible="True"/>
+                <field name="invoice_value" optional="hide"/>
+                <field name="customs_value" sum="Total"/>
+                <field name="duty_amount" sum="Total" optional="show"/>
+                <field name="excise_amount" sum="Total" optional="hide"/>
+                <field name="fee_amount" sum="Total" optional="hide"/>
+                <field name="vat_amount" sum="Total"/>
+                <field name="vat_payment_date" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'posted'"
+                       decoration-info="state == 'draft'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_import_declaration_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.import.declaration.form</field>
+        <field name="model">l10n_ua.import.declaration</field>
+        <field name="arch" type="xml">
+            <form string="Import Customs Declaration">
+                <header>
+                    <button name="action_post" type="object" string="Post" class="btn-primary" groups="account.group_account_user"
+                            invisible="state != 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state == 'cancel'"
+                            confirm="Posted landed costs and the import VAT entry will be reversed. Continue?"/>
+                    <button name="action_draft" type="object" string="Reset to Draft" invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_landed_costs" type="object" class="oe_stat_button"
+                                icon="fa-truck" invisible="not landed_cost_ids">
+                            <span class="o_stat_text">Landed Costs</span>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not bill_date_warning or state != 'draft'">
+                        A vendor bill is not dated the clearance date: the goods are recognised in UAH at the
+                        NBU rate of the bill date (prepaid parts - at the rate of the prepayment).
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="26UA500020000123U4" readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group string="Customs">
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="regime" readonly="state != 'draft'"/>
+                            <field name="customs_office_id" readonly="state != 'draft'"/>
+                            <field name="customs_office_code" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="agreement_id" readonly="state != 'draft'"/>
+                            <field name="incoterm_id"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Value">
+                            <field name="currency_id" readonly="state != 'draft'"/>
+                            <field name="invoice_value" readonly="state != 'draft'"/>
+                            <field name="exchange_rate" readonly="state != 'draft'"/>
+                            <field name="company_currency_id" invisible="1"/>
+                            <field name="customs_value" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Customs Payments">
+                            <field name="duty_amount" readonly="state != 'draft'"/>
+                            <field name="excise_amount" readonly="state != 'draft'"/>
+                            <field name="fee_amount" readonly="state != 'draft'"/>
+                            <field name="split_method" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Import VAT">
+                            <field name="vat_rate" readonly="state != 'draft'"/>
+                            <field name="vat_base"/>
+                            <field name="vat_amount"/>
+                            <field name="vat_payment_date" readonly="state != 'draft'"/>
+                            <field name="amount_customs_total"/>
+                            <field name="move_id" invisible="not move_id"/>
+                            <field name="tax_invoice_id" invisible="not tax_invoice_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Vendor Bills" name="bills">
+                            <field name="bill_ids" readonly="state != 'draft'">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="invoice_date"/>
+                                    <field name="partner_id"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="amount_untaxed"/>
+                                    <field name="amount_residual"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Receipts" name="pickings">
+                            <field name="picking_ids" readonly="state != 'draft'"/>
+                        </page>
+                        <page string="Landed Costs" name="landed_costs" invisible="not landed_cost_ids">
+                            <field name="landed_cost_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_import_declaration_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.import.declaration.search</field>
+        <field name="model">l10n_ua.import.declaration</field>
+        <field name="arch" type="xml">
+            <search string="Import Customs Declarations">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="customs_office_id"/>
+                <field name="agreement_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="filter_posted" domain="[('state', '=', 'posted')]"/>
+                <separator/>
+                <filter string="Clearance Date" name="filter_date" date="date"/>
+                <group>
+                    <filter string="Vendor" name="groupby_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Customs Office" name="groupby_customs" domain="[]" context="{'group_by': 'customs_office_id'}"/>
+                    <filter string="Contract" name="groupby_agreement" domain="[]" context="{'group_by': 'agreement_id'}"/>
+                    <filter string="Clearance Month" name="groupby_date" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_import_declaration_action" model="ir.actions.act_window">
+        <field name="name">Import Customs Declarations</field>
+        <field name="res_model">l10n_ua.import.declaration</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

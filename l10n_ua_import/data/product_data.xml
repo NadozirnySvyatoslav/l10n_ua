@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Митні платежі, що входять у собівартість імпортних запасів (landed costs) -->
+        <record id="product_customs_duty" model="product.product">
+            <field name="name">Customs Duty</field>
+            <field name="type">service</field>
+            <field name="landed_cost_ok" eval="True"/>
+            <field name="split_method_landed_cost">by_current_cost_price</field>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5, 0, 0)]"/>
+            <field name="supplier_taxes_id" eval="[(5, 0, 0)]"/>
+        </record>
+        <record id="product_import_excise" model="product.product">
+            <field name="name">Import Excise Tax</field>
+            <field name="type">service</field>
+            <field name="landed_cost_ok" eval="True"/>
+            <field name="split_method_landed_cost">by_current_cost_price</field>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5, 0, 0)]"/>
+            <field name="supplier_taxes_id" eval="[(5, 0, 0)]"/>
+        </record>
+        <record id="product_customs_fee" model="product.product">
+            <field name="name">Customs Fees</field>
+            <field name="type">service</field>
+            <field name="landed_cost_ok" eval="True"/>
+            <field name="split_method_landed_cost">by_current_cost_price</field>
+            <field name="sale_ok" eval="False"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="taxes_id" eval="[(5, 0, 0)]"/>
+            <field name="supplier_taxes_id" eval="[(5, 0, 0)]"/>
+        </record>
+    </data>
+</odoo>
