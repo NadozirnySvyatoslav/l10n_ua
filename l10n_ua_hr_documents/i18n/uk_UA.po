@@ -1361,3 +1361,49 @@ msgstr ""
 "тут не встановлено, тож поле, що його тримало, це оновлення прибирає. "
 "Нотатка лишається, щоб відпустку, заради якої видано наказ, можна було "
 "знайти."
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__date_notice
+msgid "Notice Date"
+msgstr "Дата попередження"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__date_notice
+msgid "Date the employee was personally notified of the coming dismissal (art. 49-2 of the Labour Code: at least two months before a dismissal under p. 1 of art. 40)."
+msgstr "Дата персонального попередження працівника про звільнення (ст. 49-2 КЗпП: не пізніше ніж за два місяці до звільнення за п. 1 ст. 40)."
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__notice_deadline
+msgid "Earliest Dismissal Date"
+msgstr "Найраніша дата звільнення"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,help:l10n_ua_hr_documents.field_hr_order__notice_deadline
+msgid "Notice date plus the notice period of the termination reason."
+msgstr "Дата попередження плюс строк попередження за підставою звільнення."
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__severance_info
+msgid "Severance Info"
+msgstr "Вихідна допомога"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__union_consent_required
+msgid "Union Consent Required"
+msgstr "Потрібна згода профспілки"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__notice_missing
+msgid "Notice Missing"
+msgstr "Немає дати попередження"
+
+#. module: l10n_ua_hr_documents
+#: model:ir.model.fields,field_description:l10n_ua_hr_documents.field_hr_order__notice_short
+msgid "Notice Short"
+msgstr "Строк попередження не витримано"
+
+#. module: l10n_ua_hr_documents
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py
+#, python-format
+msgid "Dismissal of %(employee)s on %(date)s is earlier than the notice period allows: notified on %(notice)s, the earliest date is %(deadline)s (%(reason)s)."
+msgstr "Звільнення %(employee)s %(date)s раніше, ніж дозволяє строк попередження: попереджено %(notice)s, найраніша дата — %(deadline)s (%(reason)s)."
