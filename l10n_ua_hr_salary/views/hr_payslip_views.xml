@@ -83,6 +83,7 @@
                                     <field name="is_esv_base"/>
                                     <field name="is_in_kind" optional="hide"/>
                                     <field name="period_month" optional="show"/>
+                                    <field name="l10n_ua_bonus_period_to" optional="hide"/>
                                     <field name="notes"/>
                                 </list>
                             </field>

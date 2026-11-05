@@ -208,7 +208,7 @@ class HrReportWageFund(models.Model):
                     fund_salary += amount
                 elif code == 'ALLOWANCE':
                     fund_allowances += amount
-                elif code in ('BONUS', 'PREMIUM'):
+                elif code in ('BONUS', 'PREMIUM') or accrual_type.category == 'bonus':
                     fund_bonuses += amount
                 else:
                     fund_other += amount
