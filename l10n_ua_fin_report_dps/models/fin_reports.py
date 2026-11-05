@@ -1,5 +1,6 @@
 """Фінзвіти l10n_ua_accounting з XML ДПС і поданням."""
-from odoo import models
+from odoo import _, models
+from odoo.exceptions import UserError
 
 
 class L10nUaBalanceReport(models.Model):
@@ -102,3 +103,28 @@ class L10nUaSmallReport(models.Model):
             'HPERIOD1': period_text,
             'HZY1': str(self.date_to.year),
         }
+
+
+class L10nUaNotesReport(models.Model):
+    _name = 'l10n_ua.notes.report'
+    _inherit = ['l10n_ua.notes.report', 'l10n_ua.fin.report.dps.mixin']
+
+    # Перерахунок і повернення в чернетку скидають XML; поданий звіт — ні.
+    def action_compute(self):
+        self._fin_dps_reset()
+        return super().action_compute()
+
+    def action_draft(self):
+        self._fin_dps_reset()
+        return super().action_draft()
+
+    def _fin_dps_form(self):
+        return 'J0901301'
+
+    def _fin_dps_period(self):
+        # Примітки (ф. № 5) — лише річна звітність (НП(С)БО 1, п. 2 розд. I).
+        period_type, month, text = super()._fin_dps_period()
+        if month != 12:
+            raise UserError(_('Примітки до фінансової звітності (ф. № 5) подаються лише за рік: '
+                              'період — з 1 січня до 31 грудня.'))
+        return period_type, month, text

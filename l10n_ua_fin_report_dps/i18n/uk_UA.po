@@ -16,6 +16,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_pnl_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_cashflow_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_equity_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_notes_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_small_report_form_dps
 msgid "DPS XML"
 msgstr "XML для ДПС"
@@ -25,6 +26,7 @@ msgstr "XML для ДПС"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_pnl_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_cashflow_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_equity_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_notes_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_small_report_form_dps
 msgid "Submit to DPS"
 msgstr "Подати до ДПС"
@@ -34,6 +36,7 @@ msgstr "Подати до ДПС"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_pnl_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_cashflow_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_equity_report_form_dps
+#: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_notes_report_form_dps
 #: model_terms:ir.ui.view,arch_db:l10n_ua_fin_report_dps.view_small_report_form_dps
 msgid "DPS"
 msgstr "ДПС"
@@ -43,6 +46,7 @@ msgstr "ДПС"
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_pnl_report__xml_file
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_cashflow_report__xml_file
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_equity_report__xml_file
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_notes_report__xml_file
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_small_report__xml_file
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_fin_report_dps_mixin__xml_file
 msgid "XML File"
@@ -53,6 +57,7 @@ msgstr "Файл XML"
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_pnl_report__xml_filename
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_cashflow_report__xml_filename
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_equity_report__xml_filename
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_notes_report__xml_filename
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_small_report__xml_filename
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_fin_report_dps_mixin__xml_filename
 msgid "XML File Name"
@@ -63,6 +68,7 @@ msgstr "Ім'я файлу XML"
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_pnl_report__submission_date
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_cashflow_report__submission_date
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_equity_report__submission_date
+#: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_notes_report__submission_date
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_small_report__submission_date
 #: model:ir.model.fields,field_description:l10n_ua_fin_report_dps.field_l10n_ua_fin_report_dps_mixin__submission_date
 msgid "Submitted On"
