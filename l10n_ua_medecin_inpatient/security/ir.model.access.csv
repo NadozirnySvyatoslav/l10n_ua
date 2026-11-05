@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_admission_user,access.admission.user,model_l10n_ua_medecin_admission,l10n_ua_medecin_base.group_ua_medecin_user,1,1,1,0
+access_admission_mgr,access.admission.mgr,model_l10n_ua_medecin_admission,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1
+access_department_user,access.department.user,model_l10n_ua_medecin_department,l10n_ua_medecin_base.group_ua_medecin_user,1,0,0,0
+access_department_mgr,access.department.mgr,model_l10n_ua_medecin_department,l10n_ua_medecin_base.group_ua_medecin_manager,1,1,1,1

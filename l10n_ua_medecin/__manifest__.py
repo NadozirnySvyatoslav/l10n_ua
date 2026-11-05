@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin (Усе для закладів охорони здоров\'я)',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Umbrella: повний стек для медичних закладів України',
     'description': """
@@ -15,6 +15,7 @@ Umbrella, що встановлює повний набір модулів дл�
 * `l10n_ua_medecin_nszu` — договори НСЗУ + пакети медичних послуг + капітація
 * `l10n_ua_medecin_clinical` — прийоми (розклад), діагнози за МКХ-10, хронічні стани, алергії
 * `l10n_ua_medecin_ehealth` — інтеграція з ЦК eHealth (налаштування, лог запитів)
+* `l10n_ua_medecin_inpatient` — стаціонар: епізод лікування, ліжко-дні, відділення
 
 Для повного бюджетного циклу — додатково встановити `l10n_ua_budget`.
     """,
@@ -27,6 +28,7 @@ Umbrella, що встановлює повний набір модулів дл�
         'l10n_ua_medecin_nszu',
         'l10n_ua_medecin_clinical',
         'l10n_ua_medecin_ehealth',
+        'l10n_ua_medecin_inpatient',
     ],
     'data': [],
     'images': ['static/description/icon.png'],

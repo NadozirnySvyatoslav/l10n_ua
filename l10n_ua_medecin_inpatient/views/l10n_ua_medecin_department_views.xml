@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_department_list" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.department.list</field>
+        <field name="model">l10n_ua.medecin.department</field>
+        <field name="arch" type="xml">
+            <list string="Відділення">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="specialty_id"/>
+                <field name="head_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_department_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.department.form</field>
+        <field name="model">l10n_ua.medecin.department</field>
+        <field name="arch" type="xml">
+            <form string="Відділення">
+                <sheet>
+                    <widget name="web_ribbon" title="Архівовано" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="specialty_id"/>
+                        </group>
+                        <group>
+                            <field name="head_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Примітки"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_department_search" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.department.search</field>
+        <field name="model">l10n_ua.medecin.department</field>
+        <field name="arch" type="xml">
+            <search string="Пошук відділень">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="head_id"/>
+                <filter string="Архівовані" name="filter_inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Профіль" name="groupby_specialty" domain="[]"
+                            context="{'group_by': 'specialty_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_department" model="ir.actions.act_window">
+        <field name="name">Відділення</field>
+        <field name="res_model">l10n_ua.medecin.department</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_department_search"/>
+    </record>
+</odoo>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_admission_list" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.list</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="arch" type="xml">
+            <list string="Епізоди стаціонарного лікування"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'admitted'"
+                  decoration-success="state == 'discharged'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="department_id"/>
+                <field name="doctor_id"/>
+                <field name="admission_type"/>
+                <field name="date_admission"/>
+                <field name="date_discharge"/>
+                <field name="bed_days" sum="Разом"/>
+                <field name="treatment_result" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'admitted'"
+                       decoration-success="state == 'discharged'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_admission_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.form</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="arch" type="xml">
+            <form string="Епізод стаціонарного лікування">
+                <header>
+                    <button name="action_admit" string="Госпіталізувати" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_discharge" string="Виписати" type="object"
+                            class="btn-primary" invisible="state != 'admitted'"/>
+                    <button name="action_reopen" string="Повернути на лікування" type="object"
+                            invisible="state != 'discharged'"
+                            groups="l10n_ua_medecin_base.group_ua_medecin_manager"
+                            confirm="Повернути виписаний епізод у стан «Госпіталізовано»?"/>
+                    <button name="action_cancel" string="Скасувати" type="object"
+                            invisible="state not in ('draft', 'admitted')"/>
+                    <button name="action_draft" string="У чернетку" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,admitted,discharged"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Пацієнт">
+                            <field name="patient_id" readonly="state not in ('draft', 'admitted')"/>
+                            <field name="department_id" readonly="state not in ('draft', 'admitted')"/>
+                            <field name="doctor_id" readonly="state not in ('draft', 'admitted')"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Госпіталізація">
+                            <field name="admission_type" readonly="state not in ('draft', 'admitted')"/>
+                            <field name="referral_source" readonly="state not in ('draft', 'admitted')"/>
+                            <field name="referral_facility"
+                                   invisible="referral_source != 'other_facility' and admission_type != 'transfer'"
+                                   readonly="state not in ('draft', 'admitted')"/>
+                            <field name="date_admission" readonly="state not in ('draft', 'admitted')"/>
+                        </group>
+                    </group>
+                    <group string="Виписка" invisible="state == 'draft'">
+                        <group>
+                            <field name="date_discharge" readonly="state != 'admitted'"/>
+                            <field name="bed_days"/>
+                        </group>
+                        <group>
+                            <field name="treatment_result" readonly="state != 'admitted'"
+                                   required="state == 'admitted' and date_discharge"/>
+                            <field name="discharge_type" readonly="state != 'admitted'"
+                                   required="state == 'admitted' and date_discharge"/>
+                            <field name="discharge_facility" invisible="discharge_type != 'transferred'"
+                                   readonly="state != 'admitted'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Примітки" name="notes">
+                            <field name="notes" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_admission_search" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.search</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="arch" type="xml">
+            <search string="Пошук епізодів стаціонарного лікування">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="department_id"/>
+                <filter string="Мої пацієнти" name="filter_my"
+                        domain="[('doctor_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Чернетки" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="У стаціонарі" name="filter_admitted" domain="[('state', '=', 'admitted')]"/>
+                <filter string="Виписані" name="filter_discharged" domain="[('state', '=', 'discharged')]"/>
+                <filter string="Скасовані" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Екстрені" name="filter_emergency" domain="[('admission_type', '=', 'emergency')]"/>
+                <filter string="Планові" name="filter_planned" domain="[('admission_type', '=', 'planned')]"/>
+                <separator/>
+                <filter string="Дата госпіталізації" name="filter_date_admission" date="date_admission"/>
+                <filter string="Дата виписки" name="filter_date_discharge" date="date_discharge"/>
+                <group>
+                    <filter string="Відділення" name="groupby_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Лікуючий лікар" name="groupby_doctor" domain="[]"
+                            context="{'group_by': 'doctor_id'}"/>
+                    <filter string="Вид госпіталізації" name="groupby_admission_type" domain="[]"
+                            context="{'group_by': 'admission_type'}"/>
+                    <filter string="Результат лікування" name="groupby_result" domain="[]"
+                            context="{'group_by': 'treatment_result'}"/>
+                    <filter string="Стан" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Місяць госпіталізації" name="groupby_month" domain="[]"
+                            context="{'group_by': 'date_admission:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_admission_pivot" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.pivot</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="arch" type="xml">
+            <pivot string="Аналіз стаціонару" sample="1">
+                <field name="department_id" type="row"/>
+                <field name="date_admission" interval="month" type="col"/>
+                <field name="bed_days" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_admission_graph" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.graph</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="arch" type="xml">
+            <graph string="Аналіз стаціонару" type="bar" stacked="1" sample="1">
+                <field name="date_admission" interval="month"/>
+                <field name="treatment_result"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_admission" model="ir.actions.act_window">
+        <field name="name">Госпіталізації</field>
+        <field name="res_model">l10n_ua.medecin.admission</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_admission_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Епізодів стаціонарного лікування немає</p>
+            <p>Створіть епізод при госпіталізації пацієнта: номер карти
+                стаціонарного хворого (ф. 003/о) призначиться автоматично.</p>
+        </field>
+    </record>
+
+    <record id="action_admission_current" model="ir.actions.act_window">
+        <field name="name">У стаціонарі</field>
+        <field name="res_model">l10n_ua.medecin.admission</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_admission_search"/>
+        <field name="context">{'search_default_filter_admitted': 1, 'search_default_groupby_department': 1}</field>
+    </record>
+
+    <record id="action_report_admission" model="ir.actions.act_window">
+        <field name="name">Стаціонар</field>
+        <field name="res_model">l10n_ua.medecin.admission</field>
+        <field name="view_mode">pivot,graph,list,form</field>
+        <field name="search_view_id" ref="view_admission_search"/>
+        <field name="context">{'search_default_filter_discharged': 1}</field>
+    </record>
+</odoo>
