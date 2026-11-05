@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_budget_line_list" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.line.list</field>
+        <field name="model">l10n_ua.budget.line</field>
+        <field name="arch" type="xml">
+            <list string="Budget Lines" create="0" edit="0"
+                  decoration-danger="is_over_budget">
+                <field name="plan_id"/>
+                <field name="scenario" optional="show"/>
+                <field name="item_id"/>
+                <field name="item_type" optional="hide"/>
+                <field name="analytic_account_id" optional="show"/>
+                <field name="date_from"/>
+                <field name="date_to" optional="hide"/>
+                <field name="planned_amount" sum="Total"/>
+                <field name="actual_amount" sum="Total"/>
+                <field name="variance_amount" sum="Total"/>
+                <field name="execution_pct" widget="progressbar"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="is_over_budget" column_invisible="1"/>
+                <button name="action_open_journal_items" type="object" icon="fa-list" title="Journal Items"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_budget_line_pivot" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.line.pivot</field>
+        <field name="model">l10n_ua.budget.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Budget Analysis" sample="1">
+                <field name="item_id" type="row"/>
+                <field name="date_from" interval="month" type="col"/>
+                <field name="planned_amount" type="measure"/>
+                <field name="actual_amount" type="measure"/>
+                <field name="variance_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_budget_line_graph" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.line.graph</field>
+        <field name="model">l10n_ua.budget.line</field>
+        <field name="arch" type="xml">
+            <graph string="Budget Analysis" type="bar" sample="1">
+                <field name="item_id"/>
+                <field name="planned_amount" type="measure"/>
+                <field name="actual_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_budget_line_search" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.line.search</field>
+        <field name="model">l10n_ua.budget.line</field>
+        <field name="arch" type="xml">
+            <search string="Budget Lines">
+                <field name="plan_id"/>
+                <field name="item_id"/>
+                <field name="analytic_account_id"/>
+                <filter string="Approved" name="filter_approved" domain="[('plan_state', '=', 'approved')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('plan_state', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Income &amp; Expense Budget" name="filter_pnl" domain="[('budget_type', '=', 'pnl')]"/>
+                <filter string="Cash Flow Budget" name="filter_cash" domain="[('budget_type', '=', 'cash')]"/>
+                <separator/>
+                <filter string="Base Scenario" name="filter_base" domain="[('scenario', '=', 'base')]"/>
+                <separator/>
+                <filter string="Over Budget" name="filter_over" domain="[('is_over_budget', '=', True)]"/>
+                <separator/>
+                <filter string="Period" name="filter_date" date="date_from"/>
+                <group>
+                    <filter string="Budget" name="groupby_plan" domain="[]" context="{'group_by': 'plan_id'}"/>
+                    <filter string="Scenario" name="groupby_scenario" domain="[]" context="{'group_by': 'scenario'}"/>
+                    <filter string="Budget Item" name="groupby_item" domain="[]" context="{'group_by': 'item_id'}"/>
+                    <filter string="Direction" name="groupby_item_type" domain="[]" context="{'group_by': 'item_type'}"/>
+                    <filter string="Analytic Account" name="groupby_analytic" domain="[]" context="{'group_by': 'analytic_account_id'}"/>
+                    <filter string="Month" name="groupby_month" domain="[]" context="{'group_by': 'date_from:month'}"/>
+                    <filter string="Quarter" name="groupby_quarter" domain="[]" context="{'group_by': 'date_from:quarter'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_budget_line_analysis" model="ir.actions.act_window">
+        <field name="name">Budget Analysis</field>
+        <field name="res_model">l10n_ua.budget.line</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_filter_approved': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No approved budgets yet</p>
+            <p>Plan versus actual by budget item, period, responsibility centre and scenario.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_budget_item_list" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.item.list</field>
+        <field name="model">l10n_ua.budget.item</field>
+        <field name="arch" type="xml">
+            <list string="Budget Items">
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="parent_id" optional="show"/>
+                <field name="budget_type"/>
+                <field name="item_type"/>
+                <field name="account_codes"/>
+                <field name="account_ids" widget="many2many_tags" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_budget_item_form" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.item.form</field>
+        <field name="model">l10n_ua.budget.item</field>
+        <field name="arch" type="xml">
+            <form string="Budget Item">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Administrative expenses"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="budget_type"/>
+                            <field name="item_type"/>
+                            <field name="parent_id"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Actuals Source">
+                        <field name="account_codes" placeholder="e.g. 92, 93"/>
+                        <field name="account_ids" widget="many2many_tags"/>
+                        <field name="analytic_account_ids" widget="many2many_tags"/>
+                    </group>
+                    <div class="text-muted" invisible="budget_type != 'cash'">
+                        For a cash flow item specify counterpart accounts of cash and bank
+                        movements: e.g. 361 for receipts from customers, 631 for payments to
+                        suppliers, 66 for wages.
+                    </div>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_budget_item_search" model="ir.ui.view">
+        <field name="name">l10n_ua.budget.item.search</field>
+        <field name="model">l10n_ua.budget.item</field>
+        <field name="arch" type="xml">
+            <search string="Budget Items">
+                <field name="name" string="Item" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="account_ids"/>
+                <filter string="Income &amp; Expense Budget" name="filter_pnl" domain="[('budget_type', '=', 'pnl')]"/>
+                <filter string="Cash Flow Budget" name="filter_cash" domain="[('budget_type', '=', 'cash')]"/>
+                <separator/>
+                <filter string="Income / Inflow" name="filter_income" domain="[('item_type', '=', 'income')]"/>
+                <filter string="Expense / Outflow" name="filter_expense" domain="[('item_type', '=', 'expense')]"/>
+                <separator/>
+                <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Budget Type" name="groupby_budget_type" domain="[]" context="{'group_by': 'budget_type'}"/>
+                    <filter string="Direction" name="groupby_item_type" domain="[]" context="{'group_by': 'item_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_budget_item" model="ir.actions.act_window">
+        <field name="name">Budget Items</field>
+        <field name="res_model">l10n_ua.budget.item</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_groupby_budget_type': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a budget item</p>
+            <p>Budget items map plan figures to accounts: income and expense items
+                for the Income &amp; Expense Budget, inflows and outflows for the Cash Flow Budget.</p>
+        </field>
+    </record>
+</odoo>

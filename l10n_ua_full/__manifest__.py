@@ -27,6 +27,7 @@ Accounting & Tax
 * Fixed assets management
 * Tax Cabinet integration
 * FOP (sole proprietor) support
+* Commercial budgeting (income & expense, cash flow budgets)
 
 Banking
 -------
@@ -80,6 +81,7 @@ PRRO (Cash Registers)
         'l10n_ua_fop',
         'l10n_ua_single_tax_legal',
         'l10n_ua_doc_reports',
+        'l10n_ua_budget_commercial',
         # Banking
         'l10n_ua_bank_sync',
         'l10n_ua_bank_privat',
