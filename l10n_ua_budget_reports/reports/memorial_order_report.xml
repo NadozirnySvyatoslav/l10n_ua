@@ -11,18 +11,26 @@
 
     <template id="memorial_order_template">
         <t t-call="web.html_container">
-            <t t-set="wizard" t-value="docs and docs[0] or (data and env['l10n_ua.budget.memorial_order.wizard'].browse(data.get('wizard_id')))"/>
+            <t t-set="w_id" t-value="(docs and docs[0].id) or wizard_id or (data and data.get('wizard_id'))"/>
+            <t t-set="w_rec" t-value="w_id and env['l10n_ua.budget.memorial_order.wizard'].browse(w_id)"/>
+            <t t-set="wizard" t-value="(w_rec and w_rec.exists() and w_rec) or (docs and docs.exists() and docs[0]) or env['l10n_ua.budget.memorial_order.wizard'].new({
+                'mo_kind': mo_kind or (data and data.get('mo_kind')) or 'mo_16',
+                'date_from': date_from or (data and data.get('date_from')),
+                'date_to': date_to or (data and data.get('date_to')),
+                'company_id': env.company.id,
+            })"/>
+            <t t-set="company" t-value="wizard.company_id or env.company"/>
             <t t-set="report_data" t-value="wizard.get_report_data()"/>
             <t t-set="rows" t-value="report_data['rows']"/>
 
             <t t-call="web.external_layout">
                 <div class="page" style="font-size:10px;">
-                    <h2 style="text-align:center; margin-bottom:0;"><t t-out="(data and data.get('mo_label')) or dict(wizard._fields['mo_kind'].selection).get(wizard.mo_kind)"/></h2>
+                    <h2 style="text-align:center; margin-bottom:0;"><t t-out="mo_label or (data and data.get('mo_label')) or dict(wizard._fields['mo_kind'].selection).get(wizard.mo_kind)"/></h2>
                     <p style="text-align:center; margin-top:0;">
-                        Період: <t t-out="(data and data.get('date_from')) or wizard.date_from"/> — <t t-out="(data and data.get('date_to')) or wizard.date_to"/>
+                        Період: <t t-out="date_from or (data and data.get('date_from')) or wizard.date_from"/> — <t t-out="date_to or (data and data.get('date_to')) or wizard.date_to"/>
                     </p>
                     <p style="margin-bottom:4px;">
-                        <strong>Установа:</strong> <t t-out="wizard.company_id.name"/>
+                        <strong>Установа:</strong> <t t-out="company.name"/>
                     </p>
 
                     <table class="table table-bordered table-sm" style="font-size:9px;">
@@ -30,6 +38,7 @@
                             <tr style="background:#f0f0f0;">
                                 <th>Дата</th>
                                 <th>Документ</th>
+                                <th t-if="wizard.mo_kind == 'mo_16'">Джерело</th>
                                 <th>Рахунок</th>
                                 <th>Назва рахунку</th>
                                 <th>Призначення</th>
@@ -43,6 +52,11 @@
                             <tr t-foreach="rows" t-as="r">
                                 <td><t t-out="r['date']"/></td>
                                 <td><t t-out="r['move_name']"/></td>
+                                <td t-if="wizard.mo_kind == 'mo_16'">
+                                    <span t-if="r.get('source') == 'register'" class="badge text-bg-primary" style="display:inline-block; font-size:7.5px; padding:1px 4px; border-radius:3px; background-color:#0d6efd; color:#fff;">Регістр</span>
+                                    <span t-elif="r.get('source') == 'historical'" class="badge text-bg-secondary" style="display:inline-block; font-size:7.5px; padding:1px 4px; border-radius:3px; background-color:#6c757d; color:#fff;">Історичні</span>
+                                    <span t-else="" t-out="r.get('source_label', '')"/>
+                                </td>
                                 <td><strong t-out="r['account_code']"/></td>
                                 <td><t t-out="r['account_name']"/></td>
                                 <td><t t-out="r['description']"/></td>
@@ -52,10 +66,22 @@
                                 <td class="text-end"><t t-out="'{:,.2f}'.format(r['credit']).replace(',', ' ') if r['credit'] else ''"/></td>
                             </tr>
                             <tr style="background:#f8f8f8;">
-                                <td t-att-colspan="wizard.mo_kind == 'mo_16' and 7 or 6"><strong>РАЗОМ</strong></td>
+                                <td t-att-colspan="wizard.mo_kind == 'mo_16' and 8 or 6"><strong>РАЗОМ</strong></td>
                                 <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_debit']).replace(',', ' ')"/></strong></td>
                                 <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_credit']).replace(',', ' ')"/></strong></td>
                             </tr>
+                            <t t-if="wizard.mo_kind == 'mo_16' and report_data.get('has_historical')">
+                                <tr style="background:#fafafa; font-size:8.5px; color:#555;">
+                                    <td colspan="8" class="text-end"><em>у т.ч. Позабалансовий регістр:</em></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_register_debit', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_register_credit', 0.0)).replace(',', ' ')"/></td>
+                                </tr>
+                                <tr style="background:#fafafa; font-size:8.5px; color:#555;">
+                                    <td colspan="8" class="text-end"><em>у т.ч. Історичні проводки:</em></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_historical_debit', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_historical_credit', 0.0)).replace(',', ' ')"/></td>
+                                </tr>
+                            </t>
                         </tbody>
                     </table>
 

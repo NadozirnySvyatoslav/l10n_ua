@@ -69,13 +69,15 @@ class MemorialOrderWizard(models.TransientModel):
             'date_from': fields.Date.to_string(self.date_from),
             'date_to': fields.Date.to_string(self.date_to),
         }
+        data['data'] = dict(data)
         report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
         return report.report_action(self, data=data)
 
     def _get_report_data_mo_16(self):
         """MO-16 off-balance report from l10n_ua.offbalance.move.line + historical AML."""
         rows = []
-        sum_d = sum_c = 0.0
+        sum_reg_d = sum_reg_c = 0.0
+        sum_hist_d = sum_hist_c = 0.0
 
         # 1. New off-balance register (single-entry)
         ob_domain = [
@@ -93,6 +95,8 @@ class MemorialOrderWizard(models.TransientModel):
             rows.append({
                 'date': ln.date,
                 'move_name': move_name,
+                'source': 'register',
+                'source_label': 'Регістр',
                 'account_code': ln.account_id.code,
                 'account_name': ln.account_id.name,
                 'description': ln.name or '',
@@ -101,8 +105,8 @@ class MemorialOrderWizard(models.TransientModel):
                 'debit': ln.debit,
                 'credit': ln.credit,
             })
-            sum_d += ln.debit
-            sum_c += ln.credit
+            sum_reg_d += ln.debit
+            sum_reg_c += ln.credit
 
         # 2. Historical account.move.line entries for off-balance accounts
         aml_domain = [
@@ -120,6 +124,8 @@ class MemorialOrderWizard(models.TransientModel):
             rows.append({
                 'date': ln.date,
                 'move_name': move_name,
+                'source': 'historical',
+                'source_label': 'Історичні',
                 'account_code': ln.account_id.code,
                 'account_name': ln.account_id.name,
                 'description': ln.name or '',
@@ -128,14 +134,19 @@ class MemorialOrderWizard(models.TransientModel):
                 'debit': ln.debit,
                 'credit': ln.credit,
             })
-            sum_d += ln.debit
-            sum_c += ln.credit
+            sum_hist_d += ln.debit
+            sum_hist_c += ln.credit
 
         rows.sort(key=lambda r: (fields.Date.to_date(r['date']) or fields.Date.today(), r['move_name'] or ''))
         return {
             'rows': rows,
-            'sum_debit': sum_d,
-            'sum_credit': sum_c,
+            'sum_debit': sum_reg_d + sum_hist_d,
+            'sum_credit': sum_reg_c + sum_hist_c,
+            'sum_register_debit': sum_reg_d,
+            'sum_register_credit': sum_reg_c,
+            'sum_historical_debit': sum_hist_d,
+            'sum_historical_credit': sum_hist_c,
+            'has_historical': bool(sum_hist_d or sum_hist_c or any(r.get('source') == 'historical' for r in rows)),
         }
 
     def get_report_data(self):
