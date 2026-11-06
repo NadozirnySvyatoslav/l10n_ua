@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="l10n_ua_inventory_writedown_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.inventory.writedown.form</field>
+        <field name="model">l10n_ua.inventory.writedown</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Write-down">
+                <header>
+                    <button name="action_fill" string="Fill Stock" type="object"
+                            class="btn-primary" invisible="state != 'draft' or line_ids"/>
+                    <button name="action_fill" string="Refresh Stock" type="object"
+                            invisible="state != 'draft' or not line_ids"/>
+                    <button name="action_post" string="Post" type="object"
+                            class="btn-primary" invisible="state != 'draft' or not line_ids"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state != 'posted'"
+                            confirm="Reverse the entry and restore the stock value before the write-down?"/>
+                    <button name="action_draft" string="Set to Draft" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_move" type="object" class="oe_stat_button"
+                                icon="fa-book" invisible="not move_id" string="Journal Entry"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="move_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="loss_account_id" readonly="state != 'draft'"/>
+                            <field name="income_account_id" readonly="state != 'draft'"/>
+                            <field name="total_writedown"/>
+                            <field name="total_reversal"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Goods" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom"
+                                      decoration-danger="writedown_amount &gt; 0"
+                                      decoration-success="reversal_amount &gt; 0"
+                                      decoration-muted="exempt">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id" optional="show"/>
+                                    <field name="book_value" sum="Total"/>
+                                    <field name="book_unit_cost"/>
+                                    <field name="nrv_unit"/>
+                                    <field name="nrv_set" optional="hide"/>
+                                    <field name="exempt" optional="show"/>
+                                    <field name="prior_writedown" optional="show"/>
+                                    <field name="writedown_amount" sum="Total"/>
+                                    <field name="reversal_amount" sum="Total"/>
+                                    <field name="new_unit_cost" optional="show"/>
+                                    <field name="valuation_account_id" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="How the net realisable value was determined..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_inventory_writedown_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.inventory.writedown.list</field>
+        <field name="model">l10n_ua.inventory.writedown</field>
+        <field name="arch" type="xml">
+            <list string="Inventory Write-downs" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="total_writedown" sum="Total"/>
+                <field name="total_reversal" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'posted'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_inventory_writedown_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.inventory.writedown.search</field>
+        <field name="model">l10n_ua.inventory.writedown</field>
+        <field name="arch" type="xml">
+            <search string="Inventory Write-downs">
+                <field name="name"/>
+                <field name="line_ids" string="Product" filter_domain="[('line_ids.product_id', 'ilike', self)]"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="filter_posted" domain="[('state', '=', 'posted')]"/>
+                <group>
+                    <filter string="Status" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Date" name="groupby_date" domain="[]" context="{'group_by': 'date:year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_inventory_writedown_action" model="ir.actions.act_window">
+        <field name="name">Inventory Write-down</field>
+        <field name="res_model">l10n_ua.inventory.writedown</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_inventory_writedown_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create an inventory write-down</p>
+            <p>
+                Inventories are carried at the lower of cost and net realisable value
+                (НП(С)БО 9, п. 24). The write-down goes to 946, a later increase of the
+                net realisable value is income on 719 within the earlier write-down.
+            </p>
+        </field>
+    </record>
+
+</odoo>

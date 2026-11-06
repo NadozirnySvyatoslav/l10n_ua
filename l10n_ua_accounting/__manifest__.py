@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '19.0.7.12.0',
+    'version': '19.0.7.13.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
@@ -74,6 +74,7 @@ Dependencies:
         'product',
         'uom',
         'stock',
+        'stock_account',
         'l10n_ua_account_base',
         'l10n_ua_doc_reports',
         'l10n_ua_tax',
@@ -115,6 +116,7 @@ Dependencies:
         'views/l10n_ua_debt_netting_views.xml',
         'views/l10n_ua_deferral_views.xml',
         'views/l10n_ua_trade_markup_views.xml',
+        'views/l10n_ua_inventory_writedown_views.xml',
         # Wizards
         'wizard/cash_book_wizard_views.xml',
         'wizard/reconciliation_act_wizard_views.xml',
