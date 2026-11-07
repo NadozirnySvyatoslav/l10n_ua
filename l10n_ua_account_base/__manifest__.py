@@ -65,6 +65,7 @@ This module is required for all other l10n_ua_* modules.
         'views/l10n_ua_chess_sheet_views.xml',
         'views/l10n_ua_subconto_views.xml',
         'views/l10n_ua_offbalance_views.xml',
+        'views/l10n_ua_offbalance_report.xml',
         'views/menu_views.xml',
     ],
     'demo': [],

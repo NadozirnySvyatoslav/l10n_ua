@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_offbalance_osv" model="report.paperformat">
+        <field name="name">UA Off-Balance OSV Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">12</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_offbalance_osv" model="ir.actions.report">
+        <field name="name">ОСВ по класу 0</field>
+        <field name="model">l10n_ua.offbalance.osv</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_account_base.report_offbalance_osv</field>
+        <field name="report_file">l10n_ua_account_base.report_offbalance_osv</field>
+        <field name="print_report_name">'ОСВ_клас_0_%s_%s' % (object.period_start, object.period_end)</field>
+        <field name="paperformat_id" ref="paperformat_offbalance_osv"/>
+        <field name="binding_model_id" ref="model_l10n_ua_offbalance_osv"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_offbalance_osv">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-size: 11px;">
+                        <div class="row mb-3">
+                            <div class="col-8">
+                                <h4 class="mb-1"><t t-out="doc.company_id.name"/></h4>
+                                <div t-if="doc.company_id.company_registry">
+                                    <strong>Код ЄДРПОУ:</strong> <t t-out="doc.company_id.company_registry"/>
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="text-muted">Клас 0 (Позабалансовий облік)</div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-3">
+                            <h3 class="mb-1"><strong>ОБОРОТНО-САЛЬДОВА ВІДОМІСТЬ ПО КЛАСУ 0</strong></h3>
+                            <div class="fw-bold">
+                                за період з <t t-out="doc.period_start" t-options='{"widget": "date"}'/> по <t t-out="doc.period_end" t-options='{"widget": "date"}'/>
+                            </div>
+                            <div t-if="doc.account_id" class="small text-muted">
+                                Рахунок: <t t-out="doc.account_id.display_name"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-bordered table-sm" style="font-size: 10px;">
+                            <thead>
+                                <tr class="text-center align-middle" style="background-color: #f2f2f2;">
+                                    <th rowspan="2" style="width: 140px;">Рахунок</th>
+                                    <th rowspan="2" t-if="doc.by_partner">Контрагент</th>
+                                    <th colspan="3">Початковий залишок</th>
+                                    <th colspan="4">Обороти за період</th>
+                                    <th colspan="3">Кінцевий залишок</th>
+                                </tr>
+                                <tr class="text-center align-middle" style="background-color: #f8f9fa;">
+                                    <th>Кількість</th>
+                                    <th>Дебет</th>
+                                    <th>Кредит</th>
+                                    <th>К-сть Дт</th>
+                                    <th>Дебет</th>
+                                    <th>К-сть Кт</th>
+                                    <th>Кредит</th>
+                                    <th>Кількість</th>
+                                    <th>Дебет</th>
+                                    <th>Кредит</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="total_opening_debit" t-value="0.0"/>
+                                <t t-set="total_opening_credit" t-value="0.0"/>
+                                <t t-set="total_turnover_debit" t-value="0.0"/>
+                                <t t-set="total_turnover_credit" t-value="0.0"/>
+                                <t t-set="total_closing_debit" t-value="0.0"/>
+                                <t t-set="total_closing_credit" t-value="0.0"/>
+
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <t t-set="total_opening_debit" t-value="total_opening_debit + line.opening_debit"/>
+                                    <t t-set="total_opening_credit" t-value="total_opening_credit + line.opening_credit"/>
+                                    <t t-set="total_turnover_debit" t-value="total_turnover_debit + line.turnover_debit"/>
+                                    <t t-set="total_turnover_credit" t-value="total_turnover_credit + line.turnover_credit"/>
+                                    <t t-set="total_closing_debit" t-value="total_closing_debit + line.closing_debit"/>
+                                    <t t-set="total_closing_credit" t-value="total_closing_credit + line.closing_credit"/>
+
+                                    <td><strong><t t-out="line.account_id.code"/></strong> <span class="small text-muted" t-out="line.account_id.name"/></td>
+                                    <td t-if="doc.by_partner"><t t-out="line.partner_id.name if line.partner_id else '-'"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.opening_qty).replace(',', ' ') if line.opening_qty else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.opening_debit).replace(',', ' ') if line.opening_debit else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.opening_credit).replace(',', ' ') if line.opening_credit else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.quantity_in).replace(',', ' ') if line.quantity_in else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.turnover_debit).replace(',', ' ') if line.turnover_debit else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.quantity_out).replace(',', ' ') if line.quantity_out else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.turnover_credit).replace(',', ' ') if line.turnover_credit else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.closing_qty).replace(',', ' ') if line.closing_qty else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.closing_debit).replace(',', ' ') if line.closing_debit else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(line.closing_credit).replace(',', ' ') if line.closing_credit else ''"/></td>
+                                </tr>
+
+                                <tr class="fw-bold" style="background-color: #f2f2f2;">
+                                    <td t-att-colspan="doc.by_partner and 2 or 1">РАЗОМ</td>
+                                    <td></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(total_opening_debit).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(total_opening_credit).replace(',', ' ')"/></td>
+                                    <td></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(total_turnover_debit).replace(',', ' ')"/></td>
+                                    <td></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(total_turnover_credit).replace(',', ' ')"/></td>
+                                    <td></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(total_closing_debit).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(total_closing_credit).replace(',', ' ')"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-4 pt-3" style="page-break-inside: avoid;">
+                            <div class="col-6">
+                                <div>Керівник: _________________ (__________________)</div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div>Головний бухгалтер: _________________ (__________________)</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

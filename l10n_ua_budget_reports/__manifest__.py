@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Reports',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.2',
     'category': 'Accounting/Localization',
     'summary': 'Друковані форми кошторису, звіти 2д/4-1д, меморіальні ордери',
     'description': """

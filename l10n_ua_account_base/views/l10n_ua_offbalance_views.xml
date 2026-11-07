@@ -163,6 +163,7 @@
             <form string="Off-Balance Trial Balance (Class 0)">
                 <header>
                     <button name="action_compute" string="Compute" type="object" class="btn-primary"/>
+                    <button name="action_print" string="Print" type="object" class="btn-secondary"/>
                 </header>
                 <sheet>
                     <group>

@@ -135,6 +135,12 @@
               action="l10n_ua_account_base.l10n_ua_osv_action"
               sequence="10"/>
 
+    <menuitem id="menu_ua_reports_offbalance_osv"
+              name="Off-Balance Trial Balance (Class 0)"
+              parent="menu_ua_reports"
+              action="l10n_ua_account_base.l10n_ua_offbalance_osv_action"
+              sequence="15"/>
+
     <menuitem id="menu_ua_reports_journal_orders"
               name="Journal Orders"
               parent="menu_ua_reports"
