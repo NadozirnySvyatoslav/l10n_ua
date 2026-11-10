@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ліжка -->
+    <record id="view_bed_list" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.bed.list</field>
+        <field name="model">l10n_ua.medecin.bed</field>
+        <field name="arch" type="xml">
+            <list string="Ліжка" editable="bottom" decoration-warning="is_occupied">
+                <field name="sequence" widget="handle"/>
+                <field name="department_id"/>
+                <field name="ward"/>
+                <field name="name"/>
+                <field name="specialty_id"/>
+                <field name="date_open" optional="show"/>
+                <field name="date_close" optional="show"/>
+                <field name="is_occupied"/>
+                <field name="admission_id" optional="show"/>
+                <field name="note" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bed_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.bed.form</field>
+        <field name="model">l10n_ua.medecin.bed</field>
+        <field name="arch" type="xml">
+            <form string="Ліжко">
+                <sheet>
+                    <widget name="web_ribbon" title="Архівовано" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="department_id"/>
+                            <field name="ward"/>
+                            <field name="name"/>
+                            <field name="specialty_id"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_open"/>
+                            <field name="date_close"/>
+                            <field name="is_occupied"/>
+                            <field name="admission_id" invisible="not admission_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Примітка"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bed_search" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.bed.search</field>
+        <field name="model">l10n_ua.medecin.bed</field>
+        <field name="arch" type="xml">
+            <search string="Пошук ліжок">
+                <field name="name"/>
+                <field name="ward"/>
+                <field name="department_id"/>
+                <field name="specialty_id"/>
+                <filter string="Вільні" name="filter_free" domain="[('is_occupied', '=', False)]"/>
+                <filter string="Зайняті" name="filter_occupied" domain="[('is_occupied', '=', True)]"/>
+                <separator/>
+                <filter string="Архівовані" name="filter_inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Відділення" name="groupby_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Палата" name="groupby_ward" domain="[]"
+                            context="{'group_by': 'ward'}"/>
+                    <filter string="Профіль ліжка" name="groupby_specialty" domain="[]"
+                            context="{'group_by': 'specialty_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bed" model="ir.actions.act_window">
+        <field name="name">Ліжковий фонд</field>
+        <field name="res_model">l10n_ua.medecin.bed</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bed_search"/>
+        <field name="context">{'search_default_groupby_department': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ліжок ще немає</p>
+            <p>Додайте ліжка відділень (палата, номер, профіль) — з них
+                рахується ліжковий фонд і ф. 007/о.</p>
+        </field>
+    </record>
+
+    <!-- Відділення: ліжковий фонд -->
+    <record id="view_department_list_bed_fund" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.department.list.bed.fund</field>
+        <field name="model">l10n_ua.medecin.department</field>
+        <field name="inherit_id" ref="view_department_list"/>
+        <field name="arch" type="xml">
+            <field name="head_id" position="after">
+                <field name="bed_count"/>
+                <field name="bed_occupied_count"/>
+                <field name="bed_free_count"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_department_form_bed_fund" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.department.form.bed.fund</field>
+        <field name="model">l10n_ua.medecin.department</field>
+        <field name="inherit_id" ref="view_department_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/widget[@name='web_ribbon']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_beds" type="object" class="oe_stat_button"
+                            icon="fa-bed">
+                        <field name="bed_count" widget="statinfo" string="Ліжок"/>
+                    </button>
+                </div>
+            </xpath>
+            <field name="head_id" position="after">
+                <field name="bed_occupied_count"/>
+                <field name="bed_free_count"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Переведення між відділеннями -->
+    <record id="view_admission_transfer_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.transfer.form</field>
+        <field name="model">l10n_ua.medecin.admission.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Переведення в інше відділення">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="admission_id" readonly="1"/>
+                            <field name="department_from_id" readonly="1" force_save="1"/>
+                            <field name="department_to_id" readonly="id"
+                                   domain="[('id', '!=', department_from_id), ('company_id', '=', company_id)]"/>
+                            <field name="bed_id" invisible="not department_to_id"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="doctor_id"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Причина переведення"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_admission_transfer_list" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.transfer.list</field>
+        <field name="model">l10n_ua.medecin.admission.transfer</field>
+        <field name="arch" type="xml">
+            <list string="Переведення між відділеннями">
+                <field name="date"/>
+                <field name="department_from_id"/>
+                <field name="department_to_id"/>
+                <field name="bed_id"/>
+                <field name="doctor_id"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Епізод: ліжко і переведення -->
+    <record id="view_admission_form_bed" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.form.bed</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="inherit_id" ref="view_admission_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_discharge']" position="after">
+                <button name="action_transfer" string="Перевести у відділення" type="object"
+                        invisible="state != 'admitted'"/>
+            </xpath>
+            <xpath expr="//field[@name='department_id']" position="attributes">
+                <attribute name="readonly">state not in ('draft', 'admitted') or transfer_count</attribute>
+            </xpath>
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="bed_id" readonly="state not in ('draft', 'admitted')"
+                       invisible="not department_id"/>
+                <field name="transfer_count" invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Переведення" name="transfers" invisible="not transfer_count">
+                    <field name="transfer_ids" nolabel="1" readonly="state != 'admitted'">
+                        <list create="0" editable="bottom">
+                            <field name="date"/>
+                            <field name="department_from_id" readonly="1"/>
+                            <field name="department_to_id" readonly="1"/>
+                            <field name="bed_id" readonly="1"/>
+                            <field name="doctor_id" readonly="1"/>
+                            <field name="note"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_admission_list_bed" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.list.bed</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="inherit_id" ref="view_admission_list"/>
+        <field name="arch" type="xml">
+            <field name="department_id" position="after">
+                <field name="bed_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

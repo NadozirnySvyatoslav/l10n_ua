@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_report_007o"
+              name="Рух хворих (ф. 007/о)"
+              parent="l10n_ua_medecin_base.menu_medecin_reporting"
+              action="action_report_007o_wizard"
+              sequence="41"/>
+
+    <menuitem id="menu_bed_indicators"
+              name="Показники ліжкового фонду"
+              parent="l10n_ua_medecin_base.menu_medecin_reporting"
+              action="action_bed_indicators_wizard"
+              sequence="42"/>
+
+    <menuitem id="menu_bed"
+              name="Ліжковий фонд"
+              parent="l10n_ua_medecin_base.menu_medecin_config"
+              action="action_bed"
+              sequence="51"/>
+</odoo>

@@ -359,8 +359,8 @@ msgstr "Дата до"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,help:l10n_ua_hr_contract.field_hr_termination_reason__notice_days
-msgid "Days of advance notice required"
-msgstr "Необхідна кількість днів попередження"
+msgid "Days of advance notice required. A multiple of 30 is read as calendar months: 60 is the two months of art. 49-2 of the Labour Code, counted from the notice date."
+msgstr "Строк попередження в днях. Кратне 30 число — календарні місяці: 60 — два місяці за ст. 49-2 КЗпП, від дати попередження."
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_allowance_type__default_amount
@@ -853,8 +853,8 @@ msgstr "Кількість повідомлень з помилкою доста
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_termination_reason__compensation_amount__one_month
-msgid "One Month Salary"
-msgstr "Місячний оклад"
+msgid "One Average Monthly Earnings"
+msgstr "Один середньомісячний заробіток"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,field_description:l10n_ua_hr_contract.field_hr_document_mixin__order_date
@@ -1269,8 +1269,8 @@ msgstr ""
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_termination_reason__compensation_amount__three_months
-msgid "Three Months Salary"
-msgstr "Тримісячний оклад"
+msgid "Three Average Monthly Earnings"
+msgstr "Три середньомісячні заробітки"
 
 #. module: l10n_ua_hr_contract
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_contract.hr_employee_view_form_version_ua
@@ -1307,8 +1307,8 @@ msgstr "Переведення (ст. 36 п.5)"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_termination_reason__compensation_amount__two_months
-msgid "Two Months Salary"
-msgstr "Двомісячний оклад"
+msgid "Two Average Monthly Earnings"
+msgstr "Два середньомісячні заробітки"
 
 #. module: l10n_ua_hr_contract
 #: model:ir.model.fields,help:l10n_ua_hr_contract.field_hr_job_combining__activity_exception_decoration
@@ -1717,3 +1717,18 @@ msgstr ""
 "договору мала: %(allowances)s. Досі нова версія не переносила надбавок, але ця "
 "ще й змінила умови оплати, тож їх могли зняти наказом: оновлення їх не "
 "повертає. Якщо наказ про них досі чинний, додайте їх до цієї версії."
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_termination_reason__compensation_amount__six_months
+msgid "Six Average Monthly Earnings"
+msgstr "Шість середньомісячних заробітків"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields.selection,name:l10n_ua_hr_contract.selection__hr_termination_reason__compensation_amount__two_min_wages
+msgid "Two Minimum Wages"
+msgstr "Дві мінімальні заробітні плати"
+
+#. module: l10n_ua_hr_contract
+#: model:ir.model.fields,help:l10n_ua_hr_contract.field_hr_termination_reason__compensation_amount
+msgid "Severance pay (art. 44 of the Labour Code) as a number of average monthly earnings, computed from the last two calendar months (Procedure No. 100), or two minimum wages on conscription."
+msgstr "Вихідна допомога (ст. 44 КЗпП): кількість середньомісячних заробітків за два останні календарні місяці (Порядок № 100) або дві мінімальні заробітні плати при призові."

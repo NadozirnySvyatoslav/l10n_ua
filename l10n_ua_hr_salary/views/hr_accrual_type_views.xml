@@ -17,6 +17,7 @@
                         <group>
                             <field name="code"/>
                             <field name="category"/>
+                            <field name="l10n_ua_bonus_months" invisible="category != 'bonus'"/>
                             <field name="calculation_method"/>
                             <field name="sequence"/>
                             <field name="active"/>

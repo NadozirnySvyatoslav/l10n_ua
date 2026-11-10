@@ -9,7 +9,9 @@ hr.work.schedule itself (#213, phase 2): the weekly norm is now kept on the
 native resource.calendar and covered by test_resource_calendar_ua.py.
 """
 
-from odoo.tests import tagged
+from datetime import date
+
+from odoo.tests import TransactionCase, tagged
 from .common import ContractTestCase
 
 
@@ -115,3 +117,31 @@ class TestStaffReductionReason(ContractTestCase):
         self.assertNotEqual(reduction, liquidation)
         self.assertEqual(reduction.kzpt_code, liquidation.kzpt_code)
         self.assertNotEqual(reduction.code, liquidation.code)
+
+
+@tagged('post_install', '-at_install')
+class TestTerminationReasonLabourCode505(TransactionCase):
+    """#505: ст. 43 (згода профспілки), ст. 44 (вихідна допомога), ст. 49-2."""
+
+    def _ref(self, name):
+        return self.env.ref('l10n_ua_hr_contract.termination_reason_%s' % name)
+
+    def test_union_consent_per_article_43(self):
+        for name in ('reduction', 'reorganization', 'incompetence', 'systematic',
+                     'absence', 'long_absence', 'intoxication', 'trust', 'immoral'):
+            self.assertTrue(self._ref(name).requires_union_consent, name)
+        for name in ('liquidation', 'own_will', 'agreement', 'theft', 'reinstatement'):
+            self.assertFalse(self._ref(name).requires_union_consent, name)
+
+    def test_severance_per_article_44(self):
+        self.assertEqual(self._ref('military').compensation_amount, 'two_min_wages')
+        self.assertFalse(self._ref('long_absence').requires_compensation)
+        self.assertEqual(self._ref('reinstatement').compensation_amount, 'one_month')
+
+    def test_notice_two_calendar_months(self):
+        reduction = self._ref('reduction')
+        self.assertEqual(reduction._notice_deadline(date(2025, 12, 31)), date(2026, 2, 28))
+        self.assertEqual(reduction._notice_deadline(date(2025, 3, 10)), date(2025, 5, 10))
+        own = self._ref('own_will')  # 14 днів — дні, не місяці
+        self.assertEqual(own._notice_deadline(date(2025, 3, 10)), date(2025, 3, 24))
+        self.assertFalse(reduction._notice_deadline(False))

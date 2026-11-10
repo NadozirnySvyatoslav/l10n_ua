@@ -383,30 +383,23 @@ class HrVacationReserveLine(models.Model):
 
     @api.depends('employee_id', 'reserve_id.period_end')
     def _compute_daily_average(self):
-        """Середньоденний заробіток = sum(payslip.net за 12 місяців до кінця періоду) / (12 × 29.3)."""
-        Payslip = self.env['hr.payslip']
+        """Середньоденний заробіток — та сама база, що й для відпускних.
+
+        Порядок № 100: нарахована (не виплачена) зарплата за 12 календарних
+        місяців до кінця періоду резерву / (календарні дні − святкові − дні
+        без збереження зарплати). Рахує ``hr.leave._l10n_ua_vacation_average``,
+        тож премії за квартал/рік, перерахунки й виключені періоди тут ті самі,
+        що у відпускних.
+        """
+        Leave = self.env['hr.leave']
         for line in self:
             if not line.employee_id or not line.reserve_id.period_end:
                 line.daily_average = 0.0
                 continue
             period_end = line.reserve_id.period_end
-            period_start = period_end - relativedelta(months=12)
-            payslips = Payslip.search([
-                ('employee_id', '=', line.employee_id.id),
-                ('state', 'in', ['done', 'paid']),
-                ('date_from', '>=', period_start),
-                ('date_to', '<=', period_end),
-            ])
-            if not payslips:
-                # Fallback to contract wage. Оклад може бути у валюті —
-                # курс на кінець періоду резерву.
-                contract = line.employee_id.version_id
-                wage = contract._l10n_ua_wage_in_company_currency(
-                    period_end) if contract else 0.0
-                line.daily_average = round(wage / 29.3, 2)
-                continue
-            total = sum(payslips.mapped('total_net') or [0.0])
-            line.daily_average = round(total / (12 * 29.3), 2)
+            period_start = period_end - relativedelta(months=12) + relativedelta(days=1)
+            line.daily_average = Leave._l10n_ua_vacation_average(
+                line.employee_id, period_start, period_end)
 
     @api.depends('days_accrued', 'daily_average')
     def _compute_amount(self):

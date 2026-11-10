@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="l10n_ua_bank_payment_view_form_mono" model="ir.ui.view">
+        <field name="name">l10n_ua.bank.payment.form.mono</field>
+        <field name="model">l10n_ua.bank.payment</field>
+        <field name="inherit_id" ref="l10n_ua_bank_payment.l10n_ua_bank_payment_view_form"/>
+        <field name="arch" type="xml">
+            <!-- The file + КЕП buttons belong to the file method only. -->
+            <xpath expr="//button[@name='action_generate_file']" position="attributes">
+                <attribute name="invisible">transfer_method == 'mono_api' or state not in ('draft', 'generated')</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_kep_sign']" position="attributes">
+                <attribute name="invisible">transfer_method == 'mono_api' or state not in ('generated', 'signed')</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_mark_sent']" position="attributes">
+                <attribute name="invisible">transfer_method == 'mono_api' or state != 'signed'</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_generate_file']" position="before">
+                <button name="action_mono_send" string="Send to monobank"
+                        type="object" class="btn-primary"
+                        invisible="transfer_method != 'mono_api' or not mono_unsent"
+                        confirm="The payments will be prepared in monobank and wait there for the signature of the director. Continue?"/>
+                <button name="action_mono_refresh" string="Refresh Status"
+                        type="object"
+                        invisible="transfer_method != 'mono_api' or not mono_status"/>
+            </xpath>
+            <xpath expr="//field[@name='file_format']" position="before">
+                <field name="transfer_method" widget="radio"/>
+                <field name="mono_config_id"
+                       invisible="transfer_method != 'mono_api'"
+                       required="transfer_method == 'mono_api'"/>
+            </xpath>
+            <xpath expr="//field[@name='file_format']" position="attributes">
+                <attribute name="invisible">transfer_method == 'mono_api'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='total_amount']" position="after">
+                <field name="mono_unsent" invisible="1"/>
+                <field name="mono_status" widget="badge"
+                       invisible="not mono_status"
+                       decoration-success="mono_status == 'done'"
+                       decoration-info="mono_status == 'pending'"
+                       decoration-warning="mono_status == 'partial'"
+                       decoration-danger="mono_status in ('declined', 'error')"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='purpose']" position="after">
+                <field name="mono_pay_code" optional="hide" readonly="mono_payment_id"
+                       column_invisible="parent.transfer_method != 'mono_api'"/>
+                <field name="mono_additional_info" optional="hide" readonly="mono_payment_id"
+                       column_invisible="parent.transfer_method != 'mono_api'"/>
+                <field name="mono_ultimate_debit_name" optional="hide" readonly="mono_payment_id"
+                       column_invisible="parent.transfer_method != 'mono_api'"/>
+                <field name="mono_ultimate_debit_code" optional="hide" readonly="mono_payment_id"
+                       column_invisible="parent.transfer_method != 'mono_api'"/>
+                <field name="mono_state" widget="badge"
+                       column_invisible="parent.transfer_method != 'mono_api'"
+                       decoration-success="mono_state == 'in_statement'"
+                       decoration-info="mono_state == 'draft'"
+                       decoration-danger="mono_state in ('declined', 'error')"/>
+                <field name="mono_error" optional="show"
+                       column_invisible="parent.transfer_method != 'mono_api'"/>
+                <field name="mono_statement_line_id" optional="hide"
+                       column_invisible="parent.transfer_method != 'mono_api'"/>
+                <field name="mono_payment_id" column_invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='recipient_name']" position="attributes">
+                <attribute name="readonly">mono_payment_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='recipient_edrpou']" position="attributes">
+                <attribute name="readonly">mono_payment_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='recipient_iban']" position="attributes">
+                <attribute name="readonly">mono_payment_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='amount']" position="attributes">
+                <attribute name="readonly">mono_payment_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='purpose']" position="attributes">
+                <attribute name="readonly">mono_payment_id</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="l10n_ua_bank_payment_view_tree_mono" model="ir.ui.view">
+        <field name="name">l10n_ua.bank.payment.list.mono</field>
+        <field name="model">l10n_ua.bank.payment</field>
+        <field name="inherit_id" ref="l10n_ua_bank_payment.l10n_ua_bank_payment_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="mono_status" widget="badge" optional="show"
+                       decoration-success="mono_status == 'done'"
+                       decoration-info="mono_status == 'pending'"
+                       decoration-warning="mono_status == 'partial'"
+                       decoration-danger="mono_status in ('declined', 'error')"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

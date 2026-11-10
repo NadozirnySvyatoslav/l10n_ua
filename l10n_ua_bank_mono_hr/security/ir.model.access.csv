@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mono_salary_registry_officer,l10n_ua.mono.salary.registry.officer,model_l10n_ua_mono_salary_registry,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,1
+access_mono_salary_registry_line_officer,l10n_ua.mono.salary.registry.line.officer,model_l10n_ua_mono_salary_registry_line,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,1
+access_mono_salary_registry_type_officer,l10n_ua.mono.salary.registry.type.officer,model_l10n_ua_mono_salary_registry_type,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,1
+access_mono_payslip_import_officer,l10n_ua.mono.payslip.import.officer,model_l10n_ua_mono_payslip_import,l10n_ua_hr_base.group_hr_ua_officer,1,1,1,1
+access_bank_sync_config_hr_officer,l10n_ua.bank.sync.config.hr.officer,l10n_ua_bank_sync.model_l10n_ua_bank_sync_config,l10n_ua_hr_base.group_hr_ua_officer,1,0,0,0

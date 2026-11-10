@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bank_sync_config_payment_user,l10n_ua.bank.sync.config.payment.user,l10n_ua_bank_sync.model_l10n_ua_bank_sync_config,account.group_account_user,1,0,0,0

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="mono_payslip_import_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.mono.payslip.import.form</field>
+        <field name="model">l10n_ua.mono.payslip.import</field>
+        <field name="arch" type="xml">
+            <form string="Payslips in the monobank App">
+                <header>
+                    <button name="action_upload" string="Upload to monobank" type="object"
+                            class="btn-primary" invisible="state not in ('draft', 'loaded', 'failed', 'deleted')"/>
+                    <button name="action_send" string="Publish to Employees" type="object"
+                            class="btn-primary" invisible="state != 'loaded'"
+                            confirm="The employees will see their payslips in the monobank app. Continue?"/>
+                    <button name="action_refresh_status" string="Refresh Status" type="object"
+                            invisible="state == 'draft'"/>
+                    <button name="action_sync_contacts" string="Sync Salary Contacts" type="object"/>
+                    <button name="action_delete_import" string="Delete in monobank" type="object"
+                            invisible="state not in ('loaded', 'failed', 'loading')"
+                            confirm="The whole import of the period will be deleted in monobank. Continue?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,loaded,sent"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="config_id" readonly="state != 'draft'"/>
+                            <field name="period" readonly="state != 'draft'" placeholder="2026-10"/>
+                            <field name="payslip_run_id" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="total_employees"/>
+                            <field name="success_employees"/>
+                            <field name="failed_employees"/>
+                            <field name="employees_sent" invisible="state != 'sent'"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert" invisible="not failed_details">
+                        <field name="failed_details"/>
+                    </div>
+                    <field name="payslip_ids" readonly="state not in ('draft', 'deleted')">
+                        <list>
+                            <field name="employee_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="net_salary"/>
+                            <field name="state" widget="badge"/>
+                            <button name="action_mono_payslip_pdf" type="object"
+                                    string="PDF" icon="fa-file-pdf-o"
+                                    column_invisible="parent.state not in ('loaded', 'sent')"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="mono_payslip_import_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.mono.payslip.import.list</field>
+        <field name="model">l10n_ua.mono.payslip.import</field>
+        <field name="arch" type="xml">
+            <list string="Payslips in the monobank App"
+                  decoration-success="state == 'sent'" decoration-muted="state == 'deleted'">
+                <field name="period"/>
+                <field name="config_id"/>
+                <field name="total_employees"/>
+                <field name="failed_employees"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'sent'"
+                       decoration-info="state == 'loaded'"
+                       decoration-danger="state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_mono_payslip_import" model="ir.actions.act_window">
+        <field name="name">Payslips in the monobank App</field>
+        <field name="res_model">l10n_ua.mono.payslip.import</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_mono_payslip_import"
+              name="monobank: розрахункові листи"
+              parent="l10n_ua_hr_salary.menu_hr_payroll_root"
+              action="action_mono_payslip_import"
+              sequence="53"
+              groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+
+</odoo>

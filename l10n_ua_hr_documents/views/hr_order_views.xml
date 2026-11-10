@@ -30,6 +30,26 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="order_type != 'dismissal' or not union_consent_required">
+                        Ця підстава потребує попередньої згоди виборного органу первинної
+                        профспілкової організації (ст. 43 КЗпП), якщо працівник — член профспілки.
+                        Під час воєнного стану ст. 43 не застосовується, крім працівників,
+                        обраних до профспілкових органів (ч. 2 ст. 5 Закону № 2136-IX).
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="order_type != 'dismissal' or not notice_missing">
+                        Підстава вимагає попередити працівника заздалегідь (ст. 49-2 КЗпП).
+                        Вкажіть дату попередження — Odoo перевірить строк.
+                    </div>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="order_type != 'dismissal' or not notice_short">
+                        Строк попередження не витримано: звільнити можна не раніше
+                        <field name="notice_deadline" readonly="1" class="d-inline"/>.
+                    </div>
+                    <field name="union_consent_required" invisible="1"/>
+                    <field name="notice_missing" invisible="1"/>
+                    <field name="notice_short" invisible="1"/>
                     <!-- Empty on its own; the anchor modules linking an order
                          to another document hang their smart buttons on. -->
                     <div class="oe_button_box" name="button_box"/>
@@ -79,6 +99,9 @@
                             <field name="date_dismissal" invisible="order_type != 'dismissal'"/>
                             <field name="termination_reason_id" invisible="order_type != 'dismissal'"
                                    options="{'no_create': True}"/>
+                            <field name="date_notice" invisible="order_type != 'dismissal'"/>
+                            <field name="notice_deadline" invisible="not notice_deadline"/>
+                            <field name="severance_info" invisible="not severance_info"/>
                             <field name="dismissal_reason" invisible="order_type != 'dismissal'"/>
                             <field name="include_vacation_compensation" invisible="order_type != 'dismissal'"/>
                             <field name="unused_vacation_days" invisible="order_type != 'dismissal' or not include_vacation_compensation"/>

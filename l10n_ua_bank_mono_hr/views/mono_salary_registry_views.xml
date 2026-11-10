@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="mono_salary_registry_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.mono.salary.registry.form</field>
+        <field name="model">l10n_ua.mono.salary.registry</field>
+        <field name="arch" type="xml">
+            <form string="monobank Salary Registry">
+                <header>
+                    <button name="action_send" string="Send to monobank" type="object"
+                            class="btn-primary" invisible="state not in ('draft', 'loading')"
+                            confirm="The registry will be created in monobank and wait there for the signature of the director. Continue?"/>
+                    <button name="action_refresh_status" string="Refresh Status" type="object"
+                            invisible="not bank_registry_id or state in ('draft', 'loading')"/>
+                    <button name="action_sync_contacts" string="Sync Salary Contacts" type="object"/>
+                    <button name="action_fetch_types" string="Fetch Registry Types" type="object"
+                            invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,finalized,prepared,succeeded"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="config_id" readonly="state != 'draft'"/>
+                            <field name="registry_type_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to" readonly="state != 'draft'"/>
+                            <field name="payslip_run_id" readonly="1"
+                                   invisible="not payslip_run_id"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="line_count"/>
+                            <field name="total_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="bank_registry_id" invisible="not bank_registry_id"/>
+                            <field name="registry_reference" invisible="not registry_reference"/>
+                            <field name="status_updated_at" invisible="not status_updated_at"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-danger" role="alert" invisible="not decline_reason">
+                        <field name="decline_reason"/>
+                    </div>
+                    <field name="line_ids" readonly="state != 'draft'">
+                        <list editable="bottom">
+                            <field name="employee_id"/>
+                            <field name="full_name"/>
+                            <field name="inn"/>
+                            <field name="document_type" optional="hide"/>
+                            <field name="document_series" optional="hide"/>
+                            <field name="document_number" optional="hide"/>
+                            <field name="iban"/>
+                            <field name="amount" sum="Total"/>
+                            <field name="additional_purpose" optional="hide"/>
+                            <field name="payslip_id" optional="hide"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="mono_salary_registry_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.mono.salary.registry.list</field>
+        <field name="model">l10n_ua.mono.salary.registry</field>
+        <field name="arch" type="xml">
+            <list string="monobank Salary Registries"
+                  decoration-success="state == 'succeeded'"
+                  decoration-danger="state in ('failed', 'change_required')">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="config_id"/>
+                <field name="registry_type_id"/>
+                <field name="line_count"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'succeeded'"
+                       decoration-info="state in ('finalized', 'saved', 'in_progress', 'prepared')"
+                       decoration-danger="state in ('failed', 'change_required')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="mono_salary_registry_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.mono.salary.registry.search</field>
+        <field name="model">l10n_ua.mono.salary.registry</field>
+        <field name="arch" type="xml">
+            <search string="monobank Salary Registries">
+                <field name="name"/>
+                <field name="config_id"/>
+                <filter string="In progress" name="filter_open"
+                        domain="[('state', 'not in', ('succeeded', 'failed'))]"/>
+                <filter string="Need attention" name="filter_problem"
+                        domain="[('state', 'in', ('failed', 'change_required'))]"/>
+                <group>
+                    <filter string="Status" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mono_salary_registry" model="ir.actions.act_window">
+        <field name="name">monobank Salary Registries</field>
+        <field name="res_model">l10n_ua.mono.salary.registry</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="mono_salary_registry_type_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.mono.salary.registry.type.list</field>
+        <field name="model">l10n_ua.mono.salary.registry.type</field>
+        <field name="arch" type="xml">
+            <list string="monobank Registry Types" create="0">
+                <field name="config_id"/>
+                <field name="alias"/>
+                <field name="name"/>
+                <field name="additional_purpose_allowed"/>
+            </list>
+        </field>
+    </record>
+
+    <menuitem id="menu_mono_salary_registry"
+              name="monobank: зарплатні відомості"
+              parent="l10n_ua_hr_salary.menu_hr_payroll_root"
+              action="action_mono_salary_registry"
+              sequence="52"
+              groups="l10n_ua_hr_base.group_hr_ua_officer"/>
+
+</odoo>
