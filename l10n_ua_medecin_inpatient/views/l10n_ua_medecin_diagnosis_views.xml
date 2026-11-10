@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Діагнози та втручання на картці епізоду (#225) -->
+    <record id="view_admission_form_diagnosis" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.form.diagnosis</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="inherit_id" ref="view_admission_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='notes']" position="before">
+                <page string="Діагнози" name="diagnoses">
+                    <field name="diagnosis_ids" readonly="state == 'cancelled'">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="diagnosis_type"/>
+                            <field name="icd10_id"/>
+                            <field name="icd10_code" readonly="1"/>
+                            <field name="is_first_detected"/>
+                            <field name="date_established"/>
+                            <field name="is_chronic" optional="hide"/>
+                            <field name="note" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+                <page string="Втручання" name="procedures">
+                    <field name="procedure_ids" readonly="state == 'cancelled'"
+                           context="{'default_surgeon_id': doctor_id}">
+                        <list editable="bottom">
+                            <field name="date"/>
+                            <field name="procedure_type_id"/>
+                            <field name="name" optional="show"/>
+                            <field name="surgeon_id"/>
+                            <field name="anesthesiologist_id" optional="hide"/>
+                            <field name="anesthesia_type"/>
+                            <field name="is_emergency"/>
+                            <field name="has_complication"/>
+                            <field name="complication_note" optional="hide"/>
+                            <field name="company_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='bed_days']" position="after">
+                <field name="final_icd10_id" invisible="not final_icd10_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_admission_list_diagnosis" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.list.diagnosis</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="inherit_id" ref="view_admission_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bed_days']" position="after">
+                <field name="final_icd10_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_admission_search_diagnosis" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.admission.search.diagnosis</field>
+        <field name="model">l10n_ua.medecin.admission</field>
+        <field name="inherit_id" ref="view_admission_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="diagnosis_ids" string="Діагноз (МКХ-10)"
+                       filter_domain="[('diagnosis_ids.icd10_id', 'ilike', self)]"/>
+                <field name="procedure_ids" string="Втручання"
+                       filter_domain="['|', ('procedure_ids.code', 'ilike', self), ('procedure_ids.name', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Загальний список діагнозів: показати епізод стаціонару -->
+    <record id="view_diagnosis_list_admission" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.diagnosis.list.admission</field>
+        <field name="model">l10n_ua.medecin.diagnosis</field>
+        <field name="inherit_id" ref="l10n_ua_medecin_clinical.view_diagnosis_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='encounter_id']" position="after">
+                <field name="admission_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_diagnosis_search_admission" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.diagnosis.search.admission</field>
+        <field name="model">l10n_ua.medecin.diagnosis</field>
+        <field name="inherit_id" ref="l10n_ua_medecin_clinical.view_diagnosis_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_chronic']" position="before">
+                <filter string="Амбулаторні" name="filter_outpatient"
+                        domain="[('encounter_id', '!=', False)]"/>
+                <filter string="Стаціонарні" name="filter_inpatient"
+                        domain="[('admission_id', '!=', False)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

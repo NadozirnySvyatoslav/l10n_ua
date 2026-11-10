@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin Inpatient',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Стаціонар: епізод стаціонарного лікування (пролікований випадок), ліжко-дні',
     'description': """
@@ -18,6 +18,12 @@ Medecin Inpatient
 * Ф. 007/о «Листок обліку руху хворих і ліжкового фонду стаціонару» за добу
   (PDF) і показники за період: днів зайнятості ліжка на рік, обіг ліжка,
   середня тривалість перебування, летальність
+* Типізовані діагнози епізоду (при госпіталізації, клінічний, заключний,
+  патолого-анатомічний, супутні, ускладнення); рівно один заключний
+  діагноз у виписаного епізоду
+* Медичні (хірургічні) втручання — l10n_ua.medecin.procedure: дата, хірург,
+  анестезіолог, вид знеболення, екстреність, ускладнення; довідник кодів
+  втручань l10n_ua.medecin.procedure.type (під НК 026:2021 / АКМВ)
 
 Регуляторна база:
 
@@ -42,6 +48,8 @@ Medecin Inpatient
         'views/l10n_ua_medecin_bed_report_views.xml',
         'report/report_007o.xml',
         'views/menu_bed_views.xml',
+        'views/l10n_ua_medecin_diagnosis_views.xml',
+        'views/l10n_ua_medecin_procedure_views.xml',
     ],
     'demo': [],
     'images': ['static/description/icon.png'],

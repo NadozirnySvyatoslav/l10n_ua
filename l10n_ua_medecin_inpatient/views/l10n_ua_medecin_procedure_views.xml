@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Довідник медичних втручань -->
+    <record id="view_procedure_type_list" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.procedure.type.list</field>
+        <field name="model">l10n_ua.medecin.procedure.type</field>
+        <field name="arch" type="xml">
+            <list string="Медичні втручання" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="is_surgical"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_procedure_type_search" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.procedure.type.search</field>
+        <field name="model">l10n_ua.medecin.procedure.type</field>
+        <field name="arch" type="xml">
+            <search string="Пошук втручань">
+                <field name="code"/>
+                <field name="name"/>
+                <filter string="Хірургічні" name="filter_surgical" domain="[('is_surgical', '=', True)]"/>
+                <separator/>
+                <filter string="Архівні" name="filter_inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_procedure_type" model="ir.actions.act_window">
+        <field name="name">Медичні втручання (довідник)</field>
+        <field name="res_model">l10n_ua.medecin.procedure.type</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_procedure_type_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Довідник втручань порожній</p>
+            <p>Імпортуйте коди та назви з класифікатора медичних втручань
+                НК 026:2021 (АКМВ) або додайте потрібні вручну.</p>
+        </field>
+    </record>
+
+    <!-- Втручання -->
+    <record id="view_procedure_list" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.procedure.list</field>
+        <field name="model">l10n_ua.medecin.procedure</field>
+        <field name="arch" type="xml">
+            <list string="Медичні втручання">
+                <field name="date"/>
+                <field name="admission_id"/>
+                <field name="patient_id"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="surgeon_id"/>
+                <field name="anesthesia_type" optional="show"/>
+                <field name="is_emergency" optional="show"/>
+                <field name="has_complication" optional="show"/>
+                <field name="department_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_procedure_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.procedure.form</field>
+        <field name="model">l10n_ua.medecin.procedure</field>
+        <field name="arch" type="xml">
+            <form string="Медичне втручання">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="admission_id"/>
+                            <field name="patient_id"/>
+                            <field name="procedure_type_id"/>
+                            <field name="name"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="surgeon_id"/>
+                            <field name="anesthesiologist_id"/>
+                            <field name="anesthesia_type"/>
+                            <field name="is_emergency"/>
+                            <field name="has_complication"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Ускладнення" invisible="not has_complication">
+                        <field name="complication_note" nolabel="1" colspan="2"/>
+                    </group>
+                    <group string="Примітка">
+                        <field name="note" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_procedure_search" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.procedure.search</field>
+        <field name="model">l10n_ua.medecin.procedure</field>
+        <field name="arch" type="xml">
+            <search string="Пошук втручань">
+                <field name="procedure_type_id"/>
+                <field name="patient_id"/>
+                <field name="surgeon_id"/>
+                <field name="admission_id"/>
+                <filter string="Екстрені" name="filter_emergency" domain="[('is_emergency', '=', True)]"/>
+                <filter string="З ускладненнями" name="filter_complication" domain="[('has_complication', '=', True)]"/>
+                <separator/>
+                <filter string="Дата" name="filter_date" date="date"/>
+                <group>
+                    <filter string="Втручання" name="groupby_type" domain="[]"
+                            context="{'group_by': 'procedure_type_id'}"/>
+                    <filter string="Хірург" name="groupby_surgeon" domain="[]"
+                            context="{'group_by': 'surgeon_id'}"/>
+                    <filter string="Відділення" name="groupby_department" domain="[]"
+                            context="{'group_by': 'department_id'}"/>
+                    <filter string="Вид знеболення" name="groupby_anesthesia" domain="[]"
+                            context="{'group_by': 'anesthesia_type'}"/>
+                    <filter string="Місяць" name="groupby_month" domain="[]"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_procedure_pivot" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.procedure.pivot</field>
+        <field name="model">l10n_ua.medecin.procedure</field>
+        <field name="arch" type="xml">
+            <pivot string="Аналіз втручань" sample="1">
+                <field name="procedure_type_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_procedure" model="ir.actions.act_window">
+        <field name="name">Втручання</field>
+        <field name="res_model">l10n_ua.medecin.procedure</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="search_view_id" ref="view_procedure_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Втручань ще немає</p>
+            <p>Втручання вносяться на вкладці «Втручання» епізоду стаціонарного лікування.</p>
+        </field>
+    </record>
+
+    <!-- Меню (#225); розділи визначені в menu_views.xml -->
+    <menuitem id="menu_procedure"
+              name="Втручання"
+              parent="menu_inpatient_section"
+              action="action_procedure"
+              sequence="30"/>
+
+    <menuitem id="menu_procedure_type"
+              name="Медичні втручання"
+              parent="l10n_ua_medecin_base.menu_medecin_config"
+              action="action_procedure_type"
+              sequence="55"/>
+</odoo>
