@@ -205,3 +205,29 @@ class TestOffBalanceRegister(TransactionCase):
                 'line_ids': [(0, 0, {'account_id': self.acc_rented.id,
                                      'debit': 15000.0, 'credit': 0.0})],
             })
+    def test_offbalance_osv_print_report(self):
+        """Print button should return report action and QWeb HTML renders properly."""
+        self.env.company.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        self._entry(date(2026, 5, 10), [{
+            'account_id': self.acc_rented.id, 'direction': 'debit',
+            'partner_id': self.lessor.id, 'name': 'Трактор орендований',
+            'quantity': 1, 'amount': 80000.0,
+        }])
+        osv = self.env['l10n_ua.offbalance.osv'].create({
+            'period_start': date(2026, 5, 1),
+            'period_end': date(2026, 5, 31),
+            'company_id': self.company.id,
+            'by_partner': True,
+        })
+        action = osv.action_print()
+        self.assertEqual(action.get('type'), 'ir.actions.report')
+        self.assertEqual(action.get('report_name'), 'l10n_ua_account_base.report_offbalance_osv')
+
+        report = self.env.ref('l10n_ua_account_base.action_report_offbalance_osv')
+        html, _ = report._render_qweb_html(report.report_name, osv.ids)
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('ОБОРОТНО-САЛЬДОВА ВІДОМІСТЬ ПО КЛАСУ 0', html_str)
+        self.assertIn('80 000.00', html_str)
+        self.assertIn(self.acc_rented.code, html_str)
+        self.assertIn(self.lessor.name, html_str)
+

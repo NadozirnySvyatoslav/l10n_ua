@@ -7752,17 +7752,13 @@ msgid "Off-Balance Movements (Class 0)"
 msgstr "Рух по позабалансових рахунках (клас 0)"
 
 #. module: l10n_ua_account_base
-#: model:ir.ui.menu,name:l10n_ua_account_base.menu_l10n_ua_offbalance_osv
-msgid "Off-Balance Trial Balance"
-msgstr "ОСВ по позабалансових рахунках"
-
-#. module: l10n_ua_account_base
 #: model:ir.actions.act_window,name:l10n_ua_account_base.l10n_ua_offbalance_osv_action
+#: model:ir.actions.report,name:l10n_ua_account_base.action_report_offbalance_osv
 #: model:ir.model,name:l10n_ua_account_base.model_l10n_ua_offbalance_osv
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_list
 msgid "Off-Balance Trial Balance (Class 0)"
-msgstr "ОСВ по позабалансових рахунках (клас 0)"
+msgstr "ОСВ по класу 0"
 
 #. module: l10n_ua_account_base
 #: model:ir.model,name:l10n_ua_account_base.model_l10n_ua_offbalance_osv_line
