@@ -7788,6 +7788,11 @@ msgid "Posted"
 msgstr "Проведено"
 
 #. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_offbalance_osv_view_form
+msgid "Print"
+msgstr "Друк"
+
+#. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__quantity_in
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__quantity_in
 msgid "Qty In"
