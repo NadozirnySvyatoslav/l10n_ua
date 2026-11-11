@@ -63,3 +63,35 @@
 ```
 
 Не називати тест-метод `test_sequence` — Odoo 19 мовчки пропускає всі тести модуля.
+
+## Опис модуля для Odoo Apps
+
+Сторінку модуля в Apps будує `static/description/index.html`. Правила:
+
+- **Файл — повний HTML-документ із кодуванням.** Без `<meta charset="UTF-8">` Apps
+  читає файл як Latin-1, і українська стає «ÐÐ¾Ð³Ð¾…» (10.11.2026 так зламались 13 модулів).
+  Шаблон:
+
+  ```html
+  <!DOCTYPE html>
+  <html lang="uk">
+  <head>
+      <meta charset="UTF-8">
+  </head>
+  <body>
+  <section>…</section>
+  </body>
+  </html>
+  ```
+
+- Поруч `icon.png` (128×128) — без нього в Apps стоїть порожня іконка.
+- Картинки — відносні шляхи до файлів у `static/description/` (Apps переписує їх на CDN).
+- Перед PR, що зачіпає `static/description/`:
+
+  ```bash
+  python3 docs/tools/apps_check/check_descriptions.py
+  ```
+
+  Помилка = PR не зливаємо. Ця ж перевірка працює в GitHub Actions на кожен PR.
+- Після публікації відкрий сторінку `https://apps.odoo.com/apps/modules/<версія>/<модуль>`
+  і перевір, що текст читається.
