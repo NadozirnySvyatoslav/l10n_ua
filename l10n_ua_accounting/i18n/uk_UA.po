@@ -7483,9 +7483,10 @@ msgstr "Чиста вартість реалізації не може бути 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_writedown
 msgid ""
-"Net write-down of this product by earlier posted documents: the limit of a "
-"reversal (п. 28)."
-msgstr "Сума уцінки товару попередніми проведеними документами за вирахуванням відновлень — межа відновлення (п. 28)."
+"Part of earlier posted write-downs of this product that is still in the "
+"quantity on hand: the limit of a reversal (п. 28). Updated by «Fill» and on "
+"posting."
+msgstr "Частина попередніх проведених уцінок товару, що припадає на поточний залишок, — межа відновлення (п. 28). Оновлюється кнопкою «Заповнити» і під час проведення."
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__new_unit_cost
@@ -7626,3 +7627,45 @@ msgstr "Документ уцінки"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__loss_account_id
 msgid "Write-down Loss Account"
 msgstr "Рахунок втрат від уцінки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_unit_writedown
+msgid "Earlier Write-down per Unit"
+msgstr "Попередня уцінка на одиницю"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_unit_writedown
+msgid "Net write-down per unit by earlier posted documents."
+msgstr "Уцінка на одиницю попередніми проведеними документами за вирахуванням відновлень."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_cost_cap
+msgid "Unit Cost Before Write-downs"
+msgstr "Ціна до уцінок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_cost_cap
+msgid "Unit cost before the earlier write-downs: a reversal does not raise the cost above it."
+msgstr "Ціна одиниці до попередніх уцінок: відновлення не підіймає ціну вище неї."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__done_move_count
+msgid "Done Move Count"
+msgstr "Кількість виконаних рухів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__done_move_count
+msgid "Done stock moves of the product at posting: a cancel is refused once the goods have moved."
+msgstr "Виконані складські рухи товару на момент проведення: якщо товар рухався, скасування заборонене."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Stock moves after the document date are already done for: %s. Date the write-down on or after the last move."
+msgstr "Після дати документа вже є виконані складські рухи: %s. Датуйте уцінку днем останнього руху або пізніше."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "The goods have moved since the write-down was posted: %s. Post a new write-down (or a reversal) instead of cancelling."
+msgstr "Після проведення уцінки товар рухався: %s. Замість скасування проведіть нову уцінку (або відновлення)."

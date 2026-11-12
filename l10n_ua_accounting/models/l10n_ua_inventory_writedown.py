@@ -166,11 +166,21 @@ class L10nUaInventoryWritedown(models.Model):
         if later:
             raise UserError(_(
                 'A later write-down of the same goods is already posted: %s.', later.name))
+        # Уцінка заднім числом: рухи після дати документа вже оцінено за старою
+        # вартістю, нова вартість «на дату» розвела б склад і Головну книгу.
+        moved = self.line_ids.filtered(lambda l: l.writedown_amount or l.reversal_amount) \
+            ._done_moves([('date', '>', self._valuation_datetime())]).product_id
+        if moved:
+            raise UserError(_(
+                'Stock moves after the document date are already done for: %s. '
+                'Date the write-down on or after the last move.',
+                ', '.join(moved.mapped('display_name'))))
 
     def action_post(self):
         for rec in self:
+            if rec.state == 'draft':
+                rec.line_ids._refresh_book_value()
             rec._check_postable()
-            rec.line_ids._refresh_book_value()
             lines = rec.line_ids.filtered(lambda l: l.writedown_amount or l.reversal_amount)
             move = False
             if lines:
@@ -208,17 +218,34 @@ class L10nUaInventoryWritedown(models.Model):
         return True
 
     def action_cancel(self):
-        """Сторно проводки; вартість запасу повертається до облікової до уцінки."""
+        """Сторно проводки; вартість запасу повертається до облікової до уцінки.
+
+        Скасувати можна, лише поки товар не рухався після проведення: інакше
+        частину уцінки вже списано в собівартість, і повне сторно датою
+        документа розвело б склад і Головну книгу.
+        """
         for rec in self:
             if rec.state != 'posted':
                 continue
-            later = self.search([
-                ('id', '!=', rec.id), ('company_id', '=', rec.company_id.id),
-                ('state', '=', 'posted'), ('date', '>=', rec.date), ('id', '>', rec.id),
-                ('line_ids.product_id', 'in', rec.line_ids.product_id.ids),
-            ], limit=1)
-            if later:
-                raise UserError(_('Cancel the later write-down first: %s.', later.name))
+            if rec.move_id:
+                # Пізніша — за датою; в межах однієї дати — за порядком проведення.
+                later = self.search([
+                    ('id', '!=', rec.id), ('company_id', '=', rec.company_id.id),
+                    ('state', '=', 'posted'),
+                    ('line_ids.product_id', 'in', rec.line_ids.product_id.ids),
+                    '|', ('date', '>', rec.date),
+                    '&', ('date', '=', rec.date), ('move_id', '>', rec.move_id.id),
+                ], limit=1)
+                if later:
+                    raise UserError(_('Cancel the later write-down first: %s.', later.name))
+                moved = rec.line_ids.filtered(
+                    lambda l: (l.writedown_amount or l.reversal_amount)
+                    and len(l._done_moves()) != l.done_move_count).product_id
+                if moved:
+                    raise UserError(_(
+                        'The goods have moved since the write-down was posted: %s. '
+                        'Post a new write-down (or a reversal) instead of cancelling.',
+                        ', '.join(moved.mapped('display_name'))))
             if rec.move_id and rec.move_id.state == 'posted':
                 rec.move_id._reverse_moves(default_values_list=[{
                     'date': rec.date,
@@ -285,9 +312,21 @@ class L10nUaInventoryWritedownLine(models.Model):
              'written down when the finished goods they go into are expected to '
              'sell at or above cost (НП(С)БО 9, п. 25).')
     prior_writedown = fields.Monetary(
-        string='Earlier Write-downs', compute='_compute_prior_writedown',
-        help='Net write-down of this product by earlier posted documents: the '
-             'limit of a reversal (п. 28).')
+        string='Earlier Write-downs', readonly=True,
+        help='Part of earlier posted write-downs of this product that is still in '
+             'the quantity on hand: the limit of a reversal (п. 28). Updated by '
+             '«Fill» and on posting.')
+    prior_unit_writedown = fields.Float(
+        string='Earlier Write-down per Unit', digits=(16, 6), readonly=True,
+        help='Net write-down per unit by earlier posted documents.')
+    prior_cost_cap = fields.Float(
+        string='Unit Cost Before Write-downs', digits=(16, 6), readonly=True,
+        help='Unit cost before the earlier write-downs: a reversal does not '
+             'raise the cost above it.')
+    done_move_count = fields.Integer(
+        readonly=True, copy=False,
+        help='Done stock moves of the product at posting: a cancel is refused '
+             'once the goods have moved.')
     writedown_amount = fields.Monetary(
         string='Write-down', compute='_compute_amounts', store=True)
     reversal_amount = fields.Monetary(
@@ -317,21 +356,40 @@ class L10nUaInventoryWritedownLine(models.Model):
             line.valuation_account_id = accounts.get('stock_valuation') \
                 or line.company_id.account_stock_valuation_id
 
-    @api.depends('product_id', 'writedown_id.date', 'writedown_id.company_id')
-    def _compute_prior_writedown(self):
-        for line in self:
-            if not line.product_id or not line.writedown_id.date:
-                line.prior_writedown = 0.0
-                continue
-            prior = self.search([
-                ('product_id', '=', line.product_id.id),
-                ('company_id', '=', line.company_id.id),
-                ('writedown_id.state', '=', 'posted'),
-                ('writedown_id.date', '<=', line.writedown_id.date),
-                ('id', '!=', line._origin.id or 0),
-            ])
-            line.prior_writedown = max(
-                0.0, sum(prior.mapped('writedown_amount')) - sum(prior.mapped('reversal_amount')))
+    def _prior_values(self, quantity, unit_cost):
+        """Ліміт сторно (п. 28) від попередніх проведених уцінок товару.
+
+        Ліміт — лише та частина уцінки, що припадає на поточний залишок:
+        уцінка на одиницю × кількість, і нова ціна не вище ціни до уцінки
+        (решту вже списано в собівартість проданого).
+        """
+        self.ensure_one()
+        prior = self.search([
+            ('product_id', '=', self.product_id.id),
+            ('company_id', '=', self.company_id.id),
+            ('writedown_id.state', '=', 'posted'),
+            ('writedown_id.date', '<=', self.writedown_id.date),
+            ('writedown_id', '!=', self.writedown_id.id),
+            ('quantity', '>', 0),
+        ])
+        per_unit = max(0.0, sum(
+            (p.writedown_amount - p.reversal_amount) / p.quantity for p in prior))
+        cap = max(prior.filtered('writedown_amount').mapped('previous_unit_cost'), default=0.0)
+        currency = self.currency_id or self.env.company.currency_id
+        limit = currency.round(min(per_unit * quantity, max(0.0, cap - unit_cost) * quantity))
+        return {
+            'prior_unit_writedown': per_unit,
+            'prior_cost_cap': cap,
+            'prior_writedown': max(0.0, limit),
+        }
+
+    def _done_moves(self, extra_domain=None):
+        """Виконані складські рухи товару рядка в компанії."""
+        return self.env['stock.move'].search([
+            ('product_id', 'in', self.product_id.ids),
+            ('company_id', 'in', self.company_id.ids),
+            ('state', '=', 'done'),
+        ] + (extra_domain or []))
 
     @api.onchange('nrv_unit')
     def _onchange_nrv_unit(self):
@@ -375,9 +433,14 @@ class L10nUaInventoryWritedownLine(models.Model):
             # Кінець дня документа: дата без часу дала б залишок на початок дня.
             product = line.product_id.with_company(line.company_id).with_context(
                 to_date=line.writedown_id._valuation_datetime())
+            qty = product.qty_available
+            value = line.currency_id.round(product.total_value)
+            # Суми рядка — stored compute від цих полів, тож у чернетці вони
+            # не застарівають від прихованого пошуку; ліміт оновлюється тут.
             line.write({
-                'quantity': product.qty_available,
-                'book_value': line.currency_id.round(product.total_value),
+                'quantity': qty,
+                'book_value': value,
+                **line._prior_values(qty, value / qty if qty else 0.0),
             })
 
     def _apply_new_value(self):
@@ -390,7 +453,10 @@ class L10nUaInventoryWritedownLine(models.Model):
         ProductValue = self.env['product.value'].sudo()
         for line in self.filtered(lambda l: l.writedown_amount or l.reversal_amount):
             product = line.product_id.with_company(line.company_id)
-            line.previous_unit_cost = line.book_unit_cost
+            line.write({
+                'previous_unit_cost': line.book_unit_cost,
+                'done_move_count': len(line._done_moves()),
+            })
             ProductValue.with_company(line.company_id).create({
                 'product_id': product.id,
                 'company_id': line.company_id.id,

@@ -59,9 +59,26 @@ class TestInventoryWritedown(AccountingTestCase):
         move.picked = True
         move._action_done()
 
+    @classmethod
+    def _deliver(cls, product, qty):
+        warehouse = cls.env['stock.warehouse'].search([('company_id', '=', cls.company.id)], limit=1)
+        move = cls.env['stock.move'].create({
+            'product_id': product.id,
+            'product_uom_qty': qty,
+            'product_uom': product.uom_id.id,
+            'location_id': warehouse.lot_stock_id.id,
+            'location_dest_id': cls.env.ref('stock.stock_location_customers').id,
+        })
+        move._action_confirm()
+        move._action_assign()
+        move.quantity = qty
+        move.picked = True
+        move._action_done()
+
     def _writedown(self, nrv, product=None, **vals):
+        vals.setdefault('date', fields.Date.today())
         doc = self.env['l10n_ua.inventory.writedown'].create({
-            'company_id': self.company.id, 'date': fields.Date.today(), **vals})
+            'company_id': self.company.id, **vals})
         doc.action_fill()
         line = doc.line_ids.filtered(lambda l: l.product_id == (product or self.product))
         if nrv is not None:
@@ -142,6 +159,62 @@ class TestInventoryWritedown(AccountingTestCase):
             sum(reversal.line_ids.filtered(lambda l: l.account_id == self.acc_946).mapped('credit')),
             400.0)
         self.assertAlmostEqual(self._value(), 1000.0)
+
+    def test_reversal_limited_to_quantity_on_hand(self):
+        """Ліміт сторно — уцінка на одиницю × поточний залишок, не вся уцінка.
+
+        10 од. по 100 уцінено до 90 (100 на 946), 9 од. продано; ЧВР решти
+        1 од. зросла до 150 → дохід 10 (а не min(60, 100) = 60), ціна 100.
+        """
+        first, _line = self._writedown(90.0)
+        first.action_post()
+        # Власний документ у ліміт не входить.
+        self.assertFalse(first.line_ids._prior_values(10, 90.0)['prior_writedown'])
+        second, line = self._writedown(None, date=fields.Date.add(fields.Date.today(), days=1))
+        values = line._prior_values(1, 90.0)
+        self.assertAlmostEqual(values['prior_unit_writedown'], 10.0)
+        self.assertAlmostEqual(values['prior_cost_cap'], 100.0)
+        line.write({'quantity': 1, 'book_value': 90.0, **values})
+        line.nrv_unit = 150.0
+        self.assertAlmostEqual(line.prior_writedown, 10.0)
+        self.assertAlmostEqual(line.reversal_amount, 10.0)
+        self.assertAlmostEqual(line.new_unit_cost, 100.0)
+
+    def test_cancel_refused_after_goods_moved(self):
+        """Уцінка → продаж частини → скасування заборонено: склад = ГК."""
+        doc, _line = self._writedown(80.0)
+        doc.action_post()
+        self._deliver(self.product, 5)
+        with self.assertRaisesRegex(UserError, 'moved'):
+            doc.action_cancel()
+        self.assertEqual(doc.state, 'posted')
+
+    def test_backdated_writedown_refused_after_moves(self):
+        """Уцінка заднім числом, коли після дати вже були рухи товару."""
+        doc, _line = self._writedown(None, date=fields.Date.subtract(fields.Date.today(), days=1))
+        # Товар надійшов сьогодні; рядок «на вчора» — вручну, щоб була сума уцінки.
+        self.env['l10n_ua.inventory.writedown.line'].create({
+            'writedown_id': doc.id, 'product_id': self.product.id,
+            'quantity': 10, 'book_value': 1000.0, 'nrv_unit': 80.0,
+        })
+        self.assertAlmostEqual(doc.total_writedown, 200.0)
+        with self.assertRaisesRegex(UserError, 'after the document date'):
+            doc._check_postable()
+
+    def test_cancel_checks_later_writedown_by_date(self):
+        """Пізніша за датою уцінка, створена раніше (менший id), блокує скасування."""
+        later, _line = self._writedown(
+            90.0, date=fields.Date.add(fields.Date.today(), days=1))
+        earlier, _line = self._writedown(80.0)
+        self.assertLess(later.id, earlier.id)
+        earlier.action_post()
+        later.action_post()
+        with self.assertRaisesRegex(UserError, 'later write-down'):
+            earlier.action_cancel()
+
+    def test_line_has_multicompany_rule(self):
+        rule = self.env.ref('l10n_ua_accounting.l10n_ua_inventory_writedown_line_company_rule')
+        self.assertEqual(rule.model_id.model, 'l10n_ua.inventory.writedown.line')
 
     def test_fifo_refused(self):
         fifo = self.env['product.category'].create({
