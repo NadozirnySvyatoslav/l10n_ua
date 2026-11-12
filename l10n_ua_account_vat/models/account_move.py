@@ -128,7 +128,9 @@ class AccountMove(models.Model):
         """Дата ПН за правилом визнання, застосовним до цієї операції.
 
         Касовий метод (п. 187.10 ПКУ): дата руху коштів. Поки оплати немає,
-        податкове зобовʼязання не виникло і ПН складати нема на що.
+        податкове зобовʼязання не виникло і ПН складати нема на що. Надходжень
+        може бути кілька, і на кожне складається своя ПН зі своєю датою
+        (`_l10n_ua_cash_settlements`); тут — дата першої з них.
 
         Перша подія (загальне правило, ст. 187): раніша з дати відвантаження
         і дати оплати. Дату відвантаження беремо як дату документа —
@@ -145,11 +147,7 @@ class AccountMove(models.Model):
 
         if rule == 'cash':
             if not settlements:
-                raise UserError(_(
-                    'За контрагентом «%s» застосовується касовий метод ПДВ, '
-                    'тож ПН складається за датою оплати. Документ ще не оплачений.',
-                    self.commercial_partner_id.display_name))
-            self._l10n_ua_check_single_tax_invoice_fits(settlements)
+                self._l10n_ua_raise_cash_unpaid()
             return settlements[0]
 
         # Перша подія. Післяоплата дати не зсуває: перша подія — відвантаження,
@@ -163,15 +161,23 @@ class AccountMove(models.Model):
         self._l10n_ua_check_single_tax_invoice_fits(settlements)
         return settlements[0]
 
+    def _l10n_ua_raise_cash_unpaid(self):
+        raise UserError(_(
+            'За контрагентом «%s» застосовується касовий метод ПДВ, '
+            'тож ПН складається за датою оплати. Документ ще не оплачений.',
+            self.commercial_partner_id.display_name))
+
     def _l10n_ua_check_single_tax_invoice_fits(self, settlements):
         """Відмовитись, якщо однією ПН операцію коректно не описати.
 
-        ПН тут одна на весь документ, а ПКУ прив'язує зобов'язання до події
-        і її суми. Збігається це лише тоді, коли подія одна й покриває
-        документ повністю. Інакше вийшла б ПН на повну суму датою першої
-        події — завищене зобов'язання в одному періоді й порожнеча в
-        наступному. Поділ по подіях — #255; доти відмова з поясненням чесніша
-        за мовчки виданий некоректний податковий документ.
+        Діє для першої події: ПН там одна на весь документ, а ПКУ прив'язує
+        зобов'язання до події і її суми. Збігається це лише тоді, коли подія
+        одна й покриває документ повністю. Інакше вийшла б ПН на повну суму
+        датою першої події — завищене зобов'язання в одному періоді й
+        порожнеча в наступному. Для касового методу поділ по надходженнях
+        реалізовано (#255); часткову передоплату за першою подією (ПН на аванс
+        + ПН на відвантаження решти) — ще ні, і доти відмова з поясненням
+        чесніша за мовчки виданий некоректний податковий документ.
         """
         self.ensure_one()
         if len(settlements) > 1:
@@ -189,23 +195,92 @@ class AccountMove(models.Model):
                 residual=formatLang(self.env, self.amount_residual,
                                     currency_obj=self.currency_id)))
 
-    def action_create_tax_invoice(self):
-        """Create a tax invoice (ПН) from customer/vendor invoice."""
+    # ------------------------------------------------------------------
+    # Касовий метод: ПН на кожне надходження (п. 187.10 ПКУ, #255)
+    # ------------------------------------------------------------------
+
+    def _l10n_ua_cash_settlements(self):
+        """Погашення документа з частками, які вони покривають, за порядком.
+
+        Повертає список словників ``partial``, ``date``, ``payment_move``,
+        ``share_before``, ``share_after``: частка документа (з ПДВ, у валюті
+        документа), покрита до цього погашення і разом із ним.
+
+        Набір погашень той самий, що в `_l10n_ua_settlement_dates`: будь-яке
+        зіставлення рядка розрахунків, крім курсової різниці. Порядок — за
+        датою надходження, далі за id, тобто стабільний між викликами: від
+        нього залежить розкладання копійок, і повторний виклик має дати ті
+        самі суми, що й перший.
+        """
         self.ensure_one()
-        if self.state != 'posted':
-            raise UserError(_('Створити ПН можна тільки для проведеного документа.'))
+        settlement_lines = self.line_ids.filtered(
+            lambda l: l.account_id.account_type in (
+                'asset_receivable', 'liability_payable'))
+        partials = settlement_lines.matched_debit_ids | settlement_lines.matched_credit_ids
+        exchange_moves = partials.exchange_move_id
 
-        if self.move_type in ('out_invoice', 'out_refund'):
-            invoice_type = 'issued'
-        elif self.move_type in ('in_invoice', 'in_refund'):
-            invoice_type = 'received'
-        else:
-            raise UserError(_('ПН можна створити тільки для рахунків.'))
+        entries = []
+        for partial in partials:
+            own_is_debit = partial.debit_move_id in settlement_lines
+            counterpart = partial.credit_move_id if own_is_debit else partial.debit_move_id
+            if counterpart.move_id in exchange_moves:
+                continue
+            amount = (partial.debit_amount_currency if own_is_debit
+                      else partial.credit_amount_currency)
+            entries.append({
+                'partial': partial,
+                'date': counterpart.date,
+                'payment_move': counterpart.move_id,
+                'amount': amount,
+            })
+        entries.sort(key=lambda e: (e['date'], e['partial'].id))
 
-        is_refund = self.move_type in ('out_refund', 'in_refund')
+        total = abs(sum(settlement_lines.mapped('amount_currency')))
+        covered = 0.0
+        for entry in entries:
+            entry['share_before'] = covered / total if total else 0.0
+            covered += entry['amount']
+            entry['share_after'] = covered / total if total else 0.0
+        return entries
 
-        # Build lines from invoice lines.
-        #
+    def _l10n_ua_split_bases(self, ilines, share_before, share_after):
+        """База кожного рядка ПН для надходження, що покриває частку документа.
+
+        Розподіл пропорційний: надходження з ПДВ покриває однакову частку
+        кожного рядка. Рахуємо кумулятивно — база рядка в цій ПН є різницею
+        округлених «покрито разом із цим надходженням» і «покрито до нього».
+        Так після повної оплати сума баз рядка по всіх ПН дорівнює рядку
+        документа до копійки, скільки б надходжень не було.
+
+        Підсумок ПН так само дорівнює округленій частці підсумку документа, а
+        копійчану різницю між ним і сумою рядків гасить останній рядок із
+        ненульовою сумою (на нульовому вона зникла б: база там — кількість ×
+        нульова ціна).
+        """
+        currency = self.company_currency_id
+        subtotals = {iline: iline.balance * self.direction_sign for iline in ilines}
+
+        def portion(amount):
+            return (currency.round(amount * share_after)
+                    - currency.round(amount * share_before))
+
+        bases = {iline: portion(subtotal) for iline, subtotal in subtotals.items()}
+        absorbers = ilines.filtered(lambda l: not currency.is_zero(subtotals[l]))
+        if absorbers:
+            last = absorbers[-1]
+            target = portion(sum(subtotals.values()))
+            others = sum(base for iline, base in bases.items() if iline != last)
+            bases[last] = currency.round(target - others)
+        return bases
+
+    def _l10n_ua_tax_invoice_line_vals(self, share=None, bases=None):
+        """Рядки ПН з рядків документа.
+
+        Без ``bases`` — на повну суму документа. З ``bases`` (касовий метод)
+        — на суму надходження: ціна лишається фактичною ціною постачання, а
+        кількість зменшується пропорційно, бо гр. 7 ПН — ціна одиниці, і
+        «розрізати» треба саме обсяг, за який надійшли кошти.
+        """
         # Фільтр саме `display_type == 'product'`: у Odoo 17+ звичайний рядок
         # має display_type 'product', а не порожній, тож умова `not display_type`
         # (написана під Odoo <=16) відкидала геть усі рядки й ПН виходила
@@ -215,11 +290,11 @@ class AccountMove(models.Model):
         # кількість при незмінній ціні. Доки цикл не виконувався, гілка refund
         # була безпечно порожньою; тепер вона створює документ, і без знаку РК
         # збільшував би зобов'язання замість зменшувати.
-        sign = -1 if is_refund else 1
+        sign = -1 if self.move_type in ('out_refund', 'in_refund') else 1
 
         line_vals = []
         seq = 10
-        for iline in self.invoice_line_ids.filtered(lambda l: l.display_type == 'product'):
+        for iline in self._l10n_ua_tax_invoice_source_lines():
             # Суму беремо з проводки, а не з `price_subtotal`: ПН завжди у
             # гривні (`currency_id` — related на валюту компанії), а проводка
             # вже перерахована за курсом документа. Перераховувати кожен рядок
@@ -231,6 +306,10 @@ class AccountMove(models.Model):
             # price_unit, і знижка зникла б. Для <CINA> в XML ЄРПН потрібна
             # саме фактична ціна постачання.
             net_unit_price = subtotal / iline.quantity if iline.quantity else 0.0
+            quantity = iline.quantity
+            if bases is not None:
+                quantity = (iline.quantity * bases[iline] / subtotal if subtotal
+                            else iline.quantity * share)
 
             line_vals.append((0, 0, {
                 'sequence': seq,
@@ -240,35 +319,120 @@ class AccountMove(models.Model):
                 # 1307 п. 16 рядок несе рівно один із двох кодів, тож який
                 # саме, вирішує тип номенклатури, а не наявність значення.
                 **iline.product_id._l10n_ua_product_codes(),
-                'quantity': sign * iline.quantity,
+                'quantity': sign * quantity,
                 'uom_id': iline.product_uom_id.id if iline.product_uom_id else False,
                 'price_unit': net_unit_price,
                 'vat_rate': self._l10n_ua_vat_rate_for_line(iline),
             }))
             seq += 10
+        return line_vals
 
-        # Get next number
-        seq_code = f'l10n_ua.tax.invoice.{invoice_type}'
-        number = self.env['ir.sequence'].next_by_code(seq_code) or _('Новий')
+    def _l10n_ua_tax_invoice_source_lines(self):
+        return self.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
 
-        vals = {
+    def _l10n_ua_tax_invoice_base_vals(self, invoice_type, is_refund):
+        # Стороною операції в ПН є юрособа, а не її контакт: ІПН і назва
+        # для ЄРПН належать саме їй. Рахунок можна виставити на
+        # «Бухгалтерію» чи адресу доставки — у ПН має піти підприємство,
+        # інакше <BUYER_IPN> вийде порожнім і документ не зареєструється.
+        number = self.env['ir.sequence'].next_by_code(
+            f'l10n_ua.tax.invoice.{invoice_type}') or _('Новий')
+        return {
             'invoice_type': invoice_type,
             'doc_type': 'rk' if is_refund else 'pn',
             'number': number,
-            # Дата ПН — дата виникнення податкового зобовʼязання, а не день
-            # натискання кнопки: від неї рахується строк реєстрації в ЄРПН і
-            # період декларації.
-            'date': self._l10n_ua_tax_invoice_date(),
             'vat_method': self._l10n_ua_tax_invoice_rule(),
-            # Стороною операції в ПН є юрособа, а не її контакт: ІПН і назва
-            # для ЄРПН належать саме їй. Рахунок можна виставити на
-            # «Бухгалтерію» чи адресу доставки — у ПН має піти підприємство,
-            # інакше <BUYER_IPN> вийде порожнім і документ не зареєструється.
             'partner_id': self.commercial_partner_id.id,
             'company_id': self.company_id.id,
             'move_id': self.id,
-            'line_ids': line_vals,
         }
+
+    def _l10n_ua_create_cash_tax_invoices(self):
+        """Скласти ПН на кожне ще не покрите надходження (п. 187.10 ПКУ).
+
+        Покритим вважається погашення, до якого прив'язана нескасована ПН.
+        Повторний виклик складає лише відсутні ПН, тож кнопку можна тиснути
+        після кожної нової оплати.
+
+        ПН, що втратила зіставлення (оплату розʼєднали з рахунком), блокує
+        генерацію: чи зобов'язання за тими коштами лишилось, чи їх
+        повернули, чи перенесли на інший рахунок, вирішує людина. Мовчки
+        скласти нову ПН на повторне зіставлення означало б задвоїти
+        зобов'язання.
+        """
+        self.ensure_one()
+        TaxInvoice = self.env['l10n_ua.tax.invoice']
+        active = self.tax_invoice_ids.filtered(lambda t: t.state != 'cancelled')
+        orphans = active.filtered(lambda t: t.vat_method == 'cash' and not t.partial_reconcile_id)
+        if orphans:
+            raise UserError(_(
+                'ПН %(names)s складено за касовим методом, але вона не пов\'язана '
+                'з жодним чинним погашенням цього документа (зіставлення з оплатою '
+                'скасовано або ПН складено до поділу по надходженнях). Щоб не '
+                'задвоїти зобов\'язання, нові ПН не складаються: скасуйте зайву ПН '
+                'або оформіть її коригування, і повторіть.',
+                names=', '.join(orphans.mapped('name'))))
+
+        settlements = self._l10n_ua_cash_settlements()
+        if not settlements:
+            self._l10n_ua_raise_cash_unpaid()
+
+        covered = active.partial_reconcile_id
+        missing = [s for s in settlements if s['partial'] not in covered]
+        if not missing:
+            raise UserError(_(
+                'На всі надходження за цим документом ПН уже складено.'))
+
+        # Скасування ПН могло ще не потрапити в БД, а унікальний індекс
+        # (одна чинна ПН на погашення) перевіряє саме стан у БД.
+        TaxInvoice.flush_model(['state', 'partial_reconcile_id'])
+        ilines = self._l10n_ua_tax_invoice_source_lines()
+        created = TaxInvoice
+        for settlement in missing:
+            bases = self._l10n_ua_split_bases(
+                ilines, settlement['share_before'], settlement['share_after'])
+            share = settlement['share_after'] - settlement['share_before']
+            vals = self._l10n_ua_tax_invoice_base_vals('issued', False)
+            vals.update({
+                'date': settlement['date'],
+                'partial_reconcile_id': settlement['partial'].id,
+                'payment_move_id': settlement['payment_move'].id,
+                'line_ids': self._l10n_ua_tax_invoice_line_vals(share=share, bases=bases),
+            })
+            created |= TaxInvoice.create(vals)
+        return created
+
+    def action_create_tax_invoice(self):
+        """Create a tax invoice (ПН) from customer/vendor invoice.
+
+        За касовим методом — по одній ПН на кожне ще не покрите надходження.
+        """
+        self.ensure_one()
+        if self.state != 'posted':
+            raise UserError(_('Створити ПН можна тільки для проведеного документа.'))
+
+        if self.move_type in ('out_invoice', 'out_refund'):
+            invoice_type = 'issued'
+        elif self.move_type in ('in_invoice', 'in_refund'):
+            invoice_type = 'received'
+        else:
+            raise UserError(_('ПН можна створити тільки для рахунків.'))
+
+        if self._l10n_ua_tax_invoice_rule() == 'cash':
+            return self._l10n_ua_tax_invoices_action(
+                self._l10n_ua_create_cash_tax_invoices())
+
+        is_refund = self.move_type in ('out_refund', 'in_refund')
+        # Дата ПН — дата виникнення податкового зобовʼязання, а не день
+        # натискання кнопки: від неї рахується строк реєстрації в ЄРПН і
+        # період декларації. Визначаємо до номера: відмова тут не має
+        # спалювати номер у послідовності.
+        date = self._l10n_ua_tax_invoice_date()
+        vals = self._l10n_ua_tax_invoice_base_vals(invoice_type, is_refund)
+        vals.update({
+            'date': date,
+            'line_ids': self._l10n_ua_tax_invoice_line_vals(),
+        })
         if is_refund:
             # РК без посилання на оригінал ЄРПН не приймає. Знаходимо ПН
             # сторнованого документа; якщо її немає (ПН виписана поза
@@ -280,12 +444,24 @@ class AccountMove(models.Model):
             })
 
         tax_invoice = self.env['l10n_ua.tax.invoice'].create(vals)
+        return self._l10n_ua_tax_invoices_action(tax_invoice)
 
+    def _l10n_ua_tax_invoices_action(self, tax_invoices):
+        if len(tax_invoices) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'l10n_ua.tax.invoice',
+                'res_id': tax_invoices.id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
         return {
             'type': 'ir.actions.act_window',
+            'name': _('Податкові накладні'),
             'res_model': 'l10n_ua.tax.invoice',
-            'res_id': tax_invoice.id,
-            'view_mode': 'form',
+            'view_mode': 'list,form',
+            'views': [(False, 'list'), (False, 'form')],
+            'domain': [('id', 'in', tax_invoices.ids)],
             'target': 'current',
         }
 

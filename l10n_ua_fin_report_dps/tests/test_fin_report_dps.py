@@ -12,7 +12,9 @@ from lxml import etree
 
 from odoo.exceptions import UserError
 from odoo.tests import tagged
+from odoo.tools.misc import file_path
 
+from odoo.addons.l10n_ua_accounting.models.l10n_ua_notes_data import notes_rows, notes_xml_element
 from odoo.addons.l10n_ua_accounting.tests.common import AccountingTestCase
 
 CONFIG = 'odoo.addons.l10n_ua_tax_cabinet.models.l10n_ua_tax_cabinet_config.L10nUaTaxCabinetConfig'
@@ -136,6 +138,54 @@ class TestFinReportDps(AccountingTestCase):
             self.assertEqual(body.findtext('HPERIOD'), '31 грудня')
             self.assertEqual(body.findtext('HPERIOD1'), 'рік')
             self.assertEqual(body.findtext('R1300G4'), '354.0')
+
+    def test_notes_layout_matches_xsd(self):
+        """Кожна комірка ф. № 5 — елемент J0901301 і навпаки; власні назви рядків — …G1S."""
+        tree = etree.parse(file_path('l10n_ua_fin_report_dps/data/xsd/J0901301.xsd'))
+        xs = '{http://www.w3.org/2001/XMLSchema}'
+        body = tree.find('.//%scomplexType[@name="DBody"]/%ssequence' % (xs, xs))
+        elements = [el for el in body if el.tag == xs + 'element']
+        numbers = {el.get('name') for el in elements if el.get('type') == 'DGdecimal0'}
+        labels = {el.get('name') for el in elements if el.get('name').endswith('G1S')}
+        rows = [r for r in notes_rows() if r[2] and r[4] != 'title']
+        cells = {notes_xml_element(code, g) for _s, _q, code, _n, _k, graphs in rows for g in graphs}
+        self.assertEqual(cells, numbers)
+        self.assertEqual({notes_xml_element(r[2], '1S') for r in rows if r[4] == 'blank'}, labels)
+
+    def test_notes_year(self):
+        report = self.env['l10n_ua.notes.report'].create({
+            'company_id': self.company.id, 'date_from': date(Y, 1, 1), 'date_to': date(Y, 12, 31)})
+        report.action_compute()
+        report.line_ids.filtered(lambda l: l.code == '060').write(
+            {'label': 'Права на програмне забезпечення & бази даних', 'g14': 5})
+        report.line_ids.filtered(lambda l: l.code == '1411').g3 = 40
+        report.action_confirm()
+        root = self._xml(report)
+        head, body = root.find('DECLARHEAD'), root.find('DECLARBODY')
+        self.assertEqual((head.findtext('C_DOC'), head.findtext('C_DOC_SUB'),
+                          head.findtext('C_DOC_VER')), ('J09', '013', '1'))
+        self.assertEqual((head.findtext('PERIOD_TYPE'), head.findtext('PERIOD_MONTH')), ('5', '12'))
+        self.assertEqual(body.findtext('HZY'), str(Y))
+        self.assertEqual(body.findtext('HKOATUU'), '8038900000')
+        self.assertEqual(body.findtext('HBOS'), 'Петренко Іван Іванович')
+        self.assertEqual(body.findtext('R0060G1S'), 'Права на програмне забезпечення & бази даних')
+        self.assertEqual(body.findtext('R0060G14'), '5')
+        self.assertEqual(body.findtext('R0080G14'), '5')        # «Разом» розділу I
+        self.assertEqual((body.findtext('R1411G3'), body.findtext('R1430G3')), ('40', '40'))
+        # ІХ: дебіторка з ф. № 1 — 240 − 200 = 40 тис. грн; порожніх комірок немає.
+        self.assertEqual(body.findtext('R0940G3'), '40')
+        self.assertIsNone(body.find('R0010G3'))
+        self.assertIn('J0901301', report.xml_filename)
+        report.action_draft()           # не подано — XML скидається
+        self.assertFalse(report.xml_file)
+
+    def test_notes_annual_only(self):
+        report = self.env['l10n_ua.notes.report'].create({
+            'company_id': self.company.id, 'date_from': date(Y, 1, 1), 'date_to': date(Y, 9, 30)})
+        report.action_compute()
+        report.action_confirm()
+        with self.assertRaisesRegex(UserError, 'лише за рік'):
+            report.action_generate_dps_xml()
 
     # ------------------------------------------------------------ перевірки
 

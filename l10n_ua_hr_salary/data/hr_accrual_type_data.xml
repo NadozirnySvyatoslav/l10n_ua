@@ -48,6 +48,54 @@
             <field name="sequence">30</field>
         </record>
         
+        <!-- Порядок № 100, п. 3, абз. 3: у середній заробіток — частками
+             за 3 міс., рахуючи від місяця нарахування. -->
+        <record id="accrual_type_bonus_quarter" model="hr.accrual.type">
+            <field name="name">Премія квартальна</field>
+            <field name="code">BONUS_Q</field>
+            <field name="category">bonus</field>
+            <field name="l10n_ua_bonus_months">3</field>
+            <field name="calculation_method">fixed</field>
+            <field name="is_basic_salary">True</field>
+            <field name="is_taxable_pdfo">True</field>
+            <field name="is_military_tax">True</field>
+            <field name="is_esv_base">True</field>
+            <field name="d4_income_type">101</field>
+            <field name="sequence">31</field>
+        </record>
+
+        <!-- Порядок № 100, п. 3, абз. 3: у середній заробіток — частками
+             за 6 міс., рахуючи від місяця нарахування. -->
+        <record id="accrual_type_bonus_half_year" model="hr.accrual.type">
+            <field name="name">Премія за півріччя</field>
+            <field name="code">BONUS_H</field>
+            <field name="category">bonus</field>
+            <field name="l10n_ua_bonus_months">6</field>
+            <field name="calculation_method">fixed</field>
+            <field name="is_basic_salary">True</field>
+            <field name="is_taxable_pdfo">True</field>
+            <field name="is_military_tax">True</field>
+            <field name="is_esv_base">True</field>
+            <field name="d4_income_type">101</field>
+            <field name="sequence">32</field>
+        </record>
+
+        <!-- Порядок № 100, п. 3, абз. 3: у середній заробіток — частками
+             за 12 міс., рахуючи від місяця нарахування. -->
+        <record id="accrual_type_bonus_year" model="hr.accrual.type">
+            <field name="name">Премія річна</field>
+            <field name="code">BONUS_Y</field>
+            <field name="category">bonus</field>
+            <field name="l10n_ua_bonus_months">12</field>
+            <field name="calculation_method">fixed</field>
+            <field name="is_basic_salary">True</field>
+            <field name="is_taxable_pdfo">True</field>
+            <field name="is_military_tax">True</field>
+            <field name="is_esv_base">True</field>
+            <field name="d4_income_type">101</field>
+            <field name="sequence">33</field>
+        </record>
+
         <record id="accrual_type_vacation" model="hr.accrual.type">
             <field name="name">Відпускні</field>
             <field name="code">VACATION</field>

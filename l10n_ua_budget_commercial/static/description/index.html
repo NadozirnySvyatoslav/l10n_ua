@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<section style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px;">
+
+<h1 style="color: #875A7B; border-bottom: 3px solid #875A7B; padding-bottom: 15px; font-size: 2em;">Ukraine - Commercial Budgeting</h1>
+
+<div style="background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #875A7B;">
+    <strong style="font-size: 1.3em;">Бюджетування для комерційних компаній на Odoo Community</strong><br/><br/>
+    Бюджет доходів і витрат (БДР) та бюджет руху грошових коштів (БДДС) за статтями,
+    періодами, центрами фінансової відповідальності й сценаріями — з автоматичним фактом
+    з бухгалтерії, відхиленнями та відсотком виконання. Стандартний <code>account_budget</code>
+    є лише в Enterprise; цей модуль його замінює і не залежить від модулів держсектору (кошторисів).
+</div>
+
+<div style="display: flex; gap: 15px; flex-wrap: wrap; margin: 25px 0;">
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px; border: 1px solid #e0e0e0;">
+        <div style="font-size: 2em; color: #875A7B; font-weight: bold;">2</div>
+        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">види бюджету: БДР і БДДС</div>
+    </div>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px; border: 1px solid #e0e0e0;">
+        <div style="font-size: 2em; color: #875A7B; font-weight: bold;">3</div>
+        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">сценарії</div>
+    </div>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px; border: 1px solid #e0e0e0;">
+        <div style="font-size: 2em; color: #875A7B; font-weight: bold;">21</div>
+        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">стартова стаття бюджету</div>
+    </div>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px; border: 1px solid #e0e0e0;">
+        <div style="font-size: 2em; color: #875A7B; font-weight: bold;">xlsx</div>
+        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">експорт / імпорт</div>
+    </div>
+</div>
+
+<h2 style="color: #00A09D; margin-top: 40px; border-left: 4px solid #00A09D; padding-left: 15px;">Статті бюджету</h2>
+<ul>
+    <li>Довідник статей з ієрархією: батьківська стаття збирає факт підстатей.</li>
+    <li>Стаття прив'язується до рахунків явно або префіксами кодів («92, 93») — префікси діють для всіх компаній.</li>
+    <li>Необов'язковий фільтр за аналітичними рахунками.</li>
+    <li>Стартовий набір для плану рахунків НП(С)БО: доходи (70–74), витрати (90–98), надходження й видатки коштів (36, 63, 64, 65, 66, 50/60, 15, 671).</li>
+</ul>
+
+<h2 style="color: #00A09D; margin-top: 40px; border-left: 4px solid #00A09D; padding-left: 15px;">Як рахується факт</h2>
+<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <tr style="background: #875A7B; color: #fff;">
+        <th style="padding: 10px; text-align: left;">Вид бюджету</th>
+        <th style="padding: 10px; text-align: left;">Факт</th>
+    </tr>
+    <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 10px;"><strong>БДР</strong> (метод нарахування)</td>
+        <td style="padding: 10px;">Обороти проведених проводок за рахунками статті: доходи — кредитове сальдо, витрати — дебетове.</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #e0e0e0;">
+        <td style="padding: 10px;"><strong>БДДС</strong> (касовий метод)</td>
+        <td style="padding: 10px;">Як прямий метод Ф№3: проводки з грошовим боком (каса, банк, рахунки неоплачених надходжень/платежів), стаття — за кореспондуючим рахунком. Дт 311 Кт 361 — надходження від покупців, Дт 631 Кт 311 — оплата постачальникам.</td>
+    </tr>
+</table>
+<p>Якщо в рядку вказано ЦФВ або проєкт (аналітичний рахунок), у факт потрапляє лише частка проводки за відсотком аналітичного розподілу.</p>
+
+<h2 style="color: #00A09D; margin-top: 40px; border-left: 4px solid #00A09D; padding-left: 15px;">Бюджети</h2>
+<ul>
+    <li>Період із розбивкою на місяці, квартали або роки; кнопка «Заповнити рядки» створює рядки для всіх статей × періодів.</li>
+    <li>Ієрархія <strong>компанія → ЦФВ → проєкт</strong> через батьківський бюджет; аналіз з батьківського бюджету охоплює всі дочірні.</li>
+    <li>Сценарії: базовий, оптимістичний, песимістичний; порівняння сценаріїв у зведеній таблиці.</li>
+    <li>Статуси: чернетка → затверджено → закрито. Після затвердження план заблоковано, факт оновлюється кнопкою і щоденно cron-ом.</li>
+    <li>Копіювання бюджету в інший сценарій або період (зсув на N місяців, коефіцієнт %), разом з дочірніми бюджетами.</li>
+    <li>План, факт, відхилення, залишок, % виконання; перехід до проводок, з яких складається факт.</li>
+    <li>Зведена таблиця й графік «План/факт» за статтями, періодами, ЦФВ і сценаріями.</li>
+</ul>
+
+<h2 style="color: #00A09D; margin-top: 40px; border-left: 4px solid #00A09D; padding-left: 15px;">Excel</h2>
+<p>Експорт плану матрицею «статті × періоди» (аркуш «План») та звіту про виконання (аркуш «Виконання»).
+Відредагований аркуш «План» імпортується назад: стаття — за кодом або назвою, ЦФВ — за кодом або назвою
+аналітичного рахунку; порожні клітинки пропускаються.</p>
+
+<h2 style="color: #00A09D; margin-top: 40px; border-left: 4px solid #00A09D; padding-left: 15px;">Контроль бюджету</h2>
+<p>Налаштування → Рахунки → «Контроль бюджету в рахунках постачальників»: <em>вимкнено</em> (за замовчуванням),
+<em>попередження</em> (рахунок проводиться, у чатері — перелік перевищених статей) або <em>блокувати</em>
+(рахунок, що виводить затверджений БДР за межі плану, провести не можна).</p>
+
+<h2 style="color: #00A09D; margin-top: 40px; border-left: 4px solid #00A09D; padding-left: 15px;">Поза межами модуля</h2>
+<p>Збалансована система показників (BSC) і ковзні прогнози не реалізовані. Контроль замовлень на закупівлю
+не входить, щоб модуль не залежав від <code>purchase</code>.</p>
+
+<div style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 30px;">
+    Меню: <strong>Рахунки → Бюджетування</strong> (бюджети, аналіз виконання, статті бюджету).
+    Доступ: бухгалтер — створення й редагування, адміністратор бухгалтерії — затвердження й закриття.
+</div>
+
+</section>
+</body>
+</html>

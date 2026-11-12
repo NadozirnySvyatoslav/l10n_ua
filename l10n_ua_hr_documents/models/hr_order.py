@@ -85,6 +85,22 @@ class HrOrder(models.Model):
              'When set, the dismissal order will use its full_text and render '
              'description_html (legal explanation) in the print template.',
     )
+    # Строк попередження й згода профспілки (#505).
+    date_notice = fields.Date(
+        string='Notice Date',
+        tracking=True,
+        help='Date the employee was personally notified of the coming dismissal '
+             '(art. 49-2 of the Labour Code: at least two months before a '
+             'dismissal under p. 1 of art. 40).')
+    notice_deadline = fields.Date(
+        string='Earliest Dismissal Date',
+        compute='_compute_notice',
+        help='Notice date plus the notice period of the termination reason.')
+    notice_missing = fields.Boolean(compute='_compute_notice')
+    notice_short = fields.Boolean(compute='_compute_notice')
+    union_consent_required = fields.Boolean(
+        related='termination_reason_id.requires_union_consent')
+    severance_info = fields.Char(compute='_compute_notice')
     include_vacation_compensation = fields.Boolean(
         string='Compensate Unused Vacation',
         default=True,
@@ -152,6 +168,41 @@ class HrOrder(models.Model):
         if self.employee_id:
             self.department_id = self.employee_id.department_id
             self.job_id = self.employee_id.job_id
+
+    @api.depends('order_type', 'termination_reason_id', 'date_notice',
+                 'date_dismissal', 'date')
+    def _compute_notice(self):
+        labels = dict(self.env['hr.termination.reason']._fields[
+            'compensation_amount']._description_selection(self.env))
+        for order in self:
+            reason = order.termination_reason_id
+            needs = order.order_type == 'dismissal' and reason and reason.notice_days > 0 \
+                and reason.category == 'employer_initiative'
+            deadline = reason._notice_deadline(order.date_notice) if needs else False
+            dismissal = order.date_dismissal or order.date
+            order.notice_deadline = deadline
+            order.notice_missing = bool(needs and not order.date_notice)
+            order.notice_short = bool(deadline and dismissal and dismissal < deadline)
+            order.severance_info = labels.get(reason.compensation_amount) \
+                if order.order_type == 'dismissal' and reason.requires_compensation \
+                and reason.compensation_amount not in (False, 'none') else False
+
+    def _check_notice_period(self):
+        """Звільнення з ініціативи роботодавця не раніше строку попередження.
+
+        Блокуємо лише коли дату попередження вказано і строк не витримано;
+        без дати форма лише попереджає — її могли зафіксувати поза Odoo.
+        """
+        for order in self.filtered(lambda o: o.order_type == 'dismissal' and o.notice_short):
+            raise UserError(_(
+                'Dismissal of %(employee)s on %(date)s is earlier than the notice '
+                'period allows: notified on %(notice)s, the earliest date is '
+                '%(deadline)s (%(reason)s).',
+                employee=order.employee_id.display_name,
+                date=order.date_dismissal or order.date,
+                notice=order.date_notice, deadline=order.notice_deadline,
+                reason=order.termination_reason_id.full_reference
+                or order.termination_reason_id.name))
 
     @api.onchange('termination_reason_id')
     def _onchange_termination_reason_id(self):
@@ -517,6 +568,7 @@ class HrOrder(models.Model):
     def action_confirm(self):
         if self.filtered(lambda o: o.order_type == 'vacation'):
             self._check_vacation_confirm_rights()
+        self._check_notice_period()
         self.write({
             'state': 'confirmed',
             'confirmed_by_id': self.env.user.id,
@@ -576,6 +628,9 @@ class HrOrder(models.Model):
             'termination_order_number': self.name,
             'termination_order_date': self.date,
         }
+        if self.termination_reason_id:
+            # Підстава на картці — з неї розрахунковий лист бере вихідну допомогу.
+            order_vals['termination_reason_ua_id'] = self.termination_reason_id.id
         versions = self._current_contract_versions()
         if versions:
             versions.write({'contract_date_end': dismissal_date, **order_vals})
@@ -647,11 +702,14 @@ class HrOrder(models.Model):
                 start=later_start,
             ))
         if versions:
-            versions.write({
+            vals = {
                 'contract_date_end': False,
                 'termination_order_number': False,
                 'termination_order_date': False,
-            })
+            }
+            if self.termination_reason_id:
+                vals['termination_reason_ua_id'] = False
+            versions.write(vals)
         if self.previous_departure_date_saved:
             employee.with_context(active_test=False).departure_date = \
                 self.previous_departure_date or False

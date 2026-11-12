@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_budget_root" name="Budgeting" parent="account.menu_finance"
+              sequence="25" groups="account.group_account_user,account.group_account_readonly"/>
+    <menuitem id="menu_budget_plan" name="Budgets" parent="menu_budget_root"
+              action="action_budget_plan" sequence="10"/>
+    <menuitem id="menu_budget_analysis" name="Budget Analysis" parent="menu_budget_root"
+              action="action_budget_line_analysis" sequence="20"/>
+    <menuitem id="menu_budget_item" name="Budget Items" parent="menu_budget_root"
+              action="action_budget_item" sequence="90"/>
+</odoo>

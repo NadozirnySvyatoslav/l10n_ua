@@ -43,6 +43,14 @@ class HrAccrualType(models.Model):
              'flag: it takes the pay in the contribution base (ESV Base), '
              'per Порядок № 1266.'
     )
+    l10n_ua_bonus_months = fields.Selection(
+        [('1', 'Month'), ('3', 'Quarter'), ('6', 'Half-Year'), ('12', 'Year')],
+        string='Bonus Period', default='1', required=True,
+        help='For a bonus: the period it is paid for. A bonus for a quarter, '
+             'half-year or year counts in the average salary for vacations '
+             'spread over as many months, counting back from the month it is '
+             'accrued in, pro rata to the working days worked (Порядок № 100, '
+             'п. 3, абз. 3).')
     is_taxable_pdfo = fields.Boolean(
         string='Taxable (PDFO)',
         default=True

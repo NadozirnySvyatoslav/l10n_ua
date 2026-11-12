@@ -73,6 +73,14 @@ class HrPayslipAccrual(models.Model):
              'means the month of the payslip.'
     )
 
+    l10n_ua_bonus_period_to = fields.Date(
+        string='Bonus For Period Ending',
+        help='For a bonus for a quarter, half-year or year: the last month of '
+             'the period it is for, when that is not the month of the payslip '
+             '(a bonus for the first quarter accrued in April: March). The '
+             'average salary divides the bonus by the working days worked in '
+             'that period (Порядок № 100, п. 3, абз. 3).')
+
     is_auto_generated = fields.Boolean(
         string='Auto-generated',
         default=False,

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Розділ «Стаціонар» — після «Прийоми» (10) і «Пацієнти» (20),
+         щоб вхід у застосунок і далі відкривав розклад прийомів. -->
+    <menuitem id="menu_inpatient_section"
+              name="Стаціонар"
+              parent="l10n_ua_medecin_base.menu_medecin_root"
+              sequence="30"/>
+
+    <menuitem id="menu_admission_current"
+              name="У стаціонарі"
+              parent="menu_inpatient_section"
+              action="action_admission_current"
+              sequence="10"/>
+
+    <menuitem id="menu_admission"
+              name="Усі госпіталізації"
+              parent="menu_inpatient_section"
+              action="action_admission"
+              sequence="20"/>
+
+    <menuitem id="menu_report_admission"
+              name="Стаціонар"
+              parent="l10n_ua_medecin_base.menu_medecin_reporting"
+              action="action_report_admission"
+              sequence="40"/>
+
+    <menuitem id="menu_department"
+              name="Відділення"
+              parent="l10n_ua_medecin_base.menu_medecin_config"
+              action="action_department"
+              sequence="50"/>
+</odoo>

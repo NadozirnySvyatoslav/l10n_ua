@@ -1,0 +1,1088 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_bank_mono_hr
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04 16:41+0000\n"
+"PO-Revision-Date: 2026-11-04 16:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "%s has neither an RNOKPP nor a document."
+msgstr "%s не має ні РНОКПП, ні документа."
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "2026-10"
+msgstr "2026-10"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "A registry sent to monobank cannot be deleted."
+msgstr "Відомість, надіслану в monobank, видалити не можна."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.constraint,message:l10n_ua_bank_mono_hr.constraint_l10n_ua_mono_salary_registry_type_config_alias_uniq
+msgid "A registry type is listed once per connection."
+msgstr "Тип відомості для підключення може бути лише один раз."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Accrual"
+msgstr "Нарахування"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_needaction
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_needaction
+msgid "Action Needed"
+msgstr "Потрібна дія"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__active
+msgid "Active"
+msgstr "Активний"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "Add at least one recipient."
+msgstr "Додайте хоча б одного одержувача."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__alias
+msgid "Alias"
+msgstr "Код"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__amount
+msgid "Amount"
+msgstr "Сума"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "Amount of %s must be positive."
+msgstr "Сума для %s має бути додатною."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__additional_purpose
+msgid ""
+"Appended to the registry purpose as is, without a separator: start it with a"
+" space when needed."
+msgstr ""
+"Дописується до призначення відомості як є, без роздільника: за потреби "
+"почніть із пробілу."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_attachment_count
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_attachment_count
+msgid "Attachment Count"
+msgstr "Кількість вкладень"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__batches_sent
+msgid "Batches Sent"
+msgstr "Надіслано пакетів"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__change_required
+msgid "Change required"
+msgstr "Потрібні зміни"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid "Choose the monobank connection."
+msgstr "Оберіть підключення monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid "Choose the monobank corporate API connection."
+msgstr "Оберіть підключення monobank Corporate API."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid "Choose the registry type (fetch the list from monobank)."
+msgstr "Оберіть тип відомості (завантажте список із monobank)."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_res_company
+msgid "Companies"
+msgstr "Компанії"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__company_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__company_id
+msgid "Company"
+msgstr "Компанія"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__create_uid
+msgid "Created by"
+msgstr "Створив"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "Created in monobank"
+msgstr "Створено в monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__create_date
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__create_date
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__create_date
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__create_date
+msgid "Created on"
+msgstr "Створено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__currency_id
+msgid "Currency"
+msgstr "Валюта"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__decline_reason
+msgid "Decline Reason"
+msgstr "Причина відхилення"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Deduction"
+msgstr "Утримання"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "Delete in monobank"
+msgstr "Видалити в monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_payslip_import__state__deleted
+msgid "Deleted"
+msgstr "Видалено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__name
+msgid "Description"
+msgstr "Опис"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_employee__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_bank_export__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_run__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_res_company__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__document_type
+msgid "Document"
+msgstr "Документ"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__document_number
+msgid "Document No."
+msgstr "Номер документа"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_payslip_import__state__draft
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__draft
+msgid "Draft"
+msgstr "Чернетка"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_hr_employee
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__employee_id
+msgid "Employee"
+msgstr "Працівник"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__employees_sent
+msgid "Employees Sent"
+msgstr "Надіслано працівникам"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__failed_details
+msgid ""
+"Employees monobank could not match: add them to the salary contacts and "
+"upload again."
+msgstr ""
+"Працівники, яких monobank не знайшов: додайте їх до зарплатних контактів і "
+"завантажте ще раз."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_payslip_import__state__failed
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__failed
+msgid "Failed"
+msgstr "Помилка"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__failed_employees
+msgid "Failed Employees"
+msgstr "Працівників з помилками"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+msgid "Fetch Registry Types"
+msgstr "Завантажити типи відомостей"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.hr_payslip_bank_export_view_form_mono
+msgid "Fetch from monobank"
+msgstr "Завантажити з monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_follower_ids
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_follower_ids
+msgid "Followers"
+msgstr "Підписники"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_partner_ids
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Підписники (партнери)"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry_line__document_type__foreign_passport
+msgid "Foreign passport"
+msgstr "Закордонний паспорт"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_bank_export__file_format
+msgid "Format"
+msgstr "Формат"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__full_name
+msgid "Full Name"
+msgstr "ПІБ"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__has_message
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__has_message
+msgid "Has Message"
+msgstr "Має повідомлення"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__iban
+msgid "IBAN"
+msgstr "IBAN"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "IBAN differs"
+msgstr "Інший IBAN"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "IBAN in monobank %(bank)s, in Odoo %(odoo)s"
+msgstr "IBAN у monobank %(bank)s, в Odoo %(odoo)s"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_employee__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_bank_export__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_run__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_res_company__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry_line__document_type__id_card
+msgid "ID card"
+msgstr "ID-картка"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_hr_employee__l10n_ua_mono_contact_id
+msgid ""
+"ID of the employee among the salary contacts of the company in monobank."
+msgstr "ID працівника серед зарплатних контактів компанії в monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_needaction
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Якщо позначено, нові повідомлення потребують вашої уваги."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_has_error
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_has_sms_error
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_has_error
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Import of %s deleted in monobank."
+msgstr "Імпорт за %s видалено в monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__in_progress
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_search
+msgid "In progress"
+msgstr "В обробці"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_is_follower
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_is_follower
+msgid "Is Follower"
+msgstr "Підписник"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__write_uid
+msgid "Last Updated by"
+msgstr "Останнє оновлення"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__write_date
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__write_date
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__write_date
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__write_date
+msgid "Last Updated on"
+msgstr "Останнє оновлення"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__line_count
+msgid "Line Count"
+msgstr "Кількість рядків"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_payslip_import__state__loading
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__loading
+msgid "Loading"
+msgstr "Завантаження"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_has_error
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_has_error
+msgid "Message Delivery error"
+msgstr "Помилка доставки повідомлення"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_ids
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_ids
+msgid "Messages"
+msgstr "Повідомлення"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Military tax"
+msgstr "Військовий збір"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__name
+msgid "Name"
+msgstr "Назва"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_search
+msgid "Need attention"
+msgstr "Потребують уваги"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "No RNOKPP or passport for %s."
+msgstr "Немає РНОКПП або паспорта для %s."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "No RNOKPP or passport for: %s"
+msgstr "Немає РНОКПП або паспорта для: %s"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid ""
+"No bank account (IBAN) for employees:\n"
+"- %s"
+msgstr ""
+"Немає банківського рахунку (IBAN) у працівників:\n"
+"- %s"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "No closed (Done) payslips to upload."
+msgstr "Немає закритих (Done) листків для завантаження."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "No employees."
+msgstr "Немає працівників."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "No monobank corporate API connection for %s."
+msgstr "Немає підключення monobank Corporate API для %s."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__failed_details
+msgid "Not Uploaded"
+msgstr "Не завантажено"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "Not synchronized"
+msgstr "Не синхронізовано"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Not uploaded:"
+msgstr "Не завантажено:"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_needaction_counter
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Кількість дій"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_has_error_counter
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_has_error_counter
+msgid "Number of errors"
+msgstr "Кількість помилок"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_needaction_counter
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Кількість повідомлень, що потребують дії"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_has_error_counter
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "PDF"
+msgstr "PDF"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__succeeded
+msgid "Paid"
+msgstr "Виплачено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry_line__document_type__old_passport
+msgid "Passport (old format)"
+msgstr "Паспорт (старого зразка)"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_hr_payslip_bank_export
+msgid "Payroll Bank File Export"
+msgstr "Експорт зарплатного файлу в банк"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_res_company__payroll_bank_file_format
+msgid "Payroll Bank File Format"
+msgstr "Формат зарплатного файлу"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_hr_payslip
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__payslip_id
+msgid "Payslip"
+msgstr "Розрахунковий листок"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_hr_payslip_run
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__payslip_run_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__payslip_run_id
+msgid "Payslip Batch"
+msgstr "Відомість"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__payslip_ids
+msgid "Payslips"
+msgstr "Розрахункові листки"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Payslips %(period)s (%(config)s)"
+msgstr "Розрахункові листи %(period)s (%(config)s)"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.actions.act_window,name:l10n_ua_bank_mono_hr.action_mono_payslip_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_list
+msgid "Payslips in the monobank App"
+msgstr "Розрахункові листи в застосунку monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Payslips published in the monobank app to %d employee(s)."
+msgstr ""
+"Розрахункові листи опубліковано в застосунку monobank для працівників: %d."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__additional_purpose_allowed
+msgid "Per-recipient Purpose"
+msgstr "Призначення для кожного одержувача"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__period
+msgid "Period"
+msgstr "Період"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__date_from
+msgid "Period From"
+msgstr "Період з"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__date_to
+msgid "Period To"
+msgstr "Період по"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Period must be YYYY-MM, not %s."
+msgstr "Період має бути у форматі РРРР-ММ, а не %s."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Personal income tax"
+msgstr "ПДФО"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__prepared
+msgid "Prepared"
+msgstr "Підготовлено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "Publish to Employees"
+msgstr "Опублікувати працівникам"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_payslip_import__state__sent
+msgid "Published"
+msgstr "Опубліковано"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__additional_purpose
+msgid "Purpose Addition"
+msgstr "Додаток до призначення"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__inn
+msgid "RNOKPP"
+msgstr "РНОКПП"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__rating_ids
+msgid "Ratings"
+msgstr "Оцінки"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__line_ids
+msgid "Recipients"
+msgstr "Одержувачі"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+msgid "Refresh Status"
+msgstr "Оновити статус"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__registry_id
+msgid "Registry"
+msgstr "Відомість"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__name
+msgid "Registry Name"
+msgstr "Назва відомості"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__registry_reference
+msgid "Registry Reference"
+msgstr "Референс відомості"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_bank_export__mono_registry_type_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__registry_type_id
+msgid "Registry Type"
+msgstr "Тип відомості"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid ""
+"Registry submitted to monobank: %(count)d recipient(s), %(total).2f UAH. It "
+"waits for the signature in monobank."
+msgstr ""
+"Відомість надіслано в monobank: одержувачів %(count)d, %(total).2f грн. Вона"
+" чекає підпису в monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Помилка доставки SMS"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid "Salary %s"
+msgstr "Заробітна плата %s"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid ""
+"Salary contacts: %(found)d found, %(created)d created, %(mismatch)d with "
+"another IBAN, %(failed)d failed."
+msgstr ""
+"Зарплатні контакти: знайдено %(found)d, створено %(created)d, з іншим IBAN "
+"%(mismatch)d, з помилками %(failed)d."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__period
+msgid "Salary period, YYYY-MM."
+msgstr "Період зарплати, РРРР-ММ."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__saved
+msgid "Saved"
+msgstr "Збережено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+msgid "Send to monobank"
+msgstr "Надіслати в monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_line__document_series
+msgid "Series"
+msgstr "Серія"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__state
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__state
+msgid "State"
+msgstr "Стан"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_search
+msgid "Status"
+msgstr "Статус"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__status_updated_at
+msgid "Status Updated At"
+msgstr "Статус оновлено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_salary_registry__state__finalized
+msgid "Submitted"
+msgstr "Надіслано"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__success_employees
+msgid "Success Employees"
+msgstr "Успішно оброблено"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+msgid "Sync Salary Contacts"
+msgstr "Синхронізувати зарплатні контакти"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__additional_purpose_allowed
+msgid "The bank accepts an addition to the purpose for each recipient."
+msgstr "Банк приймає додаток до призначення для кожного одержувача."
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "The employees will see their payslips in the monobank app. Continue?"
+msgstr ""
+"Працівники побачать свої розрахункові листи в застосунку monobank. "
+"Продовжити?"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "The payslip has not been uploaded to monobank."
+msgstr "Розрахунковий листок не завантажено в monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "The payslips are already published to the employees."
+msgstr "Розрахункові листи вже опубліковано працівникам."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "The period starts after it ends."
+msgstr "Початок періоду пізніший за його кінець."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "The registry has no employees."
+msgstr "У відомості немає працівників."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "The registry has no monobank ID yet."
+msgstr "Відомість ще не має ID у monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "The registry is already submitted to monobank."
+msgstr "Відомість уже надіслано в monobank."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "The registry type %(type)s takes no purpose addition (%(name)s)."
+msgstr "Тип відомості %(type)s не приймає додатку до призначення (%(name)s)."
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+msgid ""
+"The registry will be created in monobank and wait there for the signature of"
+" the director. Continue?"
+msgstr ""
+"Відомість буде створено в monobank, де вона чекатиме підпису директора. "
+"Продовжити?"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "The whole import of the period will be deleted in monobank. Continue?"
+msgstr "Весь імпорт за період буде видалено в monobank. Продовжити?"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "To be paid"
+msgstr "До виплати"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_list
+msgid "Total"
+msgstr "Разом"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__total_amount
+msgid "Total Amount"
+msgstr "Загальна сума"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__total_employees
+msgid "Total Employees"
+msgstr "Усього працівників"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Total accrued"
+msgstr "Усього нараховано"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Total deducted"
+msgstr "Усього утримано"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__registry_type_id
+msgid ""
+"Type of payment in monobank (salary, advance, …). Fetch the list from the "
+"bank with the button."
+msgstr ""
+"Вид виплати в monobank (зарплата, аванс…). Список завантажується з банку "
+"кнопкою."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "UAH"
+msgstr "грн"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Upload the payslips first."
+msgstr "Спершу завантажте розрахункові листи."
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_payslip_import_view_form
+msgid "Upload to monobank"
+msgstr "Завантажити в monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__l10n_ua_mono_payslip_import__state__loaded
+msgid "Uploaded"
+msgstr "Завантажено"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Uploaded to monobank: %(ok)d of %(total)d employee(s)."
+msgstr "Завантажено в monobank: %(ok)d з %(total)d працівників."
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__website_message_ids
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__website_message_ids
+msgid "Website Messages"
+msgstr "Повідомлення з сайту"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__website_message_ids
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__website_message_ids
+msgid "Website communication history"
+msgstr "Історія спілкування на сайті"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Worked days"
+msgstr "Відпрацьовано днів"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "Worked hours"
+msgstr "Відпрацьовано годин"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "days"
+msgstr "дн."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "failed"
+msgstr "з помилками"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "hours"
+msgstr "год"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "mismatch"
+msgstr "розбіжність"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "monobank"
+msgstr "monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__hr_payslip_bank_export__file_format__mono_api
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_hr.selection__res_company__payroll_bank_file_format__mono_api
+msgid "monobank API (salary registry)"
+msgstr "monobank API (зарплатна відомість)"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "monobank API error: %s"
+msgstr "Помилка API monobank: %s"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_payslip_bank_export__mono_config_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_payslip_import__config_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__config_id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry_type__config_id
+msgid "monobank Connection"
+msgstr "Підключення monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_l10n_ua_mono_payslip_import
+msgid "monobank Payslip Import"
+msgstr "Імпорт розрахункових листів monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_l10n_ua_mono_salary_registry__bank_registry_id
+msgid "monobank Registry ID"
+msgstr "ID відомості monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_type_view_list
+msgid "monobank Registry Types"
+msgstr "Типи відомостей monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_hr.field_hr_employee__l10n_ua_mono_contact_id
+msgid "monobank Salary Contact ID"
+msgstr "ID зарплатного контакту monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.actions.act_window,name:l10n_ua_bank_mono_hr.action_mono_salary_registry
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_search
+msgid "monobank Salary Registries"
+msgstr "Зарплатні відомості monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_l10n_ua_mono_salary_registry
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.mono_salary_registry_view_form
+msgid "monobank Salary Registry"
+msgstr "Зарплатна відомість monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_l10n_ua_mono_salary_registry_line
+msgid "monobank Salary Registry Recipient"
+msgstr "Одержувач зарплатної відомості monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model,name:l10n_ua_bank_mono_hr.model_l10n_ua_mono_salary_registry_type
+msgid "monobank Salary Registry Type"
+msgstr "Тип зарплатної відомості monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "monobank pays salaries in UAH only."
+msgstr "monobank виплачує зарплату лише в гривні."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid ""
+"monobank rejected the registry after %(sent)d of %(total)d batch(es): "
+"%(error)s"
+msgstr ""
+"monobank відхилив відомість після %(sent)d з %(total)d пакетів: %(error)s"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "monobank takes at most %d recipients in one registry."
+msgstr "monobank приймає не більше %d одержувачів в одній відомості."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_salary_registry.py:0
+msgid "monobank: %s"
+msgstr "monobank: %s"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.ui.menu,name:l10n_ua_bank_mono_hr.menu_mono_salary_registry
+msgid "monobank: зарплатні відомості"
+msgstr "monobank: зарплатні відомості"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.ui.menu,name:l10n_ua_bank_mono_hr.menu_mono_payslip_import
+msgid "monobank: розрахункові листи"
+msgstr "monobank: розрахункові листи"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.actions.server,name:l10n_ua_bank_mono_hr.ir_cron_mono_salary_registry_status_ir_actions_server
+msgid "monobank: статус зарплатних відомостей"
+msgstr "monobank: статус зарплатних відомостей"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "no RNOKPP or passport"
+msgstr "немає РНОКПП або паспорта"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/hr_employee.py:0
+msgid "no bank account (IBAN)"
+msgstr "немає банківського рахунку (IBAN)"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/models/mono_payslip_import.py:0
+msgid "not among the salary contacts"
+msgstr "немає серед зарплатних контактів"
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.hr_payslip_run_view_form_mono
+msgid "Листи в monobank"
+msgstr "Листи в monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid "Немає закритих (Done) листків за вибором."
+msgstr "Немає закритих (Done) листків за вибором."
+
+#. module: l10n_ua_bank_mono_hr
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_hr/wizard/hr_payslip_bank_export.py:0
+msgid ""
+"Немає рядків для виплати (усі суми нульові або немає закритих листків за "
+"період)."
+msgstr ""
+"Немає рядків для виплати (усі суми нульові або немає закритих листків за "
+"період)."
+
+#. module: l10n_ua_bank_mono_hr
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_hr.hr_payslip_bank_export_view_form_mono
+msgid "Створити відомість monobank"
+msgstr "Створити відомість monobank"
+
+#. module: l10n_ua_bank_mono_hr
+#: model:ir.model.fields,help:l10n_ua_bank_mono_hr.field_res_company__payroll_bank_file_format
+msgid "Типовий формат зарплатного файлу для клієнт-банку."
+msgstr "Типовий формат зарплатного файлу для клієнт-банку."

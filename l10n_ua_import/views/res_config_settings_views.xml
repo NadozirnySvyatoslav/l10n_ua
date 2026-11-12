@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_import" model="ir.ui.view">
+        <field name="name">res.config.settings.import</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='account']" position="inside">
+                <block title="Import (Ukraine)" name="l10n_ua_import">
+                    <setting id="l10n_ua_import_accounts" string="Import Customs Declarations"
+                             help="Accounts and journal of the customs payments; empty - 377 and 6441 by code">
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label for="l10n_ua_import_journal_id" class="col-lg-4 o_light_label"/>
+                                <field name="l10n_ua_import_journal_id"/>
+                            </div>
+                            <div class="row">
+                                <label for="l10n_ua_import_customs_account_id" class="col-lg-4 o_light_label"/>
+                                <field name="l10n_ua_import_customs_account_id"/>
+                            </div>
+                            <div class="row">
+                                <label for="l10n_ua_import_vat_account_id" class="col-lg-4 o_light_label"/>
+                                <field name="l10n_ua_import_vat_account_id"/>
+                            </div>
+                            <div class="row">
+                                <label for="l10n_ua_import_customs_partner_id" class="col-lg-4 o_light_label"/>
+                                <field name="l10n_ua_import_customs_partner_id"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

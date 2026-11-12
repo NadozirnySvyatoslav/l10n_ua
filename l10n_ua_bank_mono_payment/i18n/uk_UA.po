@@ -1,0 +1,400 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_bank_mono_payment
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04 16:41+0000\n"
+"PO-Revision-Date: 2026-11-04 16:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_ultimate_debit_name
+msgid "Actual Payer"
+msgstr "Фактичний платник"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_ultimate_debit_code
+msgid "Actual Payer Code"
+msgstr "Код фактичного платника"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_additional_info
+msgid "Additional Info"
+msgstr "Додаткова інформація"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "Additional info of the budget payment \"%s\" must be 6 to 130 characters."
+msgstr ""
+"Додаткова інформація бюджетного платежу «%s» має містити від 6 до 130 "
+"символів."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid "All payments of this order are already in monobank."
+msgstr "Усі платежі цього доручення вже передано в monobank."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__mono_status__pending
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment_line__mono_state__draft
+msgid "Awaiting signature"
+msgstr "Очікує підпису"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model,name:l10n_ua_bank_mono_payment.model_l10n_ua_bank_payment_line
+msgid "Bank Payment Line"
+msgstr "Рядок платіжного доручення"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model,name:l10n_ua_bank_mono_payment.model_l10n_ua_bank_payment
+msgid "Bank Payment Order (КЕП)"
+msgstr "Платіжне доручення (КЕП)"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model,name:l10n_ua_bank_mono_payment.model_account_bank_statement_line
+msgid "Bank Statement Line"
+msgstr "Рядок банківської виписки"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_additional_info
+msgid ""
+"Budget payments only: additional information of the payment, 6 to 130 "
+"characters."
+msgstr ""
+"Лише для бюджетних платежів: додаткова інформація платежу, від 6 до 130 "
+"символів."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_ultimate_debit_name
+msgid ""
+"Budget payments only: name of the actual payer, when the tax is paid for "
+"someone else."
+msgstr ""
+"Лише для бюджетних платежів: назва фактичного платника, якщо податок "
+"сплачується за іншу особу."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_pay_code
+msgid ""
+"Budget payments only: three-digit code of the payment type (e.g. 101), as "
+"the State Treasury expects it."
+msgstr ""
+"Лише для бюджетних платежів: тризначний код виду сплати (напр. 101) за "
+"вимогами Казначейства."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__mono_config_id
+msgid ""
+"Corporate API connection of the payer account. Found by the payer IBAN."
+msgstr ""
+"Підключення Corporate API рахунку платника. Визначається за IBAN платника."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__mono_status__declined
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment_line__mono_state__declined
+msgid "Declined"
+msgstr "Відхилено"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_account_bank_statement_line__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__display_name
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_ultimate_debit_code
+msgid "EDRPOU, RNOKPP or document number of the actual payer."
+msgstr "ЄДРПОУ, РНОКПП або номер документа фактичного платника."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__mono_status__error
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment_line__mono_state__error
+msgid "Error"
+msgstr "Помилка"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__mono_status__done
+msgid "Executed"
+msgstr "Виконано"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_external_ref
+msgid "External Reference"
+msgstr "Зовнішній ідентифікатор"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__transfer_method__file
+msgid "File signed with КЕП"
+msgstr "Файл із підписом КЕП"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__transfer_method
+msgid ""
+"File: the payment file is signed with a qualified signature and uploaded to "
+"the client-bank. monobank API: each payment is prepared in monobank and "
+"signed there by the director, in the app or the web cabinet; no signature in"
+" Odoo is needed."
+msgstr ""
+"Файл: платіжний файл підписується КЕП і завантажується в клієнт-банк. "
+"monobank API: кожен платіж готується в monobank і підписується там "
+"директором — у застосунку або web-кабінеті; підпис в Odoo не потрібен."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid ""
+"Fill in both the name and the code of the actual payer of \"%s\", or "
+"neither."
+msgstr ""
+"Заповніть і назву, і код фактичного платника для «%s» або залиште обидва "
+"порожніми."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__mono_unsent
+msgid "Has Unsent Payments"
+msgstr "Є невідправлені платежі"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_account_bank_statement_line__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__id
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_idempotency_key
+msgid "Idempotency Key"
+msgstr "Ключ ідемпотентності"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment_line__mono_state__in_statement
+msgid "In statement"
+msgstr "У виписці"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "Name of the actual payer of \"%s\" must be 3 to 240 characters."
+msgstr "Назва фактичного платника для «%s» має містити від 3 до 240 символів."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid ""
+"No monobank corporate API connection for the account %s. Create one (Bank → "
+"Bank Connections) with the journal of this account."
+msgstr ""
+"Немає підключення monobank Corporate API для рахунку %s. Створіть його (Банк"
+" → Підключення банків) із журналом цього рахунку."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__mono_status__partial
+msgid "Partially executed"
+msgstr "Частково виконано"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_pay_code
+msgid "Payment Code"
+msgstr "Код виду сплати"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "Payment code of \"%s\" must be three digits."
+msgstr "Код виду сплати для «%s» має складатися з трьох цифр."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "Payment purpose of \"%s\" must be 6 to 420 characters."
+msgstr "Призначення платежу «%s» має містити від 6 до 420 символів."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid ""
+"Payments of this order are already prepared in monobank: the payer account "
+"and the transfer method cannot change."
+msgstr ""
+"Платежі цього доручення вже підготовлено в monobank: рахунок платника і "
+"спосіб передачі змінити не можна."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "Recipient IBAN of \"%s\" is not a Ukrainian IBAN (UA and 27 digits)."
+msgstr "IBAN отримувача «%s» не є українським IBAN (UA і 27 цифр)."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,help:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_external_ref
+msgid ""
+"Reference the payment was prepared with; the bank statement line of the "
+"executed payment carries it too."
+msgstr ""
+"Ідентифікатор, з яким підготовлено платіж; його містить і рядок виписки "
+"виконаного платежу."
+
+#. module: l10n_ua_bank_mono_payment
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_payment.l10n_ua_bank_payment_view_form_mono
+msgid "Refresh Status"
+msgstr "Оновити статус"
+
+#. module: l10n_ua_bank_mono_payment
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_payment.l10n_ua_bank_payment_view_form_mono
+msgid "Send to monobank"
+msgstr "Надіслати в monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "Set the company EDRPOU: the purpose of a budget payment contains it."
+msgstr ""
+"Заповніть ЄДРПОУ компанії: він входить у призначення бюджетного платежу."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_statement_line_id
+msgid "Statement Line"
+msgstr "Рядок виписки"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid ""
+"The monobank connection %(config)s reads the account %(own)s, not the payer "
+"account %(iban)s."
+msgstr ""
+"Підключення monobank %(config)s працює з рахунком %(own)s, а не з рахунком "
+"платника %(iban)s."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid ""
+"The payment is already prepared in monobank and cannot be changed here. "
+"Decline it in monobank and add a new line."
+msgstr ""
+"Платіж уже підготовлено в monobank, змінити його тут не можна. Відхиліть "
+"його в monobank і додайте новий рядок."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "The payment is already prepared in monobank. Decline it there first."
+msgstr "Платіж уже підготовлено в monobank. Спершу відхиліть його там."
+
+#. module: l10n_ua_bank_mono_payment
+#: model_terms:ir.ui.view,arch_db:l10n_ua_bank_mono_payment.l10n_ua_bank_payment_view_form_mono
+msgid ""
+"The payments will be prepared in monobank and wait there for the signature "
+"of the director. Continue?"
+msgstr ""
+"Платежі буде підготовлено в monobank, де вони чекатимуть підпису директора. "
+"Продовжити?"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid "This order is not sent through the monobank API."
+msgstr "Це доручення не передається через monobank API."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__transfer_method
+msgid "Transfer Method"
+msgstr "Спосіб передачі"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid "monobank"
+msgstr "monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields.selection,name:l10n_ua_bank_mono_payment.selection__l10n_ua_bank_payment__transfer_method__mono_api
+msgid "monobank API (signed in the monobank app)"
+msgstr "monobank API (підпис у застосунку monobank)"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid "monobank API prepares payments in UAH only."
+msgstr "monobank API готує платежі лише в гривні."
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__mono_config_id
+msgid "monobank Connection"
+msgstr "Підключення monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_error
+msgid "monobank Error"
+msgstr "Помилка monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_payment_id
+msgid "monobank Payment ID"
+msgstr "ID платежу monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment_line__mono_state
+msgid "monobank State"
+msgstr "Стан у monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.model.fields,field_description:l10n_ua_bank_mono_payment.field_l10n_ua_bank_payment__mono_status
+msgid "monobank Status"
+msgstr "Статус monobank"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "monobank needs the EDRPOU or RNOKPP of the recipient \"%s\"."
+msgstr "Для monobank потрібен ЄДРПОУ або РНОКПП отримувача «%s»."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment_line.py:0
+msgid "monobank returned no payment ID: %s"
+msgstr "monobank не повернув ID платежу: %s"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid ""
+"monobank: %(sent)d payment(s) prepared for signing, %(failed)d rejected: "
+"%(errors)s"
+msgstr ""
+"monobank: підготовлено на підпис платежів: %(sent)d, відхилено: %(failed)d: "
+"%(errors)s"
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid ""
+"monobank: %d payment(s) prepared and waiting for the signature in the "
+"monobank app."
+msgstr ""
+"monobank: підготовлено платежів: %d; вони чекають підпису в застосунку "
+"monobank."
+
+#. module: l10n_ua_bank_mono_payment
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono_payment/models/l10n_ua_bank_payment.py:0
+msgid "monobank: %s"
+msgstr "monobank: %s"
+
+#. module: l10n_ua_bank_mono_payment
+#: model:ir.actions.server,name:l10n_ua_bank_mono_payment.ir_cron_mono_payment_refresh_ir_actions_server
+msgid "monobank: стан платежів на підписі"
+msgstr "monobank: стан платежів на підписі"

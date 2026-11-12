@@ -1463,6 +1463,9 @@ class HrPayslip(models.Model):
         # Погодинна оплата за навчальні заняття — #417.
         self._generate_teaching_hours()
 
+        # Вихідна допомога при звільненні (ст. 44 КЗпП) — #505.
+        self._generate_severance(params)
+
         # The norm is the month's, so the salary pays only the days worked;
         # the days away are paid by what pays for them.
         self._generate_absence_pay()
@@ -1795,6 +1798,87 @@ class HrPayslip(models.Model):
             'notes': _('Навчальні заняття: %(hours)s год за %(count)d записами',
                        hours=f'{hours:g}', count=len(entries)),
         })
+
+    def _generate_severance(self, params):
+        """Вихідна допомога за підставою звільнення (ст. 44 КЗпП).
+
+        Договір працівника закінчився в періоді листка, і його підстава
+        (hr.termination.reason) вимагає вихідної допомоги. Розмір — кількість
+        середньомісячних заробітків за два останні місяці (Порядок № 100)
+        або дві мінімальні заробітні плати при призові (п. 3 ст. 36). Вид
+        нарахування SEVERANCE: ПДФО і військовий збір так, ЄСВ ні.
+        Якщо вихідну допомогу вже внесено вручну — не дублюємо.
+        """
+        self.ensure_one()
+        acc_type = self.env['hr.accrual.type'].search([('code', '=', 'SEVERANCE')], limit=1)
+        if not acc_type or any(
+                a.accrual_type_id == acc_type and not a.is_auto_generated
+                for a in self.accrual_ids):
+            return
+        versions = self.employee_id.sudo().with_context(active_test=False).version_ids.filtered(
+            lambda v: v.contract_date_end
+            and self.date_from <= v.contract_date_end <= self.date_to
+            and v.termination_reason_ua_id.requires_compensation)
+        if not versions:
+            return
+        version = versions.sorted('contract_date_end')[-1]
+        reason = version.termination_reason_ua_id
+        end = version.contract_date_end
+        kind = reason.compensation_amount
+        if kind == 'two_min_wages':
+            if not params.min_wage:
+                return
+            quantity, rate = 2, params.min_wage
+            note = _('Вихідна допомога: 2 мінімальні заробітні плати (%s)', reason.full_reference or reason.name)
+        else:
+            months = reason.SEVERANCE_MONTHS.get(kind)
+            if not months:
+                return
+            rate = self._average_monthly_earnings(end, version)
+            if rate <= 0:
+                return
+            quantity = months
+            note = _('Вихідна допомога: %(months)s × середньомісячний заробіток (%(reason)s)',
+                     months=months, reason=reason.full_reference or reason.name)
+        self.env['hr.payslip.accrual'].create({
+            'payslip_id': self.id,
+            'accrual_type_id': acc_type.id,
+            'quantity': quantity,
+            'rate': round(rate, 2),
+            'amount': round(quantity * rate, 2),
+            'is_auto_generated': True,
+            'notes': note,
+        })
+
+    def _average_monthly_earnings(self, event_date, version=False):
+        """Середньомісячний заробіток за Порядком № 100 (п. 2 абз. 4, п. 8).
+
+        Виплати за два календарні місяці перед місяцем події: середньоденний
+        заробіток (заробіток за відпрацьовані дні / відпрацьовані дні) ×
+        середньомісячне число робочих днів за графіком (сума робочих днів двох
+        місяців / 2). Заробіток — види нарахувань з ознакою is_basic_salary
+        (п. 3 без виплат п. 4). Якщо відпрацьованих днів за два місяці немає —
+        посадовий оклад (п. 4 абз. 5).
+        """
+        self.ensure_one()
+        month_start = event_date.replace(day=1)
+        period_from = month_start - relativedelta(months=2)
+        slips = self.search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'done'),
+            ('date_from', '>=', period_from),
+            ('date_to', '<', month_start),
+        ])
+        earnings = sum(slips.mapped('accrual_ids').filtered(
+            lambda a: a.accrual_type_id.is_basic_salary).mapped('amount'))
+        worked = sum(slips.mapped('worked_days'))
+        scheduled = sum(slips.mapped('scheduled_days'))
+        months = len({(s.date_from.year, s.date_from.month) for s in slips})
+        if worked > 0 and scheduled > 0 and months:
+            # П. 8: середньомісячне число робочих днів — за графіком двох місяців.
+            return earnings / worked * (scheduled / months)
+        version = version or self.version_id
+        return version.wage or 0.0
 
     def _generate_seniority(self, segments, params, several=False, versions=False):
         """Створити авто-надбавку «За вислугу років» на основі стажу.

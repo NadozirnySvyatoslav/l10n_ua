@@ -5,7 +5,7 @@ from datetime import date, datetime, time, timedelta
 from time import sleep
 from zoneinfo import ZoneInfo
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -387,22 +387,39 @@ class L10nUaBankSyncConfig(models.Model):
 
     # --- Corporate API (legal entities) ---
 
-    def _mono_corp_request(self, path, params=None):
-        """GET a Corporate API resource and return its decoded JSON."""
+    def _mono_corp_request(self, path, params=None, method='GET', payload=None,
+                           idempotency_key=None, raw=False):
+        """Call a Corporate API resource and return its decoded JSON.
+
+        `payload` goes as the JSON body of a POST or DELETE. Mutations that
+        create something in the bank (a payment, a salary registry) take an
+        `idempotency_key`: the same key may be sent again after a network
+        failure without creating a second one. `raw` returns the response
+        itself (a PDF, or an empty 204), and None for an empty body.
+        """
         self.ensure_one()
         url = f"{MONO_CORP_API_URL}{path}"
         headers = {
             'x-token': self._mono_token(),
             'accept': 'application/json',
         }
+        if idempotency_key:
+            headers['idempotency-key'] = idempotency_key
+        kwargs = {'headers': headers, 'params': params, 'timeout': 60}
+        if payload is not None:
+            kwargs['json'] = payload
+        # requests.get / post / delete, not requests.request: callers and
+        # tests patch the verb they mean.
+        send = getattr(requests, method.lower())
         waited = 0
         while True:
             try:
-                response = requests.get(url, headers=headers, params=params, timeout=60)
+                response = send(url, **kwargs)
             except requests.exceptions.RequestException as e:
                 raise UserError(_("Connection failed: %s") % str(e))
 
-            _logger.info("monobank corporate: %s -> %s", path, response.status_code)
+            _logger.info("monobank corporate: %s %s -> %s",
+                         method, path, response.status_code)
 
             if response.status_code != 429:
                 break
@@ -421,15 +438,52 @@ class L10nUaBankSyncConfig(models.Model):
             sleep(retry_after)
             waited += retry_after
 
-        if response.status_code != 200:
-            try:
-                error = response.json()
-                message = error.get('errorDescription') or error.get('errorCode')
-            except (ValueError, AttributeError):
-                message = None
-            raise UserError(_("monobank API error: %s") % (message or response.text))
-
+        if response.status_code not in (200, 201, 202, 204):
+            raise UserError(_("monobank API error: %s") % self._mono_corp_error(response))
+        if raw:
+            return response
+        if response.status_code == 204 or not response.content:
+            return None
         return response.json()
+
+    @staticmethod
+    def _mono_corp_error(response):
+        """`errorDescription (errorCode)` of a failed call, or its text."""
+        try:
+            error = response.json()
+            code, message = error.get('errorCode'), error.get('errorDescription')
+        except (ValueError, AttributeError):
+            code = message = None
+        if code and message:
+            return f"{message} ({code})"
+        return message or code or response.text or str(response.status_code)
+
+    @api.model
+    def _mono_corp_config_for_iban(self, iban, company=None):
+        """The corporate monobank connection of an own account IBAN: the one
+        set on it explicitly, or the one of the journal with that account."""
+        iban = _clean_iban(iban)
+        if not iban:
+            return self.browse()
+        company = company or self.env.company
+        configs = self.search([
+            ('provider', '=', 'mono'),
+            ('mono_api_type', '=', 'corporate'),
+            ('company_id', '=', company.id),
+        ])
+        explicit = configs.filtered(
+            lambda c: _clean_iban(c.mono_account_id) == iban)
+        return explicit[:1] or configs.filtered(
+            lambda c: not c.mono_account_id
+            and _clean_iban(c.bank_account_id.acc_number) == iban)[:1]
+
+    def _mono_corp_iban_or_none(self):
+        """IBAN of the corporate account, or '' when there is none valid."""
+        self.ensure_one()
+        try:
+            return self._mono_corp_iban()
+        except UserError:
+            return ''
 
     def _mono_corp_iban(self):
         """IBAN of the account to read: set explicitly, or the journal's."""

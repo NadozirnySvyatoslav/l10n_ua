@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Vacation Reserve',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Human Resources/Localization',
     'summary': 'Резерв відпусток: автоматичне нарахування проводок (П(С)БО 26)',
     'description': """

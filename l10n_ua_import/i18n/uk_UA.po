@@ -1,0 +1,870 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* l10n_ua_import
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04 16:37+0000\n"
+"PO-Revision-Date: 2026-11-04 16:37+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__vat_rate__14
+msgid "14%"
+msgstr "14%"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__vat_rate__20
+msgid "20%"
+msgstr "20%"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "26UA500020000123U4"
+msgstr "26UA500020000123U4"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.view_move_form_import
+msgid "<span class=\"o_stat_text\">Customs</span>"
+msgstr "<span class=\"o_stat_text\">Митниця</span>"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "<span class=\"o_stat_text\">Landed Costs</span>"
+msgstr "<span class=\"o_stat_text\">Витрати на доставку</span>"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid ""
+"A vendor bill is not dated the clearance date: the goods are recognised in UAH at the\n"
+"                        NBU rate of the bill date (prepaid parts - at the rate of the prepayment)."
+msgstr ""
+"Рахунок постачальника датовано не днем митного оформлення: товари оцінюються в гривнях за\n"
+"                        курсом НБУ на дату рахунку (оплачена авансом частина — за курсом на дату авансу)."
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.res_config_settings_view_form_import
+msgid ""
+"Accounts and journal of the customs payments; empty - 377 and 6441 by code"
+msgstr ""
+"Рахунки й журнал митних платежів; якщо не задано — 377 і 6441 за кодом"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_needaction
+msgid "Action Needed"
+msgstr "Потрібна дія"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_ids
+msgid "Activities"
+msgstr "Дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Оформлення виключення дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_state
+msgid "Activity State"
+msgstr "Стан дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Іконка типу дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.constraint,message:l10n_ua_import.constraint_l10n_ua_import_declaration_name_company_uniq
+msgid "An import customs declaration with this number already exists."
+msgstr "Митна декларація на імпорт з таким номером уже існує."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_attachment_count
+msgid "Attachment Count"
+msgstr "Кількість вкладень"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__bill_date_warning
+msgid "Bill Date Warning"
+msgstr "Попередження про дату рахунку"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__split_method__by_current_cost_price
+msgid "By Current Cost"
+msgstr "За поточною вартістю"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__split_method__by_quantity
+msgid "By Quantity"
+msgstr "За кількістю"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__split_method__by_volume
+msgid "By Volume"
+msgstr "За обʼємом"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__split_method__by_weight
+msgid "By Weight"
+msgstr "За вагою"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Cancel the posted customs declaration before deleting it."
+msgstr "Скасуйте проведену митну декларацію, перш ніж видаляти її."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__state__cancel
+msgid "Cancelled"
+msgstr "Скасовано"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Clearance Date"
+msgstr "Дата оформлення"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Clearance Month"
+msgstr "Місяць оформлення"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_res_company
+msgid "Companies"
+msgstr "Компанії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__company_id
+msgid "Company"
+msgstr "Компанія"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__company_currency_id
+msgid "Company Currency"
+msgstr "Валюта компанії"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_res_config_settings
+msgid "Config Settings"
+msgstr "Налаштування"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Contract"
+msgstr "Контракт"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__currency_id
+msgid "Contract Currency"
+msgstr "Валюта контракту"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__create_uid
+msgid "Created by"
+msgstr "Створив"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__create_date
+msgid "Created on"
+msgstr "Створено"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Customs"
+msgstr "Митниця"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__duty_amount
+#: model:product.template,name:l10n_ua_import.product_customs_duty_product_template
+msgid "Customs Duty"
+msgstr "Мито"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__fee_amount
+#: model:product.template,name:l10n_ua_import.product_customs_fee_product_template
+msgid "Customs Fees"
+msgstr "Митні збори"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__customs_office_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Customs Office"
+msgstr "Митниця"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__customs_office_code
+msgid "Customs Office Code"
+msgstr "Код митного органу"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__amount_customs_total
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Customs Payments"
+msgstr "Митні платежі"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_company__l10n_ua_import_customs_account_id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_config_settings__l10n_ua_import_customs_account_id
+msgid "Customs Payments Account"
+msgstr "Рахунок розрахунків з митницею"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__regime
+msgid "Customs Regime"
+msgstr "Митний режим"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__customs_value
+msgid "Customs Value (UAH)"
+msgstr "Митна вартість (грн)"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Customs declaration %s"
+msgstr "Митна декларація %s"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Customs duty"
+msgstr "Мито"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Customs fees"
+msgstr "Митні збори"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Customs payments cannot be negative."
+msgstr "Митні платежі не можуть бути відʼємними."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__name
+msgid "Declaration Number"
+msgstr "Номер декларації"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_company__l10n_ua_import_customs_partner_id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_config_settings__l10n_ua_import_customs_partner_id
+msgid "Default Customs Office"
+msgstr "Митниця за замовчуванням"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_tax_invoice__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_vat_erpn_limit__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_stock_landed_cost__display_name
+#: model:ir.model.fields,field_description:l10n_ua_import.field_stock_valuation_adjustment_lines__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Draft"
+msgstr "Чернетка"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_l10n_ua_vat_erpn_limit
+msgid "ERPN Registration Limit (Реєстраційний ліміт)"
+msgstr "Реєстраційний ліміт ЄРПН"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__split_method__equal
+msgid "Equal"
+msgstr "Порівну"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__excise_amount
+msgid "Excise Tax"
+msgstr "Акцизний податок"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__vat_rate__exempt
+msgid "Exempt"
+msgstr "Звільнено"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_follower_ids
+msgid "Followers"
+msgstr "Підписники"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Підписники (партнери)"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Іконка Font Awesome, напр. fa-tasks"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__agreement_id
+msgid "Foreign Trade Contract"
+msgstr "Зовнішньоекономічний контракт"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__has_message
+msgid "Has Message"
+msgstr "Має повідомлення"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_tax_invoice__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_vat_erpn_limit__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_config_settings__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_stock_landed_cost__id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_stock_valuation_adjustment_lines__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__regime__im40
+msgid "IM-40 Release for Free Circulation"
+msgstr "ІМ-40 Випуск у вільний обіг"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__regime__im41
+msgid "IM-41 Re-import"
+msgstr "ІМ-41 Реімпорт"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_exception_icon
+msgid "Icon"
+msgstr "Іконка"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Іконка для позначення виключення дії."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Якщо позначено, нові повідомлення потребують вашої уваги."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__message_has_error
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
+
+#. module: l10n_ua_import
+#: model:ir.ui.menu,name:l10n_ua_import.menu_l10n_ua_import
+msgid "Import"
+msgstr "Імпорт"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.res_config_settings_view_form_import
+msgid "Import (Ukraine)"
+msgstr "Імпорт (Україна)"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_l10n_ua_import_declaration
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_tax_invoice__l10n_ua_import_declaration_id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_stock_landed_cost__l10n_ua_import_declaration_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Import Customs Declaration"
+msgstr "Митна декларація на імпорт"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/account_move.py:0
+#: model:ir.actions.act_window,name:l10n_ua_import.l10n_ua_import_declaration_action
+#: model:ir.model.fields,field_description:l10n_ua_import.field_account_bank_statement_line__l10n_ua_import_declaration_ids
+#: model:ir.model.fields,field_description:l10n_ua_import.field_account_move__l10n_ua_import_declaration_ids
+#: model:ir.ui.menu,name:l10n_ua_import.menu_l10n_ua_import_declarations
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.res_config_settings_view_form_import
+msgid "Import Customs Declarations"
+msgstr "Митні декларації на імпорт"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_company__l10n_ua_import_journal_id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_config_settings__l10n_ua_import_journal_id
+msgid "Import Customs Journal"
+msgstr "Журнал митних декларацій на імпорт"
+
+#. module: l10n_ua_import
+#: model:product.template,name:l10n_ua_import.product_import_excise_product_template
+msgid "Import Excise Tax"
+msgstr "Акцизний податок з імпорту"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__vat_amount
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Import VAT"
+msgstr "ПДВ з імпорту"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_company__l10n_ua_import_vat_account_id
+#: model:ir.model.fields,field_description:l10n_ua_import.field_res_config_settings__l10n_ua_import_vat_account_id
+msgid "Import VAT Account"
+msgstr "Рахунок ПДВ з імпорту"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__move_id
+msgid "Import VAT Entry"
+msgstr "Проведення ПДВ з імпорту"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__vat_payment_date
+msgid "Import VAT Paid On"
+msgstr "Дата сплати ПДВ"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Import VAT, customs declaration %s"
+msgstr "ПДВ з імпорту, митна декларація %s"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Import excise tax"
+msgstr "Акцизний податок з імпорту"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Import of goods, customs declaration %s"
+msgstr "Ввезення товарів, митна декларація %s"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__incoterm_id
+msgid "Incoterms"
+msgstr "Інкотермс"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__invoice_value
+msgid "Invoice Value"
+msgstr "Фактурна вартість"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_is_follower
+msgid "Is Follower"
+msgstr "Є підписником"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_account_move
+msgid "Journal Entry"
+msgstr "Проведення"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__landed_cost_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Landed Costs"
+msgstr "Витрати на доставку"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__write_uid
+msgid "Last Updated by"
+msgstr "Востаннє оновив"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__write_date
+msgid "Last Updated on"
+msgstr "Востаннє оновлено"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid ""
+"Link the receipts of the imported goods: the customs duty, excise and fees "
+"are added to their cost."
+msgstr ""
+"Вкажіть надходження імпортних товарів: мито, акциз і збори включаються до їх"
+" собівартості."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_has_error
+msgid "Message Delivery error"
+msgstr "Помилка доставки повідомлення"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_ids
+msgid "Messages"
+msgstr "Повідомлення"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Дедлайн моєї дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__exchange_rate
+msgid "NBU Rate"
+msgstr "Курс НБУ"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "Подія календаря наступної дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Дедлайн наступної дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_summary
+msgid "Next Activity Summary"
+msgstr "Підсумок наступної дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_type_id
+msgid "Next Activity Type"
+msgstr "Тип наступної дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Кількість дій"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_has_error_counter
+msgid "Number of errors"
+msgstr "Кількість помилок"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Кількість повідомлень, що потребують дії"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Only cancelled customs declarations can be reset to draft."
+msgstr "У чернетку можна повернути лише скасовану митну декларацію."
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Only draft customs declarations can be posted."
+msgstr "Провести можна лише чернетку митної декларації."
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Post"
+msgstr "Провести"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields.selection,name:l10n_ua_import.selection__l10n_ua_import_declaration__state__posted
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Posted"
+msgstr "Проведено"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid ""
+"Posted landed costs and the import VAT entry will be reversed. Continue?"
+msgstr ""
+"Проведені витрати на доставку й проведення ПДВ з імпорту буде сторновано. "
+"Продовжити?"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__rating_ids
+msgid "Ratings"
+msgstr "Оцінки"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__picking_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Receipts"
+msgstr "Надходження"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Reset to Draft"
+msgstr "Повернути в чернетку"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__activity_user_id
+msgid "Responsible User"
+msgstr "Відповідальний"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Reversal of %s"
+msgstr "Сторно %s"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Reversal of the customs declaration %s"
+msgstr "Сторно митної декларації %s"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Помилка доставки SMS"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Set the customs payments account in the accounting settings."
+msgstr "Вкажіть рахунок розрахунків з митницею в налаштуваннях бухобліку."
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Set the customs value of the declaration %s."
+msgstr "Вкажіть митну вартість декларації %s."
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "Set the import VAT account and the journal in the accounting settings."
+msgstr "Вкажіть рахунок ПДВ з імпорту і журнал у налаштуваннях бухобліку."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__split_method
+msgid "Split Method"
+msgstr "Спосіб розподілу"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__state
+msgid "State"
+msgstr "Стан"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Стан на основі дій\n"
+"Прострочено: термін уже минув\n"
+"Сьогодні: дата дії — сьогодні\n"
+"Заплановано: майбутні дії."
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_stock_landed_cost
+msgid "Stock Landed Cost"
+msgstr "Витрати на доставку"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__tax_invoice_id
+msgid "Tax Credit Document"
+msgstr "Документ податкового кредиту"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_l10n_ua_tax_invoice
+msgid "Tax Invoice (Податкова накладна)"
+msgstr "Податкова накладна"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid ""
+"The customs declaration number %s is not in the EAIS format, e.g. "
+"26UA500020000123U4."
+msgstr ""
+"Номер митної декларації %s не у форматі ЄАІС, напр. 26UA500020000123U4."
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_list
+msgid "Total"
+msgstr "Разом"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Тип дії-виключення в записі."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__vat_base
+msgid "VAT Base"
+msgstr "База ПДВ"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__vat_rate
+msgid "VAT Rate"
+msgstr "Ставка ПДВ"
+
+#. module: l10n_ua_import
+#: model:ir.model,name:l10n_ua_import.model_stock_valuation_adjustment_lines
+msgid "Valuation Adjustment Lines"
+msgstr "Рядки коригування оцінки"
+
+#. module: l10n_ua_import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Value"
+msgstr "Вартість"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__partner_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_search
+msgid "Vendor"
+msgstr "Постачальник"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__bill_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_import.l10n_ua_import_declaration_view_form
+msgid "Vendor Bills"
+msgstr "Рахунки постачальника"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,field_description:l10n_ua_import.field_l10n_ua_import_declaration__website_message_ids
+msgid "Website Messages"
+msgstr "Повідомлення з сайту"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__website_message_ids
+msgid "Website communication history"
+msgstr "Історія спілкування на сайті"
+
+#. module: l10n_ua_import
+#. odoo-python
+#: code:addons/l10n_ua_import/models/account_move.py:0
+#: code:addons/l10n_ua_import/models/import_declaration.py:0
+msgid "id"
+msgstr "id"
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__date
+msgid "Дата митного оформлення (випуску у вільний обіг)."
+msgstr "Дата митного оформлення (випуску у вільний обіг)."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__vat_payment_date
+msgid ""
+"Дата сплати ПДВ за МД — дата податкового кредиту (п. 198.2, 187.8 ПКУ). "
+"Зазвичай збігається з датою оформлення, бо ПДВ сплачують до випуску товарів."
+msgstr ""
+"Дата сплати ПДВ за МД — дата податкового кредиту (п. 198.2, 187.8 ПКУ). "
+"Зазвичай збігається з датою оформлення, бо ПДВ сплачують до випуску товарів."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_res_company__l10n_ua_import_vat_account_id
+#: model:ir.model.fields,help:l10n_ua_import.field_res_config_settings__l10n_ua_import_vat_account_id
+msgid "Дебет на суму ПДВ з МД — податковий кредит (типово 6441)."
+msgstr "Дебет на суму ПДВ з МД — податковий кредит (типово 6441)."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_res_company__l10n_ua_import_journal_id
+#: model:ir.model.fields,help:l10n_ua_import.field_res_config_settings__l10n_ua_import_journal_id
+msgid ""
+"Журнал проведень митної декларації на імпорт (ПДВ і митні платежі у "
+"собівартість)."
+msgstr ""
+"Журнал проведень митної декларації на імпорт (ПДВ і митні платежі у "
+"собівартість)."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__customs_office_code
+msgid "Код митного органу, напр. UA500020."
+msgstr "Код митного органу, напр. UA500020."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__exchange_rate
+msgid ""
+"Курс НБУ на дату митного оформлення, гривень за одиницю валюти контракту "
+"(гр. 23 МД)."
+msgstr ""
+"Курс НБУ на дату митного оформлення, гривень за одиницю валюти контракту "
+"(гр. 23 МД)."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__vat_base
+msgid "Митна вартість + мито + акциз (п. 190.1 ПКУ)."
+msgstr "Митна вартість + мито + акциз (п. 190.1 ПКУ)."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__customs_value
+msgid ""
+"Митна вартість у гривнях (гр. 45 МД). За замовчуванням — фактурна вартість "
+"за курсом НБУ на дату оформлення; уточніть, якщо до неї додано доставку до "
+"кордону тощо."
+msgstr ""
+"Митна вартість у гривнях (гр. 45 МД). За замовчуванням — фактурна вартість "
+"за курсом НБУ на дату оформлення; уточніть, якщо до неї додано доставку до "
+"кордону тощо."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__customs_office_id
+msgid ""
+"Митниця, на користь якої сплачено митні платежі — контрагент у розрахунках "
+"(377) і в реєстрі податкових документів."
+msgstr ""
+"Митниця, на користь якої сплачено митні платежі — контрагент у розрахунках "
+"(377) і в реєстрі податкових документів."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_res_company__l10n_ua_import_customs_partner_id
+#: model:ir.model.fields,help:l10n_ua_import.field_res_config_settings__l10n_ua_import_customs_partner_id
+msgid ""
+"Митниця, на рахунок якої сплачують митні платежі, для нових митних "
+"декларацій."
+msgstr ""
+"Митниця, на рахунок якої сплачують митні платежі, для нових митних "
+"декларацій."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__amount_customs_total
+msgid "Мито + акциз + збори + ПДВ — до сплати митниці."
+msgstr "Мито + акциз + збори + ПДВ — до сплати митниці."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__name
+msgid "Номер митної декларації у форматі ЄАІС, напр. 26UA500020000123U4."
+msgstr "Номер митної декларації у форматі ЄАІС, напр. 26UA500020000123U4."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_res_company__l10n_ua_import_customs_account_id
+#: model:ir.model.fields,help:l10n_ua_import.field_res_config_settings__l10n_ua_import_customs_account_id
+msgid ""
+"Розрахунки з митницею: кредит на суму мита, акцизу, зборів і ПДВ з МД. "
+"Типово 377 (аванс, сплачений на рахунок митниці) або 642, якщо платежі "
+"обліковують як обов’язкові."
+msgstr ""
+"Розрахунки з митницею: кредит на суму мита, акцизу, зборів і ПДВ з МД. "
+"Типово 377 (аванс, сплачений на рахунок митниці) або 642, якщо платежі "
+"обліковують як обов’язкові."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__invoice_value
+msgid "Фактурна вартість товарів у валюті контракту (без ПДВ)."
+msgstr "Фактурна вартість товарів у валюті контракту (без ПДВ)."
+
+#. module: l10n_ua_import
+#: model:ir.model.fields,help:l10n_ua_import.field_l10n_ua_import_declaration__split_method
+msgid "Як розподілити мито, акциз і збори між товарами надходжень."
+msgstr "Як розподілити мито, акциз і збори між товарами надходжень."

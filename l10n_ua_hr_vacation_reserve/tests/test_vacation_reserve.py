@@ -97,6 +97,31 @@ class TestVacationReserve(TransactionCase):
         # 24 * 31 / 365 = 2.03835... → 2.04
         self.assertAlmostEqual(line.days_accrued, 2.04, places=2)
 
+    def test_daily_average_is_the_vacation_pay_base(self):
+        """Середньоденний — база відпускних (нарахована, не total_net) (#416)."""
+        salary = self.env['hr.accrual.type'].search([('code', '=', 'SALARY')], limit=1)
+        slip = self.env['hr.payslip'].create({
+            'employee_id': self.emp1.id, 'company_id': self.company.id,
+            'date_from': date(2024, 12, 1), 'date_to': date(2024, 12, 31),
+        })
+        self.env['hr.payslip.accrual'].create({
+            'payslip_id': slip.id, 'accrual_type_id': salary.id,
+            'quantity': 1, 'rate': 36600, 'amount': 36600,
+        })
+        slip.state = 'done'
+        rec = self.env['hr.vacation.reserve'].create({
+            'period_start': date(2025, 1, 1),
+            'period_end': date(2025, 1, 31),
+            'line_ids': [(0, 0, {'employee_id': self.emp1.id})],
+        })
+        expected = self.env['hr.leave']._l10n_ua_vacation_average(
+            self.emp1, date(2024, 2, 1), date(2025, 1, 31))
+        self.assertTrue(expected)
+        self.assertAlmostEqual(rec.line_ids.daily_average, expected, places=2)
+        # Раніше резерв читав неіснуюче поле total_net і падав, щойно в
+        # періоді був закритий листок. Тепер — нарахована зарплата / дні.
+        self.assertGreater(rec.line_ids.daily_average, 36600 / 366)
+
     def test_expense_account_priority_company(self):
         """Без override на employee/job — береться company default."""
         rec = self.env['hr.vacation.reserve'].create({

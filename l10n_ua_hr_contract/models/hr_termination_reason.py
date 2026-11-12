@@ -43,16 +43,26 @@ class HrTerminationReason(models.Model):
         string='Severance Pay Required',
         help='Whether severance pay is required by law'
     )
+    # Розмір вихідної допомоги (ст. 44 КЗпП): кількість середньомісячних
+    # заробітків (Порядок № 100, п. 2 абз. 4 і п. 8 — за два останні місяці)
+    # або дві мінімальні заробітні плати при призові (п. 3 ст. 36).
     compensation_amount = fields.Selection([
         ('none', 'None'),
-        ('one_month', 'One Month Salary'),
-        ('two_months', 'Two Months Salary'),
-        ('three_months', 'Three Months Salary'),
-    ], string='Compensation Amount', default='none')
+        ('one_month', 'One Average Monthly Earnings'),
+        ('two_months', 'Two Average Monthly Earnings'),
+        ('three_months', 'Three Average Monthly Earnings'),
+        ('six_months', 'Six Average Monthly Earnings'),
+        ('two_min_wages', 'Two Minimum Wages'),
+    ], string='Compensation Amount', default='none',
+        help='Severance pay (art. 44 of the Labour Code) as a number of average '
+             'monthly earnings, computed from the last two calendar months '
+             '(Procedure No. 100), or two minimum wages on conscription.')
 
     notice_days = fields.Integer(
         string='Notice Days',
-        help='Days of advance notice required'
+        help='Days of advance notice required. A multiple of 30 is read as '
+             'calendar months: 60 is the two months of art. 49-2 of the Labour '
+             'Code, counted from the notice date.'
     )
 
     requires_union_consent = fields.Boolean(
@@ -95,3 +105,21 @@ class HrTerminationReason(models.Model):
         'unique(code)',
         'Termination reason code must be unique!',
     )
+
+    # Множник середньомісячного заробітку для вихідної допомоги.
+    SEVERANCE_MONTHS = {'one_month': 1, 'two_months': 2, 'three_months': 3, 'six_months': 6}
+
+    def _notice_deadline(self, notice_date):
+        """Найраніша дата звільнення після попередження notice_date.
+
+        Кратне 30 число днів — календарні місяці (ст. 49-2 КЗпП: «не пізніше
+        ніж за два місяці»), інакше — дні.
+        """
+        self.ensure_one()
+        from dateutil.relativedelta import relativedelta
+        days = self.notice_days or 0
+        if not notice_date or days <= 0:
+            return False
+        if days % 30 == 0:
+            return notice_date + relativedelta(months=days // 30)
+        return notice_date + relativedelta(days=days)

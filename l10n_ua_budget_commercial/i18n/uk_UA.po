@@ -1,0 +1,1363 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-04 17:17+0000\n"
+"PO-Revision-Date: 2026-11-04 17:17+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/account_move.py:0
+msgid ""
+"%(item)s (%(budget)s, %(from)s – %(to)s): planned %(planned)s, actual "
+"%(actual)s"
+msgstr ""
+"%(item)s (%(budget)s, %(from)s – %(to)s): план %(planned)s, факт %(actual)s"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "%s (copy)"
+msgstr "%s (копія)"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__shift_months
+msgid "12 copies the budget to the next year, 3 to the next quarter."
+msgstr "12 — копія на наступний рік, 3 — на наступний квартал."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "<span class=\"o_stat_text\">Analysis</span>"
+msgstr "<span class=\"o_stat_text\">Аналіз</span>"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_copy_wizard.py:0
+msgid ""
+"A budget broken down by quarters can only be shifted by whole quarters."
+msgstr "Бюджет із розбивкою на квартали можна зсувати лише на цілі квартали."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid ""
+"A budget broken down by quarters or years must start at the beginning of a "
+"quarter or year."
+msgstr ""
+"Бюджет із розбивкою на квартали або роки має починатися з початку кварталу "
+"або року."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_copy_wizard.py:0
+msgid "A budget broken down by years can only be shifted by whole years."
+msgstr "Бюджет із розбивкою на роки можна зсувати лише на цілі роки."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "A budget must start on the first day of a month."
+msgstr "Бюджет має починатися з першого числа місяця."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "A sub-budget must have the same budget type as its parent."
+msgstr "Дочірній бюджет має бути того самого виду, що й батьківський."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "A sub-budget period must lie within the parent budget period."
+msgstr "Період дочірнього бюджету має бути в межах періоду батьківського."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__account_codes
+msgid "Account Code Prefixes"
+msgstr "Префікси кодів рахунків"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__account_ids
+msgid "Accounts"
+msgstr "Рахунки"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_item__account_ids
+msgid ""
+"Accounts whose movements make the actual of this item. For a cash flow item "
+"these are counterpart accounts of cash movements."
+msgstr ""
+"Рахунки, обороти яких формують факт статті. Для статті БДДС — кореспондуючі "
+"рахунки руху грошових коштів."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_needaction
+msgid "Action Needed"
+msgstr "Необхідна дія"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__active
+msgid "Active"
+msgstr "Активно"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_ids
+msgid "Activities"
+msgstr "Дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Оформлення виключення дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_state
+msgid "Activity State"
+msgstr "Стан дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Іконка типу дії"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__actual_amount
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__amount_actual
+msgid "Actual"
+msgstr "Факт"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_line__variance_amount
+msgid "Actual minus planned."
+msgstr "Факт мінус план."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Actual result"
+msgstr "Фактичний результат"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid "Actual: %s"
+msgstr "Факт: %s"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+msgid "Actuals Source"
+msgstr "Джерело факту"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__actuals_date
+msgid "Actuals Updated On"
+msgstr "Факт оновлено"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Add an empty line for each budget item of this type and each period"
+msgstr ""
+"Додати порожній рядок для кожної статті цього виду бюджету та кожного "
+"періоду"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Analytic"
+msgstr "Аналітика"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__analytic_account_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Analytic Account"
+msgstr "Аналітичний рахунок"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__analytic_account_ids
+msgid "Analytic Accounts"
+msgstr "Аналітичні рахунки"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__analytic_account_id
+msgid ""
+"Analytic account of the responsibility centre (ЦФВ) or project. It is the "
+"default analytic of new lines and filters actuals."
+msgstr ""
+"Аналітичний рахунок центру фінансової відповідальності (ЦФВ) або проєкту. "
+"Підставляється в нові рядки та фільтрує факт."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Approve"
+msgstr "Затвердити"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__state__approved
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Approved"
+msgstr "Затверджено"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+msgid "Archived"
+msgstr "Архівовано"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_attachment_count
+msgid "Attachment Count"
+msgstr "Підрахунок прикріплення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_copy_wizard__scenario__base
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__scenario__base
+msgid "Base"
+msgstr "Базовий"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Base Scenario"
+msgstr "Базовий сценарій"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__res_company__l10n_ua_budget_control__block
+msgid "Block"
+msgstr "Блокувати"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__period_type
+msgid "Breakdown"
+msgstr "Розбивка"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__plan_id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__plan_id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__plan_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Budget"
+msgstr "Бюджет"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Budget \"%s\" has no lines."
+msgstr "Бюджет «%s» не має рядків."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+#: model:ir.actions.act_window,name:l10n_ua_budget_commercial.action_budget_line_analysis
+#: model:ir.ui.menu,name:l10n_ua_budget_commercial.menu_budget_analysis
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_graph
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_pivot
+msgid "Budget Analysis"
+msgstr "Аналіз виконання бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_res_company__l10n_ua_budget_control
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_res_config_settings__l10n_ua_budget_control
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.res_config_settings_view_form_budget
+msgid "Budget Control on Vendor Bills"
+msgstr "Контроль бюджету в рахунках постачальників"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_l10n_ua_budget_xlsx_wizard
+msgid "Budget Excel Export/Import"
+msgstr "Експорт/імпорт бюджету в Excel"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_l10n_ua_budget_item
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__item_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Budget Item"
+msgstr "Стаття бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.actions.act_window,name:l10n_ua_budget_commercial.action_budget_item
+#: model:ir.ui.menu,name:l10n_ua_budget_commercial.menu_budget_item
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+msgid "Budget Items"
+msgstr "Статті бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_l10n_ua_budget_line
+msgid "Budget Line"
+msgstr "Рядок бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Budget Lines"
+msgstr "Рядки бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_l10n_ua_budget_plan
+msgid "Budget Plan"
+msgstr "Бюджет"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__plan_state
+msgid "Budget Status"
+msgstr "Статус бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__budget_type
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__budget_type
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__budget_type
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Budget Type"
+msgstr "Вид бюджету"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/account_move.py:0
+msgid "Budget exceeded:"
+msgstr "Перевищено бюджет:"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.constraint,message:l10n_ua_budget_commercial.constraint_l10n_ua_budget_item_code_company_uniq
+msgid "Budget item code must be unique per budget type and company!"
+msgstr ""
+"Код статті бюджету має бути унікальним у межах виду бюджету та компанії!"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_item.py:0
+msgid "Budget items cannot be nested recursively."
+msgstr "Статті бюджету не можуть бути вкладені циклічно."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.actions.act_window,help:l10n_ua_budget_commercial.action_budget_item
+msgid ""
+"Budget items map plan figures to accounts: income and expense items\n"
+"                for the Income &amp; Expense Budget, inflows and outflows for the Cash Flow Budget."
+msgstr ""
+"Статті бюджету пов'язують планові показники з рахунками: доходи й витрати\n"
+"                для БДР, надходження й видатки для БДДС."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.ui.menu,name:l10n_ua_budget_commercial.menu_budget_root
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.res_config_settings_view_form_budget
+msgid "Budgeting"
+msgstr "Бюджетування"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.actions.act_window,name:l10n_ua_budget_commercial.action_budget_plan
+#: model:ir.ui.menu,name:l10n_ua_budget_commercial.menu_budget_plan
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Budgets"
+msgstr "Бюджети"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Budgets cannot be nested recursively."
+msgstr "Бюджети не можуть бути вкладені циклічно."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_copy_wizard_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Cash Flow Budget"
+msgstr "БДДС"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_item__budget_type__cash
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__budget_type__cash
+msgid "Cash Flow Budget (cash basis)"
+msgstr "БДДС (бюджет руху грошових коштів, касовий метод)"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.res_config_settings_view_form_budget
+msgid "Check approved Income & Expense budgets when a vendor bill is posted"
+msgstr "Перевіряти затверджені БДР під час проведення рахунку постачальника"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_xlsx_wizard_form
+msgid "Close"
+msgstr "Закрити"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__state__closed
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Closed"
+msgstr "Закрито"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__code
+msgid "Code"
+msgstr "Код"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__coefficient
+msgid "Coefficient, %"
+msgstr "Коефіцієнт, %"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_item__account_codes
+msgid ""
+"Comma-separated account code prefixes, e.g. \"70, 71\". Combined with the "
+"explicit accounts. Prefixes work for every company."
+msgstr ""
+"Префікси кодів рахунків через кому, напр. «70, 71». Додаються до явно "
+"вибраних рахунків. Префікси діють для будь-якої компанії."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__note
+msgid "Comment"
+msgstr "Коментар"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_res_company
+msgid "Companies"
+msgstr "Компанії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__company_id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__company_id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__company_id
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__level__company
+msgid "Company"
+msgstr "Компанія"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_res_config_settings
+msgid "Config Settings"
+msgstr "Налаштування"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__source_plan_id
+msgid "Copied From"
+msgstr "Скопійовано з"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_copy_wizard_form
+msgid "Copy"
+msgstr "Копіювати"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.actions.act_window,name:l10n_ua_budget_commercial.action_budget_copy_wizard
+#: model:ir.model,name:l10n_ua_budget_commercial.model_l10n_ua_budget_copy_wizard
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_copy_wizard_form
+msgid "Copy Budget"
+msgstr "Копіювання бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__copy_children
+msgid "Copy Sub-budgets"
+msgstr "Копіювати дочірні бюджети"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__copy_children
+msgid ""
+"Copy the whole hierarchy of sub-budgets (responsibility centres, projects)."
+msgstr "Копіювати всю ієрархію дочірніх бюджетів (ЦФВ, проєкти)."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Copy to Scenario / Period"
+msgstr "Копіювати в сценарій / період"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.actions.act_window,help:l10n_ua_budget_commercial.action_budget_plan
+msgid "Create a budget"
+msgstr "Створіть бюджет"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.actions.act_window,help:l10n_ua_budget_commercial.action_budget_item
+msgid "Create a budget item"
+msgstr "Створіть статтю бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__create_uid
+msgid "Created by"
+msgstr "Створив"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__create_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__create_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__create_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__create_date
+msgid "Created on"
+msgstr "Створено"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__currency_id
+msgid "Currency"
+msgstr "Валюта"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__variance_amount
+msgid "Deviation"
+msgstr "Відхилення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__item_type
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__item_type
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Direction"
+msgstr "Напрям"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__res_company__l10n_ua_budget_control__none
+msgid "Disabled"
+msgstr "Вимкнено"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_account_move__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Draft"
+msgstr "Чернетка"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__date_to
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__date_to
+msgid "End Date"
+msgstr "Дата закінчення"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_xlsx_wizard_form
+msgid "Excel"
+msgstr "Excel"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Execution"
+msgstr "Виконання"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__execution_pct
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__execution_pct
+msgid "Execution, %"
+msgstr "Виконання, %"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_item__item_type__expense
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+msgid "Expense / Outflow"
+msgstr "Витрати / видаток"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_xlsx_wizard__mode__export
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_xlsx_wizard_form
+msgid "Export"
+msgstr "Експорт"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.actions.act_window,name:l10n_ua_budget_commercial.action_budget_xlsx_export
+msgid "Export Budget to Excel"
+msgstr "Експорт бюджету в Excel"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Export to Excel"
+msgstr "Експорт в Excel"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__file_data
+msgid "File"
+msgstr "Файл"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__file_name
+msgid "File Name"
+msgstr "Назва файлу"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_follower_ids
+msgid "Followers"
+msgstr "Підписники"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Підписники (Партнери)"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Іконка з чудовим шрифтом, напр. fa-tasks"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+msgid ""
+"For a cash flow item specify counterpart accounts of cash and bank\n"
+"                        movements: e.g. 361 for receipts from customers, 631 for payments to\n"
+"                        suppliers, 66 for wages."
+msgstr ""
+"Для статті БДДС вкажіть кореспондуючі рахунки руху коштів у касі та на\n"
+"                        рахунках у банку: напр. 361 — надходження від покупців, 631 — оплата\n"
+"                        постачальникам, 66 — заробітна плата."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Generate Lines"
+msgstr "Заповнити рядки"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__has_message
+msgid "Has Message"
+msgstr "Є повідомлення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_account_move__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_exception_icon
+msgid "Icon"
+msgstr "Значок"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Іконка для визначення виключення дії."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Якщо позначено, то нові повідомлення будуть потребувати вашої уваги."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_has_error
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_xlsx_wizard__mode__import
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_xlsx_wizard_form
+msgid "Import"
+msgstr "Імпорт"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.actions.act_window,name:l10n_ua_budget_commercial.action_budget_xlsx_import
+msgid "Import Budget from Excel"
+msgstr "Імпорт бюджету з Excel"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Import from Excel"
+msgstr "Імпорт з Excel"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Income & Expense Budget"
+msgstr "БДР"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_item__budget_type__pnl
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__budget_type__pnl
+msgid "Income & Expense Budget (accrual)"
+msgstr "БДР (бюджет доходів і витрат, метод нарахування)"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_item__budget_type
+msgid ""
+"Income & Expense Budget (БДР): actuals are account balances of the item accounts.\n"
+"Cash Flow Budget (БДДС): actuals are cash and bank movements whose counterpart account belongs to the item."
+msgstr ""
+"БДР: факт — обороти за рахунками статті.\n"
+"БДДС: факт — рух коштів у касі й банку, кореспондуючий рахунок якого належить статті."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_item__item_type__income
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+msgid "Income / Inflow"
+msgstr "Доходи / надходження"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_is_follower
+msgid "Is Follower"
+msgstr "Стежить"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_search
+msgid "Item"
+msgstr "Стаття"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_item.py:0
+msgid "Item \"%(item)s\" and its parent must have the same budget type."
+msgstr ""
+"Стаття «%(item)s» і батьківська стаття мають бути одного виду бюджету."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid "Item \"%(item)s\" does not belong to the budget type of \"%(plan)s\"."
+msgstr "Стаття «%(item)s» не належить до виду бюджету «%(plan)s»."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Item Code"
+msgstr "Код статті"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model,name:l10n_ua_budget_commercial.model_account_move
+msgid "Journal Entry"
+msgstr "Запис у журналі"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Journal Items"
+msgstr "Проводки"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Востаннє оновив"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__write_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__write_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__write_date
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__write_date
+msgid "Last Updated on"
+msgstr "Останнє оновлення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_item__company_id
+msgid "Leave empty to share the item between companies."
+msgstr "Залиште порожнім, щоб стаття була спільною для всіх компаній."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__level
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Level"
+msgstr "Рівень"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid "Line \"%(item)s\" (%(from)s – %(to)s) is outside the budget period."
+msgstr ""
+"Рядок «%(item)s» (%(from)s – %(to)s) виходить за межі періоду бюджету."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Lines"
+msgstr "Рядки"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid "Lines can only be added to a draft budget."
+msgstr "Рядки можна додавати лише в бюджет-чернетку."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Lines can only be generated in a draft budget."
+msgstr "Заповнювати рядки можна лише в бюджеті-чернетці."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Lines created: %(created)s, updated: %(updated)s."
+msgstr "Створено рядків: %(created)s, оновлено: %(updated)s."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid "Lines of an approved or closed budget cannot be deleted."
+msgstr "Рядки затвердженого або закритого бюджету видаляти не можна."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_has_error
+msgid "Message Delivery error"
+msgstr "Помилка доставлення повідомлення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_ids
+msgid "Messages"
+msgstr "Повідомлення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__mode
+msgid "Mode"
+msgstr "Режим"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__period_type__month
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Month"
+msgstr "Місяць"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Дедлайн моєї дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__name
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__name
+msgid "Name"
+msgstr "Назва"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__name
+msgid "New Budget Name"
+msgstr "Назва нового бюджету"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "Наступна подія календаря дій"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Дедлайн наступної дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_summary
+msgid "Next Activity Summary"
+msgstr "Підсумок наступної дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_type_id
+msgid "Next Activity Type"
+msgstr "Тип наступної дії"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.actions.act_window,help:l10n_ua_budget_commercial.action_budget_line_analysis
+msgid "No approved budgets yet"
+msgstr "Затверджених бюджетів ще немає"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "No column header matches a period of the budget (expected e.g. %s)."
+msgstr ""
+"Жоден заголовок колонки не відповідає періоду бюджету (очікується, напр., "
+"%s)."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__note
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__note
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Notes"
+msgstr "Примітки"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+msgid "Notes..."
+msgstr "Примітки..."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Кількість дій"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_has_error_counter
+msgid "Number of errors"
+msgstr "Кількість помилок"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Кількість повідомлень, які вимагають дії"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Кількість повідомлень з помилковою дставкою"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Only a draft budget can be imported into."
+msgstr "Імпортувати можна лише в бюджет-чернетку."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Only accounting administrators can approve, close or reopen budgets."
+msgstr ""
+"Затверджувати, закривати й повертати бюджети в чернетку можуть лише "
+"адміністратори бухгалтерії."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Only approved budgets can be closed."
+msgstr "Закрити можна лише затверджений бюджет."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Only draft budgets can be approved."
+msgstr "Затвердити можна лише бюджет-чернетку."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "Only draft budgets can be deleted."
+msgstr "Видалити можна лише бюджет-чернетку."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_copy_wizard__scenario__optimistic
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__scenario__optimistic
+msgid "Optimistic"
+msgstr "Оптимістичний"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_item__analytic_account_ids
+msgid ""
+"Optional: only journal items distributed to these analytic accounts count as"
+" actual of the item."
+msgstr ""
+"Необов'язково: у факт статті потрапляють лише проводки, розподілені на ці "
+"аналітичні рахунки."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__is_over_budget
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Over Budget"
+msgstr "Перевищення"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__parent_id
+msgid "Parent Budget"
+msgstr "Батьківський бюджет"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__parent_id
+msgid "Parent Item"
+msgstr "Батьківська стаття"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__parent_path
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__parent_path
+msgid "Parent Path"
+msgstr "Батьківський шлях"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Period"
+msgstr "Період"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_copy_wizard__scenario__pessimistic
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__scenario__pessimistic
+msgid "Pessimistic"
+msgstr "Песимістичний"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Plan"
+msgstr "План"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.actions.act_window,help:l10n_ua_budget_commercial.action_budget_plan
+msgid ""
+"Plan income and expenses (accrual) or cash flows (cash basis) by budget items,\n"
+"                periods and responsibility centres, then compare with actuals from accounting."
+msgstr ""
+"Плануйте доходи й витрати (БДР) або рух коштів (БДДС) за статтями, періодами\n"
+"                та ЦФВ і порівнюйте з фактом з бухгалтерії."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.actions.act_window,help:l10n_ua_budget_commercial.action_budget_line_analysis
+msgid ""
+"Plan versus actual by budget item, period, responsibility centre and "
+"scenario."
+msgstr "План/факт за статтями, періодами, ЦФВ і сценаріями."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__planned_amount
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__amount_planned
+msgid "Planned"
+msgstr "План"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__coefficient
+msgid "Planned amounts are multiplied by this percentage, e.g. 110 for +10%."
+msgstr "Планові суми множаться на цей відсоток, напр. 110 — це +10%."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid ""
+"Planned figures of an approved or closed budget cannot be changed. Reset the"
+" budget to draft first."
+msgstr ""
+"Планові показники затвердженого або закритого бюджету змінювати не можна. "
+"Спершу поверніть бюджет у чернетку."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_line__remaining_amount
+msgid "Planned minus actual."
+msgstr "План мінус факт."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Planned result"
+msgstr "Плановий результат"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Please choose a file to import."
+msgstr "Виберіть файл для імпорту."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/account_move.py:0
+msgid ""
+"Posting %(move)s exceeds the approved budget:\n"
+"%(details)s"
+msgstr ""
+"Проведення %(move)s перевищує затверджений бюджет:\n"
+"%(details)s"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__level__project
+msgid "Project"
+msgstr "Проєкт"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__period_type__quarter
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+msgid "Quarter"
+msgstr "Квартал"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__rating_ids
+msgid "Ratings"
+msgstr "Оцінювання"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__remaining_amount
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__amount_remaining
+msgid "Remaining"
+msgstr "Залишок"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Reset to Draft"
+msgstr "Повернути в чернетку"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__level__center
+msgid "Responsibility Centre"
+msgstr "Центр фінансової відповідальності"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__analytic_account_id
+msgid "Responsibility Centre / Project"
+msgstr "ЦФВ / проєкт"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_line__analytic_account_id
+msgid ""
+"Responsibility centre or project. When set, only journal items distributed "
+"to it count, weighted by the distribution percentage."
+msgstr ""
+"ЦФВ або проєкт. Якщо вказано, у факт потрапляють лише проводки, розподілені "
+"на нього, пропорційно відсотку розподілу."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__user_id
+msgid "Responsible"
+msgstr "Відповідальний"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_user_id
+msgid "Responsible User"
+msgstr "Відповідальний користувач"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_xlsx_wizard__import_result
+msgid "Result"
+msgstr "Результат"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Row %(row)s: \"%(value)s\" is not a number."
+msgstr "Рядок %(row)s: «%(value)s» — не число."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Row %(row)s: analytic account \"%(analytic)s\" not found."
+msgstr "Рядок %(row)s: аналітичний рахунок «%(analytic)s» не знайдено."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "Row %(row)s: budget item \"%(item)s\" not found."
+msgstr "Рядок %(row)s: статтю бюджету «%(item)s» не знайдено."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Помилка доставки SMS"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__scenario
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__scenario
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__scenario
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Scenario"
+msgstr "Сценарій"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__sequence
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__item_sequence
+msgid "Sequence"
+msgstr "Послідовність"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_copy_wizard__shift_months
+msgid "Shift Period by (months)"
+msgstr "Зсув періоду (місяців)"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_line__date_from
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__date_from
+msgid "Start Date"
+msgstr "Дата початку"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__state
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Status"
+msgstr "Статус"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Етап заснований на діях\n"
+"Протерміновано: термін виконання вже минув\n"
+"Сьогодні: дата дії сьогодні\n"
+"Заплановано: майбутні дії."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__child_count
+msgid "Sub-budget Count"
+msgstr "Кількість дочірніх бюджетів"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__child_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Sub-budgets"
+msgstr "Дочірні бюджети"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_item__child_ids
+msgid "Sub-items"
+msgstr "Підстатті"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "The file is empty."
+msgstr "Файл порожній."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "The file is not a valid Excel (.xlsx) workbook."
+msgstr "Файл не є коректною книгою Excel (.xlsx)."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+msgid "The openpyxl Python library is required to import Excel files."
+msgstr "Для імпорту файлів Excel потрібна Python-бібліотека openpyxl."
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_line.py:0
+msgid "The start date of a budget line must be before its end date."
+msgstr "Дата початку рядка бюджету має передувати даті закінчення."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.constraint,message:l10n_ua_budget_commercial.constraint_l10n_ua_budget_plan_check_dates
+msgid "The start date of a budget must be before its end date!"
+msgstr "Дата початку бюджету має передувати даті закінчення!"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_search
+msgid "Top-level Budgets"
+msgstr "Бюджети верхнього рівня"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/wizard/budget_xlsx_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_line_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Total"
+msgstr "Разом"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Тип дії виключення на записі."
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "Update Actuals"
+msgstr "Оновити факт"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_xlsx_wizard_form
+msgid ""
+"Upload a workbook in the export format: item code, item name, analytic\n"
+"                    account, then one column per budget period. Empty cells are skipped,\n"
+"                    existing lines are updated, missing ones are created."
+msgstr ""
+"Завантажте книгу у форматі експорту: код статті, назва статті, аналітичний\n"
+"                    рахунок, далі по колонці на кожен період бюджету. Порожні клітинки пропускаються,\n"
+"                    наявні рядки оновлюються, відсутні — створюються."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__res_company__l10n_ua_budget_control__warning
+msgid "Warning"
+msgstr "Попередження"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,field_description:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__website_message_ids
+msgid "Website Messages"
+msgstr "Повідомлення з веб-сайту"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_l10n_ua_budget_plan__website_message_ids
+msgid "Website communication history"
+msgstr "Історія бесіди на сайті"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_res_company__l10n_ua_budget_control
+#: model:ir.model.fields,help:l10n_ua_budget_commercial.field_res_config_settings__l10n_ua_budget_control
+msgid ""
+"What happens when a posted vendor bill makes an approved Income & Expense budget line exceed its plan:\n"
+"- Disabled: nothing;\n"
+"- Warning: the bill is posted and a note is logged on it;\n"
+"- Block: the bill cannot be posted."
+msgstr ""
+"Що відбувається, коли проведений рахунок постачальника виводить рядок затвердженого БДР за межі плану:\n"
+"- Вимкнено: нічого;\n"
+"- Попередження: рахунок проводиться, у ньому з'являється примітка;\n"
+"- Блокувати: рахунок не можна провести."
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.model.fields.selection,name:l10n_ua_budget_commercial.selection__l10n_ua_budget_plan__period_type__year
+msgid "Year"
+msgstr "Рік"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+msgid "e.g. 92, 93"
+msgstr "напр. 92, 93"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_item_form
+msgid "e.g. Administrative expenses"
+msgstr "напр. Адміністративні витрати"
+
+#. module: l10n_ua_budget_commercial
+#: model_terms:ir.ui.view,arch_db:l10n_ua_budget_commercial.view_budget_plan_form
+msgid "e.g. Budget 2027"
+msgstr "напр. Бюджет 2027"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "parent_id"
+msgstr "parent_id"
+
+#. module: l10n_ua_budget_commercial
+#. odoo-python
+#: code:addons/l10n_ua_budget_commercial/models/budget_plan.py:0
+msgid "plan_id"
+msgstr "plan_id"
+
+#. module: l10n_ua_budget_commercial
+#: model:ir.actions.server,name:l10n_ua_budget_commercial.ir_cron_budget_refresh_actuals_ir_actions_server
+msgid "Бюджетування: оновлення факту затверджених бюджетів"
+msgstr "Бюджетування: оновлення факту затверджених бюджетів"

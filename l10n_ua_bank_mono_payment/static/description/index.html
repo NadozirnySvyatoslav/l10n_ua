@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 0 auto; color: #333;">
+    <div style="text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #005BBB 0%, #FFD500 100%); border-radius: 8px; margin-bottom: 25px;">
+        <h1 style="color: white; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">monobank: платежі на підпис у застосунку</h1>
+    </div>
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <p>Платіжні доручення готуються в monobank через Corporate API (<code>/ext/v1/payment/prepare</code>) і підписуються директором у застосунку або web-кабінеті monobank — без КЕП в Odoo.</p><ul><li>Звичайні й бюджетні платежі (код виду сплати, додаткова інформація, фактичний платник).</li><li>Ідемпотентне надсилання: повтор після збою мережі не створює дубль.</li><li>Стан платежу з банку: очікує підпису, відхилено, у виписці; автоматичне зв'язування з рядком виписки.</li></ul>
+        <p>Потрібен токен Corporate API з web-кабінету monobank (web.monobank.ua) і підключення <strong>l10n_ua_bank_mono</strong> в режимі «Corporate API».</p>
+    </div>
+</div>
+</body>
+</html>
