@@ -12,3 +12,4 @@ jobs:
         with:
           python-version: '3.12'
       - run: python3 docs/tools/apps_check/check_descriptions.py
+      - run: python3 docs/tools/po_check/check_po_refs.py
