@@ -110,6 +110,16 @@ class L10nUaInventoryWritedown(models.Model):
         self.ensure_one()
         return datetime.combine(self.date, time(23, 59, 59))
 
+    def _value_datetime(self):
+        """Мітка нового ``product.value``: кінець дня документа, але не пізніше «зараз».
+
+        Для документа сьогоднішньою датою 23:59:59 — це майбутнє: вартість
+        «на зараз» такого запису не бачить, і склад розходиться з Головною
+        книгою. Рухи цього дня до «зараз» уже враховано в обліковій вартості.
+        """
+        self.ensure_one()
+        return min(self._valuation_datetime(), fields.Datetime.now())
+
     def action_fill(self):
         """Рядки для всіх запасів компанії з залишком на дату документа.
 
@@ -395,16 +405,24 @@ class L10nUaInventoryWritedownLine(models.Model):
     def _onchange_nrv_unit(self):
         self.nrv_set = True
 
+    @staticmethod
+    def _sync_nrv_set(vals):
+        """«ЧВР введено» — від самого значення: очищене поле (False/None) — не нуль.
+
+        Перекриває nrv_set з форми: після onchange там лишається True,
+        навіть коли користувач потім очистив ЧВР.
+        """
+        if 'nrv_unit' in vals:
+            vals['nrv_set'] = vals['nrv_unit'] is not False and vals['nrv_unit'] is not None
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if 'nrv_unit' in vals and 'nrv_set' not in vals:
-                vals['nrv_set'] = True
+            self._sync_nrv_set(vals)
         return super().create(vals_list)
 
     def write(self, vals):
-        if 'nrv_unit' in vals and 'nrv_set' not in vals:
-            vals['nrv_set'] = True
+        self._sync_nrv_set(vals)
         return super().write(vals)
 
     @api.depends('quantity', 'book_value', 'nrv_unit', 'nrv_set', 'exempt', 'prior_writedown')
@@ -449,6 +467,10 @@ class L10nUaInventoryWritedownLine(models.Model):
         Для AVCO Odoo бере вартість з останнього ``product.value``, якщо він
         пізніший за останнє надходження, і рахує середню далі від неї; для
         стандартної собівартості вона ж — ціна на дату.
+
+        Поточна вартість (без to_date) і для AVCO, і для стандартної — це
+        кількість × ``standard_price``: ``product.value`` без партії її не
+        оновлює, тож ціну пишемо явно (без повторного запису product.value).
         """
         ProductValue = self.env['product.value'].sudo()
         for line in self.filtered(lambda l: l.writedown_amount or l.reversal_amount):
@@ -461,12 +483,11 @@ class L10nUaInventoryWritedownLine(models.Model):
                 'product_id': product.id,
                 'company_id': line.company_id.id,
                 'value': float_round(line.new_unit_cost, precision_digits=6),
-                'date': line.writedown_id._valuation_datetime(),
+                'date': line.writedown_id._value_datetime(),
                 'description': line.writedown_id.name,
             })
-            if product.cost_method == 'standard':
-                product.sudo().with_context(disable_auto_revaluation=True).standard_price = \
-                    line.new_unit_cost
+            product.sudo().with_context(disable_auto_revaluation=True).standard_price = \
+                line.new_unit_cost
 
     def _restore_value(self):
         ProductValue = self.env['product.value'].sudo()
@@ -476,11 +497,9 @@ class L10nUaInventoryWritedownLine(models.Model):
                 'product_id': product.id,
                 'company_id': line.company_id.id,
                 'value': line.previous_unit_cost,
-                # Та сама мітка, що в уцінки: з однаковою датою Odoo бере
-                # пізніший запис, а «зараз» могло б бути раніше кінця дня документа.
-                'date': max(line.writedown_id._valuation_datetime(), fields.Datetime.now()),
+                # Не раніше мітки уцінки: з однаковою датою Odoo бере пізніший запис.
+                'date': max(line.writedown_id._value_datetime(), fields.Datetime.now()),
                 'description': _('Cancelled: %s', line.writedown_id.name),
             })
-            if product.cost_method == 'standard':
-                product.sudo().with_context(disable_auto_revaluation=True).standard_price = \
-                    line.previous_unit_cost
+            product.sudo().with_context(disable_auto_revaluation=True).standard_price = \
+                line.previous_unit_cost

@@ -212,9 +212,54 @@ class TestInventoryWritedown(AccountingTestCase):
         with self.assertRaisesRegex(UserError, 'later write-down'):
             earlier.action_cancel()
 
-    def test_line_has_multicompany_rule(self):
-        rule = self.env.ref('l10n_ua_accounting.l10n_ua_inventory_writedown_line_company_rule')
-        self.assertEqual(rule.model_id.model, 'l10n_ua.inventory.writedown.line')
+    def test_partial_stock_reversal_end_to_end(self):
+        """Уцінка → продаж 9 од. → сторно на залишку 1 од.: склад = ГК.
+
+        10 од. по 100 → 90 (100 на 946), продано 9; ЧВР решти зросла до 150 →
+        дохід 10 на 719, ціна 100, вартість залишку 100.
+        """
+        first, _line = self._writedown(90.0)
+        first.action_post()
+        self.assertAlmostEqual(self._value(), 900.0)
+        self._deliver(self.product, 9)
+        self.assertAlmostEqual(self._value(), 90.0)
+        second, line = self._writedown(150.0)
+        self.assertEqual(line.quantity, 1)
+        self.assertAlmostEqual(line.prior_writedown, 10.0)
+        self.assertAlmostEqual(line.reversal_amount, 10.0)
+        second.action_post()
+        income = second.move_id.line_ids.filtered(lambda l: l.account_id == self.acc_719)
+        self.assertAlmostEqual(income.credit, 10.0)
+        self.assertAlmostEqual(self._value(), 100.0)
+
+    def test_cleared_nrv_is_not_zero(self):
+        """Очищена ЧВР (False з форми) — не нуль: рядок лишається за обліковою вартістю."""
+        doc, line = self._writedown(80.0)
+        self.assertTrue(line.nrv_set)
+        self.assertAlmostEqual(line.writedown_amount, 200.0)
+        # Форма після onchange шле nrv_set=True разом з очищеним полем.
+        line.write({'nrv_unit': False, 'nrv_set': True})
+        self.assertFalse(line.nrv_set)
+        self.assertFalse(line.writedown_amount)
+        line.nrv_unit = 0.0
+        self.assertTrue(line.nrv_set)
+        self.assertAlmostEqual(line.writedown_amount, 1000.0)
+
+    def test_other_company_user_does_not_see_lines(self):
+        doc, line = self._writedown(80.0)
+        other = self.env['res.company'].create({'name': 'Інша компанія (уцінка)'})
+        user = self.env['res.users'].create({
+            'name': 'Бухгалтер іншої компанії', 'login': 'writedown_other_company',
+            'company_id': other.id, 'company_ids': [(6, 0, other.ids)],
+            'group_ids': [(6, 0, self.env.ref('account.group_account_user').ids)],
+        })
+        Line = self.env['l10n_ua.inventory.writedown.line'].with_user(user)
+        Doc = self.env['l10n_ua.inventory.writedown'].with_user(user)
+        self.assertFalse(Line.search([('id', '=', line.id)]))
+        self.assertFalse(Doc.search([('id', '=', doc.id)]))
+        # Свій користувач рядок бачить — правило не ховає все підряд.
+        self.assertEqual(self.env['l10n_ua.inventory.writedown.line'].search(
+            [('id', '=', line.id)]), line)
 
     def test_fifo_refused(self):
         fifo = self.env['product.category'].create({
