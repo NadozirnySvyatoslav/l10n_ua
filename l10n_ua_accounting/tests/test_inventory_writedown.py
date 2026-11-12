@@ -4,7 +4,7 @@
 """
 from odoo import fields
 from odoo.exceptions import UserError
-from odoo.tests import tagged
+from odoo.tests import Form, tagged
 
 from .common import AccountingTestCase
 
@@ -233,17 +233,31 @@ class TestInventoryWritedown(AccountingTestCase):
         self.assertAlmostEqual(self._value(), 100.0)
 
     def test_cleared_nrv_is_not_zero(self):
-        """Очищена ЧВР (False з форми) — не нуль: рядок лишається за обліковою вартістю."""
-        doc, line = self._writedown(80.0)
+        """Очищена у формі ЧВР (клієнт шле 0) — не нуль; уцінка до нуля — лише прапорцем."""
+        doc, line = self._writedown(None)
+        with Form(doc) as form:
+            with form.line_ids.edit(0) as row:
+                row.nrv_unit = 80.0
+                self.assertTrue(row.nrv_set)
         self.assertTrue(line.nrv_set)
         self.assertAlmostEqual(line.writedown_amount, 200.0)
-        # Форма після onchange шле nrv_set=True разом з очищеним полем.
-        line.write({'nrv_unit': False, 'nrv_set': True})
+        # Очищення поля: веб-клієнт шле 0, як і Form.
+        with Form(doc) as form:
+            with form.line_ids.edit(0) as row:
+                row.nrv_unit = 0.0
+                self.assertFalse(row.nrv_set)
         self.assertFalse(line.nrv_set)
         self.assertFalse(line.writedown_amount)
-        line.nrv_unit = 0.0
+        self.assertAlmostEqual(line.new_unit_cost, 100.0)
+        # Уцінка до нуля — явно: 0 і прапорець «ЧВР введено».
+        with Form(doc) as form:
+            with form.line_ids.edit(0) as row:
+                row.nrv_set = True
         self.assertTrue(line.nrv_set)
         self.assertAlmostEqual(line.writedown_amount, 1000.0)
+        # Програмний запис без прапорця: 0 — «не введено».
+        line.nrv_unit = 0.0
+        self.assertFalse(line.nrv_set)
 
     def test_other_company_user_does_not_see_lines(self):
         doc, line = self._writedown(80.0)

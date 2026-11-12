@@ -7570,8 +7570,9 @@ msgstr "Укажіть рахунки втрат від уцінки (946) і д
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__nrv_set
 msgid ""
 "Set when the net realisable value is entered: a line without it is left at "
-"book value (an empty value is not a zero NRV)."
-msgstr "Позначається, коли введено чисту вартість реалізації: рядок без неї лишається за обліковою вартістю (порожнє значення — не нульова ЧВР)."
+"book value. Set automatically for a non-zero value; to write the stock down "
+"to zero, enter 0 and tick this box."
+msgstr "Позначається, коли введено чисту вартість реалізації: рядок без неї лишається за обліковою вартістю. Для ненульового значення ставиться автоматично; щоб уцінити до нуля, введіть 0 і поставте цю позначку."
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__valuation_account_id

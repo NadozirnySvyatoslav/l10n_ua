@@ -57,7 +57,7 @@
                                     <field name="book_value" sum="Total"/>
                                     <field name="book_unit_cost"/>
                                     <field name="nrv_unit"/>
-                                    <field name="nrv_set" optional="hide"/>
+                                    <field name="nrv_set"/>
                                     <field name="exempt" optional="show"/>
                                     <field name="prior_writedown" optional="show"/>
                                     <field name="writedown_amount" sum="Total"/>

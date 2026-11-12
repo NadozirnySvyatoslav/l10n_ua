@@ -315,7 +315,8 @@ class L10nUaInventoryWritedownLine(models.Model):
     nrv_set = fields.Boolean(
         string='NRV Entered',
         help='Set when the net realisable value is entered: a line without it '
-             'is left at book value (an empty value is not a zero NRV).')
+             'is left at book value. Set automatically for a non-zero value; to '
+             'write the stock down to zero, enter 0 and tick this box.')
     exempt = fields.Boolean(
         string='Do Not Write Down',
         help='Raw materials and other supplies held for production are not '
@@ -403,17 +404,18 @@ class L10nUaInventoryWritedownLine(models.Model):
 
     @api.onchange('nrv_unit')
     def _onchange_nrv_unit(self):
-        self.nrv_set = True
+        # Веб-клієнт шле очищене поле як 0, тож 0 тут — «не введено».
+        # Нульова ЧВР (уцінка до нуля) — лише явним прапорцем «ЧВР введено».
+        self.nrv_set = bool(self.nrv_unit)
 
     @staticmethod
     def _sync_nrv_set(vals):
-        """«ЧВР введено» — від самого значення: очищене поле (False/None) — не нуль.
+        """«ЧВР введено» без явного прапорця — від значення: 0/порожньо — не введено.
 
-        Перекриває nrv_set з форми: після onchange там лишається True,
-        навіть коли користувач потім очистив ЧВР.
+        Якщо nrv_set передано (форма, явна уцінка до нуля), його не перекриваємо.
         """
-        if 'nrv_unit' in vals:
-            vals['nrv_set'] = vals['nrv_unit'] is not False and vals['nrv_unit'] is not None
+        if 'nrv_unit' in vals and 'nrv_set' not in vals:
+            vals['nrv_set'] = bool(vals['nrv_unit'])
 
     @api.model_create_multi
     def create(self, vals_list):
