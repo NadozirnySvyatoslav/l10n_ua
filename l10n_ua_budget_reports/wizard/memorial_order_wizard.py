@@ -304,12 +304,18 @@ class MemorialOrderWizard(models.TransientModel):
             aggregates=['debit:sum', 'credit:sum'],
         )
         prior_bal_by_acc = {}
-        hist_prior_balance = 0.0
+        pos_prior_balance = 0.0
+        neg_prior_balance = 0.0
         for acc, d, c in hist_open_rows:
             bal = (d or 0.0) - (c or 0.0)
             prior_bal_by_acc[acc.id] = bal
-            if company.currency_id.compare_amounts(bal, 0.0) > 0:
-                hist_prior_balance += bal
+            cmp = company.currency_id.compare_amounts(bal, 0.0)
+            if cmp > 0:
+                pos_prior_balance += bal
+            elif cmp < 0:
+                neg_prior_balance += -bal
+
+        hist_prior_balance = max(pos_prior_balance, neg_prior_balance)
         has_prior_unreversed = company.currency_id.compare_amounts(hist_prior_balance, 0.0) > 0
 
         has_unmigrated_prior_balance = (

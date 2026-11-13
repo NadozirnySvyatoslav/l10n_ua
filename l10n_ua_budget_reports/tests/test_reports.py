@@ -952,3 +952,70 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         data_budget = wiz_budget.get_report_data()
         self.assertEqual(data_budget.get('hist_prior_balance'), 60000.0)
         self.assertTrue(data_budget.get('has_unmigrated_prior_balance'))
+
+    def test_10_credit_prior_balance_warning(self):
+        """Кредитовий залишок минулого періоду на позабалансовому рахунку (зобов'язання) коректно викликає попередження."""
+        comp_credit = self.env['res.company'].create({
+            'name': 'Установа Кредитовий Позабаланс',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp_credit
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp_credit.id]))
+        c_env = c_env['res.company'].with_company(comp_credit).env
+
+        acc_05 = c_env['account.account'].create({
+            'name': 'Списана кредиторська заборгованість',
+            'code': '05test',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp_credit.id])],
+        })
+        contra = c_env['account.account'].create({
+            'name': 'Технічний балансуючий рахунок',
+            'code': '00test',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp_credit.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'CR05',
+            'type': 'general',
+            'company_id': comp_credit.id,
+        })
+        prior_move = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp_credit.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({
+                    'account_id': contra.id,
+                    'name': 'Технічний дебет',
+                    'debit': 45000.0,
+                    'credit': 0.0,
+                }),
+                Command.create({
+                    'account_id': acc_05.id,
+                    'name': 'Списана кредиторка',
+                    'debit': 0.0,
+                    'credit': 45000.0,
+                }),
+            ],
+        })
+        prior_move.action_post()
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp_credit.id,
+        })
+        data = wiz.get_report_data()
+        self.assertEqual(data.get('hist_prior_balance'), 45000.0)
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+        self.assertFalse(data.get('has_unreversed_prior_balance'))
+
+        comp_credit.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        action_dict = wiz.action_print()
+        report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
+        html, _ = report._render_qweb_html(report.report_name, [wiz.id], data=action_dict.get('data'))
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('Виявлено неперенесені залишки минулих періодів', html_str)

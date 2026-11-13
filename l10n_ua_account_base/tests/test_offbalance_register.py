@@ -231,3 +231,11 @@ class TestOffBalanceRegister(TransactionCase):
         self.assertIn(self.acc_rented.code, html_str)
         self.assertIn(self.lessor.name, html_str)
 
+    def test_offbalance_osv_menu_exists(self):
+        """Пункт меню ОСВ класу 0 існує та посилається на дію l10n_ua_offbalance_osv_action."""
+        menu = self.env.ref('l10n_ua_account_base.menu_l10n_ua_offbalance_osv', raise_if_not_found=False)
+        self.assertTrue(menu, 'Menu item menu_l10n_ua_offbalance_osv must exist')
+        action = self.env.ref('l10n_ua_account_base.l10n_ua_offbalance_osv_action')
+        self.assertEqual(menu.action, action)
+
+

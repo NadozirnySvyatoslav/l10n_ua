@@ -3478,11 +3478,6 @@ msgid "Trial Balance"
 msgstr "Оборотно-сальдова відомість"
 
 #. module: l10n_ua_accounting
-#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_offbalance_osv
-msgid "Off-Balance Trial Balance (Class 0)"
-msgstr "ОСВ по класу 0"
-
-#. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__turnover_type
 msgid "Turnover Type"
 msgstr "Тип обороту"
