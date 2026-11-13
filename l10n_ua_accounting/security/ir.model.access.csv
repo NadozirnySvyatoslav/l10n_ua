@@ -43,3 +43,7 @@ access_trade_markup_user,l10n_ua.trade.markup.user,model_l10n_ua_trade_markup,ac
 access_trade_markup_readonly,l10n_ua.trade.markup.readonly,model_l10n_ua_trade_markup,account.group_account_readonly,1,0,0,0
 access_trade_markup_line_user,l10n_ua.trade.markup.line.user,model_l10n_ua_trade_markup_line,account.group_account_user,1,1,1,1
 access_trade_markup_line_readonly,l10n_ua.trade.markup.line.readonly,model_l10n_ua_trade_markup_line,account.group_account_readonly,1,0,0,0
+access_inventory_writedown_user,l10n_ua.inventory.writedown.user,model_l10n_ua_inventory_writedown,account.group_account_user,1,1,1,1
+access_inventory_writedown_readonly,l10n_ua.inventory.writedown.readonly,model_l10n_ua_inventory_writedown,account.group_account_readonly,1,0,0,0
+access_inventory_writedown_line_user,l10n_ua.inventory.writedown.line.user,model_l10n_ua_inventory_writedown_line,account.group_account_user,1,1,1,1
+access_inventory_writedown_line_readonly,l10n_ua.inventory.writedown.line.readonly,model_l10n_ua_inventory_writedown_line,account.group_account_readonly,1,0,0,0

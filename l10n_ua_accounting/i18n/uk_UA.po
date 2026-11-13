@@ -636,6 +636,7 @@ msgstr "Рахунки"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_needaction
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_needaction
 msgid "Action Needed"
 msgstr "Необхідна дія"
 
@@ -867,6 +868,7 @@ msgstr "Прикріпити скан чека/рахунку"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_attachment_count
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_attachment_count
 msgid "Attachment Count"
 msgstr "Кількість вкладень"
 
@@ -996,6 +998,7 @@ msgstr "Можна скасувати лише закритий період."
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_create_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_post_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
 msgid "Cancel"
 msgstr "Скасувати"
 
@@ -1012,6 +1015,7 @@ msgstr "Скасування взаємозаліку %s"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_deferral__state__cancelled
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_search
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_inventory_writedown__state__cancelled
 msgid "Cancelled"
 msgstr "Скасовано"
 
@@ -1218,6 +1222,8 @@ msgstr "Компанії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_create_wizard__company_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__company_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_report__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__company_id
 msgid "Company"
 msgstr "Компанія"
 
@@ -1354,6 +1360,8 @@ msgstr "Створіть перший взаємозалік"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_create_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_post_wizard__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__create_uid
 msgid "Created by"
 msgstr "Створив"
 
@@ -1387,6 +1395,8 @@ msgstr "Створив"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_create_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_post_wizard__create_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__create_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__create_date
 msgid "Created on"
 msgstr "Створено"
 
@@ -1420,6 +1430,8 @@ msgstr "Кредит"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_report__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__currency_id
 msgid "Currency"
 msgstr "Валюта"
 
@@ -1480,6 +1492,8 @@ msgstr "Замовник"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_report__date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_search
 msgid "Date"
 msgstr "Дата"
 
@@ -1611,6 +1625,8 @@ msgstr "Детально"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_post_wizard__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_report__display_name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__display_name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__display_name
 msgid "Display Name"
 msgstr "Відображувана назва"
 
@@ -1673,6 +1689,8 @@ msgstr "Документ"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_deferral__state__draft
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_search
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_inventory_writedown__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_search
 msgid "Draft"
 msgstr "Чернетка"
 
@@ -1770,6 +1788,7 @@ msgstr "Ключ потоку"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_follower_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_follower_ids
 msgid "Followers"
 msgstr "Підписники"
 
@@ -1785,6 +1804,7 @@ msgstr "Підписники"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_partner_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Підписники (Партнери)"
 
@@ -1825,6 +1845,7 @@ msgstr "Головна книга"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__has_message
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__has_message
 msgid "Has Message"
 msgstr "Є повідомлення"
 
@@ -1866,6 +1887,8 @@ msgstr "Є повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_post_wizard__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_report__id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__id
 msgid "ID"
 msgstr "ID"
 
@@ -1911,6 +1934,7 @@ msgstr "Іконка для визначення виключення дії."
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_deferral__message_needaction
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "Якщо позначено, то нові повідомлення будуть потребувати вашої уваги."
 
@@ -1937,6 +1961,8 @@ msgstr "Якщо позначено, то нові повідомлення бу
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_deferral__message_has_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_deferral__message_has_sms_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
 
@@ -2025,6 +2051,7 @@ msgstr "Є касовим ордером"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_is_follower
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_is_follower
 msgid "Is Follower"
 msgstr "Стежить"
 
@@ -2039,6 +2066,7 @@ msgstr "Є платіжним дорученням"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__journal_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__journal_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_create_wizard__journal_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__journal_id
 msgid "Journal"
 msgstr "Журнал"
 
@@ -2062,6 +2090,8 @@ msgstr "Проводки - %s"
 #: model:ir.model,name:l10n_ua_accounting.model_account_move
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__move_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_report__move_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__move_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
 msgid "Journal Entry"
 msgstr "Проводка"
 
@@ -2131,6 +2161,8 @@ msgstr "Рядок проводки %(item)s не проведено."
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_create_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_post_wizard__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__write_uid
 msgid "Last Updated by"
 msgstr "Востаннє оновив"
 
@@ -2164,6 +2196,8 @@ msgstr "Востаннє оновив"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_create_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_post_wizard__write_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__write_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__write_date
 msgid "Last Updated on"
 msgstr "Останнє оновлення"
 
@@ -2192,6 +2226,7 @@ msgstr "Тип рядка"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__line_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__line_ids
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__line_ids
 msgid "Lines"
 msgstr "Рядки"
 
@@ -2232,6 +2267,7 @@ msgstr "Харчування"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_has_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_has_error
 msgid "Message Delivery error"
 msgstr "Помилка доставлення повідомлення"
 
@@ -2247,6 +2283,7 @@ msgstr "Помилка доставлення повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_ids
 msgid "Messages"
 msgstr "Повідомлення"
 
@@ -2283,6 +2320,7 @@ msgstr "Дедлайн моєї дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_currency_revaluation__name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__name
 msgid "Name"
 msgstr "Назва"
 
@@ -2402,6 +2440,7 @@ msgstr "Необоротні активи, утримувані для прод�
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report_line__note
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__note
 msgid "Note"
 msgstr "Примітка"
 
@@ -2421,6 +2460,7 @@ msgstr "Примітка"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__note
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
 msgid "Notes"
 msgstr "Примітки"
 
@@ -2450,6 +2490,7 @@ msgstr "Номер"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_needaction_counter
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_needaction_counter
 msgid "Number of Actions"
 msgstr "Кількість дій"
 
@@ -2465,6 +2506,7 @@ msgstr "Кількість дій"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_has_error_counter
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_has_error_counter
 msgid "Number of errors"
 msgstr "Кількість помилок"
 
@@ -2480,6 +2522,7 @@ msgstr "Кількість помилок"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_deferral__message_needaction_counter
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "Кількість повідомлень, які вимагають дії"
 
@@ -2495,6 +2538,7 @@ msgstr "Кількість повідомлень, які вимагають д�
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_deferral__message_has_error_counter
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Кількість повідомлень з помилкою доставки"
 
@@ -2843,6 +2887,7 @@ msgstr "Додатний = борг працівника, Від'ємний = б
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_post_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
 msgid "Post"
 msgstr "Провести"
 
@@ -2852,6 +2897,8 @@ msgstr "Провести"
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_debt_netting__state__posted
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral_line__is_posted
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_inventory_writedown__state__posted
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_search
 msgid "Posted"
 msgstr "Проведено"
 
@@ -2915,6 +2962,7 @@ msgstr "Призначення авансу (відрядження, закуп�
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__quantity
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__quantity
 msgid "Quantity"
 msgstr "Кількість"
 
@@ -3063,6 +3111,7 @@ msgstr "Код рядка"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_has_sms_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_sms_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__message_has_sms_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr ""
 
@@ -3170,6 +3219,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
 msgid "Set to Draft"
 msgstr "Зробити чернеткою"
 
@@ -3196,6 +3246,8 @@ msgstr "Дата початку періоду надання послуг"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__state
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__state
 msgid "State"
 msgstr "Стан"
 
@@ -3213,6 +3265,7 @@ msgstr "Рядки звіту"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__state
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_search
 msgid "Status"
 msgstr "Статус"
 
@@ -3357,6 +3410,8 @@ msgstr "На затвердження"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_deferral_view_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_period_closing_view_form_deferral
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_list
 msgid "Total"
 msgstr "Разом"
 
@@ -3579,6 +3634,7 @@ msgstr "Ми винні контрагенту"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_deferral__website_message_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__website_message_ids
 msgid "Website Messages"
 msgstr "Повідомлення з веб-сайту"
 
@@ -3594,6 +3650,7 @@ msgstr "Повідомлення з веб-сайту"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_deferral__website_message_ids
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__website_message_ids
 msgid "Website communication history"
 msgstr "Історія бесіди на сайті"
 
@@ -6595,6 +6652,7 @@ msgstr "Початок періоду"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__rating_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__rating_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__rating_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__rating_ids
 msgid "Ratings"
 msgstr "Оцінки"
 
@@ -7167,6 +7225,7 @@ msgstr "Націнка до списання"
 #. module: l10n_ua_accounting
 #. odoo-python
 #: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
 msgid "New"
 msgstr "Новий"
 
@@ -7209,6 +7268,7 @@ msgstr "Облік за продажними цінами (рахунки 282 і
 #. module: l10n_ua_accounting
 #. odoo-python
 #: code:addons/l10n_ua_accounting/models/l10n_ua_trade_markup.py:0
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
 msgid "Reversal: %s"
 msgstr "Сторно: %s"
 
@@ -7285,3 +7345,333 @@ msgstr "Застосовується, коли в проводці, що кре�
 #: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_trade_markup_action
 msgid "Write off the trade markup of a month"
 msgstr "Списати торгову націнку місяця"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "A later write-down of the same goods is already posted: %s."
+msgstr "Пізнішу уцінку цих самих товарів уже проведено: %s."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.constraint,message:l10n_ua_accounting.constraint_l10n_ua_inventory_writedown_line_product_uniq
+msgid "A product can be written down only once per document."
+msgstr "Товар можна уцінити лише один раз в одному документі."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__income_account_id
+msgid "Account 719 «Інші доходи від операційної діяльності» (п. 28)."
+msgstr "Рахунок 719 «Інші доходи від операційної діяльності» (п. 28)."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__loss_account_id
+msgid "Account 946 «Втрати від знецінення запасів» (п. 27)."
+msgstr "Рахунок 946 «Втрати від знецінення запасів» (п. 27)."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown__date
+msgid ""
+"Balance sheet date at which inventories are measured (НП(С)БО 9, п. 24)."
+msgstr "Дата балансу, на яку оцінюються запаси (НП(С)БО 9, п. 24)."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__book_value
+msgid "Book Value"
+msgstr "Облікова вартість"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Cancel a posted write-down before deleting it."
+msgstr "Перед видаленням скасуйте проведену уцінку."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Cancel the later write-down first: %s."
+msgstr "Спершу скасуйте пізнішу уцінку: %s."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Cancelled: %s"
+msgstr "Скасовано: %s"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_inventory_writedown_action
+msgid "Create an inventory write-down"
+msgstr "Створіть уцінку запасів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__exempt
+msgid "Do Not Write Down"
+msgstr "Не уцінювати"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_writedown
+msgid "Earlier Write-downs"
+msgstr "Попередні уцінки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__nrv_unit
+msgid ""
+"Expected selling price less the expected costs of completion and of selling "
+"(НП(С)БО 9, п. 4, 26)."
+msgstr "Очікувана ціна продажу мінус очікувані витрати на завершення виробництва і збут (НП(С)БО 9, п. 4, 26)."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+msgid "Fill Stock"
+msgstr "Заповнити залишками"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+msgid "Goods"
+msgstr "Товари"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+msgid "How the net realisable value was determined..."
+msgstr "Як визначено чисту вартість реалізації..."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_inventory_writedown_action
+msgid ""
+"Inventories are carried at the lower of cost and net realisable value\n"
+"                (НП(С)БО 9, п. 24). The write-down goes to 946, a later increase of the\n"
+"                net realisable value is income on 719 within the earlier write-down."
+msgstr "Запаси відображаються за меншою з оцінок — первісною вартістю або чистою вартістю реалізації (НП(С)БО 9, п. 24). Уцінка йде на 946, подальше зростання чистої вартості реалізації — дохід на 719 у межах попередньої уцінки."
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.l10n_ua_inventory_writedown_action
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_inventory_writedown
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+msgid "Inventory Write-down"
+msgstr "Уцінка запасів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_inventory_writedown_line
+msgid "Inventory Write-down Line"
+msgstr "Рядок уцінки запасів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_inventory_writedown
+msgid "Inventory Write-down to Net Realisable Value"
+msgstr "Уцінка запасів до чистої вартості реалізації"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_search
+msgid "Inventory Write-downs"
+msgstr "Уцінки запасів"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Inventory write-down %s"
+msgstr "Уцінка запасів %s"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__nrv_set
+msgid "NRV Entered"
+msgstr "ЧВР введено"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__nrv_unit
+msgid "Net Realisable Value per Unit"
+msgstr "Чиста вартість реалізації за одиницю"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.constraint,message:l10n_ua_accounting.constraint_l10n_ua_inventory_writedown_line_nrv_positive
+msgid "Net realisable value cannot be negative."
+msgstr "Чиста вартість реалізації не може бути від'ємною."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_writedown
+msgid ""
+"Part of earlier posted write-downs of this product that is still in the "
+"quantity on hand: the limit of a reversal (п. 28). Updated by «Fill» and on "
+"posting."
+msgstr "Частина попередніх проведених уцінок товару, що припадає на поточний залишок, — межа відновлення (п. 28). Оновлюється кнопкою «Заповнити» і під час проведення."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__new_unit_cost
+msgid "New Unit Cost"
+msgstr "Нова вартість одиниці"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid ""
+"No stock valuation account for: %s. Set it on the product category or in the"
+" inventory settings."
+msgstr "Немає рахунку оцінки запасів для: %s. Укажіть його в категорії товару або в налаштуваннях складу."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid ""
+"Odoo cannot revalue the remaining stock of FIFO products: %s. Remove them "
+"from the write-down or switch the product category to average cost."
+msgstr "Odoo не може переоцінити залишок товарів, що обліковуються за ФІФО: %s. Приберіть їх з уцінки або переведіть категорію товару на середньозважену собівартість."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Only a draft write-down can be filled."
+msgstr "Заповнити можна лише чернетку уцінки."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Only a draft write-down can be posted."
+msgstr "Провести можна лише чернетку уцінки."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__product_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_search
+msgid "Product"
+msgstr "Товар"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__quantity
+msgid "Quantity on hand at the document date."
+msgstr "Залишок на дату документа."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__exempt
+msgid ""
+"Raw materials and other supplies held for production are not written down "
+"when the finished goods they go into are expected to sell at or above cost "
+"(НП(С)БО 9, п. 25)."
+msgstr "Сировина й матеріали для виробництва не уцінюються, якщо готову продукцію з них очікується продати не нижче собівартості (НП(С)БО 9, п. 25)."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+msgid "Refresh Stock"
+msgstr "Оновити залишки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__reversal_amount
+msgid "Reversal"
+msgstr "Відновлення"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__income_account_id
+msgid "Reversal Income Account"
+msgstr "Рахунок доходу від відновлення"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_inventory_writedown_view_form
+msgid "Reverse the entry and restore the stock value before the write-down?"
+msgstr "Сторнувати проводку й повернути вартість запасів до уцінки?"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Set the write-down loss (946) and reversal income (719) accounts."
+msgstr "Укажіть рахунки втрат від уцінки (946) і доходу від відновлення (719)."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__nrv_set
+msgid ""
+"Set when the net realisable value is entered: a line without it is left at "
+"book value. Set automatically for a non-zero value; to write the stock down "
+"to zero, enter 0 and tick this box."
+msgstr "Позначається, коли введено чисту вартість реалізації: рядок без неї лишається за обліковою вартістю. Для ненульового значення ставиться автоматично; щоб уцінити до нуля, введіть 0 і поставте цю позначку."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__valuation_account_id
+msgid "Stock Account"
+msgstr "Рахунок запасів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__previous_unit_cost
+msgid "Stock valuation unit cost replaced by the posting; restored on cancel."
+msgstr "Вартість одиниці до проведення; повертається при скасуванні."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__total_reversal
+msgid "Total Reversal"
+msgstr "Усього відновлено"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__total_writedown
+msgid "Total Write-down"
+msgstr "Усього уцінено"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__uom_id
+msgid "Unit"
+msgstr "Од. виміру"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__book_unit_cost
+msgid "Unit Cost"
+msgstr "Вартість одиниці"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__previous_unit_cost
+msgid "Unit Cost Before Posting"
+msgstr "Вартість одиниці до проведення"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__book_value
+msgid "Value of the quantity in stock valuation at the document date."
+msgstr "Вартість залишку за складською оцінкою на дату документа."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__writedown_amount
+msgid "Write-down"
+msgstr "Уцінка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__writedown_id
+msgid "Write-down Document"
+msgstr "Документ уцінки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown__loss_account_id
+msgid "Write-down Loss Account"
+msgstr "Рахунок втрат від уцінки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_unit_writedown
+msgid "Earlier Write-down per Unit"
+msgstr "Попередня уцінка на одиницю"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_unit_writedown
+msgid "Net write-down per unit by earlier posted documents."
+msgstr "Уцінка на одиницю попередніми проведеними документами за вирахуванням відновлень."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_cost_cap
+msgid "Unit Cost Before Write-downs"
+msgstr "Ціна до уцінок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__prior_cost_cap
+msgid "Unit cost before the earlier write-downs: a reversal does not raise the cost above it."
+msgstr "Ціна одиниці до попередніх уцінок: відновлення не підіймає ціну вище неї."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__done_move_count
+msgid "Done Move Count"
+msgstr "Кількість виконаних рухів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_inventory_writedown_line__done_move_count
+msgid "Done stock moves of the product at posting: a cancel is refused once the goods have moved."
+msgstr "Виконані складські рухи товару на момент проведення: якщо товар рухався, скасування заборонене."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "Stock moves after the document date are already done for: %s. Date the write-down on or after the last move."
+msgstr "Після дати документа вже є виконані складські рухи: %s. Датуйте уцінку днем останнього руху або пізніше."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_inventory_writedown.py:0
+msgid "The goods have moved since the write-down was posted: %s. Post a new write-down (or a reversal) instead of cancelling."
+msgstr "Після проведення уцінки товар рухався: %s. Замість скасування проведіть нову уцінку (або відновлення)."
