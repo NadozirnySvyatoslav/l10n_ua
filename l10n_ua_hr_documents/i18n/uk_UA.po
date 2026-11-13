@@ -1403,7 +1403,7 @@ msgid "Notice Short"
 msgstr "Строк попередження не витримано"
 
 #. module: l10n_ua_hr_documents
-#: code:addons/l10n_ua_hr_documents/models/hr_order.py
+#: code:addons/l10n_ua_hr_documents/models/hr_order.py:0
 #, python-format
 msgid "Dismissal of %(employee)s on %(date)s is earlier than the notice period allows: notified on %(notice)s, the earliest date is %(deadline)s (%(reason)s)."
 msgstr "Звільнення %(employee)s %(date)s раніше, ніж дозволяє строк попередження: попереджено %(notice)s, найраніша дата — %(deadline)s (%(reason)s)."
