@@ -3,7 +3,8 @@ import re
 import requests
 from datetime import date, datetime, time, timedelta
 from time import sleep
-from zoneinfo import ZoneInfo
+
+import pytz
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
@@ -41,7 +42,9 @@ MONO_CORP_WINDOW_DAYS = 31
 # The longest a request sits out the rate limit before giving up, in seconds.
 MONO_CORP_MAX_RATE_WAIT = 120
 IBAN_UA_RE = re.compile(r'^UA\d{27}$')
-KYIV_TZ = ZoneInfo('Europe/Kyiv')
+# pytz, not zoneinfo: Odoo ships pytz, while zoneinfo needs the tzdata
+# package on Windows (#559). pytz zones must be attached with localize().
+KYIV_TZ = pytz.timezone('Europe/Kyiv')
 
 
 def _clean_iban(value):
@@ -51,8 +54,8 @@ def _clean_iban(value):
 def _kyiv_bounds(date_from, date_to):
     """Unix bounds of the Kyiv days [date_from, date_to], whatever the
     server's timezone is: the bank's day is the Kyiv one."""
-    return (int(datetime.combine(date_from, time.min, tzinfo=KYIV_TZ).timestamp()),
-            int(datetime.combine(date_to, time.max, tzinfo=KYIV_TZ).timestamp()))
+    return (int(KYIV_TZ.localize(datetime.combine(date_from, time.min)).timestamp()),
+            int(KYIV_TZ.localize(datetime.combine(date_to, time.max)).timestamp()))
 
 
 def _kyiv_date(ts):

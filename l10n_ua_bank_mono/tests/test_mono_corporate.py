@@ -2,14 +2,20 @@
 
 from datetime import date, datetime
 from unittest.mock import MagicMock, patch
-from zoneinfo import ZoneInfo
+
+import pytz
 
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 MODULE = 'odoo.addons.l10n_ua_bank_mono.models.l10n_ua_bank_mono_config'
 OWN_IBAN = 'UA213223130000026007233566001'
-KYIV = ZoneInfo('Europe/Kyiv')
+KYIV = pytz.timezone('Europe/Kyiv')
+
+
+def _kyiv(*args):
+    """Kyiv wall-clock datetime (pytz zones need localize(), not tzinfo=)."""
+    return KYIV.localize(datetime(*args))
 
 
 def _response(status=200, json_data=None, headers=None):
@@ -77,13 +83,13 @@ class TestMonoCorporate(TransactionCase):
             raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         self.assertEqual(
             raw['from_ts'],
-            int(datetime(2026, 9, 1, tzinfo=KYIV).timestamp()))
+            int(_kyiv(2026, 9, 1).timestamp()))
         self.assertEqual(
             raw['to_ts'],
-            int(datetime(2026, 9, 7, 23, 59, 59, tzinfo=KYIV).timestamp()))
+            int(_kyiv(2026, 9, 7, 23, 59, 59).timestamp()))
 
     def test_statement_is_read_past_one_page(self):
-        start = int(datetime(2026, 9, 1, tzinfo=KYIV).timestamp())
+        start = int(_kyiv(2026, 9, 1).timestamp())
         first = [_item(n, start + n) for n in range(500)]
         # The next page starts at the second of the last one received, so
         # that one comes again and must not be counted twice.
@@ -99,7 +105,7 @@ class TestMonoCorporate(TransactionCase):
         self.assertEqual(len(raw['response']), 520)
 
     def test_only_done_operations_are_imported(self):
-        ts = int(datetime(2026, 9, 2, 12, tzinfo=KYIV).timestamp())
+        ts = int(_kyiv(2026, 9, 2, 12).timestamp())
         raw = {'api_type': 'corp_statement', 'response': [
             _item(1, ts),
             _item(2, ts, status='PENDING'),
@@ -111,8 +117,8 @@ class TestMonoCorporate(TransactionCase):
 
     def test_booking_date_is_the_kyiv_day_of_completion(self):
         # 00:30 in Kyiv is still the previous day in UTC.
-        created = int(datetime(2026, 9, 2, 20, tzinfo=KYIV).timestamp())
-        completed = int(datetime(2026, 9, 3, 0, 30, tzinfo=KYIV).timestamp())
+        created = int(_kyiv(2026, 9, 2, 20).timestamp())
+        completed = int(_kyiv(2026, 9, 3, 0, 30).timestamp())
         raw = {'api_type': 'corp_statement', 'response': [
             _item(1, created, completedTime=completed, amount=-5050,
                   counterName='ТОВ Приклад', counterEdrpou='21133352',
@@ -183,8 +189,8 @@ class TestMonoCorporate(TransactionCase):
         """Created on the last day of one sync, booked on the first day of
         the next: the manual sync starts the next period the day after, so
         the query has to reach back to find it."""
-        created = int(datetime(2026, 9, 7, 23, tzinfo=KYIV).timestamp())
-        booked = int(datetime(2026, 9, 8, 9, tzinfo=KYIV).timestamp())
+        created = int(_kyiv(2026, 9, 7, 23).timestamp())
+        booked = int(_kyiv(2026, 9, 8, 9).timestamp())
         item = _item(1, created, completedTime=booked)
         with patch(f'{MODULE}.requests.get',
                    return_value=_response(json_data=[item])) as get:
@@ -199,7 +205,7 @@ class TestMonoCorporate(TransactionCase):
         sync starts the next period the day after, so no period ever covers
         that moment and the look-back is the operation's only way in. What
         was already imported is dropped by its id on import, not here."""
-        booked = int(datetime(2026, 9, 7, 15, tzinfo=KYIV).timestamp())
+        booked = int(_kyiv(2026, 9, 7, 15).timestamp())
         with patch(f'{MODULE}.requests.get', return_value=_response(
                 json_data=[_item(1, booked)])):
             raw = self.config._fetch_from_bank(date(2026, 9, 8), date(2026, 9, 14))
@@ -208,8 +214,8 @@ class TestMonoCorporate(TransactionCase):
         self.assertEqual(transactions[0]['date'], '2026-09-07')
 
     def test_operation_booked_after_the_period_is_left_to_a_later_one(self):
-        created = int(datetime(2026, 9, 14, 23, tzinfo=KYIV).timestamp())
-        booked = int(datetime(2026, 9, 15, 9, tzinfo=KYIV).timestamp())
+        created = int(_kyiv(2026, 9, 14, 23).timestamp())
+        booked = int(_kyiv(2026, 9, 15, 9).timestamp())
         with patch(f'{MODULE}.requests.get', return_value=_response(
                 json_data=[_item(1, created, completedTime=booked)])):
             raw = self.config._fetch_from_bank(date(2026, 9, 8), date(2026, 9, 14))
@@ -226,7 +232,7 @@ class TestMonoCorporate(TransactionCase):
             self.assertLessEqual(high - low, 31 * 86400)
 
     def test_a_full_page_within_one_second_is_not_lost_quietly(self):
-        ts = int(datetime(2026, 9, 2, 12, tzinfo=KYIV).timestamp())
+        ts = int(_kyiv(2026, 9, 2, 12).timestamp())
         page = [_item(n, ts) for n in range(500)]
         with patch(f'{MODULE}.requests.get', side_effect=[
                 _response(json_data=page), _response(json_data=page)]):
@@ -279,12 +285,12 @@ class TestMonoCorporate(TransactionCase):
     def test_statement_with_final_balances_is_verified(self):
         """Including an operation booked before the period that the
         look-back brought in: it is already in the opening balance."""
-        early = int(datetime(2026, 8, 30, 15, tzinfo=KYIV).timestamp())
-        inside = int(datetime(2026, 9, 3, 10, tzinfo=KYIV).timestamp())
+        early = int(_kyiv(2026, 8, 30, 15).timestamp())
+        inside = int(_kyiv(2026, 9, 3, 10).timestamp())
         raw = {
             'api_type': 'corp_statement',
-            'from_ts': int(datetime(2026, 9, 1, tzinfo=KYIV).timestamp()),
-            'to_ts': int(datetime(2026, 9, 7, 23, 59, 59, tzinfo=KYIV).timestamp()),
+            'from_ts': int(_kyiv(2026, 9, 1).timestamp()),
+            'to_ts': int(_kyiv(2026, 9, 7, 23, 59, 59).timestamp()),
             'date_from': '2026-09-01', 'date_to': '2026-09-07',
             'balances': self._balances(),
             'response': [
@@ -307,12 +313,12 @@ class TestMonoCorporate(TransactionCase):
                          'my-own-pretty-external-reference')
 
     def _overlap_raw(self, balances):
-        early = int(datetime(2026, 8, 30, 15, tzinfo=KYIV).timestamp())
-        inside = int(datetime(2026, 9, 3, 10, tzinfo=KYIV).timestamp())
+        early = int(_kyiv(2026, 8, 30, 15).timestamp())
+        inside = int(_kyiv(2026, 9, 3, 10).timestamp())
         return {
             'api_type': 'corp_statement',
-            'from_ts': int(datetime(2026, 9, 1, tzinfo=KYIV).timestamp()),
-            'to_ts': int(datetime(2026, 9, 7, 23, 59, 59, tzinfo=KYIV).timestamp()),
+            'from_ts': int(_kyiv(2026, 9, 1).timestamp()),
+            'to_ts': int(_kyiv(2026, 9, 7, 23, 59, 59).timestamp()),
             'date_from': '2026-09-01', 'date_to': '2026-09-07',
             'balances': balances,
             'response': [_item(1, early, amount=2500), _item(2, inside, amount=7550)]}
@@ -329,7 +335,7 @@ class TestMonoCorporate(TransactionCase):
         previous sync imported. It is skipped, and the statement is verified
         when the balances agree with every operation of the period."""
         first = self._import({'api_type': 'corp_statement', 'response': [
-            _item(1, int(datetime(2026, 8, 30, 15, tzinfo=KYIV).timestamp()),
+            _item(1, int(_kyiv(2026, 8, 30, 15).timestamp()),
                   amount=2500)]}, '2026-08-30', '2026-08-31')
         self.assertEqual(len(first.line_ids), 1)
 
@@ -343,7 +349,7 @@ class TestMonoCorporate(TransactionCase):
 
     def test_overlapping_sync_with_a_gap_is_not_verified(self):
         self._import({'api_type': 'corp_statement', 'response': [
-            _item(1, int(datetime(2026, 8, 30, 15, tzinfo=KYIV).timestamp()),
+            _item(1, int(_kyiv(2026, 8, 30, 15).timestamp()),
                   amount=2500)]}, '2026-08-30', '2026-08-31')
         balances = self._balances()
         balances[-1]['balance'] = 1200.0    # an operation the bank did not return
@@ -359,7 +365,7 @@ class TestMonoCorporate(TransactionCase):
         self.assertEqual(action['params']['type'], 'success')
 
     def test_reversal_is_marked_in_the_purpose(self):
-        ts = int(datetime(2026, 9, 2, 12, tzinfo=KYIV).timestamp())
+        ts = int(_kyiv(2026, 9, 2, 12).timestamp())
         raw = {'api_type': 'corp_statement', 'response': [
             _item(1, ts, reverse=True), _item(2, ts, reverse=False)]}
         first, second = self.config._parse_transactions(raw)
