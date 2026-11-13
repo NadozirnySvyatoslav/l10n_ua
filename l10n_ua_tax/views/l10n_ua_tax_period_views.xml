@@ -19,7 +19,7 @@
                             <field name="date_end"/>
                         </group>
                         <group>
-                            <field name="year"/>
+                            <field name="year" options="{'enable_formatting': false}"/>
                             <field name="quarter" invisible="period_type == 'month'"/>
                             <field name="month" invisible="period_type != 'month'"/>
                             <field name="company_id" groups="base.group_multi_company"/>

@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- ============================================== -->
-    <!-- Taxes UA - Main root menu                      -->
-    <!-- ============================================== -->
-
+    <!-- ============================================================ -->
+    <!-- Податки — корінь і каркас розділів.                          -->
+    <!--                                                              -->
+    <!-- Звітність до ДПС: усе, що подається в податкову, — по пункту  -->
+    <!-- на форму. Модуль нової форми (податок на прибуток, рента,    -->
+    <!-- екоподаток…) додає свій пункт з parent=menu_ua_tax_reporting. -->
+    <!-- Облік: регістри, які ведуться протягом періоду (книга обліку -->
+    <!-- доходів ФОП…) — назва пункту каже, для кого він, бо меню     -->
+    <!-- однакове для всіх компаній бази (ФОП, ТОВ, ПП).              -->
+    <!-- ПДВ — окремим розділом; довідники й підключення — у          -->
+    <!-- Налаштуваннях.                                               -->
+    <!-- Послідовності у «Звітності»: 1 журнал; 10-69 форми;          -->
+    <!-- 80 запити; 90 синхронізація.                                 -->
+    <!-- ============================================================ -->
     <menuitem id="menu_ua_tax_root"
               name="Taxes UA"
               sequence="54"
               groups="l10n_ua_account_base.group_ua_tax_accountant"
               web_icon="l10n_ua_tax,static/description/icon.png"/>
 
-    <!-- Tax Documents (main menu) -->
-    <menuitem id="menu_ua_tax_documents"
-              name="Tax Documents"
+    <menuitem id="menu_ua_tax_reporting"
+              name="DPS Reporting"
               parent="menu_ua_tax_root"
-              action="l10n_ua_tax_document_action"
               sequence="10"/>
 
-    <!-- Tax Periods -->
-    <menuitem id="menu_ua_tax_periods"
-              name="Tax Periods"
+    <!-- Журнал усього поданого: створене в Odoo і завантажене з кабінету -->
+    <menuitem id="menu_ua_tax_documents"
+              name="All Filed Documents"
+              parent="menu_ua_tax_reporting"
+              action="l10n_ua_tax_document_action"
+              sequence="1"/>
+
+    <menuitem id="menu_ua_tax_accounting"
+              name="Tax Accounting"
               parent="menu_ua_tax_root"
-              action="l10n_ua_tax_period_action"
               sequence="20"/>
 
     <!-- Configuration submenu -->
@@ -30,6 +42,12 @@
               name="Configuration"
               parent="menu_ua_tax_root"
               sequence="90"/>
+
+    <menuitem id="menu_ua_tax_periods"
+              name="Tax Periods"
+              parent="menu_ua_tax_config"
+              action="l10n_ua_tax_period_action"
+              sequence="3"/>
 
     <menuitem id="menu_ua_tax_document_types"
               name="Document Types"
@@ -48,5 +66,4 @@
               parent="menu_ua_tax_config"
               action="l10n_ua_account_base.l10n_ua_tax_office_action"
               sequence="15"/>
-
 </odoo>

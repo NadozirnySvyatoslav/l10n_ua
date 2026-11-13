@@ -1,4 +1,13 @@
+import re
+
 from odoo import api, fields, models
+
+# «ФОП Іваненко І. І.», «Іваненко І. І. ФОП», «Фізична особа-підприємець …» —
+# у звітності ДПС (HNAME/HBOS) ФОП пишеться лише прізвищем, ім'ям, по батькові,
+# великими літерами — як у прийнятих ДПС деклараціях з Електронного кабінету.
+FOP_FORM_RE = re.compile(
+    r'^\s*(?:ФОП|ФО-П|фізична\s+особа\s*[-–—]?\s*підприємець)\.?\s+'
+    r'|\s+(?:ФОП|ФО-П)\.?\s*$', re.IGNORECASE)
 
 
 class ResCompany(models.Model):
@@ -47,3 +56,11 @@ class ResCompany(models.Model):
                 company.l10n_ua_legal_form_id and
                 company.l10n_ua_legal_form_id.is_fop
             )
+
+    def _l10n_ua_dps_name(self):
+        """Назва платника для документів ДПС: для ФОП — ПІБ великими, без «ФОП»."""
+        self.ensure_one()
+        name = self.name or ''
+        if self.l10n_ua_is_fop:
+            name = (FOP_FORM_RE.sub('', name).strip() or name).upper()
+        return name

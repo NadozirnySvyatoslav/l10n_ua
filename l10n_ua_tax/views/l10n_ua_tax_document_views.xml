@@ -6,12 +6,12 @@
         <field name="name">l10n_ua.tax.document.list</field>
         <field name="model">l10n_ua.tax.document</field>
         <field name="arch" type="xml">
-            <list decoration-muted="state == 'rejected'" decoration-success="state == 'accepted'">
+            <list create="0" decoration-muted="state == 'rejected'" decoration-success="state == 'accepted'">
                 <field name="document_date"/>
                 <field name="name"/>
                 <field name="document_type_id"/>
                 <field name="document_number" optional="show"/>
-                <field name="year"/>
+                <field name="year" options="{'enable_formatting': false}"/>
                 <field name="period"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="state" widget="badge"
@@ -29,22 +29,11 @@
         <field name="name">l10n_ua.tax.document.form</field>
         <field name="model">l10n_ua.tax.document</field>
         <field name="arch" type="xml">
-            <form>
+            <!-- Документи лише з кабінету ДПС (синхронізація), тому лише перегляд -->
+            <form create="0" edit="0">
                 <header>
-                    <button name="action_fill_data" string="Fill Data" type="object"
-                            class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_prepare" string="Mark Prepared" type="object"
-                            class="btn-primary" invisible="state != 'draft'"/>
-                    <button name="action_mark_submitted" string="Mark Submitted" type="object"
-                            invisible="state not in ('draft', 'prepared')"/>
-                    <button name="action_mark_accepted" string="Mark Accepted" type="object"
-                            invisible="state != 'submitted'"/>
-                    <button name="action_mark_rejected" string="Mark Rejected" type="object"
-                            invisible="state != 'submitted'"/>
-                    <button name="action_reset_draft" string="Reset to Draft" type="object"
-                            invisible="state in ('draft', 'accepted')"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,prepared,submitted,accepted"/>
+                           statusbar_visible="submitted,accepted"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box"/>
@@ -56,7 +45,7 @@
                             <field name="document_date"/>
                         </group>
                         <group string="Period">
-                            <field name="year"/>
+                            <field name="year" options="{'enable_formatting': false}"/>
                             <field name="period"/>
                             <field name="period_id"/>
                         </group>
@@ -109,8 +98,6 @@
                 <field name="document_type_id"/>
                 <field name="document_number"/>
                 <field name="taxpayer_code"/>
-                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
-                <filter name="prepared" string="Prepared" domain="[('state', '=', 'prepared')]"/>
                 <filter name="submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
                 <filter name="accepted" string="Accepted" domain="[('state', '=', 'accepted')]"/>
                 <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
@@ -130,7 +117,7 @@
                 No tax documents yet
             </p>
             <p>
-                Create tax declarations, reports and other documents.
+                Documents appear here after synchronisation with the Tax Cabinet.
             </p>
         </field>
     </record>
