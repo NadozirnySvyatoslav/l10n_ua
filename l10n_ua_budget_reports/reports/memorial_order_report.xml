@@ -11,56 +11,411 @@
 
     <template id="memorial_order_template">
         <t t-call="web.html_container">
-            <t t-set="wizard" t-value="env['l10n_ua.budget.memorial_order.wizard'].browse(data.get('wizard_id'))"/>
+            <t t-set="w_id" t-value="(docs and docs[0].id) or wizard_id or (data and data.get('wizard_id'))"/>
+            <t t-set="w_rec" t-value="w_id and env['l10n_ua.budget.memorial_order.wizard'].browse(w_id)"/>
+            <t t-set="w_kind" t-value="(data and data.get('mo_kind')) or mo_kind or (docs and docs[0].mo_kind) or 'mo_2'"/>
+            <t t-set="w_company_id" t-value="(data and data.get('company_id')) or company_id"/>
+            <t t-set="w_company_rec" t-value="w_company_id and env['res.company'].browse(w_company_id)"/>
+            <t t-set="w_company" t-value="(w_company_rec and w_company_rec.exists()) or (docs and docs[0].company_id) or env.company"/>
+            <t t-set="w_date_from" t-value="(data and data.get('date_from')) or date_from or (docs and docs[0].date_from)"/>
+            <t t-set="w_date_to" t-value="(data and data.get('date_to')) or date_to or (docs and docs[0].date_to)"/>
+            <t t-set="wizard_vals" t-value="{k: v for k, v in {
+                'mo_kind': w_kind,
+                'date_from': w_date_from,
+                'date_to': w_date_to,
+                'company_id': w_company.id,
+            }.items() if v}"/>
+            <t t-set="wizard" t-value="(w_rec and w_rec.exists() and w_rec) or (docs and docs.exists() and docs[0]) or env['l10n_ua.budget.memorial_order.wizard'].with_company(w_company).new(wizard_vals)"/>
+            <t t-set="company" t-value="wizard.company_id or w_company"/>
             <t t-set="report_data" t-value="wizard.get_report_data()"/>
-            <t t-set="rows" t-value="report_data['rows']"/>
+            <t t-set="rows" t-value="report_data.get('rows') or report_data.get('rows_mo16', [])"/>
 
-            <t t-call="web.external_layout">
-                <div class="page" style="font-size:10px;">
-                    <h2 style="text-align:center; margin-bottom:0;"><t t-out="data.get('mo_label')"/></h2>
-                    <p style="text-align:center; margin-top:0;">
-                        Період: <t t-out="data.get('date_from')"/> — <t t-out="data.get('date_to')"/>
-                    </p>
-                    <p style="margin-bottom:4px;">
-                        <strong>Установа:</strong> <t t-out="wizard.company_id.name"/>
-                    </p>
+            <t t-if="wizard.mo_kind == 'mo_16'">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-size:10px; font-family:sans-serif;">
+                        <!-- ЗАТВЕРДЖЕНО Наказ Мінфіну № 755 -->
+                        <div class="row" style="font-size:8.5px; margin-bottom:8px;">
+                            <div class="col-6">
+                                <div style="border-bottom:1px solid #000; padding-bottom:2px; min-height:16px;">
+                                    <strong t-out="company.name"/>
+                                </div>
+                                <div class="text-center text-muted" style="font-size:7.5px;">
+                                    (найменування суб’єкта державного сектору)
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div><strong>ЗАТВЕРДЖЕНО</strong></div>
+                                <div>Наказ Міністерства фінансів України</div>
+                                <div>08.09.2017 № 755</div>
+                            </div>
+                        </div>
 
-                    <table class="table table-bordered table-sm" style="font-size:9px;">
-                        <thead>
-                            <tr style="background:#f0f0f0;">
-                                <th>Дата</th>
-                                <th>Документ</th>
-                                <th>Рахунок</th>
-                                <th>Назва рахунку</th>
-                                <th>Призначення</th>
-                                <th>Контрагент</th>
-                                <th class="text-end">Дт</th>
-                                <th class="text-end">Кт</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr t-foreach="rows" t-as="r">
-                                <td><t t-out="r['date']"/></td>
-                                <td><t t-out="r['move_name']"/></td>
-                                <td><strong t-out="r['account_code']"/></td>
-                                <td><t t-out="r['account_name']"/></td>
-                                <td><t t-out="r['description']"/></td>
-                                <td><t t-out="r['partner']"/></td>
-                                <td class="text-end"><t t-out="'{:,.2f}'.format(r['debit']).replace(',', ' ') if r['debit'] else ''"/></td>
-                                <td class="text-end"><t t-out="'{:,.2f}'.format(r['credit']).replace(',', ' ') if r['credit'] else ''"/></td>
-                            </tr>
-                            <tr style="background:#f8f8f8;">
-                                <td colspan="6"><strong>РАЗОМ</strong></td>
-                                <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_debit']).replace(',', ' ')"/></strong></td>
-                                <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_credit']).replace(',', ' ')"/></strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <!-- Коди ЄДРПОУ / ДКУД -->
+                        <div class="row mb-2" style="font-size:8.5px;">
+                            <div class="col-6">
+                                <table class="table table-bordered table-sm text-center mb-0" style="font-size:8px; width:auto;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding:2px 6px;">Ідентифікаційний код за ЄДРПОУ</td>
+                                            <td style="padding:2px 8px; font-weight:bold;"><t t-out="company.company_registry or company.vat or ''"/></td>
+                                            <td style="padding:2px 6px;">Код за ДКУД</td>
+                                            <td style="padding:2px 8px; min-width:40px;"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
-                    <div style="margin-top:20px;">
-                        Виконавець: ________________ /__________________/
+                        <!-- Заголовок МЕМОРІАЛЬНИЙ ОРДЕР № 16-авт -->
+                        <div class="text-center my-2">
+                            <h3 class="mb-0 fw-bold" style="font-size:13px;">МЕМОРІАЛЬНИЙ ОРДЕР № 16-авт</h3>
+                            <div style="font-size:10px; font-weight:bold;">
+                                за <t t-out="date_from or (data and data.get('date_from')) or wizard.date_from"/> — <t t-out="date_to or (data and data.get('date_to')) or wizard.date_to"/> р.
+                            </div>
+                            <div class="text-muted" style="font-size:10px;">
+                                Накопичувальна відомість позабалансового обліку
+                            </div>
+                        </div>
+
+                        <div class="mb-2" style="font-size:8.5px;">
+                            <strong>Одиниця виміру:</strong> <t t-out="company.currency_id.symbol or 'грн.'"/>
+                        </div>
+
+                        <!-- Попередження: завислі неперенесені залишки минулих періодів -->
+                        <t t-if="report_data.get('has_unmigrated_prior_balance')">
+                            <div class="alert alert-warning p-2 mb-2" style="font-size:8.5px; border:1px solid #ffeeba; background-color:#fff3cd; color:#856404;">
+                                <strong>Увага (неперенесені залишки):</strong> Виявлено неперенесені залишки минулих періодів на позабалансових субрахунках в <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_unmigrated_prior_balance', report_data.get('hist_prior_balance', 0.0))).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong>, при цьому вхідне сальдо відповідних субрахунків у новому регістрі дорівнює 0,00 <t t-out="company.currency_id.symbol or 'грн.'"/>. Для коректного обліку внесіть документ введення початкових залишків станом на початок періоду.
+                            </div>
+                        </t>
+
+                        <!-- Попередження: ризик подвійного обліку через несторновані проводки минулих періодів -->
+                        <t t-if="report_data.get('has_unreversed_prior_balance')">
+                            <div class="alert alert-danger p-2 mb-2" style="font-size:8.5px; border:1px solid #f5c6cb; background-color:#f8d7da; color:#721c24;">
+                                <strong>Увага (ризик подвійного обліку):</strong> Виявлено несторновані залишки минулих періодів у старій схемі <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_unreversed_prior_balance', report_data.get('hist_prior_balance', 0.0))).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong> при наявності введених залишків у новому регістрі (<t t-out="'{:,.2f}'.format(report_data.get('opening_balance', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>). Виконайте сторнування старих проводок згідно з інструкцією <em>offbalance_migration.md</em>.
+                            </div>
+                        </t>
+
+                        <!-- Попередження, якщо в поточному періоді є невідсторновані/неперенесені операції в старій схемі -->
+                        <t t-if="report_data.get('has_unmigrated_historical')">
+                            <div class="alert alert-warning p-2 mb-3" style="font-size:8.5px; border:1px solid #ffeeba; background-color:#fff3cd; color:#856404;">
+                                <t t-if="report_data.get('is_register_empty')">
+                                    <strong>Увага:</strong> У звітному періоді виявлено операції подвійного запису на позабалансових субрахунках в <code>account.move.line</code> (див. Додаток нижче), проте регістр позабалансового обліку не містить записів. Підсумкові суми форми № 16-авт та ОСВ класу 0 є нульовими. Для відображення оборотів перенесіть залишки до регістру позабалансового обліку згідно з інструкцією <em>offbalance_migration.md</em>.
+                                </t>
+                                <t t-else="">
+                                    <strong>Увага (паралельний облік в <code>account.move</code>):</strong> Поряд із записами нового позабалансового регістру у звітному періоді виявлено невідсторновані операції подвійного запису на позабалансових субрахунках в <code>account.move.line</code> (див. Додаток нижче). Вони не входять до підсумків форми № 16-авт та ОСВ класу 0 — перенесіть їх у <code>l10n_ua.offbalance.move</code>, а помилкові або старі проводки в <code>account.move</code> сторнуйте.
+                                </t>
+                            </div>
+                        </t>
+
+                        <!-- Таблична частина (6 колонок за Наказом Мінфіну № 755) -->
+                        <table class="table table-bordered table-sm mb-3" style="font-size:8.5px;">
+                            <thead>
+                                <tr class="text-center align-middle" style="background:#f0f0f0;">
+                                    <th style="width:30px;">№ з/п</th>
+                                    <th>Назва об’єкта позабалансового обліку</th>
+                                    <th>Надходження</th>
+                                    <th style="width:110px;">Кредит субрахунків</th>
+                                    <th style="width:110px;">Дебет субрахунків</th>
+                                    <th style="width:90px;" class="text-end">Сума</th>
+                                </tr>
+                                <tr class="text-center text-muted" style="background:#f9f9f9; font-size:7.5px;">
+                                    <th>1</th>
+                                    <th>2</th>
+                                    <th>3</th>
+                                    <th>4</th>
+                                    <th>5</th>
+                                    <th>6</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="report_data.get('rows_mo16')">
+                                    <tr t-foreach="report_data['rows_mo16']" t-as="r">
+                                        <td class="text-center"><t t-out="r['num']"/></td>
+                                        <td><t t-out="r['object_name']"/></td>
+                                        <td><t t-out="r['receipt_doc']"/></td>
+                                        <td class="text-center"><t t-out="r['credit_account']"/></td>
+                                        <td class="text-center"><t t-out="r['debit_account']"/></td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(r['amount']).replace(',', ' ')"/></td>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-2">
+                                            <em>Операцій позабалансового обліку за звітний період не зафіксовано.</em>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Підсумки за субрахунками -->
+                        <div class="row mb-3" style="font-size:8.5px;">
+                            <div class="col-6">
+                                <table class="table table-bordered table-sm mb-2" style="font-size:8px;">
+                                    <thead>
+                                        <tr style="background:#f0f0f0;">
+                                            <th>Показник</th>
+                                            <th class="text-center" style="width:80px;">Субрахунок</th>
+                                            <th class="text-end" style="width:90px;">Сума</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="report_data.get('credit_subtotals', [])" t-as="cs">
+                                            <td>Усього до кредиту рахунків:</td>
+                                            <td class="text-center"><strong t-out="cs['code']"/></td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(cs['amount']).replace(',', ' ')"/></td>
+                                        </tr>
+                                        <t t-if="not report_data.get('credit_subtotals')">
+                                            <tr>
+                                                <td>Усього до кредиту рахунків:</td>
+                                                <td class="text-center">—</td>
+                                                <td class="text-end">0.00</td>
+                                            </tr>
+                                        </t>
+                                        <tr style="background:#f8f9fa; font-weight:bold;">
+                                            <td colspan="2">Разом:</td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('total_credit', 0.0)).replace(',', ' ')"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-bordered table-sm mb-2" style="font-size:8px;">
+                                    <thead>
+                                        <tr style="background:#f0f0f0;">
+                                            <th>Показник</th>
+                                            <th class="text-center" style="width:80px;">Субрахунок</th>
+                                            <th class="text-end" style="width:90px;">Сума</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="report_data.get('debit_subtotals', [])" t-as="ds">
+                                            <td>Усього до дебету субрахунків:</td>
+                                            <td class="text-center"><strong t-out="ds['code']"/></td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(ds['amount']).replace(',', ' ')"/></td>
+                                        </tr>
+                                        <t t-if="not report_data.get('debit_subtotals')">
+                                            <tr>
+                                                <td>Усього до дебету субрахунків:</td>
+                                                <td class="text-center">—</td>
+                                                <td class="text-end">0.00</td>
+                                            </tr>
+                                        </t>
+                                        <tr style="background:#f8f9fa; font-weight:bold;">
+                                            <td colspan="2">Разом:</td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('total_debit', 0.0)).replace(',', ' ')"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" style="font-size:8.5px; border-bottom:1px solid #ddd; padding-bottom:4px;">
+                            <strong>Сума оборотів за меморіальним ордером:</strong>
+                            <strong t-out="'{:,.2f}'.format(report_data.get('total_turnover', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>
+                            <span class="text-muted" style="font-size:7.5px;">
+                                (Дт: <t t-out="'{:,.2f}'.format(report_data.get('total_debit', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>,
+                                 Кт: <t t-out="'{:,.2f}'.format(report_data.get('total_credit', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>)
+                            </span>
+                        </div>
+
+                        <!-- Залишки на початок і кінець періоду (у розрізі позабалансових субрахунків) -->
+                        <h4 style="font-size:9.5px; margin:10px 0 4px; font-weight:bold;">
+                            Залишки на початок і кінець періоду (у розрізі позабалансових субрахунків)
+                        </h4>
+                        <table class="table table-bordered table-sm mb-3" style="font-size:8px;">
+                            <thead>
+                                <tr class="text-center align-middle" style="background:#f0f0f0;">
+                                    <th rowspan="2" style="width:25px;">№</th>
+                                    <th rowspan="2">Субрахунок</th>
+                                    <th colspan="2">Залишок на початок</th>
+                                    <th colspan="2">Надходження (Дебет)</th>
+                                    <th colspan="2">Вибуття (Кредит)</th>
+                                    <th colspan="2">Залишок на кінець</th>
+                                </tr>
+                                <tr class="text-center align-middle" style="background:#f8f9fa;">
+                                    <th>К-сть</th>
+                                    <th>Сума</th>
+                                    <th>К-сть</th>
+                                    <th>Сума</th>
+                                    <th>К-сть</th>
+                                    <th>Сума</th>
+                                    <th>К-сть</th>
+                                    <th>Сума</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="report_data.get('positions')">
+                                    <tr t-foreach="report_data['positions']" t-as="pos">
+                                        <td class="text-center"><t t-out="pos_index + 1"/></td>
+                                        <td>
+                                            <strong t-out="pos['account_code']"/> <span class="text-muted" t-out="pos['account_name']"/>
+                                        </td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(pos['opening_qty']).replace(',', ' ') if pos['opening_qty'] else ''"/></td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(pos['opening_balance']).replace(',', ' ') if pos['opening_balance'] else ''"/></td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(pos['sum_qty_in']).replace(',', ' ') if pos['sum_qty_in'] else ''"/></td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(pos['sum_debit']).replace(',', ' ') if pos['sum_debit'] else ''"/></td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(pos['sum_qty_out']).replace(',', ' ') if pos['sum_qty_out'] else ''"/></td>
+                                        <td class="text-end"><t t-out="'{:,.2f}'.format(pos['sum_credit']).replace(',', ' ') if pos['sum_credit'] else ''"/></td>
+                                        <td class="text-end fw-bold"><t t-out="'{:,.2f}'.format(pos['closing_qty']).replace(',', ' ') if pos['closing_qty'] else ''"/></td>
+                                        <td class="text-end fw-bold"><t t-out="'{:,.2f}'.format(pos['closing_balance']).replace(',', ' ') if pos['closing_balance'] else ''"/></td>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted py-2">
+                                            <em>Залишки на позабалансових субрахунках відсутні.</em>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr style="background:#f0f0f0; font-weight:bold;">
+                                    <td colspan="2" class="text-uppercase">РАЗОМ за відомістю (збігається із загальним підсумком ОСВ класу 0)</td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('opening_qty', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('opening_balance', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_qty_in', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_register_debit', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_qty_out', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_register_credit', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('closing_qty', 0.0)).replace(',', ' ')"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('closing_balance', 0.0)).replace(',', ' ')"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Підписи та відмітки -->
+                        <div class="mt-3" style="font-size:8.5px;">
+                            <table class="table table-borderless table-sm text-center mb-2" style="font-size:8px; border:none;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:130px; border:none;">Посада / Роль</th>
+                                        <th style="border:none;">Посада</th>
+                                        <th style="width:120px; border:none;">Підпис</th>
+                                        <th style="width:140px; border:none;">Ініціали і прізвище</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-start" style="border:none;"><strong>Виконавець</strong></td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start" style="border:none;"><strong>Перевірив</strong></td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-start" style="border:none;"><strong>Головний бухгалтер</strong></td>
+                                        <td style="border:none;"></td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                        <td class="text-muted" style="border:none;">____________________</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="d-flex justify-content-between my-2">
+                                <div>«___» ____________ 20__ р.</div>
+                                <div><strong>Додаток на ___ аркушах</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- Додаток для історичних проводок (тільки за наявності) -->
+                        <t t-if="report_data.get('has_historical')">
+                            <div style="page-break-before: always; margin-top:20px;">
+                                <h4 style="font-size:9.5px; font-weight:bold; color:#444;">
+                                    Додаток: Довідково — Історичні проводки подвійного запису (account.move.line)
+                                </h4>
+                                <p style="font-size:7.5px; color:#777; margin:0 0 4px;">
+                                    Записи зі старої схеми подвійного запису (технічні балансуючі субрахунки 09 у парних проводках виключено). Наводяться довідково та не входять до складу оборотів форми 16-авт та ОСВ класу 0.
+                                </p>
+                                <table class="table table-bordered table-sm" style="font-size:8px;">
+                                    <thead>
+                                        <tr style="background:#f5f5f5;">
+                                            <th>Дата</th>
+                                            <th>Документ</th>
+                                            <th>Рахунок</th>
+                                            <th>Назва рахунку</th>
+                                            <th>Призначення</th>
+                                            <th>Контрагент</th>
+                                            <th class="text-end">К-сть</th>
+                                            <th class="text-end">Дт</th>
+                                            <th class="text-end">Кт</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="report_data.get('rows_historical', [])" t-as="r">
+                                            <td><t t-out="r['date']"/></td>
+                                            <td><t t-out="r['move_name']"/></td>
+                                            <td><strong t-out="r['account_code']"/></td>
+                                            <td><t t-out="r['account_name']"/></td>
+                                            <td><t t-out="r['description']"/></td>
+                                            <td><t t-out="r['partner']"/></td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(r['quantity']).replace(',', ' ') if r.get('quantity') else ''"/></td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(r['debit']).replace(',', ' ') if r['debit'] else ''"/></td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(r['credit']).replace(',', ' ') if r['credit'] else ''"/></td>
+                                        </tr>
+                                        <tr style="background:#f5f5f5; color:#555; font-weight:bold;">
+                                            <td colspan="7">РАЗОМ (довідково)</td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_historical_debit', 0.0)).replace(',', ' ')"/></td>
+                                            <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_historical_credit', 0.0)).replace(',', ' ')"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
                     </div>
-                </div>
+                </t>
+            </t>
+            <t t-else="">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-size:10px;">
+                        <h2 style="text-align:center; margin-bottom:0;"><t t-out="mo_label or (data and data.get('mo_label')) or dict(wizard._fields['mo_kind'].selection).get(wizard.mo_kind)"/></h2>
+                        <p style="text-align:center; margin-top:0;">
+                            Період: <t t-out="date_from or (data and data.get('date_from')) or wizard.date_from"/> — <t t-out="date_to or (data and data.get('date_to')) or wizard.date_to"/>
+                        </p>
+                        <p style="margin-bottom:4px;">
+                            <strong>Установа:</strong> <t t-out="company.name"/>
+                        </p>
+
+                        <table class="table table-bordered table-sm" style="font-size:9px;">
+                            <thead>
+                                <tr style="background:#f0f0f0;">
+                                    <th>Дата</th>
+                                    <th>Документ</th>
+                                    <th>Рахунок</th>
+                                    <th>Назва рахунку</th>
+                                    <th>Призначення</th>
+                                    <th>Контрагент</th>
+                                    <th class="text-end">Дт</th>
+                                    <th class="text-end">Кт</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="rows" t-as="r">
+                                    <td><t t-out="r['date']"/></td>
+                                    <td><t t-out="r['move_name']"/></td>
+                                    <td><strong t-out="r['account_code']"/></td>
+                                    <td><t t-out="r['account_name']"/></td>
+                                    <td><t t-out="r['description']"/></td>
+                                    <td><t t-out="r['partner']"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(r['debit']).replace(',', ' ') if r['debit'] else ''"/></td>
+                                    <td class="text-end"><t t-out="'{:,.2f}'.format(r['credit']).replace(',', ' ') if r['credit'] else ''"/></td>
+                                </tr>
+                                <tr style="background:#f8f8f8;">
+                                    <td colspan="6"><strong>РАЗОМ</strong></td>
+                                    <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_debit']).replace(',', ' ')"/></strong></td>
+                                    <td class="text-end"><strong><t t-out="'{:,.2f}'.format(report_data['sum_credit']).replace(',', ' ')"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top:20px;">
+                            Виконавець: ________________ /__________________/
+                        </div>
+                    </div>
+                </t>
             </t>
         </t>
     </template>

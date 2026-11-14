@@ -46,7 +46,6 @@ MO_ACCOUNT_FILTER = {
     'mo_13': {'account_types': ('asset_current',),      'codes_prefix': ('2015', '2014', '1812'), 'side': 'credit'},
     'mo_14': {'account_types': ('income', 'income_other'),  'codes_prefix': ('7',)},
     'mo_15': {'account_types': ('asset_receivable',),       'codes': ('2114', '2117')},
-    'mo_16': {'account_types': ('off_balance',),            'codes_prefix': ('0',)},
     'mo_17': {'account_types': ('asset_current', 'liability_current'), 'codes': ('6614',)},
 }
 
@@ -70,17 +69,347 @@ class MemorialOrderWizard(models.TransientModel):
             'date_to': fields.Date.to_string(self.date_to),
             'company_id': self.company_id.id,
         }
+        data['data'] = dict(data)
         report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
         return report.report_action(self, data=data)
+
+    def _get_report_data_mo_16(self):
+        """MO-16 off-balance report: Section 1 = positional register (matches OSV Class 0),
+        Section 2 = chronological documents, Section 3 = historical AML."""
+        company = self.company_id or self.env.company
+        OBLine = self.env['l10n_ua.offbalance.move.line'].with_company(company)
+        AML = self.env['account.move.line'].with_company(company)
+
+        base_domain = [
+            ('state', '=', 'posted'),
+            ('company_id', '=', company.id),
+        ]
+        groupby = ['account_id']
+        aggregates = ['debit:sum', 'credit:sum', 'quantity_in:sum', 'quantity_out:sum']
+
+        # 1. Bucket map strictly by account_id to calculate positional balances in cut of subaccounts
+        data = {}
+
+        def get_bucket(acc_id):
+            if acc_id not in data:
+                data[acc_id] = {
+                    'account_id': acc_id,
+                    'opening_balance': 0.0,
+                    'opening_qty': 0.0,
+                    'turnover_debit': 0.0,
+                    'turnover_credit': 0.0,
+                    'quantity_in': 0.0,
+                    'quantity_out': 0.0,
+                }
+            return data[acc_id]
+
+        # Prior period: date < date_from
+        open_rows = OBLine._read_group(
+            base_domain + [('date', '<', self.date_from)],
+            groupby,
+            aggregates
+        )
+        for row in open_rows:
+            acc_rec, d, c, qi, qo = row
+            b = get_bucket(acc_rec.id)
+            b['opening_balance'] += (d or 0.0) - (c or 0.0)
+            b['opening_qty'] += (qi or 0.0) - (qo or 0.0)
+
+        # Current period: date_from <= date <= date_to
+        period_rows = OBLine._read_group(
+            base_domain + [('date', '>=', self.date_from), ('date', '<=', self.date_to)],
+            groupby,
+            aggregates
+        )
+        for row in period_rows:
+            acc_rec, d, c, qi, qo = row
+            b = get_bucket(acc_rec.id)
+            b['turnover_debit'] += (d or 0.0)
+            b['turnover_credit'] += (c or 0.0)
+            b['quantity_in'] += (qi or 0.0)
+            b['quantity_out'] += (qo or 0.0)
+
+        # Build positional list for subaccounts table
+        Account = self.env['account.account'].with_company(company)
+        acc_ids = list(data.keys())
+        accounts = {a.id: a for a in Account.browse(acc_ids)}
+
+        positions = []
+        tot_open_bal = tot_open_qty = 0.0
+        tot_turn_d = tot_turn_c = 0.0
+        tot_turn_qi = tot_turn_qo = 0.0
+        tot_close_bal = tot_close_qty = 0.0
+
+        for acc_id, val in data.items():
+            acc = accounts.get(acc_id)
+            close_bal = val['opening_balance'] + val['turnover_debit'] - val['turnover_credit']
+            close_qty = val['opening_qty'] + val['quantity_in'] - val['quantity_out']
+
+            # Skip position only if completely empty across all periods
+            if (company.currency_id.is_zero(val['opening_balance'])
+                    and company.currency_id.is_zero(val['turnover_debit'])
+                    and company.currency_id.is_zero(val['turnover_credit'])
+                    and not val['opening_qty']
+                    and not val['quantity_in']
+                    and not val['quantity_out']):
+                continue
+
+            pos_data = {
+                'account_id': acc_id,
+                'account_code': acc.code if acc else '',
+                'account_name': acc.name if acc else '',
+                'opening_balance': val['opening_balance'],
+                'opening_qty': val['opening_qty'],
+                'sum_debit': val['turnover_debit'],
+                'sum_credit': val['turnover_credit'],
+                'sum_qty_in': val['quantity_in'],
+                'sum_qty_out': val['quantity_out'],
+                'closing_balance': close_bal,
+                'closing_qty': close_qty,
+            }
+            positions.append(pos_data)
+
+            tot_open_bal += val['opening_balance']
+            tot_open_qty += val['opening_qty']
+            tot_turn_d += val['turnover_debit']
+            tot_turn_c += val['turnover_credit']
+            tot_turn_qi += val['quantity_in']
+            tot_turn_qo += val['quantity_out']
+            tot_close_bal += close_bal
+            tot_close_qty += close_qty
+
+        positions.sort(key=lambda p: p['account_code'] or '')
+
+        # 2. Chronological movements for typical form No. 16-avt (6-column table)
+        ob_domain = base_domain + [
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+        ]
+        ob_lines = OBLine.search(ob_domain, order='date, id')
+
+        rows_mo16 = []
+        credit_subtotals_map = defaultdict(float)
+        debit_subtotals_map = defaultdict(float)
+        account_names = {}
+
+        for idx, ln in enumerate(ob_lines, 1):
+            account_names[ln.account_id.code] = ln.account_id.name
+            obj_name = ln.name or ''
+            if ln.partner_id:
+                obj_name = f"{obj_name} ({ln.partner_id.name})"
+
+            if ln.direction == 'debit':
+                doc = ln.move_id.ref or ln.move_id.name or ''
+                if ln.date:
+                    doc = f"{doc} від {ln.date}" if doc else str(ln.date)
+                if ln.quantity_in:
+                    qty_str = '{:,.2f}'.format(ln.quantity_in).replace(',', ' ')
+                    doc = f"{doc} (к-сть: {qty_str})"
+                cr_acc = '—'
+                db_acc = ln.account_id.code or '—'
+                debit_subtotals_map[ln.account_id.code] += ln.amount
+            else:
+                doc = ln.move_id.ref or ln.move_id.name or '—'
+                if ln.date and doc != '—':
+                    doc = f"{doc} від {ln.date}"
+                if ln.quantity_out:
+                    qty_str = '{:,.2f}'.format(ln.quantity_out).replace(',', ' ')
+                    doc = f"{doc} (к-сть: {qty_str})"
+                cr_acc = ln.account_id.code or '—'
+                db_acc = '—'
+                credit_subtotals_map[ln.account_id.code] += ln.amount
+
+            rows_mo16.append({
+                'num': idx,
+                'object_name': obj_name,
+                'receipt_doc': doc,
+                'credit_account': cr_acc,
+                'debit_account': db_acc,
+                'amount': ln.amount,
+                'date': ln.date,
+                'move_name': ln.move_id.name if not ln.move_id.ref else f"{ln.move_id.name} ({ln.move_id.ref})",
+                'account_code': ln.account_id.code,
+                'account_name': ln.account_id.name,
+                'description': ln.name or '',
+                'partner': ln.partner_id.name if ln.partner_id else '',
+                'quantity': ln.quantity_in if ln.direction == 'debit' else ln.quantity_out,
+                'debit': ln.debit,
+                'credit': ln.credit,
+                'source': 'register',
+                'source_label': 'Регістр',
+            })
+
+        credit_subtotals = [
+            {'code': code, 'name': account_names.get(code, ''), 'amount': amt}
+            for code, amt in sorted(credit_subtotals_map.items())
+        ]
+        debit_subtotals = [
+            {'code': code, 'name': account_names.get(code, ''), 'amount': amt}
+            for code, amt in sorted(debit_subtotals_map.items())
+        ]
+        total_credit = sum(item['amount'] for item in credit_subtotals)
+        total_debit = sum(item['amount'] for item in debit_subtotals)
+        total_turnover = total_debit + total_credit
+
+        # 3. Historical account.move.line entries for off-balance accounts
+        all_curr_aml = AML.search([
+            ('parent_state', '=', 'posted'),
+            ('company_id', '=', company.id),
+            ('date', '>=', self.date_from),
+            ('date', '<=', self.date_to),
+            ('account_id.account_type', '=', 'off_balance'),
+        ], order='date, id')
+        # Hide 09* only when the same move also has non-09 off-balance lines (technical contra)
+        moves_with_non_09 = {
+            ln.move_id.id for ln in all_curr_aml
+            if not (ln.account_id.code or '').startswith('09')
+        }
+        rows_historical = []
+        sum_hist_d = sum_hist_c = 0.0
+        for ln in all_curr_aml:
+            acc_code = ln.account_id.code or ''
+            if ln.move_id.id in moves_with_non_09 and acc_code.startswith('09'):
+                continue
+            move_name = ln.move_id.name
+            if ln.move_id.ref:
+                move_name = f"{move_name} ({ln.move_id.ref})"
+            rows_historical.append({
+                'date': ln.date,
+                'move_name': move_name,
+                'source': 'historical',
+                'source_label': 'Історичні',
+                'account_code': acc_code,
+                'account_name': ln.account_id.name,
+                'description': ln.name or '',
+                'partner': ln.partner_id.name if ln.partner_id else '',
+                'quantity': ln.quantity or 0.0,
+                'debit': ln.debit,
+                'credit': ln.credit,
+            })
+            sum_hist_d += ln.debit
+            sum_hist_c += ln.credit
+
+        sort_key = lambda r: (fields.Date.to_date(r['date']) or fields.Date.today(), r['move_name'] or '')
+        rows_historical.sort(key=sort_key)
+
+        # 4. Check historical unreversed balances in account.move.line prior to date_from
+        reg_open_by_acc = {
+            acc_id: val['opening_balance']
+            for acc_id, val in data.items()
+            if not company.currency_id.is_zero(val['opening_balance'])
+        }
+
+        all_prior_aml = AML.search([
+            ('parent_state', '=', 'posted'),
+            ('company_id', '=', company.id),
+            ('date', '<', self.date_from),
+            ('account_id.account_type', '=', 'off_balance'),
+        ])
+
+        prior_bal_by_acc = defaultdict(float)
+        for ln in all_prior_aml:
+            prior_bal_by_acc[ln.account_id.id] += (ln.debit or 0.0) - (ln.credit or 0.0)
+
+        active_prior_moves = all_prior_aml.move_id.filtered(
+            lambda m: not m.reversed_entry_id
+            and not any(
+                rev.state == 'posted' and rev.date < self.date_from
+                for rev in m.reversal_move_ids
+            )
+        )
+
+        unmigrated_moves = []
+        unreversed_moves = []
+        for m in active_prior_moves:
+            m_ob_lines = m.line_ids.filtered(lambda l: l.account_id.account_type == 'off_balance')
+            if not m_ob_lines:
+                continue
+            m_acc_ids = {l.account_id.id for l in m_ob_lines}
+            if not any(not company.currency_id.is_zero(prior_bal_by_acc.get(a_id, 0.0)) for a_id in m_acc_ids):
+                continue
+            vol = max(sum(l.debit for l in m_ob_lines), sum(l.credit for l in m_ob_lines))
+            is_migrated = any(a_id in reg_open_by_acc for a_id in m_acc_ids)
+            if is_migrated:
+                unreversed_moves.append(vol)
+            else:
+                unmigrated_moves.append(vol)
+
+        hist_unmigrated_prior_balance = sum(unmigrated_moves)
+        hist_unreversed_prior_balance = sum(unreversed_moves)
+        has_unmigrated_prior_balance = bool(unmigrated_moves)
+        has_unreversed_prior_balance = bool(unreversed_moves)
+
+        if has_unmigrated_prior_balance and not has_unreversed_prior_balance:
+            hist_prior_balance = hist_unmigrated_prior_balance
+        elif has_unreversed_prior_balance and not has_unmigrated_prior_balance:
+            hist_prior_balance = hist_unreversed_prior_balance
+        else:
+            hist_prior_balance = hist_unmigrated_prior_balance + hist_unreversed_prior_balance
+
+        # 5. Active current-period AML entries excluding standard reversals and entries reversed in-period
+        active_curr_aml = all_curr_aml.filtered(
+            lambda l: not l.move_id.reversed_entry_id
+            and not any(
+                rev.state == 'posted' and self.date_from <= rev.date <= self.date_to
+                for rev in l.move_id.reversal_move_ids
+            )
+        )
+        manual_prior_close_only = False
+        if active_curr_aml:
+            curr_delta_by_acc = defaultdict(float)
+            for ln in active_curr_aml:
+                curr_delta_by_acc[ln.account_id.id] += (ln.debit or 0.0) - (ln.credit or 0.0)
+            manual_prior_close_only = all(
+                not company.currency_id.is_zero(prior_bal_by_acc.get(acc_id, 0.0))
+                and company.currency_id.is_zero(prior_bal_by_acc.get(acc_id, 0.0) + delta)
+                for acc_id, delta in curr_delta_by_acc.items()
+            )
+
+        is_register_empty = bool(not rows_mo16 and not positions)
+        has_unmigrated_historical = bool(active_curr_aml) and not manual_prior_close_only
+
+        return {
+            'positions': positions,
+            'rows_mo16': rows_mo16,
+            'rows_historical': rows_historical,
+            'credit_subtotals': credit_subtotals,
+            'debit_subtotals': debit_subtotals,
+            'total_credit': total_credit,
+            'total_debit': total_debit,
+            'total_turnover': total_turnover,
+            'opening_balance': tot_open_bal,
+            'opening_qty': tot_open_qty,
+            'sum_debit': tot_turn_d,
+            'sum_credit': tot_turn_c,
+            'sum_qty_in': tot_turn_qi,
+            'sum_qty_out': tot_turn_qo,
+            'closing_balance': tot_close_bal,
+            'closing_qty': tot_close_qty,
+            'sum_register_debit': tot_turn_d,
+            'sum_register_credit': tot_turn_c,
+            'sum_historical_debit': sum_hist_d,
+            'sum_historical_credit': sum_hist_c,
+            'has_historical': bool(rows_historical),
+            'is_register_empty': is_register_empty,
+            'has_unmigrated_historical': has_unmigrated_historical,
+            'hist_prior_balance': hist_prior_balance,
+            'hist_unmigrated_prior_balance': hist_unmigrated_prior_balance,
+            'hist_unreversed_prior_balance': hist_unreversed_prior_balance,
+            'has_unmigrated_prior_balance': has_unmigrated_prior_balance,
+            'has_unreversed_prior_balance': has_unreversed_prior_balance,
+        }
 
     def get_report_data(self):
         """Aggregate posted journal lines per MO definition."""
         self.ensure_one()
+        if self.mo_kind == 'mo_16':
+            return self._get_report_data_mo_16()
         spec = MO_ACCOUNT_FILTER.get(self.mo_kind, {})
-        AML = self.env['account.move.line']
+        company = self.company_id or self.env.company
+        AML = self.env['account.move.line'].with_company(company)
         domain = [
             ('parent_state', '=', 'posted'),
-            ('company_id', '=', self.company_id.id),
+            ('company_id', '=', company.id),
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
         ]

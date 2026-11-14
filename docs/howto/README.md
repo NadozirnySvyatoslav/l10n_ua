@@ -12,6 +12,7 @@
 | Домен | Гайд | Перевірка | Опис домену |
 |-------|------|-----------|-------------|
 | Базові та бухгалтерія | [accounting.md](accounting.md) | ✅ звірено наживо | [core_accounting.md](../core_accounting.md) |
+| Позабалансовий облік (клас 0) | [offbalance_migration.md](offbalance_migration.md) | ✅ перевірено наживо | [core_accounting.md](../core_accounting.md) |
 | Податки та звітність | [taxes.md](taxes.md) | ✅ звірено наживо | [taxes.md](../taxes.md) |
 | Банки та платежі | [banks.md](banks.md) | 🔑 потребує API-ключів | [banks.md](../banks.md) |
 | ПРРО (фіскалізація) | [prro.md](prro.md) | 🔑 потребує акаунта Checkbox | [prro.md](../prro.md) |

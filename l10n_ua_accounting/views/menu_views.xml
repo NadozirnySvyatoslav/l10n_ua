@@ -142,6 +142,15 @@
               action="l10n_ua_account_base.l10n_ua_osv_action"
               sequence="10"/>
 
+    <!-- Переміщення ОСВ класу 0 до розділу «Звітність -> Бухгалтерські звіти»
+         без створення дублюючого меню (запобігання антипатерну H1, #418).
+         Для базових/бюджетних баз без цього модуля меню лишається під menu_l10n_ua_offbalance. -->
+    <record id="l10n_ua_account_base.menu_l10n_ua_offbalance_osv" model="ir.ui.menu">
+        <field name="parent_id" ref="menu_ua_reports"/>
+        <field name="name">Off-Balance Trial Balance (Class 0)</field>
+        <field name="sequence">15</field>
+    </record>
+
     <menuitem id="menu_ua_reports_journal_orders"
               name="Journal Orders"
               parent="menu_ua_reports"
