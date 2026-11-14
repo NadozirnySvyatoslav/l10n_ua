@@ -240,7 +240,7 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         report_data = wizard.get_report_data()
 
         # Перевірка рядків із позабалансового регістра
-        matching_rows = [r for r in report_data['rows_register'] if 'Орендована будівля' in r['description']]
+        matching_rows = [r for r in report_data['rows_mo16'] if 'Орендована будівля' in r['description']]
         self.assertEqual(len(matching_rows), 1)
         self.assertEqual(matching_rows[0]['quantity'], 2.0)
         self.assertEqual(matching_rows[0]['debit'], 150000.0)
@@ -275,10 +275,10 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         self.assertTrue(report_data.get('has_unmigrated_historical'))
         self.assertFalse(report_data.get('is_register_empty'))
 
-        # Рядки rows мають містити виключно операції регістра (без змішування з історичними)
-        self.assertEqual(len(report_data['rows']), 1)
-        self.assertEqual(report_data['rows'][0]['source'], 'register')
-        self.assertEqual(sum(r['debit'] for r in report_data['rows']), report_data['sum_debit'])
+        # Рядки rows_mo16 мають містити виключно операції регістра (без змішування з історичними)
+        self.assertEqual(len(report_data['rows_mo16']), 1)
+        self.assertEqual(report_data['rows_mo16'][0]['source'], 'register')
+        self.assertEqual(sum(r['debit'] for r in report_data['rows_mo16']), report_data['sum_debit'])
 
         # Перевірка підсумкових позицій за субрахунками
         positions = report_data.get('positions', [])
@@ -1019,3 +1019,315 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         html, _ = report._render_qweb_html(report.report_name, [wiz.id], data=action_dict.get('data'))
         html_str = html.decode() if isinstance(html, bytes) else html
         self.assertIn('Виявлено неперенесені залишки минулих періодів', html_str)
+
+    def test_11_per_account_unmigrated_and_unreversed_isolation(self):
+        """Субрахунок 01 перенесено і сторновано, а 02 лишився в AML: видає лише жовте 'не перенесено'."""
+        comp = self.env['res.company'].create({
+            'name': 'Установа Посубрахункова Ізоляція',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp.id]))
+        c_env = c_env['res.company'].with_company(comp).env
+
+        acc_01 = c_env['account.account'].create({
+            'name': 'Орендовані НА',
+            'code': '01iso',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        acc_02 = c_env['account.account'].create({
+            'name': 'Активи на зберіганні',
+            'code': '02iso',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra = c_env['account.account'].create({
+            'name': 'Контра-рахунок 09',
+            'code': '09iso',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'ISO1',
+            'type': 'general',
+            'company_id': comp.id,
+        })
+
+        # 1. Історична проводка по 01 (50 000 грн)
+        m01 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': 'Актив 01', 'debit': 50000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра 09', 'debit': 0.0, 'credit': 50000.0}),
+            ],
+        })
+        m01.action_post()
+
+        # 2. Сторнування проводки m01 до date_from
+        rev_m01 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'reversed_entry_id': m01.id,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': 'Сторно актив 01', 'debit': 0.0, 'credit': 50000.0}),
+                Command.create({'account_id': contra.id, 'name': 'Сторно контра 09', 'debit': 50000.0, 'credit': 0.0}),
+            ],
+        })
+        rev_m01.action_post()
+
+        # 3. Введення залишку 01 у новий регістр (50 000 грн)
+        open_reg = c_env['l10n_ua.offbalance.move'].create({
+            'date': self.prior_date,
+            'company_id': comp.id,
+            'ref': 'Введення 01',
+            'line_ids': [
+                Command.create({
+                    'account_id': acc_01.id,
+                    'direction': 'debit',
+                    'name': 'Початковий 01',
+                    'quantity': 1.0,
+                    'amount': 50000.0,
+                }),
+            ],
+        })
+        open_reg.action_post()
+
+        # 4. Історична проводка по 02 (30 000 грн) — не перенесена в регістр і не сторнована!
+        m02 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_02.id, 'name': 'Актив 02', 'debit': 30000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра 09', 'debit': 0.0, 'credit': 30000.0}),
+            ],
+        })
+        m02.action_post()
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp.id,
+        })
+        data = wiz.get_report_data()
+
+        # Залишок на 02 є неперенесеним (жовте), а на 01 — перенесено і сторновано (червоного немає)
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+        self.assertFalse(data.get('has_unreversed_prior_balance'))
+        self.assertEqual(data.get('hist_unmigrated_prior_balance'), 30000.0)
+        self.assertEqual(data.get('hist_prior_balance'), 30000.0)
+        self.assertEqual(data.get('opening_balance'), 50000.0)
+
+        comp.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        action_dict = wiz.action_print()
+        report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
+        html, _ = report._render_qweb_html(report.report_name, [wiz.id], data=action_dict.get('data'))
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('Виявлено неперенесені залишки минулих періодів', html_str)
+        self.assertNotIn('ризик подвійного обліку', html_str)
+
+    def test_12_simultaneous_unmigrated_and_unreversed_prior_balances(self):
+        """Одночасна наявність неперенесеного (02) та невідсторнованого (01) субрахунків активує обидва прапорці."""
+        comp = self.env['res.company'].create({
+            'name': 'Установа Одночасні Залишки',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp.id]))
+        c_env = c_env['res.company'].with_company(comp).env
+
+        acc_01 = c_env['account.account'].create({
+            'name': 'Орендовані НА подвійні',
+            'code': '01sim',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        acc_02 = c_env['account.account'].create({
+            'name': 'Активи на зберіганні подвійні',
+            'code': '02sim',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra = c_env['account.account'].create({
+            'name': 'Контра-рахунок 09',
+            'code': '09sim',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'SIM1',
+            'type': 'general',
+            'company_id': comp.id,
+        })
+
+        # 1. 01: є в AML (70 000 грн, не сторновано!)
+        m01 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': 'Актив 01', 'debit': 70000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра 09', 'debit': 0.0, 'credit': 70000.0}),
+            ],
+        })
+        m01.action_post()
+
+        # 2. 01: введено в регістр (70 000 грн) -> створює ризик подвійного обліку (unreversed)
+        open_reg = c_env['l10n_ua.offbalance.move'].create({
+            'date': self.prior_date,
+            'company_id': comp.id,
+            'ref': 'Введення 01',
+            'line_ids': [
+                Command.create({
+                    'account_id': acc_01.id,
+                    'direction': 'debit',
+                    'name': 'Початковий 01',
+                    'quantity': 1.0,
+                    'amount': 70000.0,
+                }),
+            ],
+        })
+        open_reg.action_post()
+
+        # 3. 02: є в AML (25 000 грн), але в регістр не введено (unmigrated)
+        m02 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_02.id, 'name': 'Актив 02', 'debit': 25000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра 09', 'debit': 0.0, 'credit': 25000.0}),
+            ],
+        })
+        m02.action_post()
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp.id,
+        })
+        data = wiz.get_report_data()
+
+        # Обидва прапорці мають бути активними одночасно
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+        self.assertTrue(data.get('has_unreversed_prior_balance'))
+        self.assertEqual(data.get('hist_unmigrated_prior_balance'), 25000.0)
+        self.assertEqual(data.get('hist_unreversed_prior_balance'), 70000.0)
+        self.assertEqual(data.get('hist_prior_balance'), 95000.0)
+        self.assertEqual(data.get('opening_balance'), 70000.0)
+
+        comp.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        action_dict = wiz.action_print()
+        report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
+        html, _ = report._render_qweb_html(report.report_name, [wiz.id], data=action_dict.get('data'))
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('Виявлено неперенесені залишки минулих періодів', html_str)
+        self.assertIn('ризик подвійного обліку', html_str)
+        self.assertTrue('25 000.00' in html_str or '25 000,00' in html_str)
+        self.assertTrue('70 000.00' in html_str or '70 000,00' in html_str)
+
+    def test_13_partial_contra_09_additive_calculation(self):
+        """Сума історичних залишків коректно додається без артефакту max(pos, neg) при часткових 09* контрзаписах."""
+        comp = self.env['res.company'].create({
+            'name': 'Установа Часткові Контрзаписи',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp.id]))
+        c_env = c_env['res.company'].with_company(comp).env
+
+        acc_01 = c_env['account.account'].create({
+            'name': 'Орендовані НА',
+            'code': '01add',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        acc_02 = c_env['account.account'].create({
+            'name': 'Активи на зберіганні',
+            'code': '02add',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        acc_05 = c_env['account.account'].create({
+            'name': 'Списана заборгованість (пасив)',
+            'code': '05add',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra_09 = c_env['account.account'].create({
+            'name': 'Контра-рахунок 09',
+            'code': '09add',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra_00 = c_env['account.account'].create({
+            'name': 'Технічний контр-рахунок 00',
+            'code': '00add',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'ADD1',
+            'type': 'general',
+            'company_id': comp.id,
+        })
+
+        # Проводка 1: Дт 01 (100 000) / Кт 09 (100 000) — парний контрзапис на 09
+        m1 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': 'Актив 01', 'debit': 100000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra_09.id, 'name': 'Контра 09', 'debit': 0.0, 'credit': 100000.0}),
+            ],
+        })
+        m1.action_post()
+
+        # Проводка 2: Дт 02 (40 000) / Кт 00 (40 000) — контрзапис на технічному рахунку 00 (не 09)
+        m2 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_02.id, 'name': 'Актив 02', 'debit': 40000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra_00.id, 'name': 'Контра 00', 'debit': 0.0, 'credit': 40000.0}),
+            ],
+        })
+        m2.action_post()
+
+        # Проводка 3: Дт 00 (20 000) / Кт 05 (20 000) — пасивний позабаланс із контрзаписом за дебетом 00
+        m3 = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': contra_00.id, 'name': 'Контра 00', 'debit': 20000.0, 'credit': 0.0}),
+                Command.create({'account_id': acc_05.id, 'name': 'Пасив 05', 'debit': 0.0, 'credit': 20000.0}),
+            ],
+        })
+        m3.action_post()
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp.id,
+        })
+        data = wiz.get_report_data()
+
+        # Загальний обсяг неперенесених операцій: 100 000 + 40 000 + 20 000 = 160 000.
+        # Старий алгоритм max(pos, neg) порахував би max(140 000, 120 000) = 140 000.
+        self.assertEqual(data.get('hist_prior_balance'), 160000.0)
+        self.assertEqual(data.get('hist_unmigrated_prior_balance'), 160000.0)
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+        self.assertFalse(data.get('has_unreversed_prior_balance'))

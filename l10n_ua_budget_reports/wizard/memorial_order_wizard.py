@@ -293,37 +293,58 @@ class MemorialOrderWizard(models.TransientModel):
         rows_historical.sort(key=sort_key)
 
         # 4. Check historical unreversed balances in account.move.line prior to date_from
-        hist_open_rows = AML._read_group(
-            [
-                ('parent_state', '=', 'posted'),
-                ('company_id', '=', company.id),
-                ('date', '<', self.date_from),
-                ('account_id.account_type', '=', 'off_balance'),
-            ],
-            groupby=['account_id'],
-            aggregates=['debit:sum', 'credit:sum'],
-        )
-        prior_bal_by_acc = {}
-        pos_prior_balance = 0.0
-        neg_prior_balance = 0.0
-        for acc, d, c in hist_open_rows:
-            bal = (d or 0.0) - (c or 0.0)
-            prior_bal_by_acc[acc.id] = bal
-            cmp = company.currency_id.compare_amounts(bal, 0.0)
-            if cmp > 0:
-                pos_prior_balance += bal
-            elif cmp < 0:
-                neg_prior_balance += -bal
+        reg_open_by_acc = {
+            acc_id: val['opening_balance']
+            for acc_id, val in data.items()
+            if not company.currency_id.is_zero(val['opening_balance'])
+        }
 
-        hist_prior_balance = max(pos_prior_balance, neg_prior_balance)
-        has_prior_unreversed = company.currency_id.compare_amounts(hist_prior_balance, 0.0) > 0
+        all_prior_aml = AML.search([
+            ('parent_state', '=', 'posted'),
+            ('company_id', '=', company.id),
+            ('date', '<', self.date_from),
+            ('account_id.account_type', '=', 'off_balance'),
+        ])
 
-        has_unmigrated_prior_balance = (
-            has_prior_unreversed and company.currency_id.is_zero(tot_open_bal)
+        prior_bal_by_acc = defaultdict(float)
+        for ln in all_prior_aml:
+            prior_bal_by_acc[ln.account_id.id] += (ln.debit or 0.0) - (ln.credit or 0.0)
+
+        active_prior_moves = all_prior_aml.move_id.filtered(
+            lambda m: not m.reversed_entry_id
+            and not any(
+                rev.state == 'posted' and rev.date < self.date_from
+                for rev in m.reversal_move_ids
+            )
         )
-        has_unreversed_prior_balance = (
-            has_prior_unreversed and not company.currency_id.is_zero(tot_open_bal)
-        )
+
+        unmigrated_moves = []
+        unreversed_moves = []
+        for m in active_prior_moves:
+            m_ob_lines = m.line_ids.filtered(lambda l: l.account_id.account_type == 'off_balance')
+            if not m_ob_lines:
+                continue
+            m_acc_ids = {l.account_id.id for l in m_ob_lines}
+            if not any(not company.currency_id.is_zero(prior_bal_by_acc.get(a_id, 0.0)) for a_id in m_acc_ids):
+                continue
+            vol = max(sum(l.debit for l in m_ob_lines), sum(l.credit for l in m_ob_lines))
+            is_migrated = any(a_id in reg_open_by_acc for a_id in m_acc_ids)
+            if is_migrated:
+                unreversed_moves.append(vol)
+            else:
+                unmigrated_moves.append(vol)
+
+        hist_unmigrated_prior_balance = sum(unmigrated_moves)
+        hist_unreversed_prior_balance = sum(unreversed_moves)
+        has_unmigrated_prior_balance = bool(unmigrated_moves)
+        has_unreversed_prior_balance = bool(unreversed_moves)
+
+        if has_unmigrated_prior_balance and not has_unreversed_prior_balance:
+            hist_prior_balance = hist_unmigrated_prior_balance
+        elif has_unreversed_prior_balance and not has_unmigrated_prior_balance:
+            hist_prior_balance = hist_unreversed_prior_balance
+        else:
+            hist_prior_balance = hist_unmigrated_prior_balance + hist_unreversed_prior_balance
 
         # 5. Active current-period AML entries excluding standard reversals and entries reversed in-period
         active_curr_aml = all_curr_aml.filtered(
@@ -350,9 +371,7 @@ class MemorialOrderWizard(models.TransientModel):
         return {
             'positions': positions,
             'rows_mo16': rows_mo16,
-            'rows_register': rows_mo16,
             'rows_historical': rows_historical,
-            'rows': rows_mo16,
             'credit_subtotals': credit_subtotals,
             'debit_subtotals': debit_subtotals,
             'total_credit': total_credit,
@@ -374,6 +393,8 @@ class MemorialOrderWizard(models.TransientModel):
             'is_register_empty': is_register_empty,
             'has_unmigrated_historical': has_unmigrated_historical,
             'hist_prior_balance': hist_prior_balance,
+            'hist_unmigrated_prior_balance': hist_unmigrated_prior_balance,
+            'hist_unreversed_prior_balance': hist_unreversed_prior_balance,
             'has_unmigrated_prior_balance': has_unmigrated_prior_balance,
             'has_unreversed_prior_balance': has_unreversed_prior_balance,
         }

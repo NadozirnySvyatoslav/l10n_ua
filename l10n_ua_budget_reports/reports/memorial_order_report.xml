@@ -28,7 +28,7 @@
             <t t-set="wizard" t-value="(w_rec and w_rec.exists() and w_rec) or (docs and docs.exists() and docs[0]) or env['l10n_ua.budget.memorial_order.wizard'].with_company(w_company).new(wizard_vals)"/>
             <t t-set="company" t-value="wizard.company_id or w_company"/>
             <t t-set="report_data" t-value="wizard.get_report_data()"/>
-            <t t-set="rows" t-value="report_data['rows']"/>
+            <t t-set="rows" t-value="report_data.get('rows') or report_data.get('rows_mo16', [])"/>
 
             <t t-if="wizard.mo_kind == 'mo_16'">
                 <t t-call="web.basic_layout">
@@ -84,14 +84,14 @@
                         <!-- Попередження: завислі неперенесені залишки минулих періодів -->
                         <t t-if="report_data.get('has_unmigrated_prior_balance')">
                             <div class="alert alert-warning p-2 mb-2" style="font-size:8.5px; border:1px solid #ffeeba; background-color:#fff3cd; color:#856404;">
-                                <strong>Увага (неперенесені залишки):</strong> Виявлено неперенесені залишки минулих періодів на позабалансових субрахунках в <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_prior_balance', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong>, при цьому вхідне сальдо нового регістру дорівнює 0,00 <t t-out="company.currency_id.symbol or 'грн.'"/>. Для коректного обліку внесіть документ введення початкових залишків станом на початок періоду.
+                                <strong>Увага (неперенесені залишки):</strong> Виявлено неперенесені залишки минулих періодів на позабалансових субрахунках в <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_unmigrated_prior_balance', report_data.get('hist_prior_balance', 0.0))).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong>, при цьому вхідне сальдо відповідних субрахунків у новому регістрі дорівнює 0,00 <t t-out="company.currency_id.symbol or 'грн.'"/>. Для коректного обліку внесіть документ введення початкових залишків станом на початок періоду.
                             </div>
                         </t>
 
                         <!-- Попередження: ризик подвійного обліку через несторновані проводки минулих періодів -->
                         <t t-if="report_data.get('has_unreversed_prior_balance')">
                             <div class="alert alert-danger p-2 mb-2" style="font-size:8.5px; border:1px solid #f5c6cb; background-color:#f8d7da; color:#721c24;">
-                                <strong>Увага (ризик подвійного обліку):</strong> Виявлено несторновані залишки минулих періодів у старій схемі <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_prior_balance', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong> при наявності введених залишків у новому регістрі (<t t-out="'{:,.2f}'.format(report_data.get('opening_balance', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>). Виконайте сторнування старих проводок згідно з інструкцією <em>offbalance_migration.md</em>.
+                                <strong>Увага (ризик подвійного обліку):</strong> Виявлено несторновані залишки минулих періодів у старій схемі <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_unreversed_prior_balance', report_data.get('hist_prior_balance', 0.0))).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong> при наявності введених залишків у новому регістрі (<t t-out="'{:,.2f}'.format(report_data.get('opening_balance', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>). Виконайте сторнування старих проводок згідно з інструкцією <em>offbalance_migration.md</em>.
                             </div>
                         </t>
 
