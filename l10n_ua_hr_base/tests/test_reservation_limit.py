@@ -68,8 +68,12 @@ class TestReservationLimit(TestHrUaBase):
         reminder = self._reminders('Перевищено ліміт')
         self.assertEqual(len(reminder), 1)
         self.assertEqual(reminder.user_id, self.officer_user)
-        self.assertGreaterEqual(reminder.date_deadline, date(2026, 11, 17))
-        self.assertLess(reminder.date_deadline.weekday(), 5)
+        # Службовий строк 5 р. д.: 03.11 (вт) → 10.11 (вт).
+        self.assertEqual(reminder.date_deadline, date(2026, 11, 10))
+        # К1 (#524): у ПКМУ № 1328 немає «п. 9-2» і 10 р. д. на анулювання.
+        self.assertNotIn('9-2', reminder.note)
+        self.assertNotIn('10 робочих', reminder.note)
+        self.assertIn('ПКМУ № 1328', reminder.note)
 
     def test_not_critical_never_exceeded(self):
         self.company.l10n_ua_critical_enterprise = False

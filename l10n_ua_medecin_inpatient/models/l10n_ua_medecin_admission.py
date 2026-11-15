@@ -1,5 +1,6 @@
 from datetime import timezone
-from zoneinfo import ZoneInfo
+
+import pytz
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
@@ -151,7 +152,7 @@ class L10nUaMedecinAdmission(models.Model):
         """Календарна дата моменту `dt` (UTC, naive) у часовому поясі закладу."""
         self.ensure_one()
         tz_name = self.company_id.partner_id.tz or DEFAULT_TZ
-        return dt.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(tz_name)).date()
+        return dt.replace(tzinfo=timezone.utc).astimezone(pytz.timezone(tz_name)).date()
 
     @api.depends('date_admission', 'date_discharge', 'company_id')
     def _compute_bed_days(self):

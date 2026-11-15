@@ -6,7 +6,8 @@ Fixtures follow the response samples of https://api.monobank.ua/docs/index.html
 
 from datetime import date, datetime
 from unittest.mock import MagicMock, patch
-from zoneinfo import ZoneInfo
+
+import pytz
 
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import TransactionCase, new_test_user, tagged
@@ -14,7 +15,12 @@ from odoo.tests import TransactionCase, new_test_user, tagged
 MODULE = 'odoo.addons.l10n_ua_bank_mono.models.l10n_ua_bank_mono_config'
 OWN_IBAN = 'UA213223130000026007233566001'
 OTHER_IBAN = 'UA293220010000026002700000002'
-KYIV = ZoneInfo('Europe/Kyiv')
+KYIV = pytz.timezone('Europe/Kyiv')
+
+
+def _kyiv(*args):
+    """Kyiv wall-clock datetime (pytz zones need localize(), not tzinfo=)."""
+    return KYIV.localize(datetime(*args))
 
 
 def _response(status=200, json_data=None, headers=None):
@@ -86,8 +92,8 @@ class TestMonoPersonal(TransactionCase):
         with patch(f'{MODULE}.requests.get',
                    return_value=_response(json_data=[])) as get:
             raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
-        low = int(datetime(2026, 9, 1, tzinfo=KYIV).timestamp())
-        high = int(datetime(2026, 9, 7, 23, 59, 59, tzinfo=KYIV).timestamp())
+        low = int(_kyiv(2026, 9, 1).timestamp())
+        high = int(_kyiv(2026, 9, 7, 23, 59, 59).timestamp())
         self.assertEqual(
             get.call_args.args[0],
             f'https://api.monobank.ua/personal/statement/acc-own/{low}/{high}')
@@ -97,7 +103,7 @@ class TestMonoPersonal(TransactionCase):
     def test_operation_date_is_the_kyiv_day(self):
         # 00:30 on 3 September in Kyiv is still 2 September in UTC: on a
         # server in UTC the line used to land on the previous day.
-        ts = int(datetime(2026, 9, 3, 0, 30, tzinfo=KYIV).timestamp())
+        ts = int(_kyiv(2026, 9, 3, 0, 30).timestamp())
         trans = self.config._parse_transactions(
             {'api_type': 'statement', 'response': [_item(1, ts)]})[0]
         self.assertEqual(trans['date'], '2026-09-03')
@@ -119,7 +125,7 @@ class TestMonoPersonal(TransactionCase):
     def test_statement_is_read_past_a_full_page(self):
         """500 operations is a full page: the rest of the period used to be
         lost without a word."""
-        end = int(datetime(2026, 9, 7, 20, tzinfo=KYIV).timestamp())
+        end = int(_kyiv(2026, 9, 7, 20).timestamp())
         # Newest first, counting back from `to`.
         first = [_item(n, end - n) for n in range(500)]
         second = [_item(499, end - 499)] + [
@@ -138,7 +144,7 @@ class TestMonoPersonal(TransactionCase):
         self.assertEqual(len({i['id'] for i in raw['response']}), 530)
 
     def test_too_many_operations_ask_for_a_shorter_period(self):
-        end = int(datetime(2026, 9, 7, 20, tzinfo=KYIV).timestamp())
+        end = int(_kyiv(2026, 9, 7, 20).timestamp())
         pages = [[_item(p * 500 + n, end - p * 500 - n) for n in range(500)]
                  for p in range(2)]
         with patch(f'{MODULE}.sleep'), patch(
@@ -208,7 +214,7 @@ class TestMonoPersonal(TransactionCase):
     def test_balances_come_from_the_operations(self):
         """Each operation carries the balance after it: the statement is
         verified instead of always being derived."""
-        ts = int(datetime(2026, 9, 2, 12, tzinfo=KYIV).timestamp())
+        ts = int(_kyiv(2026, 9, 2, 12).timestamp())
         raw = {'api_type': 'statement', 'response': [
             # Newest first.
             _item(2, ts + 60, amount=-95000, balance=10050000),
