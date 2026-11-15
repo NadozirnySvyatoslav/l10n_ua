@@ -1331,3 +1331,87 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         self.assertEqual(data.get('hist_unmigrated_prior_balance'), 160000.0)
         self.assertTrue(data.get('has_unmigrated_prior_balance'))
         self.assertFalse(data.get('has_unreversed_prior_balance'))
+
+    def test_14_closed_transaction_no_turnover_doubling(self):
+        """Закриті історичні операції не враховуються та не подвоюють суму неперенесених залишків."""
+        comp = self.env['res.company'].create({
+            'name': 'Установа Закриті Операції',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp.id]))
+        c_env = c_env['res.company'].with_company(comp).env
+
+        acc_01 = c_env['account.account'].create({
+            'name': 'Орендовані НА',
+            'code': '01closed',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        acc_02 = c_env['account.account'].create({
+            'name': 'Активи на зберіганні',
+            'code': '02open',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra = c_env['account.account'].create({
+            'name': 'Контра-рахунок 09',
+            'code': '09closed',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'CLS1',
+            'type': 'general',
+            'company_id': comp.id,
+        })
+
+        # 1. Закрита операція на 01: отримано 100 000, повернуто 100 000 до date_from
+        m_in = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': 'Оренда надходження', 'debit': 100000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра надходження', 'debit': 0.0, 'credit': 100000.0}),
+            ],
+        })
+        m_in.action_post()
+
+        m_out = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': contra.id, 'name': 'Контра повернення', 'debit': 100000.0, 'credit': 0.0}),
+                Command.create({'account_id': acc_01.id, 'name': 'Оренда повернення', 'debit': 0.0, 'credit': 100000.0}),
+            ],
+        })
+        m_out.action_post()
+
+        # 2. Діюча операція на 02: 50 000 до date_from
+        m_open = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_02.id, 'name': 'Зберігання відкрито', 'debit': 50000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра зберігання', 'debit': 0.0, 'credit': 50000.0}),
+            ],
+        })
+        m_open.action_post()
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp.id,
+        })
+        data = wiz.get_report_data()
+
+        # Сума має бути строго 50 000 (лише відкрите сальдо по 02), а не 250 000 (100k + 100k + 50k)
+        self.assertEqual(data.get('hist_prior_balance'), 50000.0)
+        self.assertEqual(data.get('hist_unmigrated_prior_balance'), 50000.0)
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+        self.assertFalse(data.get('has_unreversed_prior_balance'))

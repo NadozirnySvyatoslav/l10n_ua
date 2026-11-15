@@ -299,52 +299,60 @@ class MemorialOrderWizard(models.TransientModel):
             if not company.currency_id.is_zero(val['opening_balance'])
         }
 
-        all_prior_aml = AML.search([
-            ('parent_state', '=', 'posted'),
-            ('company_id', '=', company.id),
-            ('date', '<', self.date_from),
-            ('account_id.account_type', '=', 'off_balance'),
-        ])
-
-        prior_bal_by_acc = defaultdict(float)
-        for ln in all_prior_aml:
-            prior_bal_by_acc[ln.account_id.id] += (ln.debit or 0.0) - (ln.credit or 0.0)
-
-        active_prior_moves = all_prior_aml.move_id.filtered(
-            lambda m: not m.reversed_entry_id
-            and not any(
-                rev.state == 'posted' and rev.date < self.date_from
-                for rev in m.reversal_move_ids
-            )
+ add        hist_open_rows = AML._read_group(
+            [
+                ('parent_state', '=', 'posted'),
+                ('company_id', '=', company.id),
+                ('date', '<', self.date_from),
+                ('account_id.account_type', '=', 'off_balance'),
+            ],
+            groupby=['account_id'],
+            aggregates=['debit:sum', 'credit:sum'],
         )
 
-        unmigrated_moves = []
-        unreversed_moves = []
-        for m in active_prior_moves:
-            m_ob_lines = m.line_ids.filtered(lambda l: l.account_id.account_type == 'off_balance')
-            if not m_ob_lines:
+        prior_bal_by_acc = {}
+        for acc, d, c in hist_open_rows:
+            prior_bal_by_acc[acc.id] = (d or 0.0) - (c or 0.0)
+
+        def _is_contra(account):
+            name = (account.name or '').lower()
+            code = (account.code or '').strip()
+            if any(k in name for k in ('контр', 'техніч', 'балансуюч', 'contra')):
+                return True
+            if code in ('00', '000', '0000'):
+                return True
+            if (code.startswith(('09', '0009', '009'))) and 'амортиз' not in name:
+                return True
+            return False
+
+        real_accounts_bal = []
+        contra_accounts_bal = []
+        for acc, d, c in hist_open_rows:
+            bal = abs((d or 0.0) - (c or 0.0))
+            if company.currency_id.is_zero(bal):
                 continue
-            m_acc_ids = {l.account_id.id for l in m_ob_lines}
-            if not any(not company.currency_id.is_zero(prior_bal_by_acc.get(a_id, 0.0)) for a_id in m_acc_ids):
-                continue
-            vol = max(sum(l.debit for l in m_ob_lines), sum(l.credit for l in m_ob_lines))
-            is_migrated = any(a_id in reg_open_by_acc for a_id in m_acc_ids)
-            if is_migrated:
-                unreversed_moves.append(vol)
+            if _is_contra(acc):
+                contra_accounts_bal.append((acc, bal))
             else:
-                unmigrated_moves.append(vol)
+                real_accounts_bal.append((acc, bal))
 
-        hist_unmigrated_prior_balance = sum(unmigrated_moves)
-        hist_unreversed_prior_balance = sum(unreversed_moves)
-        has_unmigrated_prior_balance = bool(unmigrated_moves)
-        has_unreversed_prior_balance = bool(unreversed_moves)
+        target_accounts = real_accounts_bal if real_accounts_bal else contra_accounts_bal
 
-        if has_unmigrated_prior_balance and not has_unreversed_prior_balance:
-            hist_prior_balance = hist_unmigrated_prior_balance
-        elif has_unreversed_prior_balance and not has_unmigrated_prior_balance:
-            hist_prior_balance = hist_unreversed_prior_balance
-        else:
-            hist_prior_balance = hist_unmigrated_prior_balance + hist_unreversed_prior_balance
+        hist_unmigrated_prior_balance = 0.0
+        hist_unreversed_prior_balance = 0.0
+        for acc, bal in target_accounts:
+            if acc.id in reg_open_by_acc:
+                hist_unreversed_prior_balance += bal
+            else:
+                hist_unmigrated_prior_balance += bal
+
+        has_unmigrated_prior_balance = (
+            company.currency_id.compare_amounts(hist_unmigrated_prior_balance, 0.0) > 0
+        )
+        has_unreversed_prior_balance = (
+            company.currency_id.compare_amounts(hist_unreversed_prior_balance, 0.0) > 0
+        )
+        hist_prior_balance = hist_unmigrated_prior_balance + hist_unreversed_prior_balance
 
         # 5. Active current-period AML entries excluding standard reversals and entries reversed in-period
         active_curr_aml = all_curr_aml.filtered(
