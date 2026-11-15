@@ -1325,8 +1325,9 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         })
         data = wiz.get_report_data()
 
-        # Загальний обсяг неперенесених операцій: 100 000 + 40 000 + 20 000 = 160 000.
-        # Старий алгоритм max(pos, neg) порахував би max(140 000, 120 000) = 140 000.
+        # Сума чистих залишків по трьох різних відкритих позабалансових рахунках:
+        # 01 (+100 000), 02 (+40 000) та 05 (+20 000) = 160 000.
+        # Алгоритм коректно ізолює контр-рахунки 00/09 без змішування протилежних сальдо.
         self.assertEqual(data.get('hist_prior_balance'), 160000.0)
         self.assertEqual(data.get('hist_unmigrated_prior_balance'), 160000.0)
         self.assertTrue(data.get('has_unmigrated_prior_balance'))
@@ -1415,3 +1416,202 @@ class TestMemorialOrder16Offbalance(TransactionCase):
         self.assertEqual(data.get('hist_unmigrated_prior_balance'), 50000.0)
         self.assertTrue(data.get('has_unmigrated_prior_balance'))
         self.assertFalse(data.get('has_unreversed_prior_balance'))
+
+    def test_15_partial_disposal_prior_balance_reconciliation(self):
+        """Звичайне вибуття частини запасів/активів без сторно рахує залишок (40k), а не обсяг операцій (160k)."""
+        comp = self.env['res.company'].create({
+            'name': 'Установа Часткове Вибуття',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp.id]))
+        c_env = c_env['res.company'].with_company(comp).env
+
+        acc_01 = c_env['account.account'].create({
+            'name': 'Орендовані НА',
+            'code': '01disp',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra = c_env['account.account'].create({
+            'name': 'Технічний балансуючий рахунок',
+            'code': '00disp',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'DSP1',
+            'type': 'general',
+            'company_id': comp.id,
+        })
+
+        # 1. Надходження: Дт 01 (100 000) / Кт 00 (100 000)
+        m_in = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': 'Надходження 100k', 'debit': 100000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': 'Контра 100k', 'debit': 0.0, 'credit': 100000.0}),
+            ],
+        })
+        m_in.action_post()
+
+        # 2. Звичайне вибуття (не сторно!): Дт 00 (60 000) / Кт 01 (60 000)
+        m_out = c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': contra.id, 'name': 'Контра вибуття 60k', 'debit': 60000.0, 'credit': 0.0}),
+                Command.create({'account_id': acc_01.id, 'name': 'Вибуття 60k', 'debit': 0.0, 'credit': 60000.0}),
+            ],
+        })
+        m_out.action_post()
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp.id,
+        })
+        data = wiz.get_report_data()
+
+        # Реальний чистий залишок до початку періоду: 100 000 - 60 000 = 40 000.
+        # Попередження повинно показувати 40 000, а не 160 000 (100k + 60k)!
+        self.assertEqual(data.get('hist_unmigrated_prior_balance'), 40000.0)
+        self.assertEqual(data.get('hist_prior_balance'), 40000.0)
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+        self.assertFalse(data.get('has_unreversed_prior_balance'))
+
+        comp.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        action_dict = wiz.action_print()
+        report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
+        html, _ = report._render_qweb_html(report.report_name, [wiz.id], data=action_dict.get('data'))
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('Виявлено неперенесені залишки минулих періодів', html_str)
+        self.assertTrue('40 000.00' in html_str or '40 000,00' in html_str)
+        self.assertNotIn('160 000', html_str)
+
+    def test_16_multi_account_disposal_and_migration_isolation(self):
+        """Ознака міграції та вибуття визначаються індивідуально для кожного рахунку, а не за проводкою."""
+        comp = self.env['res.company'].create({
+            'name': 'Установа Порахункова Ізоляція',
+            'country_id': self.env.ref('base.ua').id,
+        })
+        self.env.user.company_ids |= comp
+        c_env = self.env(context=dict(self.env.context, allowed_company_ids=[comp.id]))
+        c_env = c_env['res.company'].with_company(comp).env
+
+        acc_01 = c_env['account.account'].create({
+            'name': 'Орендовані НА 01',
+            'code': '01iso',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        acc_02 = c_env['account.account'].create({
+            'name': 'Активи на зберіганні 02',
+            'code': '02iso',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        contra = c_env['account.account'].create({
+            'name': 'Технічний балансуючий 00',
+            'code': '00iso',
+            'account_type': 'off_balance',
+            'company_ids': [Command.set([comp.id])],
+        })
+        journal = c_env['account.journal'].create({
+            'name': 'Операції вручну',
+            'code': 'ISO1',
+            'type': 'general',
+            'company_id': comp.id,
+        })
+
+        # 1. Рахунок 01: 100k надходження, 60k вибуття -> чистий залишок 40k
+        c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_01.id, 'name': '01 надходження', 'debit': 100000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': '00 контра', 'debit': 0.0, 'credit': 100000.0}),
+            ],
+        }).action_post()
+        c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': contra.id, 'name': '00 контра', 'debit': 60000.0, 'credit': 0.0}),
+                Command.create({'account_id': acc_01.id, 'name': '01 вибуття', 'debit': 0.0, 'credit': 60000.0}),
+            ],
+        }).action_post()
+
+        # 2. Рахунок 02: 80k надходження, 30k вибуття -> чистий залишок 50k
+        c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': acc_02.id, 'name': '02 надходження', 'debit': 80000.0, 'credit': 0.0}),
+                Command.create({'account_id': contra.id, 'name': '00 контра', 'debit': 0.0, 'credit': 80000.0}),
+            ],
+        }).action_post()
+        c_env['account.move'].create({
+            'journal_id': journal.id,
+            'company_id': comp.id,
+            'date': self.prior_date,
+            'line_ids': [
+                Command.create({'account_id': contra.id, 'name': '00 контра', 'debit': 30000.0, 'credit': 0.0}),
+                Command.create({'account_id': acc_02.id, 'name': '02 вибуття', 'debit': 0.0, 'credit': 30000.0}),
+            ],
+        }).action_post()
+
+        # 3. Рахунок 01 МІГРОВАНО в новий регістр (початковий залишок 40 000 грн)
+        c_env['l10n_ua.offbalance.move'].create({
+            'date': self.prior_date,
+            'company_id': comp.id,
+            'ref': 'Введення залишків 01',
+            'line_ids': [
+                Command.create({
+                    'account_id': acc_01.id,
+                    'direction': 'debit',
+                    'name': 'Вхідне сальдо 01',
+                    'quantity': 1.0,
+                    'amount': 40000.0,
+                }),
+            ],
+        }).action_post()
+
+        # Рахунок 02 НЕ мігровано (в новому регістрі по ньому 0.00 грн)
+
+        wiz = c_env['l10n_ua.budget.memorial_order.wizard'].create({
+            'mo_kind': 'mo_16',
+            'date_from': self.period_start,
+            'date_to': self.today,
+            'company_id': comp.id,
+        })
+        data = wiz.get_report_data()
+
+        # По 01: є в новому регістрі (40k) + є несторнований залишок в AML (40k) -> hist_unreversed
+        self.assertEqual(data.get('hist_unreversed_prior_balance'), 40000.0)
+        self.assertTrue(data.get('has_unreversed_prior_balance'))
+
+        # По 02: немає в новому регістрі + є залишок в AML (50k) -> hist_unmigrated
+        self.assertEqual(data.get('hist_unmigrated_prior_balance'), 50000.0)
+        self.assertTrue(data.get('has_unmigrated_prior_balance'))
+
+        # Сумарний історичний залишок = 40 000 + 50 000 = 90 000 (а не 100+60+80+30=270k)
+        self.assertEqual(data.get('hist_prior_balance'), 90000.0)
+
+        comp.external_report_layout_id = self.env.ref('web.external_layout_standard')
+        action_dict = wiz.action_print()
+        report = self.env.ref('l10n_ua_budget_reports.action_report_memorial_order')
+        html, _ = report._render_qweb_html(report.report_name, [wiz.id], data=action_dict.get('data'))
+        html_str = html.decode() if isinstance(html, bytes) else html
+        self.assertIn('Виявлено неперенесені залишки минулих періодів', html_str)
+        self.assertIn('ризик подвійного обліку', html_str)
+        self.assertTrue('40 000.00' in html_str or '40 000,00' in html_str)
+        self.assertTrue('50 000.00' in html_str or '50 000,00' in html_str)

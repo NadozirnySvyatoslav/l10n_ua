@@ -299,7 +299,7 @@ class MemorialOrderWizard(models.TransientModel):
             if not company.currency_id.is_zero(val['opening_balance'])
         }
 
- add        hist_open_rows = AML._read_group(
+        hist_open_rows = AML._read_group(
             [
                 ('parent_state', '=', 'posted'),
                 ('company_id', '=', company.id),
@@ -319,9 +319,9 @@ class MemorialOrderWizard(models.TransientModel):
             code = (account.code or '').strip()
             if any(k in name for k in ('контр', 'техніч', 'балансуюч', 'contra')):
                 return True
-            if code in ('00', '000', '0000'):
-                return True
             if (code.startswith(('09', '0009', '009'))) and 'амортиз' not in name:
+                return True
+            if code.startswith('00') and not code.startswith(('0001', '0002', '0003', '0004', '0005', '0006', '0007', '0008')):
                 return True
             return False
 
