@@ -81,29 +81,10 @@
                             <strong>Одиниця виміру:</strong> <t t-out="company.currency_id.symbol or 'грн.'"/>
                         </div>
 
-                        <!-- Попередження: завислі неперенесені залишки минулих періодів -->
-                        <t t-if="report_data.get('has_unmigrated_prior_balance')">
+                        <!-- Попередження: несторновані старі проводки на позабалансових рахунках -->
+                        <t t-if="report_data.get('has_unreversed_legacy_moves')">
                             <div class="alert alert-warning p-2 mb-2" style="font-size:8.5px; border:1px solid #ffeeba; background-color:#fff3cd; color:#856404;">
-                                <strong>Увага (неперенесені залишки):</strong> Виявлено неперенесені залишки минулих періодів на позабалансових субрахунках в <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_unmigrated_prior_balance', report_data.get('hist_prior_balance', 0.0))).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong>, при цьому вхідне сальдо відповідних субрахунків у новому регістрі дорівнює 0,00 <t t-out="company.currency_id.symbol or 'грн.'"/>. Для коректного обліку внесіть документ введення початкових залишків станом на початок періоду.
-                            </div>
-                        </t>
-
-                        <!-- Попередження: ризик подвійного обліку через несторновані проводки минулих періодів -->
-                        <t t-if="report_data.get('has_unreversed_prior_balance')">
-                            <div class="alert alert-danger p-2 mb-2" style="font-size:8.5px; border:1px solid #f5c6cb; background-color:#f8d7da; color:#721c24;">
-                                <strong>Увага (ризик подвійного обліку):</strong> Виявлено несторновані залишки минулих періодів у старій схемі <code>account.move.line</code> на суму <strong><t t-out="'{:,.2f}'.format(report_data.get('hist_unreversed_prior_balance', report_data.get('hist_prior_balance', 0.0))).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/></strong> при наявності введених залишків у новому регістрі (<t t-out="'{:,.2f}'.format(report_data.get('opening_balance', 0.0)).replace(',', ' ')"/> <t t-out="company.currency_id.symbol or 'грн.'"/>). Виконайте сторнування старих проводок згідно з інструкцією <em>offbalance_migration.md</em>.
-                            </div>
-                        </t>
-
-                        <!-- Попередження, якщо в поточному періоді є невідсторновані/неперенесені операції в старій схемі -->
-                        <t t-if="report_data.get('has_unmigrated_historical')">
-                            <div class="alert alert-warning p-2 mb-3" style="font-size:8.5px; border:1px solid #ffeeba; background-color:#fff3cd; color:#856404;">
-                                <t t-if="report_data.get('is_register_empty')">
-                                    <strong>Увага:</strong> У звітному періоді виявлено операції подвійного запису на позабалансових субрахунках в <code>account.move.line</code> (див. Додаток нижче), проте регістр позабалансового обліку не містить записів. Підсумкові суми форми № 16-авт та ОСВ класу 0 є нульовими. Для відображення оборотів перенесіть залишки до регістру позабалансового обліку згідно з інструкцією <em>offbalance_migration.md</em>.
-                                </t>
-                                <t t-else="">
-                                    <strong>Увага (паралельний облік в <code>account.move</code>):</strong> Поряд із записами нового позабалансового регістру у звітному періоді виявлено невідсторновані операції подвійного запису на позабалансових субрахунках в <code>account.move.line</code> (див. Додаток нижче). Вони не входять до підсумків форми № 16-авт та ОСВ класу 0 — перенесіть їх у <code>l10n_ua.offbalance.move</code>, а помилкові або старі проводки в <code>account.move</code> сторнуйте.
-                                </t>
+                                <strong>Увага (несторновані старі проводки):</strong> У журналі проведень (<code>account.move.line</code>) виявлено ненульові залишки на позабалансових рахунках. Згідно з інструкцією <em>offbalance_migration.md</em>, перевірте старі проводки та виконайте їх сторнування, щоб виключити викривлення даних.
                             </div>
                         </t>
 
@@ -320,51 +301,6 @@
                                 <div><strong>Додаток на ___ аркушах</strong></div>
                             </div>
                         </div>
-
-                        <!-- Додаток для історичних проводок (тільки за наявності) -->
-                        <t t-if="report_data.get('has_historical')">
-                            <div style="page-break-before: always; margin-top:20px;">
-                                <h4 style="font-size:9.5px; font-weight:bold; color:#444;">
-                                    Додаток: Довідково — Історичні проводки подвійного запису (account.move.line)
-                                </h4>
-                                <p style="font-size:7.5px; color:#777; margin:0 0 4px;">
-                                    Записи зі старої схеми подвійного запису (технічні балансуючі субрахунки 09 у парних проводках виключено). Наводяться довідково та не входять до складу оборотів форми 16-авт та ОСВ класу 0.
-                                </p>
-                                <table class="table table-bordered table-sm" style="font-size:8px;">
-                                    <thead>
-                                        <tr style="background:#f5f5f5;">
-                                            <th>Дата</th>
-                                            <th>Документ</th>
-                                            <th>Рахунок</th>
-                                            <th>Назва рахунку</th>
-                                            <th>Призначення</th>
-                                            <th>Контрагент</th>
-                                            <th class="text-end">К-сть</th>
-                                            <th class="text-end">Дт</th>
-                                            <th class="text-end">Кт</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr t-foreach="report_data.get('rows_historical', [])" t-as="r">
-                                            <td><t t-out="r['date']"/></td>
-                                            <td><t t-out="r['move_name']"/></td>
-                                            <td><strong t-out="r['account_code']"/></td>
-                                            <td><t t-out="r['account_name']"/></td>
-                                            <td><t t-out="r['description']"/></td>
-                                            <td><t t-out="r['partner']"/></td>
-                                            <td class="text-end"><t t-out="'{:,.2f}'.format(r['quantity']).replace(',', ' ') if r.get('quantity') else ''"/></td>
-                                            <td class="text-end"><t t-out="'{:,.2f}'.format(r['debit']).replace(',', ' ') if r['debit'] else ''"/></td>
-                                            <td class="text-end"><t t-out="'{:,.2f}'.format(r['credit']).replace(',', ' ') if r['credit'] else ''"/></td>
-                                        </tr>
-                                        <tr style="background:#f5f5f5; color:#555; font-weight:bold;">
-                                            <td colspan="7">РАЗОМ (довідково)</td>
-                                            <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_historical_debit', 0.0)).replace(',', ' ')"/></td>
-                                            <td class="text-end"><t t-out="'{:,.2f}'.format(report_data.get('sum_historical_credit', 0.0)).replace(',', ' ')"/></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </t>
                     </div>
                 </t>
             </t>

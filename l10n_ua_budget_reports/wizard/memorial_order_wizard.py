@@ -75,7 +75,7 @@ class MemorialOrderWizard(models.TransientModel):
 
     def _get_report_data_mo_16(self):
         """MO-16 off-balance report: Section 1 = positional register (matches OSV Class 0),
-        Section 2 = chronological documents, Section 3 = historical AML."""
+        Section 2 = chronological documents (typical form No. 16-avt)."""
         company = self.company_id or self.env.company
         OBLine = self.env['l10n_ua.offbalance.move.line'].with_company(company)
         AML = self.env['account.move.line'].with_company(company)
@@ -251,135 +251,25 @@ class MemorialOrderWizard(models.TransientModel):
         total_debit = sum(item['amount'] for item in debit_subtotals)
         total_turnover = total_debit + total_credit
 
-        # 3. Historical account.move.line entries for off-balance accounts
-        all_curr_aml = AML.search([
-            ('parent_state', '=', 'posted'),
-            ('company_id', '=', company.id),
-            ('date', '>=', self.date_from),
-            ('date', '<=', self.date_to),
-            ('account_id.account_type', '=', 'off_balance'),
-        ], order='date, id')
-        # Hide 09* only when the same move also has non-09 off-balance lines (technical contra)
-        moves_with_non_09 = {
-            ln.move_id.id for ln in all_curr_aml
-            if not (ln.account_id.code or '').startswith('09')
-        }
-        rows_historical = []
-        sum_hist_d = sum_hist_c = 0.0
-        for ln in all_curr_aml:
-            acc_code = ln.account_id.code or ''
-            if ln.move_id.id in moves_with_non_09 and acc_code.startswith('09'):
-                continue
-            move_name = ln.move_id.name
-            if ln.move_id.ref:
-                move_name = f"{move_name} ({ln.move_id.ref})"
-            rows_historical.append({
-                'date': ln.date,
-                'move_name': move_name,
-                'source': 'historical',
-                'source_label': 'Історичні',
-                'account_code': acc_code,
-                'account_name': ln.account_id.name,
-                'description': ln.name or '',
-                'partner': ln.partner_id.name if ln.partner_id else '',
-                'quantity': ln.quantity or 0.0,
-                'debit': ln.debit,
-                'credit': ln.credit,
-            })
-            sum_hist_d += ln.debit
-            sum_hist_c += ln.credit
-
-        sort_key = lambda r: (fields.Date.to_date(r['date']) or fields.Date.today(), r['move_name'] or '')
-        rows_historical.sort(key=sort_key)
-
-        # 4. Check historical unreversed balances in account.move.line prior to date_from
-        reg_open_by_acc = {
-            acc_id: val['opening_balance']
-            for acc_id, val in data.items()
-            if not company.currency_id.is_zero(val['opening_balance'])
-        }
-
-        hist_open_rows = AML._read_group(
+        # 3. Перевірка наявності несторнованих старих залишків на позабалансових рахунках в account.move.line
+        legacy_balances = AML._read_group(
             [
                 ('parent_state', '=', 'posted'),
                 ('company_id', '=', company.id),
-                ('date', '<', self.date_from),
                 ('account_id.account_type', '=', 'off_balance'),
+                ('date', '<=', self.date_to),
             ],
-            groupby=['account_id'],
-            aggregates=['debit:sum', 'credit:sum'],
+            ['account_id'],
+            ['debit:sum', 'credit:sum'],
         )
-
-        prior_bal_by_acc = {}
-        for acc, d, c in hist_open_rows:
-            prior_bal_by_acc[acc.id] = (d or 0.0) - (c or 0.0)
-
-        def _is_contra(account):
-            name = (account.name or '').lower()
-            code = (account.code or '').strip()
-            if any(k in name for k in ('контр', 'техніч', 'балансуюч', 'contra')):
-                return True
-            if (code.startswith(('09', '0009', '009'))) and 'амортиз' not in name:
-                return True
-            if code.startswith('00') and not code.startswith(('0001', '0002', '0003', '0004', '0005', '0006', '0007', '0008')):
-                return True
-            return False
-
-        real_accounts_bal = []
-        contra_accounts_bal = []
-        for acc, d, c in hist_open_rows:
-            bal = abs((d or 0.0) - (c or 0.0))
-            if company.currency_id.is_zero(bal):
-                continue
-            if _is_contra(acc):
-                contra_accounts_bal.append((acc, bal))
-            else:
-                real_accounts_bal.append((acc, bal))
-
-        target_accounts = real_accounts_bal if real_accounts_bal else contra_accounts_bal
-
-        hist_unmigrated_prior_balance = 0.0
-        hist_unreversed_prior_balance = 0.0
-        for acc, bal in target_accounts:
-            if acc.id in reg_open_by_acc:
-                hist_unreversed_prior_balance += bal
-            else:
-                hist_unmigrated_prior_balance += bal
-
-        has_unmigrated_prior_balance = (
-            company.currency_id.compare_amounts(hist_unmigrated_prior_balance, 0.0) > 0
+        has_unreversed_legacy_moves = any(
+            not company.currency_id.is_zero((d or 0.0) - (c or 0.0))
+            for _acc, d, c in legacy_balances
         )
-        has_unreversed_prior_balance = (
-            company.currency_id.compare_amounts(hist_unreversed_prior_balance, 0.0) > 0
-        )
-        hist_prior_balance = hist_unmigrated_prior_balance + hist_unreversed_prior_balance
-
-        # 5. Active current-period AML entries excluding standard reversals and entries reversed in-period
-        active_curr_aml = all_curr_aml.filtered(
-            lambda l: not l.move_id.reversed_entry_id
-            and not any(
-                rev.state == 'posted' and self.date_from <= rev.date <= self.date_to
-                for rev in l.move_id.reversal_move_ids
-            )
-        )
-        manual_prior_close_only = False
-        if active_curr_aml:
-            curr_delta_by_acc = defaultdict(float)
-            for ln in active_curr_aml:
-                curr_delta_by_acc[ln.account_id.id] += (ln.debit or 0.0) - (ln.credit or 0.0)
-            manual_prior_close_only = all(
-                not company.currency_id.is_zero(prior_bal_by_acc.get(acc_id, 0.0))
-                and company.currency_id.is_zero(prior_bal_by_acc.get(acc_id, 0.0) + delta)
-                for acc_id, delta in curr_delta_by_acc.items()
-            )
-
-        is_register_empty = bool(not rows_mo16 and not positions)
-        has_unmigrated_historical = bool(active_curr_aml) and not manual_prior_close_only
 
         return {
             'positions': positions,
             'rows_mo16': rows_mo16,
-            'rows_historical': rows_historical,
             'credit_subtotals': credit_subtotals,
             'debit_subtotals': debit_subtotals,
             'total_credit': total_credit,
@@ -395,16 +285,7 @@ class MemorialOrderWizard(models.TransientModel):
             'closing_qty': tot_close_qty,
             'sum_register_debit': tot_turn_d,
             'sum_register_credit': tot_turn_c,
-            'sum_historical_debit': sum_hist_d,
-            'sum_historical_credit': sum_hist_c,
-            'has_historical': bool(rows_historical),
-            'is_register_empty': is_register_empty,
-            'has_unmigrated_historical': has_unmigrated_historical,
-            'hist_prior_balance': hist_prior_balance,
-            'hist_unmigrated_prior_balance': hist_unmigrated_prior_balance,
-            'hist_unreversed_prior_balance': hist_unreversed_prior_balance,
-            'has_unmigrated_prior_balance': has_unmigrated_prior_balance,
-            'has_unreversed_prior_balance': has_unreversed_prior_balance,
+            'has_unreversed_legacy_moves': has_unreversed_legacy_moves,
         }
 
     def get_report_data(self):
