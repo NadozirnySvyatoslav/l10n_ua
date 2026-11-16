@@ -32,6 +32,9 @@
             <!-- Документи лише з кабінету ДПС (синхронізація), тому лише перегляд -->
             <form create="0" edit="0">
                 <header>
+                    <!-- Прихована кнопка — якір для xpath l10n_ua_tax_cabinet у 20.0
+                         (//button[@name='action_prepare']). Прибрати разом із портом tax_cabinet (#569). -->
+                    <button name="action_prepare" string="Mark Prepared" type="object" invisible="1"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="submitted,accepted"/>
                 </header>
