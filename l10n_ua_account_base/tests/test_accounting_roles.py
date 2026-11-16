@@ -117,6 +117,8 @@ class TestAccountingRoles(TransactionCase):
         admin = self.env.ref('base.user_admin')
         self.assertTrue(admin.has_group(f'{MOD}.group_ua_dps_submit'))
         self.assertTrue(admin.has_group(f'{MOD}.group_ua_bank_send'))
+        for s in SECTIONS:
+            self.assertTrue(admin.has_group(f'{MOD}.group_ua_{s}_manager'), s)
 
     def test_new_levels_do_not_widen_old_groups(self):
         """Standard (non-UA) groups reached through any new level are already

@@ -55,6 +55,7 @@
             <field name="sequence">30</field>
             <field name="comment">Create and edit tax invoices and VAT declarations.</field>
             <field name="implied_ids" eval="[(4, ref('group_ua_vat_all')), (4, ref('account.group_account_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
         <!-- Зарплата -->
@@ -83,6 +84,7 @@
             <field name="sequence">30</field>
             <field name="comment">Create and post payslips, advances and salary payments.</field>
             <field name="implied_ids" eval="[(4, ref('group_ua_payroll_all'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
         <!-- Податки -->
@@ -111,6 +113,7 @@
             <field name="sequence">30</field>
             <field name="comment">Create and edit declarations; tax cabinet settings.</field>
             <field name="implied_ids" eval="[(4, ref('group_ua_tax_all')), (4, ref('account.group_account_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
         <!-- Рахунки -->
@@ -139,6 +142,7 @@
             <field name="sequence">30</field>
             <field name="comment">Create and post invoices and service acts.</field>
             <field name="implied_ids" eval="[(4, ref('group_ua_invoice_all')), (4, ref('account.group_account_invoice'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
         <!-- Банки -->
@@ -167,6 +171,7 @@
             <field name="sequence">30</field>
             <field name="comment">Import statements, reconcile, prepare and sign payment orders.</field>
             <field name="implied_ids" eval="[(4, ref('group_ua_bank_all')), (4, ref('account.group_account_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
         <!-- Додаткові права: окремі, не входять у рівень «Керувати» (Р4, рішення 16.11) -->
