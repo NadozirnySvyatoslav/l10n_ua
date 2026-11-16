@@ -7969,3 +7969,183 @@ msgstr ""
 #: model:l10n_ua.subconto.type,name:l10n_ua_account_base.subconto_type_product
 msgid "Products"
 msgstr "Номенклатура"
+
+#. module: l10n_ua_account_base
+#: model:ir.module.category,name:l10n_ua_account_base.module_category_l10n_ua_accounting_roles
+msgid "Accounting (UA)"
+msgstr "Бухгалтерія (UA)"
+
+#. module: l10n_ua_account_base
+#: model:ir.module.category,description:l10n_ua_account_base.module_category_l10n_ua_accounting_roles
+msgid ""
+"Ukrainian accounting roles by section: VAT, payroll, taxes, invoices, banks"
+msgstr ""
+"Ролі бухгалтерії за розділами: ПДВ, зарплата, податки, рахунки, банки"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_vat
+msgid "VAT and Tax Invoices"
+msgstr "ПДВ і ПН"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_payroll
+msgid "Payroll"
+msgstr "Зарплата"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_tax
+msgid "Taxes"
+msgstr "Податки"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_invoice
+msgid "Invoices"
+msgstr "Рахунки"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_bank
+msgid "Banks"
+msgstr "Банки"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_dps_submit
+msgid "Submit to Tax Service (DPS)"
+msgstr "Подання в ДПС"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_bank_send
+msgid "Send Payments to Bank"
+msgstr "Відправка платежів у банк"
+
+#. module: l10n_ua_account_base
+#: model:res.groups.privilege,name:l10n_ua_account_base.res_groups_privilege_ua_role
+msgid "Role (UA)"
+msgstr "Роль (UA)"
+
+#. module: l10n_ua_account_base
+#: model:res.groups,name:l10n_ua_account_base.group_ua_bank_own
+#: model:res.groups,name:l10n_ua_account_base.group_ua_invoice_own
+#: model:res.groups,name:l10n_ua_account_base.group_ua_payroll_own
+#: model:res.groups,name:l10n_ua_account_base.group_ua_tax_own
+#: model:res.groups,name:l10n_ua_account_base.group_ua_vat_own
+msgid "Read Own"
+msgstr "Обмежено читати"
+
+#. module: l10n_ua_account_base
+#: model:res.groups,name:l10n_ua_account_base.group_ua_bank_all
+#: model:res.groups,name:l10n_ua_account_base.group_ua_invoice_all
+#: model:res.groups,name:l10n_ua_account_base.group_ua_payroll_all
+#: model:res.groups,name:l10n_ua_account_base.group_ua_tax_all
+#: model:res.groups,name:l10n_ua_account_base.group_ua_vat_all
+msgid "Read All"
+msgstr "Читати всі"
+
+#. module: l10n_ua_account_base
+#: model:res.groups,name:l10n_ua_account_base.group_ua_bank_manager
+#: model:res.groups,name:l10n_ua_account_base.group_ua_invoice_manager
+#: model:res.groups,name:l10n_ua_account_base.group_ua_payroll_manager
+#: model:res.groups,name:l10n_ua_account_base.group_ua_tax_manager
+#: model:res.groups,name:l10n_ua_account_base.group_ua_vat_manager
+msgid "Manage"
+msgstr "Керувати"
+
+#. module: l10n_ua_account_base
+#: model:res.groups,name:l10n_ua_account_base.group_ua_bank_send
+#: model:res.groups,name:l10n_ua_account_base.group_ua_dps_submit
+msgid "Allowed"
+msgstr "Дозволено"
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_vat_own
+msgid "Tax invoices created by the user or from the user's invoices."
+msgstr "ПН, які користувач створив сам або з його рахунків."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_vat_all
+msgid "All tax invoices, VAT register and VAT declarations, read only."
+msgstr "Усі ПН, реєстр і декларації з ПДВ — лише читання."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_vat_manager
+msgid "Create and edit tax invoices and VAT declarations."
+msgstr "Створення й редагування ПН і декларацій з ПДВ."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_payroll_own
+msgid "Payroll documents of the departments assigned to the user."
+msgstr "Зарплатні документи призначених користувачу підрозділів."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_payroll_all
+msgid "All payroll documents and payroll journal entries, read only."
+msgstr "Усі зарплатні документи й проводки зарплатних журналів — лише читання."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_payroll_manager
+msgid "Create and post payslips, advances and salary payments."
+msgstr "Нарахування, аванси й виплати зарплати: створення й проведення."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_tax_own
+msgid "Declarations and tax documents created by the user."
+msgstr "Декларації й податкові документи, створені користувачем."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_tax_all
+msgid ""
+"All declarations, financial statements and tax cabinet settings, read only."
+msgstr ""
+"Усі декларації, фінзвітність і налаштування податкового кабінету — лише "
+"читання."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_tax_manager
+msgid "Create and edit declarations; tax cabinet settings."
+msgstr "Створення й редагування декларацій; налаштування податкового кабінету."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_invoice_own
+msgid ""
+"Invoices and service acts where the user is the salesperson or the author."
+msgstr "Рахунки й акти, де користувач — відповідальний продавець або автор."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_invoice_all
+msgid "All customer and vendor invoices and service acts, read only."
+msgstr "Усі рахунки покупців і постачальників та акти — лише читання."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_invoice_manager
+msgid "Create and post invoices and service acts."
+msgstr "Створення й проведення рахунків і актів."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_bank_own
+msgid ""
+"Statements, payments and entries of the bank accounts and cash desks "
+"assigned to the user."
+msgstr ""
+"Виписки, платежі й проводки призначених користувачу банківських рахунків і "
+"кас."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_bank_all
+msgid "All bank and cash journals, read only."
+msgstr "Усі банківські й касові журнали — лише читання."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_bank_manager
+msgid "Import statements, reconcile, prepare and sign payment orders."
+msgstr "Імпорт виписок, звірка, підготовка й підписання платіжок."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_dps_submit
+msgid ""
+"Register tax invoices in ERPN and submit declarations and reports to the tax "
+"service."
+msgstr "Реєстрація ПН в ЄРПН і подання декларацій та звітів у ДПС."
+
+#. module: l10n_ua_account_base
+#: model:res.groups,comment:l10n_ua_account_base.group_ua_bank_send
+msgid "Send signed payment orders and salary registries to the bank."
+msgstr "Відправка підписаних платіжок і зарплатних реєстрів у банк."
