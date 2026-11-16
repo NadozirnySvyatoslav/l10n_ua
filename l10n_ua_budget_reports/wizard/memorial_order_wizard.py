@@ -106,8 +106,8 @@ class MemorialOrderWizard(models.TransientModel):
         # Prior period: date < date_from
         open_rows = OBLine._read_group(
             base_domain + [('date', '<', self.date_from)],
-            groupby,
-            aggregates
+            groupby=groupby,
+            aggregates=aggregates,
         )
         for row in open_rows:
             acc_rec, d, c, qi, qo = row
@@ -118,8 +118,8 @@ class MemorialOrderWizard(models.TransientModel):
         # Current period: date_from <= date <= date_to
         period_rows = OBLine._read_group(
             base_domain + [('date', '>=', self.date_from), ('date', '<=', self.date_to)],
-            groupby,
-            aggregates
+            groupby=groupby,
+            aggregates=aggregates,
         )
         for row in period_rows:
             acc_rec, d, c, qi, qo = row
@@ -259,8 +259,8 @@ class MemorialOrderWizard(models.TransientModel):
                 ('account_id.account_type', '=', 'off_balance'),
                 ('date', '<=', self.date_to),
             ],
-            ['account_id'],
-            ['debit:sum', 'credit:sum'],
+            groupby=['account_id'],
+            aggregates=['debit:sum', 'credit:sum'],
         )
         has_unreversed_legacy_moves = any(
             not company.currency_id.is_zero((d or 0.0) - (c or 0.0))
