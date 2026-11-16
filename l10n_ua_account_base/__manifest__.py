@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account Base Localization',
-    'version': '20.0.1.3.0',
+    'version': '20.0.1.4.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian localization base module with accounting',
     'description': """
@@ -19,11 +19,14 @@ Foundation module for all Ukrainian localization modules providing:
 * Formatters (dates, money, numbers to words)
 
 Accounting features:
-* Chart of accounts according to P(S)BO (classes 0-9)
+* Chart of accounts according to P(S)BO, Order No. 291 (classes 0-9):
+  completes the stock l10n_ua chart with missing subaccounts, names and
+  analytics (partner / employee / product, currency, quantity)
 * Account extensions (ua_class, ua_subaccount, analytics_type)
 * Document extensions (ua_doc_type, ua_doc_number)
 * Journal orders (Журнали-ордери №1-7)
 * Trial balance / OSV (Оборотно-сальдова відомість)
+* Off-balance register (class 0, simple single-entry system) with its own OSV
 
 This module is required for all other l10n_ua_* modules.
     """,
@@ -48,6 +51,7 @@ This module is required for all other l10n_ua_* modules.
         'data/l10n_ua_bank_data.xml',
         'data/account_chart_template_data.xml',
         'data/l10n_ua_subconto_data.xml',
+        'data/l10n_ua_offbalance_data.xml',
         'views/res_partner_views.xml',
         'views/res_partner_bank_views.xml',
         'views/l10n_ua_bank_views.xml',
@@ -63,6 +67,7 @@ This module is required for all other l10n_ua_* modules.
         'views/l10n_ua_general_ledger_views.xml',
         'views/l10n_ua_chess_sheet_views.xml',
         'views/l10n_ua_subconto_views.xml',
+        'views/l10n_ua_offbalance_views.xml',
         'views/menu_views.xml',
     ],
     'demo': [],

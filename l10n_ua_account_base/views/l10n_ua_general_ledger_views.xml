@@ -14,7 +14,7 @@
                 </header>
                 <sheet>
                     <group>
-                        <field name="year"/>
+                        <field name="year" options="{'enable_formatting': false}"/>
                         <field name="company_id" groups="base.group_multi_company"/>
                     </group>
                     <notebook>
@@ -67,7 +67,7 @@
         <field name="arch" type="xml">
             <list string="General Ledger">
                 <field name="name"/>
-                <field name="year"/>
+                <field name="year" options="{'enable_formatting': false}"/>
                 <field name="state"/>
             </list>
         </field>
