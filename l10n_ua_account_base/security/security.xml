@@ -12,12 +12,218 @@
         </record>
 
         <!-- ============================================== -->
+        <!-- Ролі бухгалтерії на формі користувача (#567)   -->
+        <!-- ============================================== -->
+        <!--
+            Власна категорія «Бухгалтерія (UA)»: 5 розділів × 3 рівні
+            (порожньо → Обмежено читати → Читати всі → Керувати) і 2 окремі
+            права. Odoo 19 показує групи без privilege_id лише в режимі
+            розробника, тому кожне додаткове право — окремий привілей
+            з одним рівнем «Дозволено».
+            Ч.1: лише групи й implied. Обмеження по записах (ir.rule) і
+            перевірки двох прав у коді — наступні частини #567.
+        -->
+        <record id="module_category_l10n_ua_accounting_roles" model="ir.module.category">
+            <field name="name">Accounting (UA)</field>
+            <field name="description">Ukrainian accounting roles by section: VAT, payroll, taxes, invoices, banks</field>
+            <field name="sequence">8</field>
+        </record>
+
+        <!-- ПДВ і ПН -->
+        <record id="res_groups_privilege_ua_vat" model="res.groups.privilege">
+            <field name="name">VAT and Tax Invoices</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">10</field>
+        </record>
+        <record id="group_ua_vat_own" model="res.groups">
+            <field name="name">Read Own</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_vat"/>
+            <field name="sequence">10</field>
+            <field name="comment">Tax invoices created by the user or from the user's invoices.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_readonly'))]"/>
+        </record>
+        <record id="group_ua_vat_all" model="res.groups">
+            <field name="name">Read All</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_vat"/>
+            <field name="sequence">20</field>
+            <field name="comment">All tax invoices, VAT register and VAT declarations, read only.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_vat_own'))]"/>
+        </record>
+        <record id="group_ua_vat_manager" model="res.groups">
+            <field name="name">Manage</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_vat"/>
+            <field name="sequence">30</field>
+            <field name="comment">Create and edit tax invoices and VAT declarations.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_vat_all')), (4, ref('account.group_account_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Зарплата -->
+        <record id="res_groups_privilege_ua_payroll" model="res.groups.privilege">
+            <field name="name">Payroll</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">20</field>
+        </record>
+        <record id="group_ua_payroll_own" model="res.groups">
+            <field name="name">Read Own</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_payroll"/>
+            <field name="sequence">10</field>
+            <field name="comment">Payroll documents of the departments assigned to the user.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_readonly'))]"/>
+        </record>
+        <record id="group_ua_payroll_all" model="res.groups">
+            <field name="name">Read All</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_payroll"/>
+            <field name="sequence">20</field>
+            <field name="comment">All payroll documents and payroll journal entries, read only.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_payroll_own'))]"/>
+        </record>
+        <record id="group_ua_payroll_manager" model="res.groups">
+            <field name="name">Manage</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_payroll"/>
+            <field name="sequence">30</field>
+            <field name="comment">Create and post payslips, advances and salary payments.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_payroll_all'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Податки -->
+        <record id="res_groups_privilege_ua_tax" model="res.groups.privilege">
+            <field name="name">Taxes</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">30</field>
+        </record>
+        <record id="group_ua_tax_own" model="res.groups">
+            <field name="name">Read Own</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_tax"/>
+            <field name="sequence">10</field>
+            <field name="comment">Declarations and tax documents created by the user.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_readonly'))]"/>
+        </record>
+        <record id="group_ua_tax_all" model="res.groups">
+            <field name="name">Read All</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_tax"/>
+            <field name="sequence">20</field>
+            <field name="comment">All declarations, financial statements and tax cabinet settings, read only.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_tax_own'))]"/>
+        </record>
+        <record id="group_ua_tax_manager" model="res.groups">
+            <field name="name">Manage</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_tax"/>
+            <field name="sequence">30</field>
+            <field name="comment">Create and edit declarations; tax cabinet settings.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_tax_all')), (4, ref('account.group_account_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Рахунки -->
+        <record id="res_groups_privilege_ua_invoice" model="res.groups.privilege">
+            <field name="name">Invoices</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">40</field>
+        </record>
+        <record id="group_ua_invoice_own" model="res.groups">
+            <field name="name">Read Own</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_invoice"/>
+            <field name="sequence">10</field>
+            <field name="comment">Invoices and service acts where the user is the salesperson or the author.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_readonly'))]"/>
+        </record>
+        <record id="group_ua_invoice_all" model="res.groups">
+            <field name="name">Read All</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_invoice"/>
+            <field name="sequence">20</field>
+            <field name="comment">All customer and vendor invoices and service acts, read only.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_invoice_own'))]"/>
+        </record>
+        <record id="group_ua_invoice_manager" model="res.groups">
+            <field name="name">Manage</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_invoice"/>
+            <field name="sequence">30</field>
+            <field name="comment">Create and post invoices and service acts.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_invoice_all')), (4, ref('account.group_account_invoice'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Банки -->
+        <record id="res_groups_privilege_ua_bank" model="res.groups.privilege">
+            <field name="name">Banks</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">50</field>
+        </record>
+        <record id="group_ua_bank_own" model="res.groups">
+            <field name="name">Read Own</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_bank"/>
+            <field name="sequence">10</field>
+            <field name="comment">Statements, payments and entries of the bank accounts and cash desks assigned to the user.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_readonly'))]"/>
+        </record>
+        <record id="group_ua_bank_all" model="res.groups">
+            <field name="name">Read All</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_bank"/>
+            <field name="sequence">20</field>
+            <field name="comment">All bank and cash journals, read only.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_bank_own'))]"/>
+        </record>
+        <record id="group_ua_bank_manager" model="res.groups">
+            <field name="name">Manage</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_bank"/>
+            <field name="sequence">30</field>
+            <field name="comment">Import statements, reconcile, prepare and sign payment orders.</field>
+            <field name="implied_ids" eval="[(4, ref('group_ua_bank_all')), (4, ref('account.group_account_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Додаткові права: окремі, не входять у рівень «Керувати» (Р4, рішення 16.11) -->
+        <record id="res_groups_privilege_ua_dps_submit" model="res.groups.privilege">
+            <field name="name">Submit to Tax Service (DPS)</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">60</field>
+        </record>
+        <record id="group_ua_dps_submit" model="res.groups">
+            <field name="name">Allowed</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_dps_submit"/>
+            <field name="sequence">10</field>
+            <field name="comment">Register tax invoices in ERPN and submit declarations and reports to the tax service.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="res_groups_privilege_ua_bank_send" model="res.groups.privilege">
+            <field name="name">Send Payments to Bank</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">70</field>
+        </record>
+        <record id="group_ua_bank_send" model="res.groups">
+            <field name="name">Allowed</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_bank_send"/>
+            <field name="sequence">10</field>
+            <field name="comment">Send signed payment orders and salary registries to the bank.</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <!-- Наявні 4 UA-групи — список «Роль (UA)» у тій самій категорії -->
+        <record id="res_groups_privilege_ua_role" model="res.groups.privilege">
+            <field name="name">Role (UA)</field>
+            <field name="category_id" ref="module_category_l10n_ua_accounting_roles"/>
+            <field name="sequence">5</field>
+        </record>
+
+        <!-- ============================================== -->
         <!-- Групи доступу                                  -->
         <!-- ============================================== -->
+        <!--
+            Старі групи implied НОВІ рівні (не навпаки), права наявних
+            користувачів не змінюються: усі стандартні групи, які дають
+            нові рівні, у старих груп уже є через account.group_account_user.
+        -->
 
         <!-- Базовий користувач UA -->
         <record id="group_ua_user" model="res.groups">
             <field name="name">UA User</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_role"/>
+            <field name="sequence">10</field>
             <field name="comment">Basic access to Ukrainian localization features (directories, validators)</field>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
@@ -25,22 +231,34 @@
         <!-- Бухгалтер UA -->
         <record id="group_ua_accountant" model="res.groups">
             <field name="name">UA Accountant</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_role"/>
+            <field name="sequence">20</field>
             <field name="comment">Access to Ukrainian accounting features (OSV, journal orders, documents)</field>
-            <field name="implied_ids" eval="[(4, ref('group_ua_user')), (4, ref('account.group_account_user'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_ua_user')), (4, ref('account.group_account_user')),
+                                             (4, ref('group_ua_invoice_manager')), (4, ref('group_ua_bank_manager')),
+                                             (4, ref('group_ua_vat_all')), (4, ref('group_ua_tax_all')),
+                                             (4, ref('group_ua_payroll_all'))]"/>
         </record>
 
         <!-- Податковий бухгалтер UA -->
         <record id="group_ua_tax_accountant" model="res.groups">
             <field name="name">UA Tax Accountant</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_role"/>
+            <field name="sequence">30</field>
             <field name="comment">Access to Ukrainian tax features (VAT, tax cabinet, declarations)</field>
-            <field name="implied_ids" eval="[(4, ref('group_ua_accountant'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_ua_accountant')),
+                                             (4, ref('group_ua_vat_manager')), (4, ref('group_ua_tax_manager')),
+                                             (4, ref('group_ua_dps_submit'))]"/>
         </record>
 
         <!-- Головний бухгалтер / Керівник UA -->
         <record id="group_ua_manager" model="res.groups">
             <field name="name">UA Chief Accountant</field>
+            <field name="privilege_id" ref="res_groups_privilege_ua_role"/>
+            <field name="sequence">40</field>
             <field name="comment">Full access to Ukrainian accounting, tax, and reporting features</field>
-            <field name="implied_ids" eval="[(4, ref('group_ua_tax_accountant')), (4, ref('account.group_account_manager'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_ua_tax_accountant')), (4, ref('account.group_account_manager')),
+                                             (4, ref('group_ua_payroll_manager')), (4, ref('group_ua_bank_send'))]"/>
         </record>
 
     </data>
