@@ -22,7 +22,11 @@ class ResCompany(models.Model):
     l10n_ua_agro_in_kind_income_account_id = fields.Many2one(
         'account.account', string='In-kind Payment Income Account',
         help='Дохід від реалізації інших оборотних активів — 712.')
-    l10n_ua_agro_pdfo_rate = fields.Float(string='PIT Rate (%)', default=18.0)
+    l10n_ua_agro_pdfo_rate = fields.Float(
+        string='PIT Rate (%)', default=18.0,
+        help='Оренда земельних ділянок, земельних часток (паїв), майнових паїв — 18 % '
+             '(пп. 170.1.4, п. 167.1 ПКУ). Ставка 5 % з 23.10.2026 (Закон № 5025-IX) '
+             'стосується лише житлової/нежитлової нерухомості і до землі НЕ застосовується.')
     l10n_ua_agro_military_rate = fields.Float(string='Military Levy Rate (%)', default=5.0)
 
     def _l10n_ua_agro_account(self, field, prefixes):
