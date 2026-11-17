@@ -96,7 +96,7 @@
               sequence="20"/>
 
     <menuitem id="menu_l10n_ua_offbalance_osv"
-              name="Off-Balance Trial Balance"
+              name="Off-Balance Trial Balance (Class 0)"
               parent="menu_l10n_ua_offbalance"
               action="l10n_ua_offbalance_osv_action"
               sequence="30"/>
