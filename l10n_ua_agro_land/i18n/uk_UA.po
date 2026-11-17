@@ -1021,6 +1021,24 @@ msgid "PIT on land rent, %s"
 msgstr "ПДФО з орендної плати, %s"
 
 #. module: l10n_ua_agro_land
+#. odoo-python
+#: code:addons/l10n_ua_agro_land/models/res_config_settings.py:0
+msgid "PIT rate on land rent"
+msgstr "Ставка ПДФО з оренди землі"
+
+#. module: l10n_ua_agro_land
+#. odoo-python
+#: code:addons/l10n_ua_agro_land/models/res_config_settings.py:0
+msgid ""
+"Check the rate: personal income tax on land and land share rent is 18% (PTC "
+"170.1.4, 167.1). The 5% rate from 23.10.2026 (Law No. 5025-IX) applies only "
+"to residential/non-residential real estate."
+msgstr ""
+"Перевірте: для оренди землі та паїв ставка ПДФО 18 % (пп. 170.1.4, п. 167.1 "
+"ПКУ). Ставка 5 % з 23.10.2026 (Закон № 5025-IX) стосується лише "
+"житлової/нежитлової нерухомості."
+
+#. module: l10n_ua_agro_land
 #: model:ir.model.fields,field_description:l10n_ua_agro_land.field_l10n_ua_agro_rent_accrual_line__paid_amount
 msgid "Paid"
 msgstr "Виплачено"
@@ -1619,6 +1637,16 @@ msgstr ""
 #: model:ir.model.fields,help:l10n_ua_agro_land.field_res_company__l10n_ua_agro_pdfo_account_id
 #: model:ir.model.fields,help:l10n_ua_agro_land.field_res_config_settings__l10n_ua_agro_pdfo_account_id
 msgid "Розрахунки за ПДФО — 6411."
+msgstr ""
+
+#. module: l10n_ua_agro_land
+#: model:ir.model.fields,help:l10n_ua_agro_land.field_res_company__l10n_ua_agro_pdfo_rate
+#: model:ir.model.fields,help:l10n_ua_agro_land.field_res_config_settings__l10n_ua_agro_pdfo_rate
+msgid ""
+"Оренда земельних ділянок, земельних часток (паїв), майнових паїв — 18 % (пп."
+" 170.1.4, п. 167.1 ПКУ). Ставка 5 % з 23.10.2026 (Закон № 5025-IX) "
+"стосується лише житлової/нежитлової нерухомості і до землі НЕ "
+"застосовується."
 msgstr ""
 
 #. module: l10n_ua_agro_land
