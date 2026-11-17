@@ -349,6 +349,12 @@ class L10nUaOffbalanceOsv(models.Model):
         self.line_ids = lines
         return True
 
+    def action_print(self):
+        self.ensure_one()
+        if not self.line_ids:
+            self.action_compute()
+        return self.env.ref('l10n_ua_account_base.action_report_offbalance_osv').report_action(self)
+
 
 class L10nUaOffbalanceOsvLine(models.Model):
     _name = 'l10n_ua.offbalance.osv.line'
