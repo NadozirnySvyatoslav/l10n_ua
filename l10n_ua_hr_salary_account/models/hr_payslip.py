@@ -104,6 +104,22 @@ class HrPayslip(models.Model):
             dist = dept.salary_analytic_distribution if dept else False
         return dist or False
 
+    def _l10n_ua_other_deductions_to_post(self):
+        """Withholdings to post as Дт 661 / Кт 685.
+
+        ``other_deductions`` also holds the advance deduction (category
+        ``advance``): it lowers the net pay, but the advance has already
+        debited 661 when it was paid out (Дт 661 Кт 301/311). Posting it
+        again through 685 would lower 661 twice and leave a fake debt on
+        685 (#574), so the advance is left out here. ``net_salary`` is
+        not affected.
+        """
+        self.ensure_one()
+        return sum(
+            d.amount for d in self.deduction_ids
+            if d.deduction_type_id.category not in ('tax', 'advance')
+        )
+
     def _prepare_move_lines(self, config):
         """Build list of account.move.line dicts for this payslip."""
         self.ensure_one()
@@ -174,19 +190,20 @@ class HrPayslip(models.Model):
                 'credit': round(self.military_tax_amount, 2),
             })
 
-        # 5. Other deductions: Дт 661 / Кт 685
-        if self.other_deductions and config.other_payable_account_id:
+        # 5. Other deductions: Дт 661 / Кт 685 (without the advance, #574)
+        other = round(self._l10n_ua_other_deductions_to_post(), 2)
+        if other and config.other_payable_account_id:
             lines.append({
                 'name': 'Інші утримання: %s' % emp_name,
                 'account_id': config.wages_payable_account_id.id,
-                'debit': round(self.other_deductions, 2),
+                'debit': other,
                 'credit': 0.0,
             })
             lines.append({
                 'name': 'Інші утримання: %s' % emp_name,
                 'account_id': config.other_payable_account_id.id,
                 'debit': 0.0,
-                'credit': round(self.other_deductions, 2),
+                'credit': other,
             })
 
         return lines
