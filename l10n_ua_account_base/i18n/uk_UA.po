@@ -8152,3 +8152,34 @@ msgstr "Реєстрація ПН в ЄРПН і подання декларац
 #: model:res.groups,comment:l10n_ua_account_base.group_ua_bank_send
 msgid "Send signed payment orders and salary registries to the bank."
 msgstr "Відправка підписаних платіжок і зарплатних реєстрів у банк."
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__expand_partners
+msgid "Expand by Partners"
+msgstr "Розгорнути по контрагентах"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__summary_line_ids
+msgid "Account Lines"
+msgstr "Рядки рахунків"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__detail_line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_view_form
+msgid "Partner Breakdown"
+msgstr "Розгортка по контрагентах"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__is_detail
+msgid "Breakdown Row"
+msgstr "Рядок розгортки"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_view_form
+msgid "Lines List / Export"
+msgstr "Список рядків / експорт"
+
+#. module: l10n_ua_account_base
+#: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_line_view_list
+msgid "Trial Balance Lines"
+msgstr "Рядки ОСВ"
