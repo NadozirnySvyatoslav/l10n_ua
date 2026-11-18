@@ -120,6 +120,25 @@ class HrPayslip(models.Model):
             if d.deduction_type_id.category not in ('tax', 'advance')
         )
 
+    def _l10n_ua_wages_partner(self):
+        """Partner for the 661/685 lines of this payslip (#578).
+
+        The employee's work contact, so that the trial balance can show
+        661/685 per employee and the bank payment can be reconciled with
+        the accrual. An employee without a work contact is an error: a
+        line without a partner would silently break the breakdown.
+        """
+        self.ensure_one()
+        partner = self.employee_id.work_contact_id
+        if not partner:
+            raise UserError(
+                'У працівника "%s" немає робочого контакту (партнера). '
+                'Без нього рядки 661/685 не матимуть розгортки по '
+                'працівниках. Відкрийте картку працівника і заповніть '
+                'робочий контакт.' % self.employee_id.name
+            )
+        return partner
+
     def _prepare_move_lines(self, config):
         """Build list of account.move.line dicts for this payslip."""
         self.ensure_one()
@@ -127,6 +146,7 @@ class HrPayslip(models.Model):
         expense_account = self._get_expense_account(config)
         analytic = self._get_salary_analytic_distribution()
         emp_name = self.employee_id.name
+        partner_id = self._l10n_ua_wages_partner().id
 
         # 1. Salary accrual: Дт expense / Кт 661
         if self.gross_salary:
@@ -140,6 +160,7 @@ class HrPayslip(models.Model):
             lines.append({
                 'name': 'Нарахування ЗП: %s' % emp_name,
                 'account_id': config.wages_payable_account_id.id,
+                'partner_id': partner_id,
                 'debit': 0.0,
                 'credit': round(self.gross_salary, 2),
             })
@@ -165,6 +186,7 @@ class HrPayslip(models.Model):
             lines.append({
                 'name': 'ПДФО: %s' % emp_name,
                 'account_id': config.wages_payable_account_id.id,
+                'partner_id': partner_id,
                 'debit': round(self.pdfo_amount, 2),
                 'credit': 0.0,
             })
@@ -180,6 +202,7 @@ class HrPayslip(models.Model):
             lines.append({
                 'name': 'Військовий збір: %s' % emp_name,
                 'account_id': config.wages_payable_account_id.id,
+                'partner_id': partner_id,
                 'debit': round(self.military_tax_amount, 2),
                 'credit': 0.0,
             })
@@ -196,12 +219,14 @@ class HrPayslip(models.Model):
             lines.append({
                 'name': 'Інші утримання: %s' % emp_name,
                 'account_id': config.wages_payable_account_id.id,
+                'partner_id': partner_id,
                 'debit': other,
                 'credit': 0.0,
             })
             lines.append({
                 'name': 'Інші утримання: %s' % emp_name,
                 'account_id': config.other_payable_account_id.id,
+                'partner_id': partner_id,
                 'debit': 0.0,
                 'credit': other,
             })
