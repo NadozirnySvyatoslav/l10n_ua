@@ -619,11 +619,6 @@ msgid "Year"
 msgstr "Рік"
 
 #. module: l10n_ua_tax
-#: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_documents
-msgid "Tax Documents"
-msgstr "Податкові документи"
-
-#. module: l10n_ua_tax
 #: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_config
 msgid "Configuration"
 msgstr "Налаштування"
@@ -642,3 +637,59 @@ msgstr "Коди бюджету"
 #: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_offices
 msgid "Tax Offices (ДПІ)"
 msgstr "Податкові інспекції (ДПІ)"
+
+#. module: l10n_ua_tax
+#: model:l10n_ua.tax.document.type,name:l10n_ua_tax.tax_document_type_drfo_income_request
+msgid "Request for DRFO Income Information"
+msgstr "Запит відомостей з ДРФО про доходи"
+
+#. module: l10n_ua_tax
+#: model:l10n_ua.tax.document.type,description:l10n_ua_tax.tax_document_type_drfo_income_request
+msgid ""
+"Request for information from the State Register of Individual Taxpayers "
+"(DRFO) on sources and amounts of income, withheld tax and military levy"
+msgstr ""
+"Запит щодо отримання відомостей з Державного реєстру фізичних осіб – "
+"платників податків про джерела та суми нарахованого доходу, утриманого та "
+"сплаченого податку та військового збору"
+
+#. module: l10n_ua_tax
+#: model:l10n_ua.tax.document.type,name:l10n_ua_tax.tax_document_type_drfo_income_response
+msgid "DRFO Income Information"
+msgstr "Відомості з ДРФО про доходи"
+
+#. module: l10n_ua_tax
+#: model:l10n_ua.tax.document.type,description:l10n_ua_tax.tax_document_type_drfo_income_response
+msgid ""
+"Information from the State Register of Individual Taxpayers (DRFO) on "
+"sources and amounts of income, accrued tax and military levy (response to "
+"the request)"
+msgstr ""
+"Відомості з Державного реєстру фізичних осіб – платників податків про "
+"джерела та суми нарахованого доходу, нарахованого (перерахованого) податку та "
+"військового збору (відповідь на запит)"
+
+#. module: l10n_ua_tax
+#: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_reporting
+msgid "DPS Reporting"
+msgstr "Звітність до ДПС"
+
+#. module: l10n_ua_tax
+#: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_documents
+msgid "All Filed Documents"
+msgstr "Усі подані документи"
+
+#. module: l10n_ua_tax
+#: model_terms:ir.actions.act_window,help:l10n_ua_tax.l10n_ua_tax_document_action
+msgid "No tax documents yet"
+msgstr "Податкових документів ще немає"
+
+#. module: l10n_ua_tax
+#: model_terms:ir.actions.act_window,help:l10n_ua_tax.l10n_ua_tax_document_action
+msgid "Documents appear here after synchronisation with the Tax Cabinet."
+msgstr "Документи з'являються тут після синхронізації з Електронним кабінетом."
+
+#. module: l10n_ua_tax
+#: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_accounting
+msgid "Tax Accounting"
+msgstr "Облік"
