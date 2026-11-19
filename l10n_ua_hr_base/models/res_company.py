@@ -1,3 +1,5 @@
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields
 
 
@@ -39,3 +41,18 @@ class ResCompany(models.Model):
             '- Suggest: auto-fill wage when selecting staffing position\n'
             '- Fallback: use staffing salary in payslip if contract wage is 0\n'
             '- Both: suggest on selection + fallback in payslip')
+
+    def _l10n_ua_working_dates(self, date_from, date_to):
+        """{date: full-time hours} of the working days between the two dates.
+
+        Monday to Friday at the full-time day of the company's working
+        schedule, 8 hours when it has none.
+        """
+        self.ensure_one()
+        day_hours = self.resource_calendar_id.hours_per_day or 8.0
+        working, current = {}, date_from
+        while current <= date_to:
+            if current.weekday() < 5:
+                working[current] = day_hours
+            current += relativedelta(days=1)
+        return working

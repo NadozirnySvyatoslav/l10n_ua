@@ -270,7 +270,7 @@ class HrPayslip(models.Model):
         'hr.payslip.retro', 'source_payslip_id', string='Retro (as source)',
         copy=False)
 
-    @api.depends('employee_id')
+    @api.depends('employee_id', 'employee_id.disability_group', 'employee_id.benefit_ids')
     def _compute_employee_benefits(self):
         """Compute employee benefit flags for special tax regimes"""
         for payslip in self:
@@ -278,14 +278,13 @@ class HrPayslip(models.Model):
             is_diia_city = False
 
             if payslip.employee_id:
-                # Check for disability benefits
-                if payslip.employee_id.benefit_ids:
-                    for benefit in payslip.employee_id.benefit_ids:
-                        code_lower = (benefit.code or '').lower()
-                        name_lower = (benefit.name or '').lower()
-                        if 'disability' in code_lower or 'інвалід' in name_lower:
-                            is_disability = True
-                            break
+                # Інвалідність самого працівника (ЄСВ 8,41 %, ч. 13 ст. 8 Закону № 2464-VI):
+                # група в картці або пільга DISABILITY_*. Не за назвою: «Батько дитини з
+                # інвалідністю» (DISABLED_CHILD) теж містить «інвалід», але ставки не знижує.
+                employee = payslip.employee_id
+                is_disability = employee.disability_group in ('1', '2', '3') or any(
+                    (benefit.code or '').upper().startswith('DISABILITY')
+                    for benefit in employee.benefit_ids)
 
                 # Check for Diia.City status from contract version
                 version = payslip.version_id or payslip.employee_id.current_version_id
@@ -439,7 +438,8 @@ class HrPayslip(models.Model):
         'military_tax_rate',
         'esv_rate',
         'is_diia_city',
-        'is_disability'
+        'is_disability',
+        'version_id',
     )
     def _compute_amounts(self):
         for payslip in self:
@@ -500,10 +500,14 @@ class HrPayslip(models.Model):
                 payslip.esv_base = 0.0
                 payslip.esv_amount = 0.0
             else:
-                min_esv_base = params.min_wage if params else 8000
-                max_esv_base = params.max_esv_base if params else 120000
-
-                payslip.esv_base = min(max(esv_taxable, min_esv_base), max_esv_base)
+                if params:
+                    floor = params.min_wage if payslip._l10n_ua_min_esv_applies() else 0.0
+                    payslip.esv_base = min(max(esv_taxable, floor), params.max_esv_base)
+                else:
+                    # No parameters for the period, so no statutory floor or
+                    # ceiling to apply. Such a payslip can be neither computed
+                    # nor verified: see _check_psp_parameters_known.
+                    payslip.esv_base = esv_taxable
                 payslip.esv_amount = round(payslip.esv_base * esv_rate / 100, 2)
             
             # Other deductions (excluding taxes)
@@ -543,12 +547,58 @@ class HrPayslip(models.Model):
         for payslip in self:
             if payslip.state != 'draft':
                 continue
-            
+            payslip._check_psp_parameters_known(
+                self.env['hr.psp.parameters'].get_parameters(payslip.date_to))
+
             payslip._compute_working_days()
             payslip._generate_accruals()
             payslip._generate_deductions()
         
         return True
+
+    def _check_psp_parameters_known(self, params):
+        """Refuse to compute a payslip without payroll parameters.
+
+        Without them the sheet used to fall back to constants hardcoded years
+        ago (minimum wage 8000, ESV ceiling 120000) and looked perfectly
+        normal, so nobody noticed the stale numbers.
+        """
+        self.ensure_one()
+        if not params:
+            raise UserError(_(
+                'No payroll parameters are defined on %(date)s. Add them in '
+                'Payroll → Configuration → PSP Parameters before computing '
+                'payslips.', date=self.date_to))
+
+    def _l10n_ua_min_esv_applies(self):
+        """Whether the contribution base is raised to the minimum wage.
+
+        Only for a month the employee was under contract every calendar day
+        of, or every working day of: hired or dismissed in the middle of the
+        month, the contribution is charged on what was accrued.
+
+        Never for an external secondary job: the minimum does not apply to
+        income from a source other than the main place of work (абз. 3 ч. 5
+        ст. 8 Закону № 2464-VI). Nor for an employee with a disability whose
+        contribution is charged at 8,41 % (ч. 13 ст. 8): it is charged on
+        the actual base, with no top-up to the minimum.
+        """
+        self.ensure_one()
+        if self.is_disability and not self.is_diia_city:
+            return False
+        version = self.version_id or self.employee_id.current_version_id
+        if version.sudo().employment_type_ua == 'external':
+            return False
+        if not (self.employee_id and self.date_to):
+            return True
+        start = self.date_to.replace(day=1)
+        end = start + relativedelta(months=1, days=-1)
+        days = [start + relativedelta(days=n) for n in range((end - start).days + 1)]
+        employee = self.employee_id
+        if all(employee._l10n_ua_employed_on(day) for day in days):
+            return True
+        return all(employee._l10n_ua_employed_on(day)
+                   for day in self.company_id._l10n_ua_working_dates(start, end))
 
     def _daily_hour_norm(self):
         """Денна норма годин з урахуванням ставки зайнятості (work_rate).
