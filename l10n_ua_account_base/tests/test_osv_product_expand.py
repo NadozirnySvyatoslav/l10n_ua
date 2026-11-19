@@ -178,6 +178,48 @@ class TestOsvProductExpand(TransactionCase):
         self._assert_vals(details.filtered(lambda l: not l.product_id),
                           turnover_debit=50.0, closing_debit=50.0)
 
+    def _post_lines(self, move_date, lines):
+        move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': self.journal.id,
+            'date': move_date,
+            'line_ids': [(0, 0, vals) for vals in lines],
+        })
+        move.action_post()
+        return move
+
+    def test_storno_return_and_negative_quantity(self):
+        """Кейс 7 Галини (#594): сторно-повернення постачальнику (Дт −100,
+        1 шт) і рядок з від'ємною кількістю на кредиті (−1 шт) — обидва
+        вибуття; кількість сходиться із сумою."""
+        self.company.account_storno = True
+        self._goods_data()
+        # Повернення постачальнику А 1 шт: сторно Дт 281 −100 / Кт 631 −100.
+        storno = self._post_lines(date(2025, 1, 25), [
+            {'account_id': self.acc_goods.id, 'product_id': self.prod_a.id,
+             'quantity': 1.0, 'debit': -100.0},
+            {'account_id': self.acc_settle.id, 'partner_id': self.supplier.id,
+             'credit': -100.0},
+        ])
+        self.assertTrue(storno.line_ids.filtered(
+            lambda l: l.account_id == self.acc_goods).is_storno)
+        # Рядок рахунку з −1 шт: Кт 281 100, quantity −1.
+        self._post_lines(date(2025, 1, 26), [
+            {'account_id': self.acc_settle.id, 'partner_id': self.supplier.id,
+             'debit': 100.0},
+            {'account_id': self.acc_goods.id, 'product_id': self.prod_a.id,
+             'quantity': -1.0, 'credit': 100.0},
+        ])
+        line_a = self._details(self._osv(), self.acc_goods).filtered(
+            lambda l: l.product_id == self.prod_a)
+        # 10 − 4 (списання) − 1 (сторно-повернення) − 1 (−1 шт) = 4 шт / 400.
+        self._assert_vals(
+            line_a,
+            opening_debit=1000.0, opening_qty=10.0,
+            turnover_debit=-100.0, turnover_qty_in=-1.0,
+            turnover_credit=500.0, turnover_qty_out=5.0,
+            closing_debit=400.0, closing_qty=4.0)
+
     def test_zero_account_without_analytics_skipped(self):
         """Рахунок без аналітики з протилежними сальдо партнерів, що в сумі 0,
         не дає нульового рядка (як і синтетична ОСВ без прапорців)."""

@@ -294,16 +294,26 @@ class L10nUaOsv(models.Model):
             acc['turnover_credit'] += credit or 0.0
 
         if self.expand_products:
+            # Кількість іде на бік рядка (Дт — надійшло, Кт — вибуло) зі знаком
+            # його суми: |quantity| для звичайного рядка, −|quantity| для
+            # сторно (debit < 0 / credit < 0). Знак самої quantity не важить:
+            # рядок рахунку з −1 шт на кредиті — це вибуття 1 шт (#594).
             qty_domain = base_domain + [
                 ('account_id.ua_analytics_type', '=', self._EXPAND_PRODUCT_ANALYTICS)]
-            for dates, side, key, sign in (
-                    (before, ('debit', '>', 0), 'opening_qty', 1),
-                    (before, ('credit', '>', 0), 'opening_qty', -1),
-                    (period, ('debit', '>', 0), 'turnover_qty_in', 1),
-                    (period, ('credit', '>', 0), 'turnover_qty_out', 1)):
-                for account, partner, product, qty in AML._read_group(
-                        qty_domain + dates + [side], groupby, ['quantity:sum']):
-                    bucket(account, partner, product)[key] += sign * (qty or 0.0)
+            for dates, field, key, side_sign in (
+                    (before, 'debit', 'opening_qty', 1),
+                    (before, 'credit', 'opening_qty', -1),
+                    (period, 'debit', 'turnover_qty_in', 1),
+                    (period, 'credit', 'turnover_qty_out', 1)):
+                for amount_op, amount_sign in (('>', 1), ('<', -1)):
+                    for qty_op, qty_sign in (('>', 1), ('<', -1)):
+                        sign = side_sign * amount_sign * qty_sign
+                        for account, partner, product, qty in AML._read_group(
+                                qty_domain + dates + [(field, amount_op, 0),
+                                                      ('quantity', qty_op, 0)],
+                                groupby, ['quantity:sum']):
+                            bucket(account, partner, product)[key] += (
+                                sign * (qty or 0.0))
         return data.values()
 
     def _expand_dim(self, account):
@@ -339,7 +349,7 @@ class L10nUaOsv(models.Model):
             groups = by_account.setdefault(account, {})
             total = groups.setdefault(
                 value.id if value is not None else None,
-                dict.fromkeys(amounts + qtys, 0.0) |{'value': value})
+                dict.fromkeys(amounts + qtys, 0.0) | {'value': value})
             for field in amounts + qtys:
                 total[field] += acc[field]
 
