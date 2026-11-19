@@ -83,7 +83,7 @@ class HrPayslipRun(models.Model):
             expense_totals[key]['esv'] += slip.esv_amount
             total_pdfo += slip.pdfo_amount
             total_military += slip.military_tax_amount
-            total_other += slip.other_deductions
+            total_other += slip._l10n_ua_other_deductions_to_post()
 
         lines = []
 
