@@ -9,3 +9,5 @@ from . import test_general_ledger
 from . import test_chess_sheet
 from . import test_multicompany
 from . import test_offbalance_accounts
+from . import test_offbalance_register
+from . import test_psbo_chart

@@ -84,6 +84,11 @@ class TestValidateIpn(TransactionCase):
             is_valid, error = validate_ipn(code)
             self.assertTrue(is_valid, f'IPN {code} should be valid: {error}')
 
+    def test_valid_vat_ipn_12_digits(self):
+        """ІПН платника ПДВ — 12 цифр, без контрольної суми РНОКПП."""
+        is_valid, error = validate_ipn('123456789012')
+        self.assertTrue(is_valid, error)
+
     def test_invalid_ipn_wrong_checksum(self):
         """Test IPN with wrong checksum."""
         invalid_codes = [
@@ -100,7 +105,8 @@ class TestValidateIpn(TransactionCase):
         invalid_codes = [
             '',           # Empty
             '123456789',  # Too short (9 digits)
-            '12345678901', # Too long (11 digits)
+            '12345678901', # 11 digits
+            '1234567890123',  # 13 digits
             'ABCDEFGHIJ', # Letters
             '123456789A', # Mixed
         ]

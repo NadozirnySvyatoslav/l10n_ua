@@ -44,8 +44,11 @@ def validate_edrpou(code: str) -> tuple[bool, str]:
 
 
 def validate_ipn(code: str) -> tuple[bool, str]:
-    """Validate IPN/RNOKPP code (10 digits with checksum).
-    
+    """Validate IPN/RNOKPP code: 10-digit RNOKPP (with checksum) or 12-digit VAT IPN.
+
+    Індивідуальний податковий номер платника ПДВ має 12 цифр — без контрольної
+    суми РНОКПП; саме його вимагають ПН і додаток Д1 декларації з ПДВ.
+
     Args:
         code: IPN code to validate
         
@@ -56,9 +59,12 @@ def validate_ipn(code: str) -> tuple[bool, str]:
         return False, 'IPN code is required'
     
     code = code.strip()
-    
+
+    if re.match(r'^\d{12}$', code):
+        return True, ''
+
     if not re.match(r'^\d{10}$', code):
-        return False, 'IPN must be exactly 10 digits'
+        return False, 'IPN must be 10 digits (RNOKPP) or 12 digits (VAT IPN)'
     
     digits = [int(d) for d in code]
     
