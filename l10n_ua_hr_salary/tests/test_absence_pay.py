@@ -392,6 +392,21 @@ class TestAbsencePay(SalaryTestCase):
         slip = self._payslip(date(2025, 7, 1), date(2025, 7, 31))
         self.assertAlmostEqual(slip.esv_base, self.psp_params.min_wage, places=2)
 
+    def test_no_minimum_contribution_for_a_whole_month_of_unpaid_leave(self):
+        # #573 п. 4: under contract all June, but on unpaid leave every day
+        # of it — nothing accrued, so nothing to raise to the minimum.
+        unpaid = self.env['hr.leave.type'].create({
+            'name': 'Unpaid (absence pay test)', 'ua_leave_category': 'unpaid',
+            'is_paid': False, 'requires_allocation': False,
+            'company_id': self.company.id,
+        })
+        self.version.wage = 7000
+        self._leave(unpaid, date(2025, 6, 1), date(2025, 6, 30))
+        slip = self._payslip(date(2025, 6, 1), date(2025, 6, 30))
+        self.assertFalse(self._of_type(slip, 'SALARY').amount)
+        self.assertEqual(slip.esv_base, 0.0)
+        self.assertEqual(slip.esv_amount, 0.0)
+
     def test_the_minimum_contribution_holds_for_a_hire_on_the_first_working_day(self):
         # June 2025 starts on a Sunday: hired on Monday the 2nd and at work
         # every working day of the month, the base is raised to the minimum.

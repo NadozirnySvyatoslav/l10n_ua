@@ -591,7 +591,11 @@ class HrPayslip(models.Model):
                 payslip.esv_amount = 0.0
             else:
                 if params:
-                    floor = params.min_wage if payslip._l10n_ua_min_esv_applies() else 0.0
+                    # Nothing accrued for the month itself (a whole month of
+                    # unpaid leave): no base to raise, no contribution for it.
+                    floor = params.min_wage if (
+                        esv_taxable > 0 and payslip._l10n_ua_min_esv_applies()
+                    ) else 0.0
                     payslip.esv_base = min(
                         max(esv_taxable, floor), params.max_esv_base) + other_base
                 else:
