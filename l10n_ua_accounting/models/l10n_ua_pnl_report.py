@@ -1,6 +1,5 @@
 """Ukrainian P&L Statement (Звіт про фінансові результати, Форма №2) — persistent stored report."""
 
-import base64
 import io
 
 from odoo import models, fields, api, _
@@ -146,7 +145,7 @@ class L10nUaPnlReport(models.Model):
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',
-            'datas': base64.b64encode(output.read()).decode(),
+            'raw': output.getvalue(),
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         })
         return {

@@ -83,4 +83,4 @@ class TestAgingReport(AccountingTestCase):
         report.action_compute()
         result = report.action_export_xlsx()
         self.assertIsInstance(result, dict)
-        self.assertEqual(result.get('type'), 'ir.actions.act_url')
+        self.assertXlsxExport(result)

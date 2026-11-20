@@ -88,6 +88,12 @@ class TestCashflowReport(AccountingTestCase):
 
     # ── Класифікація потоків ────────────────────────────────
 
+    def test_cashflow_report_xlsx_export(self):
+        """XLSX-експорт Ф.3 створює вкладення з файлом (#606)."""
+        self._post_move(self.acc_bank, self.acc_customers, 1000.0)
+        report = self._computed_report()
+        self.assertXlsxExport(report.action_export_xlsx())
+
     def test_customer_receipt_is_operating_inflow(self):
         """Дт 311 / Кт 361 — надходження від реалізації, рядок 3000."""
         self._post_move(self.acc_bank, self.acc_customers, 1000.0)

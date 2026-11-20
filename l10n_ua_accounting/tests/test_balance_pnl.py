@@ -60,6 +60,12 @@ class TestBalanceReport(AccountingTestCase):
         self.assertIsInstance(report.total_assets, float)
         self.assertIsInstance(report.total_liabilities, float)
 
+    def test_balance_report_xlsx_export(self):
+        """XLSX-експорт Балансу створює вкладення з файлом (#606)."""
+        report = self._create_balance_report()
+        report.action_compute()
+        self.assertXlsxExport(report.action_export_xlsx())
+
 
 @tagged('post_install', '-at_install')
 class TestPnlReport(AccountingTestCase):
@@ -92,3 +98,9 @@ class TestPnlReport(AccountingTestCase):
         self.assertEqual(report.state, 'confirmed')
         report.action_draft()
         self.assertEqual(report.state, 'draft')
+
+    def test_pnl_report_xlsx_export(self):
+        """XLSX-експорт Ф.2 створює вкладення з файлом (#606)."""
+        report = self._create_pnl_report()
+        report.action_compute()
+        self.assertXlsxExport(report.action_export_xlsx())
