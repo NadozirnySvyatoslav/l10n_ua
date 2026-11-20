@@ -67,3 +67,15 @@ class AccountingTestCase(TransactionCase):
             'name': 'Тестовий працівник',
             'company_id': cls.company.id,
         })
+
+    def assertXlsxExport(self, action):
+        """Дія експорту має вести на вкладення з непорожнім xlsx-файлом."""
+        self.assertEqual(action.get('type'), 'ir.actions.act_url')
+        att_id = int(action['url'].split('/web/content/')[1].split('?')[0])
+        attachment = self.env['ir.attachment'].browse(att_id)
+        self.assertTrue(attachment.exists())
+        # xlsx — це zip-архів, сигнатура PK
+        # bytes(): у Odoo 20 raw — обгортка BinaryFile, не bytes
+        content = bytes(attachment.raw or b'')
+        self.assertEqual(content[:2], b'PK', 'Вкладення має містити xlsx-файл')
+        return attachment

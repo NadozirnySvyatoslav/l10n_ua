@@ -7,7 +7,6 @@
 грошових рахунків і розподіляє суму по контр-рядках кожної проводки.
 """
 
-import base64
 import io
 from collections import defaultdict
 
@@ -253,7 +252,7 @@ class L10nUaCashflowReport(models.Model):
         attachment = self.env['ir.attachment'].create({
             'name': filename,
             'type': 'binary',
-            'datas': base64.b64encode(output.read()).decode(),
+            'raw': output.getvalue(),
             'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         })
         return {
