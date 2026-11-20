@@ -485,6 +485,7 @@ msgstr "Проживання"
 #. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_account_account
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing_line__account_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__account_id
 msgid "Account"
 msgstr "Рахунок"
 
@@ -524,6 +525,7 @@ msgstr "Рахунки"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_needaction
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction
 msgid "Action Needed"
 msgstr "Необхідна дія"
 
@@ -537,6 +539,7 @@ msgstr "Необхідна дія"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_ids
 msgid "Activities"
 msgstr "Дії"
 
@@ -550,6 +553,7 @@ msgstr "Дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_exception_decoration
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_exception_decoration
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "Оформлення виключення дії"
 
@@ -563,6 +567,7 @@ msgstr "Оформлення виключення дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_state
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_state
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_state
 msgid "Activity State"
 msgstr "Стан дії"
 
@@ -576,6 +581,7 @@ msgstr "Стан дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_type_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_type_icon
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_type_icon
 msgid "Activity Type Icon"
 msgstr "Іконка типу дії"
 
@@ -730,6 +736,7 @@ msgstr "Прикріпити скан чека/рахунку"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_attachment_count
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_attachment_count
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_attachment_count
 msgid "Attachment Count"
 msgstr "Кількість вкладень"
 
@@ -852,12 +859,15 @@ msgstr "Можна скасувати лише закритий період."
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
 msgid "Cancel"
 msgstr "Скасувати"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__cancelled
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_service_act__state__cancelled
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_debt_netting__state__cancel
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 msgid "Cancelled"
 msgstr "Скасовано"
 
@@ -1053,6 +1063,8 @@ msgstr "Компанії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__company_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__company_id
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__company_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__company_id
 msgid "Company"
 msgstr "Компанія"
 
@@ -1172,6 +1184,8 @@ msgstr "Створіть свій перший Акт наданих послу�
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__create_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__create_uid
 msgid "Created by"
 msgstr "Створив"
 
@@ -1198,6 +1212,8 @@ msgstr "Створив"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__create_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__create_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__create_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__create_date
 msgid "Created on"
 msgstr "Створено"
 
@@ -1226,6 +1242,8 @@ msgstr "Кредит"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report_line__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__currency_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__currency_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__currency_id
 msgid "Currency"
 msgstr "Валюта"
 
@@ -1281,6 +1299,9 @@ msgstr "Замовник"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__date
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 msgid "Date"
 msgstr "Дата"
 
@@ -1363,6 +1384,8 @@ msgstr "Детально"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_tax_period__display_name
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_res_company__display_name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__display_name
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__display_name
 msgid "Display Name"
 msgstr "Відображувана назва"
 
@@ -1403,6 +1426,8 @@ msgstr "Документ особи (паспорт, ID-картка)"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_debt_netting__state__draft
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 msgid "Draft"
 msgstr "Чернетка"
 
@@ -1486,6 +1511,7 @@ msgstr "Ключ потоку"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_follower_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_follower_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_follower_ids
 msgid "Followers"
 msgstr "Підписники"
 
@@ -1499,6 +1525,7 @@ msgstr "Підписники"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_partner_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_partner_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Підписники (Партнери)"
 
@@ -1512,6 +1539,7 @@ msgstr "Підписники (Партнери)"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_type_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__activity_type_icon
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Іконка Font Awesome, напр. fa-tasks"
 
@@ -1535,6 +1563,7 @@ msgstr "Головна книга"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__has_message
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__has_message
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__has_message
 msgid "Has Message"
 msgstr "Є повідомлення"
 
@@ -1566,6 +1595,8 @@ msgstr "Є повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_tax_period__id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_res_company__id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__id
 msgid "ID"
 msgstr "ID"
 
@@ -1579,6 +1610,7 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_exception_icon
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_exception_icon
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_exception_icon
 msgid "Icon"
 msgstr "Значок"
 
@@ -1592,6 +1624,7 @@ msgstr "Значок"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_exception_icon
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__activity_exception_icon
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr "Іконка для визначення виключення дії."
 
@@ -1605,6 +1638,7 @@ msgstr "Іконка для визначення виключення дії."
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__message_needaction
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "Якщо позначено, то нові повідомлення будуть потребувати вашої уваги."
 
@@ -1627,6 +1661,8 @@ msgstr "Якщо позначено, то нові повідомлення бу
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_sms_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_sms_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
 
@@ -1697,6 +1733,7 @@ msgstr "Є касовим ордером"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_is_follower
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_is_follower
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_is_follower
 msgid "Is Follower"
 msgstr "Стежить"
 
@@ -1708,6 +1745,7 @@ msgstr "Є платіжним дорученням"
 #. module: l10n_ua_accounting
 #: model:ir.model,name:l10n_ua_accounting.model_account_journal
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__journal_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__journal_id
 msgid "Journal"
 msgstr "Журнал"
 
@@ -1719,6 +1757,7 @@ msgstr "Проводки - %s"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_advance_report__move_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__move_id
 msgid "Journal Entry"
 msgstr "Проводка"
 
@@ -1755,6 +1794,8 @@ msgstr "Журнали-ордери"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__write_uid
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__write_uid
 msgid "Last Updated by"
 msgstr "Востаннє оновив"
 
@@ -1781,6 +1822,8 @@ msgstr "Востаннє оновив"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__write_date
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act_line__write_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__write_date
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__write_date
 msgid "Last Updated on"
 msgstr "Останнє оновлення"
 
@@ -1842,6 +1885,7 @@ msgstr "Харчування"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_error
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error
 msgid "Message Delivery error"
 msgstr "Помилка доставлення повідомлення"
 
@@ -1855,6 +1899,7 @@ msgstr "Помилка доставлення повідомлення"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_ids
 msgid "Messages"
 msgstr "Повідомлення"
 
@@ -1874,6 +1919,7 @@ msgstr "Відсутні рахунки: %s. Будь ласка, налашту
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__my_activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__my_activity_date_deadline
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr "Дедлайн моєї дії"
 
@@ -1911,6 +1957,7 @@ msgstr "Чистий результат"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_date_deadline
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_date_deadline
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr "Дедлайн наступної дії"
 
@@ -1924,6 +1971,7 @@ msgstr "Дедлайн наступної дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_summary
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_summary
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_summary
 msgid "Next Activity Summary"
 msgstr "Підсумок наступної дії"
 
@@ -1937,6 +1985,7 @@ msgstr "Підсумок наступної дії"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_type_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_type_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_type_id
 msgid "Next Activity Type"
 msgstr "Тип наступної дії"
 
@@ -2001,6 +2050,8 @@ msgstr "Примітка"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_pnl_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__note
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
 msgid "Notes"
 msgstr "Примітки"
 
@@ -2009,6 +2060,7 @@ msgstr "Примітки"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__name
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__name
 msgid "Number"
 msgstr "Номер"
 
@@ -2022,6 +2074,7 @@ msgstr "Номер"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_needaction_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction_counter
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction_counter
 msgid "Number of Actions"
 msgstr "Кількість дій"
 
@@ -2035,6 +2088,7 @@ msgstr "Кількість дій"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_error_counter
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error_counter
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error_counter
 msgid "Number of errors"
 msgstr "Кількість помилок"
 
@@ -2048,6 +2102,7 @@ msgstr "Кількість помилок"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__message_needaction_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_needaction_counter
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "Кількість повідомлень, які вимагають дії"
 
@@ -2061,6 +2116,7 @@ msgstr "Кількість повідомлень, які вимагають д�
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__message_has_error_counter
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__message_has_error_counter
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Кількість повідомлень з помилкою доставки"
 
@@ -2168,6 +2224,8 @@ msgstr "Параметри"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_reconciliation_act_wizard__partner_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__partner_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 msgid "Partner"
 msgstr "Контрагент"
 
@@ -2300,12 +2358,15 @@ msgstr "Додатний = борг працівника, Від'ємний = б
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
 msgid "Post"
 msgstr "Провести"
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_advance_report__state__posted
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_debt_netting__state__posted
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 msgid "Posted"
 msgstr "Проведено"
 
@@ -2436,6 +2497,7 @@ msgstr "Звітний період"
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
 msgid "Reset to Draft"
 msgstr "Повернути в чернетку"
 
@@ -2449,6 +2511,7 @@ msgstr "Повернути в чернетку"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_user_id
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__activity_user_id
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_user_id
 msgid "Responsible User"
 msgstr "Відповідальний"
 
@@ -2628,6 +2691,8 @@ msgstr "Рядки звіту"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__state
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_search
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_search
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__state
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
 msgid "Status"
 msgstr "Статус"
 
@@ -2641,6 +2706,7 @@ msgstr "Статус"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_state
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__activity_state
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_state
 msgid ""
 "Status based on activities\n"
 "Overdue: Due date is already passed\n"
@@ -2726,6 +2792,8 @@ msgstr "На затвердження"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cashflow_report_list
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_service_act_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_list
 msgid "Total"
 msgstr "Разом"
 
@@ -2811,6 +2879,7 @@ msgstr "Тип"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__activity_exception_decoration
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__activity_exception_decoration
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr "Тип дії виключення на записі."
 
@@ -2923,6 +2992,7 @@ msgstr "Переглянути рахунок"
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_pnl_report__website_message_ids
 #: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_service_act__website_message_ids
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__website_message_ids
 msgid "Website Messages"
 msgstr "Повідомлення з веб-сайту"
 
@@ -2936,6 +3006,7 @@ msgstr "Повідомлення з веб-сайту"
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_pnl_report__website_message_ids
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_service_act__website_message_ids
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__website_message_ids
 msgid "Website communication history"
 msgstr "Історія бесіди на сайті"
 
@@ -5035,3 +5106,398 @@ msgstr ""
 #: model:ir.ui.menu,name:account.menu_finance
 msgid "Accounting"
 msgstr "Бухоблік"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "<span>Journal Entry</span>"
+msgstr "<span>Проводка</span>"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid ""
+"A netting needs open documents on both sides: debts of the partner to the "
+"company and debts of the company to the partner."
+msgstr ""
+"Для взаємозаліку потрібні відкриті документи з обох сторін: заборгованість "
+"контрагента перед підприємством і заборгованість підприємства перед "
+"контрагентом."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "A posted debt netting cannot be deleted. Cancel it first."
+msgstr "Проведений взаємозалік не можна видалити. Спершу скасуйте його."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid ""
+"Account %(account)s does not allow reconciliation, its items cannot be "
+"offset."
+msgstr ""
+"Рахунок %(account)s не дозволяє зіставлення, його рядки не можна зарахувати."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__amount
+msgid ""
+"Amount of mutual claims to be offset. Defaults to the smaller of the two "
+"sides and cannot exceed it."
+msgstr ""
+"Сума зустрічних вимог, що зараховується. За замовчуванням — менша з двох "
+"сторін; перевищувати її не може."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "Amounts"
+msgstr "Суми"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Cancellation of debt netting %s"
+msgstr "Скасування взаємозаліку %s"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__commercial_partner_id
+msgid "Commercial Entity"
+msgstr "Комерційна особа"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__company_currency_id
+msgid "Company Currency"
+msgstr "Валюта компанії"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_debt_netting_action
+msgid "Create your first debt netting"
+msgstr "Створіть перший взаємозалік"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__date
+msgid "Date of the netting: the accounting date of the journal entry."
+msgstr "Дата взаємозаліку: дата бухгалтерської проводки."
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.l10n_ua_debt_netting_action
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_debt_netting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__netting_id
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_debt_netting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
+msgid "Debt Netting"
+msgstr "Взаємозалік"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_debt_netting
+msgid "Debt Netting Act"
+msgstr "Взаємозалік"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_debt_netting_line
+msgid "Debt Netting Document"
+msgstr "Взаємозалік"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Debt netting %(number)s: %(document)s"
+msgstr "Взаємозалік %(number)s: %(document)s"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Debt netting %s"
+msgstr "Взаємозалік %s"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__move_id
+msgid "Document"
+msgstr "Документ"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Document %(document)s is already settled. Remove it from the netting."
+msgstr "Документ"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__line_ids
+msgid "Documents"
+msgstr "Документ"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__date_maturity
+msgid "Due Date"
+msgstr "Строк оплати"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "Fill Open Items"
+msgstr "Заповнити відкритими документами"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Internal error: unexpected order of journal items."
+msgstr "Внутрішня помилка: неочікуваний порядок рядків проводки."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Journal Entries"
+msgstr "Проводки"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__move_line_id
+msgid "Journal Item"
+msgstr "Рядок проводки"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Journal item %(item)s belongs to another partner."
+msgstr "Рядок проводки %(item)s належить іншому контрагенту."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid ""
+"Journal item %(item)s is in %(item_currency)s, the netting is in "
+"%(currency)s."
+msgstr ""
+"Рядок проводки %(item)s у валюті %(item_currency)s, а взаємозалік — у "
+"%(currency)s."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Journal item %(item)s is not posted."
+msgstr "Рядок проводки %(item)s не проведено."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__amount_max
+msgid "Maximum Offset"
+msgstr "Максимальна сума заліку"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_search
+msgid "Month"
+msgstr "Місяць"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__counterpart_line_id
+msgid "Netting Journal Item"
+msgstr "Рядок проводки заліку"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "Notes..."
+msgstr "Примітки..."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__amount_offset
+msgid "Offset"
+msgstr "Зараховується"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__amount
+msgid "Offset Amount"
+msgstr "Зараховується"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.l10n_ua_debt_netting_action
+msgid ""
+"Offset mutual claims with a partner: its debts to the company\n"
+"                against the company's debts to it. Posting creates the journal\n"
+"                entry and reconciles the documents."
+msgstr "Зараховується"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Only a cancelled netting can be reset to draft."
+msgstr "Повернути в чернетку можна лише скасований взаємозалік."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Only a draft netting can be edited."
+msgstr "Редагувати можна лише чернетку взаємозаліку."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Only a draft netting can be posted."
+msgstr "Провести можна лише чернетку взаємозаліку."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__currency_id
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting_line__currency_id
+msgid "Only documents in this currency can be offset against each other."
+msgstr "Зараховувати одне проти одного можна лише документи в цій валюті."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__amount_open
+msgid "Open Amount"
+msgstr "Сума заборгованості"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__amount_payable
+msgid ""
+"Open amount of the selected documents on which the company owes the partner."
+msgstr ""
+"Непогашена сума обраних документів, за якими підприємство винне контрагенту."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting__amount_receivable
+msgid ""
+"Open amount of the selected documents on which the partner owes the company."
+msgstr ""
+"Непогашена сума обраних документів, за якими контрагент винен підприємству."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid ""
+"Open amounts of the documents have changed: the offset amount %(amount)s now"
+" exceeds the maximum of %(max)s."
+msgstr ""
+"Залишки документів змінилися: сума заліку %(amount)s тепер перевищує "
+"максимум %(max)s."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__payable_line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "Our Debts"
+msgstr "Наші борги"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_debt_netting_line__side__payable
+msgid "Owed by us"
+msgstr "Винні ми"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_debt_netting_line__side__receivable
+msgid "Owed to us"
+msgstr "Винні нам"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "Partner %(partner)s has no open items in %(currency)s."
+msgstr ""
+"У контрагента %(partner)s немає відкритих документів у валюті %(currency)s."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__receivable_line_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "Partner Debts"
+msgstr "Борги контрагента"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__amount_receivable
+msgid "Partner Owes Us"
+msgstr "Контрагент винен нам"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid "Print Act"
+msgstr "Друк акту"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__ref
+msgid "Reference"
+msgstr "Референс"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__amount_after
+msgid "Remaining"
+msgstr "Залишок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__reversal_move_id
+msgid "Reversal Entry"
+msgstr "Сторнувальна проводка"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting_line__side
+msgid "Side"
+msgstr "Сторона"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.l10n_ua_debt_netting_view_form
+msgid ""
+"The journal entry will be reversed and the documents will become open again."
+" Continue?"
+msgstr ""
+"Проводку буде сторновано, а документи знову стануть відкритими. Продовжити?"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid ""
+"The offset amount %(amount)s exceeds the smaller side of the mutual claims "
+"(%(max)s)."
+msgstr ""
+"Сума заліку %(amount)s перевищує меншу зі сторін зустрічних вимог (%(max)s)."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "The offset amount cannot be negative."
+msgstr "Сума заліку не може бути від'ємною."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_debt_netting.py:0
+msgid "The offset amount must be positive."
+msgstr "Сума заліку має бути додатною."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.constraint,message:l10n_ua_accounting.constraint_l10n_ua_debt_netting_line_netting_move_line_uniq
+msgid "The same document cannot be added to a netting twice."
+msgstr "Один документ не можна додати до взаємозаліку двічі."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting_line__date_maturity
+msgid ""
+"This field is used for payable and receivable journal entries. You can put "
+"the limit date for the payment of this line."
+msgstr ""
+"Поле використовується для рядків розрахунків з постачальниками та покупцями."
+" Тут можна вказати граничну дату оплати рядка."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting_line__amount_open
+msgid ""
+"Unsettled amount of the document in the netting currency, taken when the "
+"document was added and refreshed on posting."
+msgstr ""
+"Непогашена сума документа у валюті заліку: береться під час додавання "
+"документа й оновлюється під час проведення."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__amount_payable
+msgid "We Owe the Partner"
+msgstr "Ми винні контрагенту"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_debt_netting_line__side
+msgid ""
+"Whose debt this document is: the partner owes us (debit balance) or we owe "
+"the partner (credit balance)."
+msgstr ""
+"Чий це борг: контрагент винен нам (дебетове сальдо) чи ми винні контрагенту "
+"(кредитове сальдо)."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "Подія календаря наступної дії"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_debt_netting__rating_ids
+msgid "Ratings"
+msgstr "Оцінки"

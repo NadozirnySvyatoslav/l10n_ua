@@ -89,5 +89,23 @@
             <field name="operation">crud</field>
         </record>
 
+        <record id="l10n_ua_debt_netting_company_rule" model="ir.access">
+            <field name="name">Взаємозалік: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_debt_netting"/>
+            <field name="domain">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_debt_netting_line_company_rule" model="ir.access">
+            <field name="name">Рядок взаємозаліку: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_debt_netting_line"/>
+            <field name="domain">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
     </data>
 </odoo>
