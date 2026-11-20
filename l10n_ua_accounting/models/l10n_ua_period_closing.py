@@ -140,6 +140,14 @@ class L10nUaPeriodClosing(models.Model):
         'closing_id',
         string='Closing Lines',
     )
+    deferral_line_ids = fields.Many2many(
+        'l10n_ua.deferral.line',
+        string='Deferral Entries',
+        compute='_compute_deferral_line_ids',
+        help='Deferred expense/revenue (39/69) recognitions falling into the '
+             'period. Closing the period posts the unposted ones before the '
+             'P&L accounts are closed.',
+    )
 
     def _default_journal(self):
         return self.env['account.journal'].search([
@@ -174,6 +182,49 @@ class L10nUaPeriodClosing(models.Model):
             rec.total_revenue = revenue
             rec.total_expenses = expenses
             rec.net_result = revenue - expenses
+
+    @api.depends('period_id', 'company_id', 'state')
+    def _compute_deferral_line_ids(self):
+        for rec in self:
+            if rec.period_id and rec.company_id:
+                rec.deferral_line_ids = rec._get_due_deferral_lines(posted=None)
+            else:
+                rec.deferral_line_ids = False
+
+    def _get_due_deferral_lines(self, posted=False):
+        """Deferral schedule lines of this company dated inside the period.
+
+        :param posted: False → only lines still waiting for an entry,
+                       None → all lines of running/done schedules.
+        """
+        self.ensure_one()
+        domain = [
+            ('company_id', '=', self.company_id.id),
+            ('date', '>=', self.period_id.date_start),
+            ('date', '<=', self.period_id.date_end),
+            ('deferral_id.state', 'in', ('running', 'done')),
+        ]
+        if posted is False:
+            domain.append(('is_posted', '=', False))
+        return self.env['l10n_ua.deferral.line'].search(domain)
+
+    def _post_deferral_entries(self):
+        """Recognise deferred expenses/revenue (39/69) of the period (#372).
+
+        Runs before the P&L accounts are read so the recognised share lands in
+        this period's financial result. Lines already posted (manually or by a
+        previous closing) are skipped, so re-running is idempotent.
+        """
+        self.ensure_one()
+        return self._get_due_deferral_lines()._post(closing=self)
+
+    def _reverse_deferral_entries(self):
+        """Reverse the recognitions this closing posted and free the lines."""
+        self.ensure_one()
+        lines = self.env['l10n_ua.deferral.line'].search([
+            ('closing_id', '=', self.id),
+        ])
+        lines._unpost(date=self.date)
 
     @api.onchange('period_id', 'company_id')
     def _onchange_period_id(self):
@@ -333,6 +384,9 @@ class L10nUaPeriodClosing(models.Model):
 
         self._set_default_accounts()
         self._validate_accounts()
+
+        # Step 0: recognise deferred expenses/revenue (39/69) of the month
+        self._post_deferral_entries()
 
         # Recompute balances
         self.action_compute()
@@ -523,6 +577,9 @@ class L10nUaPeriodClosing(models.Model):
                 }],
                 cancel=True,
             )
+
+        # Reverse the deferral recognitions posted by this closing (#372)
+        self._reverse_deferral_entries()
 
         # Reset lock date if we set it
         if self.lock_period:
