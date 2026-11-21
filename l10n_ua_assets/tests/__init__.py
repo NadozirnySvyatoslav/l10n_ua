@@ -6,3 +6,4 @@ from . import test_mshp
 from . import test_modernization
 from . import test_revaluation
 from . import test_multicompany
+from . import test_commission_move

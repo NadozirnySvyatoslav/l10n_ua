@@ -1,6 +1,7 @@
 """Low-value non-current tangible assets (МНМА) management."""
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class L10nUaMnma(models.Model):
@@ -23,6 +24,14 @@ class L10nUaMnma(models.Model):
         required=True,
         default=fields.Date.context_today,
         tracking=True,
+    )
+    document_date = fields.Date(
+        string='Дата документа',
+        default=fields.Date.context_today,
+        copy=False,
+        help='Дата акту введення в експлуатацію або списання, що оформлюється '
+             'наступним. Порожнє — сьогоднішня дата. Після операції поле '
+             'очищується для наступного документа.',
     )
     commission_date = fields.Date(
         string='Дата введення',
@@ -124,12 +133,18 @@ class L10nUaMnma(models.Model):
                 record.depreciation_value = record.original_value
                 record.residual_value = 0
 
+    def _operation_date(self):
+        """Date of the act being issued: document date, or today."""
+        self.ensure_one()
+        return self.document_date or fields.Date.context_today(self)
+
     def action_commission(self):
         """Put MNMA into operation."""
         for rec in self:
             vals = {
                 'state': 'in_use',
-                'commission_date': fields.Date.context_today(self),
+                'commission_date': rec._operation_date(),
+                'document_date': False,
             }
             if not rec.commission_act_number:
                 vals['commission_act_number'] = self.env['ir.sequence'].next_by_code(
@@ -140,9 +155,17 @@ class L10nUaMnma(models.Model):
     def action_write_off(self):
         """Write off MNMA."""
         for rec in self:
+            writeoff_date = rec._operation_date()
+            if rec.commission_date and writeoff_date < rec.commission_date:
+                raise UserError(_(
+                    'Дата списання МНМА "%(name)s" (%(writeoff)s) не може бути '
+                    'раніше дати введення в експлуатацію (%(commission)s).',
+                    name=rec.display_name, writeoff=writeoff_date,
+                    commission=rec.commission_date))
             vals = {
                 'state': 'written_off',
-                'writeoff_date': fields.Date.context_today(self),
+                'writeoff_date': writeoff_date,
+                'document_date': False,
             }
             if not rec.writeoff_act_number:
                 vals['writeoff_act_number'] = self.env['ir.sequence'].next_by_code(

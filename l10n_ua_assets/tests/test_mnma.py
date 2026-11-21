@@ -8,6 +8,8 @@ Tests cover:
 """
 
 from datetime import date
+from odoo.exceptions import UserError
+from odoo import fields
 from odoo.tests import TransactionCase, tagged
 
 
@@ -80,3 +82,34 @@ class TestMnma(TransactionCase):
         mnma = self._create_mnma()
         mnma.write({'name': 'Оновлена назва'})
         self.assertEqual(mnma.name, 'Оновлена назва')
+
+    # --- #626: дата документа замість «сьогодні» ---
+
+    def test_document_date_defaults_to_today(self):
+        mnma = self._create_mnma()
+        self.assertEqual(mnma.document_date, fields.Date.context_today(mnma))
+
+    def test_commission_and_writeoff_use_document_date(self):
+        mnma = self._create_mnma()
+        mnma.document_date = date(2025, 3, 10)
+        mnma.action_commission()
+        self.assertEqual(mnma.commission_date, date(2025, 3, 10))
+        # Поле очищується під наступний документ.
+        self.assertFalse(mnma.document_date)
+        mnma.document_date = date(2025, 9, 30)
+        mnma.action_write_off()
+        self.assertEqual(mnma.writeoff_date, date(2025, 9, 30))
+
+    def test_empty_document_date_means_today(self):
+        mnma = self._create_mnma()
+        mnma.document_date = False
+        mnma.action_commission()
+        self.assertEqual(mnma.commission_date, fields.Date.context_today(mnma))
+
+    def test_writeoff_before_commission_raises(self):
+        mnma = self._create_mnma()
+        mnma.document_date = date(2025, 3, 10)
+        mnma.action_commission()
+        mnma.document_date = date(2025, 3, 9)
+        with self.assertRaises(UserError):
+            mnma.action_write_off()
