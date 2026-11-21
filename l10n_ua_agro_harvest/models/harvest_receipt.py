@@ -179,6 +179,9 @@ class AgroHarvestReceipt(models.Model):
             'company_id': self.company_id.id,
             'origin': self.name,
         })
+        # зв'язок до проведення руху: вартість вхідного руху (stock_account)
+        # рахується в _action_done і може братися з оприбуткування
+        self.move_id = move
         move._action_confirm()
         move._action_assign()
         move.move_line_ids.unlink()

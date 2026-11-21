@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Agro Accounting (P(S)BO 30)',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Localization',
     'summary': 'Agricultural produce at initial recognition (P(S)BO 30), allocation '
                'of indirect costs and crop cost calculation for the season',
@@ -25,6 +25,12 @@ Part of the "Agro" industry solution (epic #477, issue #473).
   method) or Dt 27 / Ct 23 for the difference to the planned cost; the
   plantings of the next season (winter crops sown in autumn) stay on 23 as
   work in progress. Actual cost of a ton and of a hectare by crop.
+* The stock value of the harvest equals its valuation on account 27: the
+  incoming stock move takes the value of the receipt, the debit goes to the
+  stock valuation account of the product category (fallback - the produce
+  account of the Agro settings), and the adjustment of the planned cost to
+  the actual one revalues the stock as well. The produce must use the AVCO
+  or FIFO costing method.
     """,
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://1c-to-odoo.many2one.online',

@@ -338,6 +338,7 @@ msgstr "Урожай %(receipt)s: %(product)s, %(weight)s кг"
 
 #. module: l10n_ua_agro_account
 #: model:ir.model,name:l10n_ua_agro_account.model_l10n_ua_agro_harvest_receipt
+#: model:ir.model.fields,field_description:l10n_ua_agro_account.field_stock_move__l10n_ua_agro_harvest_receipt_ids
 msgid "Harvest Receipt"
 msgstr "Завезення з поля"
 
@@ -804,3 +805,48 @@ msgstr ""
 msgid ""
 "Ціна активного ринку за одиницю мінус очікувані витрати на місці продажу."
 msgstr ""
+
+#. module: l10n_ua_agro_account
+#: model:ir.model.fields,field_description:l10n_ua_agro_account.field_l10n_ua_agro_harvest_receipt__cost_adjustment
+msgid "Cost Adjustment"
+msgstr "Доведення до фактичної собівартості"
+
+#. module: l10n_ua_agro_account
+#: model:ir.model.fields,field_description:l10n_ua_agro_account.field_l10n_ua_agro_harvest_receipt__cost_calculation_id
+msgid "Cost Calculation"
+msgstr "Калькуляція собівартості"
+
+#. module: l10n_ua_agro_account
+#: model:ir.model.fields,help:l10n_ua_agro_account.field_l10n_ua_agro_harvest_receipt__cost_adjustment
+msgid ""
+"Доведення планової собівартості до фактичної калькуляцією сезону — частка "
+"цього оприбуткування; змінює й вартість на складі."
+msgstr ""
+
+#. module: l10n_ua_agro_account
+#: model:ir.model,name:l10n_ua_agro_account.model_stock_move
+msgid "Stock Move"
+msgstr "Складський рух"
+
+#. odoo-python
+#: code:addons/l10n_ua_agro_account/models/stock_move.py:0
+msgid "Harvest %(receipt)s valued under P(S)BO 30"
+msgstr "Оприбуткування %(receipt)s за оцінкою П(С)БО 30"
+
+#. odoo-python
+#: code:addons/l10n_ua_agro_account/models/harvest_receipt.py:0
+msgid ""
+"%(product)s is costed at the standard price (category: %(category)s). The "
+"harvest is valued under P(S)BO 30 by every receipt, so give the product a "
+"category with the AVCO or FIFO costing method (Inventory → Configuration → "
+"Product Categories): otherwise the stock value and account 27 diverge."
+msgstr ""
+"%(product)s оцінюється за стандартною ціною (категорія: %(category)s). Врожай "
+"за П(С)БО 30 оцінюється кожним оприбуткуванням, тож призначте товару "
+"категорію з методом собівартості AVCO або FIFO (Склад → Налаштування → "
+"Категорії товарів): інакше вартість на складі й рахунок 27 розійдуться."
+
+#. odoo-python
+#: code:addons/l10n_ua_agro_account/models/harvest_receipt.py:0
+msgid "none"
+msgstr "без категорії"

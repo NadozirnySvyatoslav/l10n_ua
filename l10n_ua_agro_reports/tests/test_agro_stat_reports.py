@@ -25,8 +25,10 @@ class TestAgroStatReports(AgroOperationsTestCase):
         })
         cls.seed.l10n_ua_agro_material_type = 'seed'
         cls.fertilizer.l10n_ua_agro_material_type = 'fertilizer'
+        categ = cls.env['product.category'].create({'name': 'Сільгосппродукція (статзвіт)'})
+        categ.property_cost_method = 'average'
         cls.grain = cls.env['product.product'].create({
-            'name': 'Пшениця (статзвіт)', 'is_storable': True,
+            'name': 'Пшениця (статзвіт)', 'is_storable': True, 'categ_id': categ.id,
             'uom_id': cls.env.ref('uom.product_uom_kgm').id})
         cls.wheat.product_id = cls.grain
         cls.wheat.write({'base_moisture': 14.0, 'base_impurity': 1.0})
