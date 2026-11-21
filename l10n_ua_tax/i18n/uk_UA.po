@@ -559,7 +559,7 @@ msgstr "Податкова інспекція (ДПІ), де зареєстро�
 
 #. module: l10n_ua_tax
 #: model:ir.ui.menu,name:l10n_ua_tax.menu_ua_tax_root
-msgid "Taxes UA"
+msgid "Taxes"
 msgstr "Податки"
 
 #. module: l10n_ua_tax
