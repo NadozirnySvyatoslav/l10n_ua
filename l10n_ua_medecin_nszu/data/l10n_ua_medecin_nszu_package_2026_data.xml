@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Пакети ПМГ-2026. Порядок реалізації Програми медичних гарантій у 2026 р.
+        затверджено постановою КМУ від 31.12.2025 № 1808 (46 пакетів).
+        Підтверджено з офіційного повідомлення Уряду / МОЗ (02.01.2026):
+          * ПМД — капітаційна ставка 1007,3 грн на 1 задекларованого пацієнта на рік;
+          * ЕМД — базова капітаційна ставка 375 грн.
+        Решта тарифів не звірена з текстом постанови: base_tariff не задано,
+        tariff_to_confirm = True. Пакети 2025 року лишаються без змін.
+        Наступний рік: Налаштування → Пакети НСЗУ → «Копіювати на інший рік».
+    -->
+    <data noupdate="1">
+        <record id="package_pmd_capitation_2026" model="l10n_ua.medecin.nszu.package">
+            <field name="code">PMD-2026</field>
+            <field name="name">Первинна медична допомога (капітація)</field>
+            <field name="package_type">pmd_capitation</field>
+            <field name="payment_model">capitation</field>
+            <field name="year">2026</field>
+            <field name="base_tariff">1007.3</field>
+            <field name="tariff_to_confirm" eval="False"/>
+            <field name="description">&lt;p&gt;Капітаційна ставка ПМГ-2026 — 1007,3 грн на 1 задекларованого пацієнта на рік (постанова КМУ від 31.12.2025 № 1808). Реальна виплата залежить від вікового коефіцієнта і коригувальних факторів.&lt;/p&gt;</field>
+        </record>
+
+        <record id="package_emd_2026" model="l10n_ua.medecin.nszu.package">
+            <field name="code">EMD-2026</field>
+            <field name="name">Екстрена медична допомога</field>
+            <field name="package_type">emergency</field>
+            <field name="payment_model">global</field>
+            <field name="year">2026</field>
+            <field name="base_tariff">375.0</field>
+            <field name="tariff_to_confirm" eval="False"/>
+            <field name="description">&lt;p&gt;Базова капітаційна ставка ЕМД у ПМГ-2026 — 375 грн (постанова КМУ від 31.12.2025 № 1808); оплата — глобальна ставка з урахуванням коригувальних коефіцієнтів.&lt;/p&gt;</field>
+        </record>
+
+        <record id="package_childbirth_2026" model="l10n_ua.medecin.nszu.package">
+            <field name="code">CB-2026</field>
+            <field name="name">Медична допомога при пологах</field>
+            <field name="package_type">childbirth</field>
+            <field name="payment_model">per_case</field>
+            <field name="year">2026</field>
+            <field name="tariff_to_confirm" eval="True"/>
+        </record>
+
+        <record id="package_specialized_2026" model="l10n_ua.medecin.nszu.package">
+            <field name="code">SPEC-AMB-2026</field>
+            <field name="name">Спеціалізована амбулаторна допомога</field>
+            <field name="package_type">specialized</field>
+            <field name="payment_model">per_service</field>
+            <field name="year">2026</field>
+            <field name="tariff_to_confirm" eval="True"/>
+        </record>
+
+        <record id="package_hospital_2026" model="l10n_ua.medecin.nszu.package">
+            <field name="code">HOSP-2026</field>
+            <field name="name">Стаціонарна медична допомога</field>
+            <field name="package_type">hospital</field>
+            <field name="payment_model">per_case</field>
+            <field name="year">2026</field>
+            <field name="tariff_to_confirm" eval="True"/>
+        </record>
+    </data>
+</odoo>

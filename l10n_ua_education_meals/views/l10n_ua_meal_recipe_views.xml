@@ -36,6 +36,7 @@
                             <field name="protein_g"/>
                             <field name="fat_g"/>
                             <field name="carbohydrate_g"/>
+                            <field name="cost_per_portion"/>
                         </group>
                     </group>
                     <notebook>
@@ -43,9 +44,13 @@
                             <field name="ingredient_ids">
                                 <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
                                     <field name="name"/>
                                     <field name="gross_g"/>
                                     <field name="quantity_g"/>
+                                    <field name="product_qty"/>
+                                    <field name="product_uom_id"/>
+                                    <field name="cost" optional="show"/>
                                     <field name="note"/>
                                 </list>
                             </field>
