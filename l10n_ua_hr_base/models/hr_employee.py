@@ -1198,3 +1198,26 @@ class HrEmployee(models.Model):
         """Clears the job position field if it does not belong to the newly selected department"""
         if self.job_id and self.job_id not in self.allowed_job_ids:
             self.job_id = False
+
+    def _l10n_ua_employed_on(self, day):
+        """Whether the employee was under contract on that day.
+
+        A contract runs from the start date its versions carry to the end
+        date of the latest of them: every version of a contract repeats its
+        start, and only the last one is sure to know its end. A day inside no
+        contract is before the hire, after the dismissal or between two
+        contracts. An employee whose versions carry no contract period at all
+        — data imported without one — is taken to be under contract.
+        """
+        self.ensure_one()
+        latest = {}
+        for version in self.sudo().version_ids.filtered('contract_date_start'):
+            known = latest.get(version.contract_date_start)
+            if not known or version.date_version > known.date_version:
+                latest[version.contract_date_start] = version
+        if not latest:
+            return True
+        return any(
+            start <= day and (not version.contract_date_end
+                              or version.contract_date_end >= day)
+            for start, version in latest.items())
