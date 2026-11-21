@@ -27,6 +27,7 @@ import unittest
 
 from requests import PreparedRequest, Response, Session
 
+from odoo.fields import Command
 from odoo.modules.module import get_module_path
 from odoo.tests import tagged
 
@@ -168,10 +169,25 @@ class TestClickL10nUa(HttpCaseWithUserDemo):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        users = cls.env.ref('base.user_admin') | cls.user_demo
+        admin = cls.env.ref('base.user_admin')
+        users = admin | cls.user_demo
         if 'tour_enabled' in users._fields:
             users.tour_enabled = False
         cls.timeout = int(os.environ.get('L10N_UA_CLICKBOT_TIMEOUT') or 900)
+        cls.own_modules = {
+            name for name in cls.env['ir.module.module'].search([('state', '=', 'installed')]).mapped('name')
+            if name != THIS_MODULE and _is_repo_module(name)
+        }
+        # Most l10n_ua apps are gated by their own role groups (taxes,
+        # education, medicine, budget, ...), which admin does not have on a
+        # fresh database: give admin every internal group of the repository
+        # modules so that their menus are clicked too.  demo keeps its groups.
+        groups = cls.env['res.groups'].browse(cls.env['ir.model.data'].search([
+            ('model', '=', 'res.groups'), ('module', 'in', sorted(cls.own_modules)),
+        ]).mapped('res_id')).exists()
+        if 'share' in groups._fields:
+            groups = groups.filtered(lambda g: not g.share)
+        admin.write({'group_ids': [Command.link(g.id) for g in groups]})
         cls.target_modules = cls._target_modules()
         _logger.info("clickbot: modules whose apps are clicked: %s", ', '.join(sorted(cls.target_modules)))
 
@@ -186,10 +202,7 @@ class TestClickL10nUa(HttpCaseWithUserDemo):
     @classmethod
     def _target_modules(cls):
         Module = cls.env['ir.module.module']
-        own = {
-            name for name in Module.search([('state', '=', 'installed')]).mapped('name')
-            if name != THIS_MODULE and _is_repo_module(name)
-        }
+        own = cls.own_modules
         selected = [m.strip() for m in (os.environ.get('L10N_UA_CLICKBOT_MODULES') or '').split(',') if m.strip()]
         if not selected or selected == ['all']:
             return own
