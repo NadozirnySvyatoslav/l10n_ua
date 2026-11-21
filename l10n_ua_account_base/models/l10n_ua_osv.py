@@ -7,6 +7,9 @@ class L10nUaOsv(models.Model):
     _description = 'Trial Balance / OSV (Оборотно-сальдова відомість)'
     _order = 'period_start desc'
 
+    # Типи аналітики рахунку, для яких ОСВ розгортається по контрагентах.
+    _EXPAND_ANALYTICS = ('partner', 'employee')
+
     name = fields.Char(
         string='Name',
         compute='_compute_name',
@@ -30,6 +33,26 @@ class L10nUaOsv(models.Model):
         'l10n_ua.osv.line',
         'osv_id',
         string='Lines',
+    )
+    summary_line_ids = fields.One2many(
+        'l10n_ua.osv.line',
+        'osv_id',
+        string='Account Lines',
+        domain=[('is_detail', '=', False)],
+    )
+    detail_line_ids = fields.One2many(
+        'l10n_ua.osv.line',
+        'osv_id',
+        string='Partner Breakdown',
+        domain=[('is_detail', '=', True)],
+    )
+    expand_partners = fields.Boolean(
+        string='Expand by Partners',
+        help='Для рахунків з аналітикою по контрагентах або працівниках '
+             '(361, 631, 661, 68х тощо — поле «Тип аналітики» рахунку) '
+             'показати розгортку по кожному контрагенту і розгорнуте сальдо: '
+             'дебетове і кредитове сальдо рахунку — окремо, як суми сальдо '
+             'контрагентів. Решта рахунків — як у синтетичній ОСВ.',
     )
     state = fields.Selection(
         selection=[
@@ -101,7 +124,8 @@ class L10nUaOsv(models.Model):
         # Вимір розбивки: None (синтетична) / 'partner_id' (аналітична) /
         # quick-поле субконто (розбивка по обраному виду субконто).
         dim_field = None
-        if self.osv_type == 'analytic':
+        expand = self.osv_type == 'synthetic' and self.expand_partners
+        if self.osv_type == 'analytic' or expand:
             dim_field = 'partner_id'
         elif self.osv_type == 'subconto':
             if not self.subconto_type_id:
@@ -167,6 +191,10 @@ class L10nUaOsv(models.Model):
             acc['turnover_debit'] += row[-2] or 0.0
             acc['turnover_credit'] += row[-1] or 0.0
 
+        if expand:
+            self.line_ids = self._expanded_lines(data.values(), currency)
+            return True
+
         is_partner_dim = dim_field == 'partner_id'
         is_subconto = self.osv_type == 'subconto'
         lines = []
@@ -198,6 +226,78 @@ class L10nUaOsv(models.Model):
         self.line_ids = lines
         return True
 
+    @staticmethod
+    def _balance_vals(opening, turnover_debit, turnover_credit):
+        """Згорнуте сальдо одного рядка: нетто на початок/кінець у Дт або Кт."""
+        closing = opening + turnover_debit - turnover_credit
+        return {
+            'opening_debit': opening if opening > 0 else 0.0,
+            'opening_credit': -opening if opening < 0 else 0.0,
+            'turnover_debit': turnover_debit,
+            'turnover_credit': turnover_credit,
+            'closing_debit': closing if closing > 0 else 0.0,
+            'closing_credit': -closing if closing < 0 else 0.0,
+        }
+
+    def _expanded_lines(self, buckets, currency):
+        """Синтетична ОСВ з розгорткою по контрагентах (#588).
+
+        ``buckets`` — накопичувачі (рахунок, контрагент). Рахунки з аналітикою
+        по контрагентах/працівниках дають рядок рахунку з розгорнутим сальдо
+        (Дт і Кт — суми сальдо контрагентів окремо) і рядки-розгортку
+        ``is_detail``; решта рахунків — один рядок зі згорнутим сальдо, як у
+        звичайній синтетичній ОСВ.
+        """
+        money = ('opening_debit', 'opening_credit', 'turnover_debit',
+                 'turnover_credit', 'closing_debit', 'closing_credit')
+        by_account = {}
+        for acc in buckets:
+            if (currency.is_zero(acc['opening'])
+                    and currency.is_zero(acc['turnover_debit'])
+                    and currency.is_zero(acc['turnover_credit'])):
+                continue
+            by_account.setdefault(acc['account'], []).append(acc)
+
+        lines = []
+        for account, rows in by_account.items():
+            if account.ua_analytics_type not in self._EXPAND_ANALYTICS:
+                lines.append((0, 0, dict(self._balance_vals(
+                    sum(r['opening'] for r in rows),
+                    sum(r['turnover_debit'] for r in rows),
+                    sum(r['turnover_credit'] for r in rows),
+                ), account_id=account.id)))
+                continue
+
+            summary = dict.fromkeys(money, 0.0)
+            details = []
+            for row in sorted(rows, key=lambda r: r['dim'].display_name or ''):
+                vals = self._balance_vals(
+                    row['opening'], row['turnover_debit'], row['turnover_credit'])
+                for field in money:
+                    summary[field] += vals[field]
+                details.append((0, 0, dict(
+                    vals,
+                    account_id=account.id,
+                    partner_id=row['dim'].id or False,
+                    is_detail=True,
+                )))
+            lines.append((0, 0, dict(summary, account_id=account.id)))
+            lines += details
+        return lines
+
+    def action_open_lines(self):
+        """Рядки ОСВ окремим списком, згруповані по рахунках — для експорту."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.name,
+            'res_model': 'l10n_ua.osv.line',
+            'view_mode': 'list',
+            'views': [(self.env.ref(
+                'l10n_ua_account_base.l10n_ua_osv_line_view_list').id, 'list')],
+            'domain': [('osv_id', '=', self.id)],
+        }
+
     def action_confirm(self):
         self.write({'state': 'confirmed'})
 
@@ -208,8 +308,13 @@ class L10nUaOsv(models.Model):
 class L10nUaOsvLine(models.Model):
     _name = 'l10n_ua.osv.line'
     _description = 'OSV Line'
-    _order = 'account_id'
+    _order = 'account_id, is_detail, partner_id, id'
 
+    is_detail = fields.Boolean(
+        string='Breakdown Row',
+        default=False,
+        help='Рядок розгортки рахунку по контрагенту (ОСВ з розгорткою).',
+    )
     osv_id = fields.Many2one(
         'l10n_ua.osv',
         string='OSV',
