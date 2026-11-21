@@ -1247,6 +1247,27 @@ class HrEmployee(models.Model):
                 result |= employee
         return result
 
+    def _l10n_ua_dismissal_date_between(self, date_from, date_to):
+        """The day the employment ends inside the period, or False.
+
+        That is the end of a contract falling within the period after which
+        the employee is no longer under any contract — a contract followed by
+        a new one the next day (a transfer, a rehire) is not a dismissal.
+        """
+        self.ensure_one()
+        ends = {
+            version.contract_date_end
+            for version in self.sudo().with_context(
+                active_test=False).version_ids
+            if version.contract_date_end
+            and date_from <= version.contract_date_end <= date_to
+        }
+        for end in sorted(ends, reverse=True):
+            if (self._l10n_ua_employed_on(end)
+                    and not self._l10n_ua_employed_on(end + timedelta(days=1))):
+                return end
+        return False
+
     def _l10n_ua_own_calendar(self, day, version=None):
         """The employee's own working schedule on that day, when it differs
         from the company's.

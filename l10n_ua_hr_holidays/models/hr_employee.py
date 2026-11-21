@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from odoo import models, fields
 
 
@@ -53,3 +55,56 @@ class HrEmployee(models.Model):
                 balances._recompute_carryover_chain()
         return res
 
+    # Leave kinds compensated on dismissal (art. 24 of the Vacation Law):
+    # the annual leaves, basic and additional, and the additional leave of
+    # workers with children.
+    _L10N_UA_COMPENSATED_CATEGORIES = (
+        'annual_basic', 'annual_additional', 'annual_hazardous',
+        'annual_special', 'annual_irregular', 'social_children',
+    )
+
+    def _l10n_ua_unused_vacation_on(self, day):
+        """Unused vacation days on the last day of work.
+
+        Returns a list of ``(balance, days)`` — one accounting period per
+        leave type, the one containing `day`, with a positive balance. The
+        chain of periods is brought up to that day first for the leave types
+        whose balances are calculated automatically.
+        """
+        self.ensure_one()
+        Balance = self.env['hr.vacation.balance'].sudo()
+        leave_types = self.env['hr.work.entry.type'].sudo().search([
+            ('ua_leave_category', 'in', self._L10N_UA_COMPENSATED_CATEGORIES),
+            ('annual_days', '>', 0),
+        ])
+        result = []
+        for leave_type in leave_types:
+            if leave_type.ua_auto_calc_balance:
+                period = Balance._ensure_periods_up_to(self, leave_type, day)
+            else:
+                period = Balance.search([
+                    ('employee_id', '=', self.id),
+                    ('leave_type_id', '=', leave_type.id),
+                    ('period_start', '<=', day),
+                    ('period_end', '>=', day),
+                ], limit=1)
+            if not period:
+                continue
+            days = period._l10n_ua_unused_days_on(day)
+            if days > 0:
+                result.append((period, days))
+        return result
+
+    def _l10n_ua_average_daily_salary_on(self, day):
+        """Average daily salary for vacation pay and compensation on `day`
+        (Порядок №100: the 12 months before the month of `day`)."""
+        self.ensure_one()
+        start = datetime.combine(day, time.min)
+        leave = self.env['hr.leave'].new({
+            'employee_id': self.id,
+            'request_date_from': day,
+            'request_date_to': day,
+            'date_from': start,
+            'date_to': start,
+        })
+        return leave._calculate_average_salary()

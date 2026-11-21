@@ -626,20 +626,36 @@ class HrPayslip(models.Model):
         if not self.date_from or not self.date_to:
             return
 
-        # Simple calculation - count weekdays
         month_start = self.date_to.replace(day=1)
         month_end = month_start + relativedelta(months=1, days=-1)
+
+        # The norm without a timesheet: the employee's own schedule when it
+        # differs from the company's (six-day week, shifts), otherwise Monday
+        # to Friday. This module does not depend on the attendance sheet and
+        # its production calendar, so public holidays are not known here —
+        # under martial law they are working days anyway.
+        own_hours = self.employee_id._l10n_ua_schedule_hours(
+            month_start, month_end, version=self.version_id or None)
+
+        def is_working(day):
+            if own_hours is not None:
+                return own_hours.get(day, 0.0) > 0
+            return day.weekday() < 5
 
         total_scheduled = 0
         curr = month_start
         while curr <= month_end:
-            if curr.weekday() < 5:  # Monday to Friday
+            if is_working(curr):
                 total_scheduled += 1
             curr += relativedelta(days=1)
 
         daily_norm = self._daily_hour_norm()
+        work_rate = (self.version_id.work_rate or 1.0) if self.version_id else 1.0
         self.scheduled_days = total_scheduled
-        self.scheduled_hours = total_scheduled * daily_norm
+        if own_hours is not None:
+            self.scheduled_hours = sum(own_hours.values()) * work_rate
+        else:
+            self.scheduled_hours = total_scheduled * daily_norm
         
         # get amount of working days from timesheet
         if 'hr.timesheet.line' in self.env:
@@ -665,15 +681,51 @@ class HrPayslip(models.Model):
 
         # default if there is no timesheets: the working days of the period
         # the employee was under contract — hired or dismissed mid-month
-        # gets the part of the month, not the full norm.
+        # gets the part of the month, not the full norm. Days of an approved
+        # leave or sick leave are not worked: they are paid by their own
+        # accruals (see _generate_absence_accruals).
+        absent = self._l10n_ua_absence_days()
         worked = 0
+        worked_hours = 0.0
         curr = self.date_from
         while curr <= self.date_to:
-            if curr.weekday() < 5 and self.employee_id._l10n_ua_employed_on(curr):
+            if (is_working(curr) and curr not in absent
+                    and self.employee_id._l10n_ua_employed_on(curr)):
                 worked += 1
+                worked_hours += (own_hours[curr] * work_rate
+                                 if own_hours is not None else daily_norm)
             curr += relativedelta(days=1)
         self.worked_days = worked
-        self.worked_hours = worked * daily_norm
+        self.worked_hours = worked_hours
+
+    def _l10n_ua_absence_days(self):
+        """Days of the period the employee was on approved leave or on a
+        confirmed sick leave. Both models come from l10n_ua_hr_holidays /
+        hr_holidays, which this module does not require."""
+        self.ensure_one()
+        days = set()
+
+        def add(start, end):
+            day = max(start, self.date_from)
+            while day <= min(end, self.date_to):
+                days.add(day)
+                day += relativedelta(days=1)
+
+        if 'hr.leave' in self.env:
+            for leave in self.env['hr.leave'].sudo().search([
+                    ('employee_id', '=', self.employee_id.id),
+                    ('state', '=', 'validate'),
+                    ('request_date_from', '<=', self.date_to),
+                    ('request_date_to', '>=', self.date_from)]):
+                add(leave.request_date_from, leave.request_date_to)
+        if 'hr.sick.leave' in self.env:
+            for sick in self.env['hr.sick.leave'].sudo().search([
+                    ('employee_id', '=', self.employee_id.id),
+                    ('state', 'in', ('confirmed', 'paid')),
+                    ('date_from', '<=', self.date_to),
+                    ('date_to', '>=', self.date_from)]):
+                add(sick.date_from, sick.date_to)
+        return days
 
 
     @api.depends('version_id', 'version_id.salary_currency_id')
@@ -953,6 +1005,160 @@ class HrPayslip(models.Model):
 
         # Надбавка за вислугу років — #143.
         self._generate_seniority(version, params)
+
+        # Відпускні, лікарняні, компенсація відпустки при звільненні — #630.
+        self._generate_absence_accruals()
+
+    # ------------------------------------------------------------------
+    # Vacation pay, sick pay and compensation on dismissal (#630)
+    # ------------------------------------------------------------------
+
+    def _l10n_ua_accrual_type(self, code):
+        return self.env['hr.accrual.type'].search([('code', '=', code)], limit=1)
+
+    def _l10n_ua_paid_elsewhere(self, source):
+        """Whether another payslip (not cancelled) already accrued `source`."""
+        self.ensure_one()
+        return bool(self.env['hr.payslip.accrual'].sudo().search_count([
+            ('source_ref', '=', '%s,%s' % (source._name, source.id)),
+            ('payslip_id', '!=', self.id),
+            ('payslip_id.state', '!=', 'cancel'),
+        ]))
+
+    def _l10n_ua_has_manual(self, accrual_type):
+        """A line of this type entered by hand: the accountant priced it
+        already, so the automatic one is not added on top (same rule as for
+        the salary line)."""
+        return any(a.accrual_type_id == accrual_type and not a.is_auto_generated
+                   for a in self.accrual_ids)
+
+    def _generate_absence_accruals(self):
+        """Accrue what the absences of the period are paid with.
+
+        * Vacation pay (VACATION) for each approved paid leave starting in
+          the period, priced at the leave's average daily salary. It is paid
+          before the vacation (art. 21 of the Vacation Law), so the whole
+          leave goes to the month it starts in.
+        * Sick pay for each confirmed sick leave ending in the period — the
+          certificate is paid once closed: the days paid by the company
+          (SICK_EMP) and those paid by social insurance (SICK_FSS), or the
+          maternity benefit (MATERNITY) for a pregnancy certificate.
+        * Compensation for unused vacation (COMP_VAC) when the employment
+          ends in the period.
+
+        Each line is tied to its document (``source_ref``): a document that
+        another payslip has already accrued is skipped, and so is a type the
+        accountant entered by hand. Taxes follow the flags of the accrual
+        types, like every other line.
+        """
+        self.ensure_one()
+        if 'hr.leave' in self.env and hasattr(
+                self.env['hr.leave'], '_l10n_ua_vacation_pay'):
+            self._generate_vacation_pay()
+        if 'hr.sick.leave' in self.env:
+            self._generate_sick_pay()
+        if hasattr(self.env['hr.employee'], '_l10n_ua_unused_vacation_on'):
+            self._generate_vacation_compensation()
+
+    def _l10n_ua_add_accrual(self, accrual_type, source, quantity, rate,
+                             amount, notes):
+        if not accrual_type or amount <= 0:
+            return
+        self.env['hr.payslip.accrual'].create({
+            'payslip_id': self.id,
+            'accrual_type_id': accrual_type.id,
+            'quantity': quantity,
+            'rate': rate,
+            'amount': amount,
+            'is_auto_generated': True,
+            'source_ref': '%s,%s' % (source._name, source.id),
+            'notes': notes,
+        })
+
+    def _generate_vacation_pay(self):
+        self.ensure_one()
+        acc_type = self._l10n_ua_accrual_type('VACATION')
+        if not acc_type or self._l10n_ua_has_manual(acc_type):
+            return
+        leaves = self.env['hr.leave'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', '=', 'validate'),
+            ('request_date_from', '>=', self.date_from),
+            ('request_date_from', '<=', self.date_to),
+        ], order='request_date_from')
+        for leave in leaves:
+            if not leave._l10n_ua_is_vacation_pay() \
+                    or self._l10n_ua_paid_elsewhere(leave):
+                continue
+            days, average, amount = leave._l10n_ua_vacation_pay()
+            self._l10n_ua_add_accrual(
+                acc_type, leave, days, average, amount,
+                _('%(type)s %(start)s – %(end)s',
+                  type=leave.work_entry_type_id.name,
+                  start=leave.request_date_from.strftime('%d.%m.%Y'),
+                  end=leave.request_date_to.strftime('%d.%m.%Y')))
+
+    def _generate_sick_pay(self):
+        self.ensure_one()
+        employer_type = self._l10n_ua_accrual_type('SICK_EMP')
+        fss_type = self._l10n_ua_accrual_type('SICK_FSS')
+        maternity_type = self._l10n_ua_accrual_type('MATERNITY')
+        sick_leaves = self.env['hr.sick.leave'].sudo().search([
+            ('employee_id', '=', self.employee_id.id),
+            ('state', 'in', ('confirmed', 'paid')),
+            ('date_to', '>=', self.date_from),
+            ('date_to', '<=', self.date_to),
+        ], order='date_from')
+        skip_employer = self._l10n_ua_has_manual(employer_type)
+        skip_fss = self._l10n_ua_has_manual(fss_type)
+        skip_maternity = self._l10n_ua_has_manual(maternity_type)
+        for sick in sick_leaves:
+            if self._l10n_ua_paid_elsewhere(sick):
+                continue
+            pay = sick._l10n_ua_payment()
+            notes = _('%(name)s %(start)s – %(end)s, %(percent)s%%',
+                      name=sick.sick_leave_number or sick.name,
+                      start=sick.date_from.strftime('%d.%m.%Y'),
+                      end=sick.date_to.strftime('%d.%m.%Y'),
+                      percent=round(pay['percent']))
+            daily = round(pay['average'] * pay['percent'] / 100.0, 2)
+            if not skip_employer:
+                self._l10n_ua_add_accrual(
+                    employer_type, sick, pay['employer_days'], daily,
+                    pay['employer_amount'], notes)
+            if sick.sick_leave_type == 'pregnancy':
+                if not skip_maternity:
+                    self._l10n_ua_add_accrual(
+                        maternity_type, sick, pay['fss_days'], daily,
+                        pay['fss_amount'], notes)
+            elif not skip_fss:
+                self._l10n_ua_add_accrual(
+                    fss_type, sick, pay['fss_days'], daily,
+                    pay['fss_amount'], notes)
+
+    def _generate_vacation_compensation(self):
+        self.ensure_one()
+        acc_type = self._l10n_ua_accrual_type('COMP_VAC')
+        if not acc_type or self._l10n_ua_has_manual(acc_type):
+            return
+        dismissal = self.employee_id._l10n_ua_dismissal_date_between(
+            self.date_from, self.date_to)
+        if not dismissal:
+            return
+        unused = [
+            (balance, days) for balance, days
+            in self.employee_id._l10n_ua_unused_vacation_on(dismissal)
+            if not self._l10n_ua_paid_elsewhere(balance)
+        ]
+        if not unused:
+            return
+        average = self.employee_id._l10n_ua_average_daily_salary_on(dismissal)
+        for balance, days in unused:
+            self._l10n_ua_add_accrual(
+                acc_type, balance, days, average, round(days * average, 2),
+                _('%(type)s, %(period)s: %(days)s дн.',
+                  type=balance.leave_type_id.name,
+                  period=balance.period_label, days=days))
 
     def _generate_piece_work(self, version, params):
         """Створити авто-нарахування «Відрядна оплата» за нарядами періоду.

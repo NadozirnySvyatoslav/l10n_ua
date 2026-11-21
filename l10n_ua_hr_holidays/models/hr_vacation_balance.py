@@ -779,6 +779,24 @@ class HrVacationBalance(models.Model):
         compensation = compensable_days * avg_salary
         return round(compensation, 2)
 
+    def _l10n_ua_unused_days_on(self, day):
+        """Unused days of this period on `day` — the last day of work.
+
+        A work year interrupted by the dismissal gives only the part of its
+        entitlement earned up to that day (art. 24 of the Vacation Law
+        compensates the days the employee is entitled to, not the whole
+        year); a calendar-year type is granted for the year as a whole.
+        """
+        self.ensure_one()
+        entitled = self.entitled_days or 0.0
+        if (self.period_type == 'work' and self.period_start <= day
+                < self.period_end):
+            span = (self.period_end - self.period_start).days + 1
+            earned = (day - self.period_start).days + 1
+            entitled = round(entitled * earned / span, 2)
+        return round((self.carried_over or 0.0) + entitled
+                     - (self.used_days or 0.0), 2)
+
     def action_calculate_compensation(self):
         """Action to calculate and display compensation amount."""
         self.ensure_one()

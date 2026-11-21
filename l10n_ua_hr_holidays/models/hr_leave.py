@@ -1067,3 +1067,32 @@ class HrLeave(models.Model):
         if calendar_days > 0:
             return round(total_earnings / calendar_days, 2)
         return 0.0
+
+    # Leave categories not paid as vacation pay from the payroll: sick leave
+    # and maternity are paid through hr.sick.leave (company days and social
+    # insurance), childcare by the state, unpaid leave not at all.
+    _L10N_UA_NOT_VACATION_PAY = ('sick', 'maternity', 'childcare', 'unpaid')
+
+    def _l10n_ua_is_vacation_pay(self):
+        """Whether the payroll pays this leave as vacation pay (Відпускні)."""
+        self.ensure_one()
+        leave_type = self.work_entry_type_id
+        return bool(
+            leave_type.ua_leave_category and leave_type.is_paid
+            and leave_type.ua_leave_category not in self._L10N_UA_NOT_VACATION_PAY
+            and not self.sick_leave_id)
+
+    def _l10n_ua_vacation_pay(self):
+        """Vacation pay of this leave: ``(days, average_daily_salary, amount)``.
+
+        The average daily salary is the one stored on the leave (computed
+        when it was requested, or recalculated by hand). A leave approved
+        without it is priced now, by the same rule, without writing to the
+        approved leave.
+        """
+        self.ensure_one()
+        average = self.average_daily_salary
+        if not average and self.date_from:
+            average = self._calculate_average_salary()
+        days = self.calendar_days
+        return days, average, round(days * (average or 0.0), 2)

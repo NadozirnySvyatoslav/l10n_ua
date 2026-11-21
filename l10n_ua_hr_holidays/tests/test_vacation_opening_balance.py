@@ -108,6 +108,21 @@ class TestVacationOpeningBalance(TransactionCase):
         self.assertEqual(chain[0].period_start, date(2024, 3, 1))
         self.assertEqual(chain[0].carried_over, 0)
 
+    def test_compensable_days_prorated(self):
+        balance = self.Balance.create({
+            'employee_id': self.employee.id,
+            'leave_type_id': self.annual.id,
+            'period_start': date(2025, 3, 1),
+            'period_end': date(2026, 2, 28),
+            'period_index': 9,
+            'entitled_days': 24,
+            'carried_over': 10,
+        })
+        # 122 days of 365 earned by 30.06.2025.
+        self.assertEqual(balance._l10n_ua_unused_days_on(date(2025, 6, 30)),
+                         round(10 + 24 * 122 / 365, 2))
+        self.assertEqual(balance._l10n_ua_unused_days_on(date(2026, 2, 28)), 34)
+
     def test_migration_drops_backfilled_periods(self):
         """Periods backfilled from the hire date by the old code, with no
         leave on them, are removed; the chain restarts with nothing carried."""
