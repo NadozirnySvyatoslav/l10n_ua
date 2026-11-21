@@ -394,3 +394,36 @@ class HrSickLeave(models.Model):
 
     def action_draft(self):
         self.write({'state': 'draft'})
+
+    def _l10n_ua_payment(self):
+        """Payment split of this sick leave, for the payroll.
+
+        Returns a dict with ``employer_days``/``employer_amount`` (the first
+        days, paid by the company) and ``fss_days``/``fss_amount`` (paid by
+        the Pension Fund as social insurance), plus ``average`` and
+        ``percent``. A sick leave confirmed without "Calculate" is priced
+        now, by the same rules, without writing to it.
+        """
+        self.ensure_one()
+        rec = self
+        if not rec.average_daily_salary:
+            rec = self.new({
+                'employee_id': self.employee_id.id,
+                'company_id': self.company_id.id,
+                'date_from': self.date_from,
+                'date_to': self.date_to,
+                'sick_leave_type': self.sick_leave_type,
+                'insurance_experience_years': (
+                    self.insurance_experience_years
+                    or self.employee_id.insurance_experience or 0.0),
+                'average_daily_salary': self._calculate_average_salary(),
+            })
+        return {
+            'average': rec.average_daily_salary,
+            'percent': rec.payment_percent,
+            'employer_days': rec.employer_days if rec.employer_amount else 0,
+            'employer_amount': round(rec.employer_amount, 2),
+            'fss_days': (rec.calendar_days if rec.sick_leave_type == 'pregnancy'
+                         else rec.fss_days),
+            'fss_amount': round(rec.fss_amount, 2),
+        }

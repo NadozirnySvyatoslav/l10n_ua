@@ -2155,3 +2155,18 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_holidays.report_vacation_order_document
 msgid "тривалістю"
 msgstr ""
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee__l10n_ua_vacation_opening_date
+msgid "Vacation Opening Balance Date"
+msgstr "Дата вхідного залишку відпустки"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_hr_employee__l10n_ua_vacation_opening_days
+msgid "Vacation Opening Balance (days)"
+msgstr "Вхідний залишок відпустки (днів)"
+
+#. module: l10n_ua_hr_holidays
+#: model:ir.model.fields,field_description:l10n_ua_hr_holidays.field_res_company__l10n_ua_vacation_accounting_start
+msgid "Vacation Accounting Start"
+msgstr "Початок обліку відпусток"
