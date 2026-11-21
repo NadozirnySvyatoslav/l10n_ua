@@ -2,7 +2,7 @@
 <odoo>
     <!-- Top-level menu under Accounting -> Configuration -->
     <menuitem id="menu_l10n_ua_budget_root"
-              name="Бюджетний облік (UA)"
+              name="Бюджетний облік"
               parent="account.menu_finance_configuration"
               sequence="100"
               groups="group_ua_budget_user"/>
