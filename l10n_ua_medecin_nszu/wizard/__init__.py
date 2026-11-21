@@ -1,0 +1,1 @@
+from . import l10n_ua_medecin_nszu_package_copy_wizard

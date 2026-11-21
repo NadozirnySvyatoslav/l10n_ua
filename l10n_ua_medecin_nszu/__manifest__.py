@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin НСЗУ Contract',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Human Resources/Healthcare',
     'summary': 'Договори з НСЗУ, пакети медичних послуг, капітація ПМД',
     'description': """
@@ -12,7 +12,8 @@ Ukraine Medecin НСЗУ
 * Договір НСЗУ (`l10n_ua.medecin.nszu.contract`) з lifecycle:
   draft → submitted → active → expired / terminated
 * Пакети медичних послуг (`l10n_ua.medecin.nszu.package`) — каталог
-  ПМП, що замовляє НСЗУ (ПМД-капітація, специфікації, ЕМД, тощо)
+  ПМП, що замовляє НСЗУ (ПМД-капітація, специфікації, ЕМД, тощо);
+  пакети ПМГ-2025 і ПМГ-2026, майстер копіювання пакетів на наступний рік
 * Рядки договору з прив'язкою до пакету і тарифу
 * Розрахунок капітації для ПМД (Постанова КМУ № 240 «Про затвердження
   Порядку реалізації державних гарантій медичного обслуговування»):
@@ -38,7 +39,9 @@ Ukraine Medecin НСЗУ
         'security/multicompany_security.xml',
         'data/ir_sequence_data.xml',
         'data/l10n_ua_medecin_nszu_package_data.xml',
+        'data/l10n_ua_medecin_nszu_package_2026_data.xml',
         'views/l10n_ua_medecin_nszu_package_views.xml',
+        'wizard/l10n_ua_medecin_nszu_package_copy_wizard_views.xml',
         'views/l10n_ua_medecin_nszu_contract_views.xml',
         'views/menu_views.xml',
     ],

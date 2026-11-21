@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_package_copy_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_ua.medecin.nszu.package.copy.wizard.form</field>
+        <field name="model">l10n_ua.medecin.nszu.package.copy.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Копіювання пакетів НСЗУ">
+                <p class="text-muted">
+                    Створює пакети на новий рік на основі пакетів року-джерела
+                    (рік у коді пакета замінюється, напр. PMD-2026 → PMD-2027).
+                    Пакети, що вже існують у році призначення, пропускаються.
+                </p>
+                <group>
+                    <group>
+                        <field name="source_year" options="{'format': false}"/>
+                        <field name="target_year" options="{'format': false}"/>
+                    </group>
+                    <group>
+                        <field name="keep_tariff"/>
+                        <field name="mark_to_confirm"/>
+                    </group>
+                </group>
+                <field name="package_ids" widget="many2many_tags"
+                       domain="[('year', '=', source_year)]"
+                       placeholder="Усі активні пакети року-джерела"/>
+                <footer>
+                    <button name="action_copy" type="object" string="Копіювати"
+                            class="btn-primary"/>
+                    <button special="cancel" string="Скасувати"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_package_copy_wizard" model="ir.actions.act_window">
+        <field name="name">Копіювати пакети на інший рік</field>
+        <field name="res_model">l10n_ua.medecin.nszu.package.copy.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_l10n_ua_medecin_nszu_package"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids" eval="[(4, ref('l10n_ua_medecin_base.group_ua_medecin_manager'))]"/>
+    </record>
+</odoo>
