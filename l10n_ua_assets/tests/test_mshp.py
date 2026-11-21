@@ -1,5 +1,8 @@
 """МШП (рах. 22): передача в експлуатацію, забалансовий облік, списання (#204)."""
 
+from datetime import date
+
+from odoo import fields
 from odoo.tests import TransactionCase, tagged
 from odoo.exceptions import UserError
 
@@ -102,3 +105,28 @@ class TestMshp(TransactionCase):
         rec.action_transfer()
         in_use = self.env['l10n_ua.mshp'].search([('state', '=', 'in_use')])
         self.assertIn(rec, in_use)
+
+    # --- #626: дата документа списання ---
+
+    def test_write_off_uses_document_date(self):
+        rec = self._mshp(date=date(2025, 3, 1))
+        self.assertEqual(rec.document_date, fields.Date.context_today(rec))
+        rec.action_transfer()
+        self.assertEqual(rec.move_id.date, date(2025, 3, 1))
+        self.assertFalse(rec.document_date)
+        rec.document_date = date(2025, 10, 15)
+        rec.action_write_off()
+        self.assertEqual(rec.writeoff_date, date(2025, 10, 15))
+
+    def test_write_off_without_document_date_is_today(self):
+        rec = self._mshp(date=date(2025, 3, 1))
+        rec.action_transfer()
+        rec.action_write_off()
+        self.assertEqual(rec.writeoff_date, fields.Date.context_today(rec))
+
+    def test_write_off_before_transfer_raises(self):
+        rec = self._mshp(date=date(2025, 3, 1))
+        rec.action_transfer()
+        rec.document_date = date(2025, 2, 1)
+        with self.assertRaises(UserError):
+            rec.action_write_off()
