@@ -90,6 +90,8 @@ jobs:
           python -m pip install -q -r "$ODOO_SRC/requirements.txt"
           # external_dependencies of the l10n_ua modules not in Odoo's requirements
           python -m pip install -q httpx h2 paramiko
+          # HttpCase talks to Chrome through websocket-client (not in requirements.txt)
+          python -m pip install -q websocket-client
           python -c "import sys; sys.path.insert(0, '$ODOO_SRC'); import odoo.release as r; print('Odoo', r.version)"
           google-chrome --version
 
@@ -132,25 +134,9 @@ jobs:
             --test-enable --test-tags click_l10n_ua --stop-after-init \
             2>&1 | tee "$OUT/odoo-clickbot.log"
 
-      - name: Summary
+      - name: Report
         if: always() && steps.select.outputs.modules != 'none'
-        run: |
-          python3 - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
-          import json, os
-          path = os.path.join(os.environ['OUT'], 'clickbot-report.json')
-          if not os.path.exists(path):
-              print('### Clickbot\n\nNo report (the run stopped before the test finished).')
-              raise SystemExit
-          rows = json.load(open(path, encoding='utf-8'))
-          failed = [r for r in rows if not r.get('ok')]
-          print('### Clickbot: %d app runs, %d failed\n' % (len(rows), len(failed)))
-          print('| app | user | result | s |\n|---|---|---|---|')
-          for r in rows:
-              print('| %s (`%s`) | %s | %s | %s |' % (r['name'], r['app'], r['login'], 'ok' if r.get('ok') else '**FAILED**', r['seconds']))
-          with open(os.path.join(os.environ['OUT'], 'failed-apps.txt'), 'w', encoding='utf-8') as f:
-              for r in failed:
-                  f.write('%s %s\n%s\n\n' % (r['app'], r['login'], r.get('error', '')))
-          EOF
+        run: python3 tools/clickbot/report.py "$OUT"
 
       - name: Upload logs
         if: always() && steps.select.outputs.modules != 'none'

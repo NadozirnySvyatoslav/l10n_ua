@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import time
+import unittest
 
 from requests import PreparedRequest, Response, Session
 
@@ -228,6 +229,10 @@ class TestClickL10nUa(HttpCaseWithUserDemo):
                         '/odoo', code, 'odoo.isReady === true', login=login,
                         timeout=self.timeout, success_signal=DONE_SIGNAL,
                     )
+                except unittest.SkipTest as e:
+                    # e.g. Chrome or websocket-client missing: not a pass
+                    result.update(ok=False, skipped=True, error=str(e))
+                    raise
                 except BaseException as e:
                     result.update(ok=False, error=str(e)[:20000])
                     raise
@@ -237,7 +242,8 @@ class TestClickL10nUa(HttpCaseWithUserDemo):
                     result['seconds'] = round(time.time() - start)
                     self.results.append(result)
                     _logger.info("clickbot: %s as %s: %s in %ss", xmlid, login,
-                                 'ok' if result.get('ok') else 'FAILED', result['seconds'])
+                                 'ok' if result.get('ok') else 'SKIPPED' if result.get('skipped') else 'FAILED',
+                                 result['seconds'])
 
     def test_01_click_as_admin(self):
         self._click_apps('admin', self.env.ref('base.user_admin'))
