@@ -2,6 +2,7 @@
 <odoo noupdate="1">
 
     <record id="seq_currency_exchange" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Купівля/продаж валюти</field>
         <field name="code">l10n_ua.currency.exchange</field>
         <field name="prefix">ВАЛ-</field>
