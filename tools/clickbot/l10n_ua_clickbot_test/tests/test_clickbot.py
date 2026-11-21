@@ -44,6 +44,10 @@ THIS_MODULE = 'l10n_ua_clickbot_test'
 #       meant to open a form; errors raised on this menu are tolerated.
 #   core_race -- a race in core Odoo, the result is not deterministic and
 #       the error may be reported on the next menu; the menu is not clicked.
+#   opens_modal -- core list whose rows open a dialog instead of a form: the
+#       clickbot cannot go back, the dialog stays open and every following
+#       menu of the app fails ("Component is destroyed", timeouts on "New");
+#       the menu is not clicked.
 EXCEPTIONS = {
     'l10n_ua_stock_forms.menu_material_report': (
         'rows_not_openable', "M-19 material report: rows are report lines, intentionally not openable"),
@@ -55,10 +59,12 @@ EXCEPTIONS = {
         'rows_not_openable', "core Timesheets report by project: report list"),
     'hr_timesheet.timesheet_menu_report_timesheet_by_task': (
         'rows_not_openable', "core Timesheets report by task: report list"),
+    'hr_skills.hr_certification_menu': (
+        'opens_modal', "core Certifications (hr_skills): rows call open_hr_employee_skill_modal"),
     'hr_skills.menu_learnings_training_attendances': (
         'core_race', "core race in Training Attendances (hr_skills)"),
 }
-SKIPPED_KINDS = {'core_race'}
+SKIPPED_KINDS = {'core_race', 'opens_modal'}
 
 DONE_SIGNAL = 'l10n_ua clickbot done'
 
