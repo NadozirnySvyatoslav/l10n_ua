@@ -109,6 +109,22 @@
                         <field name="depreciation_account_id"/>
                     </group>
 
+                    <group string="Проводка введення в експлуатацію"
+                           help="Порожні рахунки успадковуються з групи ОЗ">
+                        <group>
+                            <field name="no_commission_move"
+                                   readonly="commission_move_id"/>
+                            <field name="commission_move_id"
+                                   invisible="not commission_move_id"/>
+                        </group>
+                        <group>
+                            <field name="fixed_asset_account_id"
+                                   invisible="no_commission_move"/>
+                            <field name="commission_account_id"
+                                   invisible="no_commission_move"/>
+                        </group>
+                    </group>
+
                     <!-- Write-off section -->
                     <group invisible="state != 'close'">
                         <group string="Списання">

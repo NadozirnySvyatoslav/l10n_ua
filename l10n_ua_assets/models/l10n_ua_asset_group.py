@@ -42,6 +42,26 @@ class L10nUaAssetGroup(models.Model):
         help='Рахунок накопиченого зносу за замовч. (131)',
     )
 
+    # --- Commissioning entry (Дт 10х / Кт 152) ---
+    create_commission_move = fields.Boolean(
+        string='Проводка введення в експлуатацію',
+        help='При введенні ОЗ цієї групи в експлуатацію формувати проводку '
+             'Дт 10х / Кт 152 (або інший рахунок джерела) на первісну вартість. '
+             'Вимкніть, якщо первісна вартість потрапляє на 10х з рахунку '
+             'постачальника чи вхідних залишків.',
+    )
+    fixed_asset_account_id = fields.Many2one(
+        'account.account',
+        string='Рахунок ОЗ (Дт 10х)',
+        help='Рахунок обліку ОЗ за замовч. (103–109)',
+    )
+    commission_account_id = fields.Many2one(
+        'account.account',
+        string='Рахунок джерела (Кт 152/631)',
+        help='Рахунок, з якого ОЗ надходить при введенні в експлуатацію '
+             '(152 «Придбання ОЗ», 631 тощо)',
+    )
+
     active = fields.Boolean(
         default=True,
     )
