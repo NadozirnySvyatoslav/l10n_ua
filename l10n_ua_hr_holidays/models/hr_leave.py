@@ -978,8 +978,10 @@ class HrLeave(models.Model):
         """
         self.ensure_one()
 
-        date_to = self.date_from.date() - relativedelta(days=1)
-        date_from = date_to - relativedelta(months=12) + relativedelta(days=1)
+        # Billing period: the 12 calendar months before the month the
+        # vacation starts in (Порядок №100, п. 2).
+        date_to = self.date_from.date().replace(day=1) - relativedelta(days=1)
+        date_from = (date_to - relativedelta(months=11)).replace(day=1)
 
         # Get payslips for the period
         # Розрахунковий листок дає `l10n_ua_hr_salary`, якого цей модуль не
@@ -994,15 +996,28 @@ class HrLeave(models.Model):
         if not payslips:
             # Fallback to version wage (Odoo 19 uses version_ids instead of contract_id)
             version = self.employee_id.current_version_id
-            if version and version.wage:
-                # Оклад може бути у валюті — курс на початок відпустки.
-                wage = version._l10n_ua_wage_in_company_currency(date_to)
-                return round(wage / 29.3, 2)
+            if version:
+                # Оклад може бути у валюті — курс на початок відпустки. Без
+                # окладу у версії — посадовий оклад зі штатного розпису:
+                # саме там він і живе в українській практиці.
+                wage = version._l10n_ua_effective_wage(date_to)
+                if wage:
+                    return round(wage / 29.3, 2)
             return 0.0
 
         # Calculate total earnings from payslip lines
         total_earnings = 0.0
         excluded_days = 0
+
+        # Only the months the employee actually worked in the period count
+        # (Порядок №100, п. 2): whoever has worked fewer than 12 months gets
+        # the average of those months, not their earnings spread over a year.
+        covered_days = set()
+        for payslip in payslips:
+            day = payslip.date_from
+            while day <= payslip.date_to:
+                covered_days.add(day)
+                day += relativedelta(days=1)
 
         for payslip in payslips:
             # УВАГА: береться весь нарахований дохід — див. коментар-близнюк
@@ -1030,15 +1045,17 @@ class HrLeave(models.Model):
             excluded_days = sum(excluded_leaves.mapped('number_of_days'))
 
         # Count public holidays in the calculation period
-        public_holidays = self.env['resource.calendar.leaves'].search_count([
-            ('resource_id', '=', False),
-            ('date_from', '>=', date_from),
-            ('date_to', '<=', date_to),
+        public_holidays = len([
+            holiday for holiday in self.env['resource.calendar.leaves'].search([
+                ('resource_id', '=', False),
+                ('date_from', '>=', date_from),
+                ('date_to', '<=', date_to),
+            ]) if holiday.date_from.date() in covered_days
         ])
 
         # Calculate calendar days in period (excluding public holidays and excluded periods)
         # Formula per CMU Resolution No. 100: earnings / (calendar days - public holidays - excluded days)
-        calendar_days = (date_to - date_from).days + 1 - public_holidays - excluded_days
+        calendar_days = len(covered_days) - public_holidays - excluded_days
 
         if calendar_days > 0:
             return round(total_earnings / calendar_days, 2)
