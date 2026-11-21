@@ -206,6 +206,7 @@ class TestAssetInventory(TransactionCase):
         inv.line_ids.write({
             'surplus_name': 'Знайдений принтер',
             'surplus_value': 5000,
+            'surplus_group_id': self.asset_group.id,
         })
         inv.action_done()
         self.assertEqual(inv.state, 'done')
@@ -281,3 +282,80 @@ class TestAssetInventory(TransactionCase):
         inv.action_done()
         with self.assertRaises(UserError):
             inv.unlink()
+
+    # --- #627: лишок → ОЗ з групою, строком, рахунками та актом введення ---
+
+    def _surplus_inventory(self, **line_vals):
+        inv = self.env['l10n_ua.asset.inventory'].create({**self._common_vals()})
+        inv.action_add_surplus()
+        inv.line_ids.write({
+            'surplus_name': 'Знайдений сканер',
+            'surplus_value': 12000,
+            **line_vals,
+        })
+        inv.action_done()
+        return inv, inv.line_ids[0].created_asset_id
+
+    def test_surplus_asset_takes_group_and_life(self):
+        expense = self.env['account.account'].create({
+            'code': '923901', 'name': 'Амортизація', 'account_type': 'expense',
+            'company_ids': [(4, self.company.id)]})
+        self.asset_group.write({
+            'depreciation_journal_id': self.journal.id,
+            'expense_account_id': expense.id,
+        })
+        inv, asset = self._surplus_inventory(
+            surplus_group_id=self.asset_group.id,
+            surplus_useful_life=24,
+            surplus_inventory_number='INV-777',
+        )
+        self.assertEqual(asset.state, 'open')
+        self.assertEqual(asset.group_id, self.asset_group)
+        self.assertEqual(asset.useful_life, 24)
+        self.assertEqual(asset.inventory_number, 'INV-777')
+        self.assertEqual(asset.commission_date, date(2025, 6, 30))
+        self.assertTrue(asset.commission_act_number)
+        self.assertEqual(asset.fixed_asset_account_id, self.acc_asset)
+        self.assertEqual(asset.depreciation_account_id, self.acc_accum)
+        # Амортизація рахується й проводиться з наступного місяця.
+        asset.action_compute_depreciation()
+        first = asset.depreciation_line_ids.sorted('date')[0]
+        self.assertEqual(first.date, date(2025, 7, 31))
+        self.assertAlmostEqual(first.amount, 500, places=2)
+        first.action_post()
+        self.assertTrue(first.move_id)
+
+    def test_surplus_life_defaults_from_group(self):
+        inv, asset = self._surplus_inventory(surplus_group_id=self.asset_group.id)
+        self.assertEqual(asset.state, 'open')
+        self.assertEqual(asset.useful_life, 60)
+
+    def test_surplus_without_group_is_draft(self):
+        inv, asset = self._surplus_inventory()
+        self.assertTrue(asset)
+        self.assertEqual(asset.state, 'draft')
+        self.assertFalse(asset.commission_act_number)
+        # Проводка Дт 10 / Кт 746 сформована інвентаризацією.
+        self.assertTrue(inv.move_id)
+        self.assertTrue(asset.no_commission_move)
+
+    def test_surplus_no_double_entry_with_commission_move(self):
+        """Лишок не отримує другої проводки Дт 10 / Кт 152 (#628)."""
+        acc_152 = self.env['account.account'].create({
+            'code': '152901', 'name': 'Придбання ОЗ',
+            'account_type': 'asset_non_current',
+            'company_ids': [(4, self.company.id)]})
+        self.asset_group.write({
+            'create_commission_move': True,
+            'depreciation_journal_id': self.journal.id,
+            'fixed_asset_account_id': self.acc_asset.id,
+            'commission_account_id': acc_152.id,
+        })
+        inv, asset = self._surplus_inventory(surplus_group_id=self.asset_group.id)
+        self.assertEqual(asset.state, 'open')
+        self.assertFalse(asset.commission_move_id)
+        # Повторне введення після повернення в чернетку теж без проводки.
+        asset.action_draft()
+        asset.commission_date = date(2025, 7, 1)
+        asset.action_commission()
+        self.assertFalse(asset.commission_move_id)
