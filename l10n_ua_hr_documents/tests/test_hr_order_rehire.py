@@ -330,9 +330,11 @@ class TestHrOrderRehire(TransactionCase):
             self.assertEqual(version.termination_order_date, order.date)
             self.assertFalse(version.contract_date_end,
                              'no period on record, nothing to close')
-        self.assertEqual(
-            employee.with_context(active_test=False).departure_date,
-            date(2025, 6, 30))
+        # Core keeps no departure for an employee without a contract (it
+        # refuses one), so there is nothing to hold a departure date; the
+        # card is archived all the same.
+        self.assertFalse(order.departure_id)
+        self.assertFalse(employee.active)
 
     def test_editing_a_past_hiring_order_keeps_the_contract_closed(self):
         """The sync runs on every write touching the order's job, dates or
