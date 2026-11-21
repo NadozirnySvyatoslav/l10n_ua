@@ -1,4 +1,4 @@
-import { Component, onWillDestroy, onWillStart, useState } from "@odoo/owl";
+import { Component, onWillDestroy, onWillStart, proxy, status, t, useProps } from "@odoo/owl";
 import { browser } from "@web/core/browser/browser";
 import { deserializeDate, formatDate } from "@web/core/l10n/dates";
 import { RPCError } from "@web/core/network/rpc";
@@ -53,15 +53,15 @@ export function materialReportPeriodProps(controller, reload) {
  */
 export class MaterialReportPeriodRange extends Component {
     static template = "l10n_ua_stock_forms.MaterialReportPeriodRange";
-    static props = {
-        wizardId: { type: [Number, Boolean], optional: true },
-        onPeriodChanged: Function,
-    };
+    props = useProps({
+        wizardId: t.or([t.number(), t.boolean()]).optional(),
+        onPeriodChanged: t.function(),
+    });
 
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
-        this.state = useState({
+        this.state = proxy({
             available: false,
             value: [false, false],
             pending: false,
@@ -159,11 +159,20 @@ export class MaterialReportPeriodRange extends Component {
      * and re-reading one record is cheaper than getting the caption wrong.
      */
     async onApplied() {
+        // onClose also fires when the dialog goes away because the user left
+        // the report (a menu click): the button is destroyed by then, and its
+        // services refuse to be called ("Component is destroyed").
+        if (status(this) === "destroyed") {
+            return;
+        }
         this.state.pending = true;
         try {
             await this.loadPeriod();
         } finally {
             this.state.pending = false;
+        }
+        if (status(this) === "destroyed") {
+            return;
         }
         await this.props.onPeriodChanged();
         this.highlight();

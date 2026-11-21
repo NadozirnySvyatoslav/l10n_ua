@@ -1,17 +1,15 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { Component, markup, useState, onWillStart, onWillUpdateProps } from "@odoo/owl";
+import { Component, markup, proxy, onWillStart, onWillUpdateProps, useProps } from "@odoo/owl";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 export class XmlViewerField extends Component {
     static template = "l10n_ua_tax_cabinet.XmlViewerField";
-    static props = {
-        ...standardFieldProps,
-    };
+    props = useProps(standardFieldProps);
 
     setup() {
-        this.state = useState({
+        this.state = proxy({
             content: '',
             loading: true,
             error: null,

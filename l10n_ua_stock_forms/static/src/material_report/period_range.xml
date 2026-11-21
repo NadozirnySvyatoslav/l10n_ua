@@ -8,14 +8,14 @@
          question never arises. Changing it is a job for the dialog behind the
          button, where the two dates are ordinary form fields. -->
     <t t-name="l10n_ua_stock_forms.MaterialReportPeriodRange">
-        <div t-if="state.available"
+        <div t-if="this.state.available"
              class="o_l10n_ua_material_report_period d-print-none">
             <button class="btn btn-secondary text-nowrap"
-                    t-att-class="{ o_period_just_applied: state.justApplied }"
-                    t-on-click="onOpen">
-                <i t-if="state.pending" class="fa fa-fw fa-circle-o-notch fa-spin me-1"/>
+                    t-att-class="{ o_period_just_applied: this.state.justApplied }"
+                    t-on-click="this.onOpen">
+                <i t-if="this.state.pending" class="fa fa-fw fa-circle-o-notch fa-spin me-1"/>
                 <i t-else="" class="fa fa-fw fa-calendar me-1"/>
-                <t t-out="label"/>
+                <t t-out="this.label"/>
             </button>
         </div>
     </t>

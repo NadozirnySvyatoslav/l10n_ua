@@ -2,7 +2,7 @@
 
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { Component, useState, onWillStart, onWillUnmount } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, proxy, useProps } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { checkLibPresent, createSigner, listCAs, KEY_CA_MISMATCH } from "./kep_sign_service";
 
@@ -41,7 +41,7 @@ function saveCa(name) {
  */
 export class KepSignAction extends Component {
     static template = "l10n_ua_sign.KepSignAction";
-    static props = { "*": true };
+    props = useProps();
 
     setup() {
         this.orm = useService("orm");
@@ -54,7 +54,7 @@ export class KepSignAction extends Component {
         this.resId = params.res_id;
         this.callKwargs = params.mode ? { context: { kep_mode: params.mode } } : {};
 
-        this.state = useState({
+        this.state = proxy({
             phase: "loading", // loading | ready | done | error
             busy: false,
             error: null,
