@@ -14,12 +14,56 @@ class AgroHarvestReceipt(models.Model):
         help='Справедлива вартість мінус витрати на місці продажу або планова собівартість, грн/кг.')
     valuation_amount = fields.Monetary(string='Valuation', readonly=True, copy=False)
     account_move_id = fields.Many2one('account.move', string='Journal Entry', readonly=True, copy=False)
+    cost_calculation_id = fields.Many2one(
+        'l10n_ua.agro.cost.calculation', string='Cost Calculation', readonly=True, copy=False,
+        index='btree_not_null')
+    cost_adjustment = fields.Monetary(
+        string='Cost Adjustment', readonly=True, copy=False,
+        help='Доведення планової собівартості до фактичної калькуляцією сезону — '
+             'частка цього оприбуткування; змінює й вартість на складі.')
 
     def action_done(self):
         drafts = self.filtered(lambda r: r.state == 'draft')
+        # оцінка — до проведення руху: склад бере з неї вартість вхідного руху
+        drafts.filtered(lambda r: r.product_id and r.credit_weight > 0)._compute_valuation()
         res = super().action_done()
         drafts.filtered(lambda r: r.state == 'done')._post_valuation()
         return res
+
+    def _l10n_ua_agro_stock_value(self):
+        """Вартість оприбуткування на складі — та сама, що на рахунку 27."""
+        self.ensure_one()
+        return self.valuation_amount + self.cost_adjustment
+
+    def _compute_valuation(self):
+        for receipt in self:
+            receipt._check_cost_method()
+            price = receipt._valuation_price()
+            amount = receipt.company_id.currency_id.round(price * receipt.credit_weight)
+            receipt.write({'valuation_price': price, 'valuation_amount': amount, 'cost_adjustment': 0.0})
+
+    def _check_cost_method(self):
+        """За стандартною ціною склад оцінює залишок як ціна товару × кількість,
+        а не за оприбуткуваннями — оцінка врожаю на склад не потрапить, і закриття
+        складу зніме її з рахунку 27."""
+        self.ensure_one()
+        product = self.product_id.with_company(self.company_id)
+        if product.is_storable and product.cost_method == 'standard':
+            raise UserError(self.env._(
+                '%(product)s is costed at the standard price (category: %(category)s). The harvest '
+                'is valued under P(S)BO 30 by every receipt, so give the product a category with the '
+                'AVCO or FIFO costing method (Inventory → Configuration → Product Categories): '
+                'otherwise the stock value and account 27 diverge.',
+                product=product.display_name,
+                category=product.categ_id.display_name or self.env._('none')))
+
+    def _produce_account(self):
+        """Рахунок оцінки запасів з категорії товару — той, який звіряє закриття
+        складу; без нього — рахунок продукції з налаштувань агро (27)."""
+        self.ensure_one()
+        company = self.company_id
+        return self.product_id.categ_id.with_company(company).property_stock_valuation_account_id \
+            or company._l10n_ua_agro_ops_account('l10n_ua_agro_produce_account_id', ('27',))
 
     def _valuation_price(self):
         """Ціна 1 кг: справедлива вартість (за одиницю товару → за кг) або
@@ -49,11 +93,10 @@ class AgroHarvestReceipt(models.Model):
     def _post_valuation(self):
         for receipt in self:
             company = receipt.company_id
-            price = receipt._valuation_price()
-            amount = company.currency_id.round(price * receipt.credit_weight)
+            amount = receipt.valuation_amount
             if company.currency_id.is_zero(amount):
                 continue
-            produce = company._l10n_ua_agro_ops_account('l10n_ua_agro_produce_account_id', ('27',))
+            produce = receipt._produce_account()
             if company.l10n_ua_agro_valuation_method == 'fair_value':
                 credit = company._l10n_ua_agro_ops_account(
                     'l10n_ua_agro_recognition_income_account_id', ('710',))
@@ -85,7 +128,7 @@ class AgroHarvestReceipt(models.Model):
                 ],
             })
             move.action_post()
-            receipt.write({'valuation_price': price, 'valuation_amount': amount, 'account_move_id': move.id})
+            receipt.account_move_id = move
 
     def _agro_analytic_distribution(self):
         self.ensure_one()
@@ -113,5 +156,12 @@ class AgroHarvestReceipt(models.Model):
 
     def action_draft(self):
         res = super().action_draft()
-        self.write({'account_move_id': False, 'valuation_price': 0.0, 'valuation_amount': 0.0})
+        self.write({'account_move_id': False, 'valuation_price': 0.0, 'valuation_amount': 0.0,
+                    'cost_adjustment': 0.0, 'cost_calculation_id': False})
         return res
+
+    def _revalue_stock(self):
+        """Перерахувати вартість вхідних рухів після доведення собівартості."""
+        moves = self.move_id.filtered(lambda m: m.state == 'done')
+        if moves:
+            moves.sudo()._set_value()

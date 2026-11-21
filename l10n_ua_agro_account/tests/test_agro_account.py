@@ -23,8 +23,14 @@ class TestAgroAccount(AgroOperationsTestCase):
             'l10n_ua_agro_recognition_expense_account_id': cls.acc_940.id,
             'l10n_ua_agro_overhead_account_id': cls.acc_91.id,
         })
+        # продукція — середньозважена собівартість, рахунок оцінки 27
+        cls.produce_categ = cls.env['product.category'].create({'name': 'Сільгосппродукція (тест)'})
+        cls.produce_categ.write({
+            'property_cost_method': 'average',
+            'property_stock_valuation_account_id': cls.acc_27.id,
+        })
         cls.grain = cls.env['product.product'].create({
-            'name': 'Пшениця (тест)', 'is_storable': True,
+            'name': 'Пшениця (тест)', 'is_storable': True, 'categ_id': cls.produce_categ.id,
             'uom_id': cls.env.ref('uom.product_uom_kgm').id})
         cls.wheat.product_id = cls.grain
         cls.wheat.write({'base_moisture': 14.0, 'base_impurity': 1.0})
@@ -131,6 +137,51 @@ class TestAgroAccount(AgroOperationsTestCase):
         calc.action_post()
         # продукція доведена до фактичної собівартості
         self.assertAlmostEqual(self._balance(self.acc_27), line.total_cost, places=2)
+
+    def _closing_27(self):
+        """Сума, яку закриття складу провело б по рахунку 27."""
+        vals = self.company._action_close_stock_valuation()
+        return sum(v.get('debit', 0.0) - v.get('credit', 0.0)
+                   for v in vals if v['account_id'] == self.acc_27.id)
+
+    def test_stock_value_matches_produce_account(self):
+        """#603: склад оцінює врожай так само, як рахунок 27."""
+        receipt = self._harvest()
+        self.assertEqual(receipt.move_id.value, 800000.0)
+        self.assertAlmostEqual(self.grain.total_value, 800000.0, places=2)
+        self.assertAlmostEqual(self.grain.standard_price, 8.0, places=4)
+        self.assertAlmostEqual(self._closing_27(), 0.0, places=2)
+
+    def test_planned_cost_adjusts_stock(self):
+        """Доведення до фактичної собівартості змінює і вартість на складі."""
+        self.company.l10n_ua_agro_valuation_method = 'planned_cost'
+        self._work()
+        receipt = self._harvest()
+        self.assertAlmostEqual(self.grain.total_value, 175600.0, places=2)
+        calc = self._calculation()
+        line = calc.line_ids.filtered(lambda l: l.planting_id == self.planting)
+        calc.action_post()
+        self.assertAlmostEqual(receipt.cost_adjustment, line.total_cost - 175600.0, places=2)
+        self.assertAlmostEqual(self.grain.total_value, line.total_cost, places=2)
+        self.assertAlmostEqual(self._balance(self.acc_27), line.total_cost, places=2)
+        self.assertAlmostEqual(self._closing_27(), 0.0, places=2)
+        calc.action_cancel()
+        self.assertEqual(receipt.cost_adjustment, 0.0)
+        self.assertAlmostEqual(self.grain.total_value, 175600.0, places=2)
+        self.assertAlmostEqual(self._balance(self.acc_27), 175600.0, places=2)
+
+    def test_standard_price_costing_refused(self):
+        self.produce_categ.property_cost_method = 'standard'
+        with self.assertRaises(UserError):
+            self._harvest()
+
+    def test_real_time_no_double_entry(self):
+        """Складська проводка руху з виробничої локації не задвоює Дт 27."""
+        self.produce_categ.property_valuation = 'real_time'
+        self.grain.property_stock_production.valuation_account_id = self.acc_231
+        receipt = self._harvest()
+        self.assertFalse(receipt.move_id.account_move_id)
+        self.assertEqual(self._balance(self.acc_27), 800000.0)
 
     def test_missing_fair_value(self):
         self.env['l10n_ua.agro.fair.value'].search([]).unlink()

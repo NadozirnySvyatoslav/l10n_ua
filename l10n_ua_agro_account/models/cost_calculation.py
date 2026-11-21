@@ -173,13 +173,56 @@ class AgroCostCalculation(models.Model):
                 continue
             if not calc.line_ids:
                 raise UserError(self.env._('Compute the calculation first.'))
-            move = self.env['account.move'].create(calc._prepare_move_vals())
+            adjustments = calc._harvest_adjustments()
+            move = self.env['account.move'].create(calc._prepare_move_vals(adjustments))
             move.action_post()
             calc.write({'move_id': move.id, 'state': 'posted'})
+            calc._apply_harvest_adjustments(adjustments)
         return True
 
-    def _prepare_move_vals(self):
+    def _harvest_receipts(self, planting):
+        """Оприбуткування посіву, вже списані з 23 за плановою собівартістю."""
+        return self.env['l10n_ua.agro.harvest.receipt'].search([
+            ('planting_id', '=', planting.id), ('company_id', '=', self.company_id.id),
+            ('state', '=', 'done'), ('account_move_id.state', '=', 'posted'),
+            ('account_move_id.date', '>=', self.date_from), ('account_move_id.date', '<=', self.date),
+        ], order='date, id')
+
+    def _harvest_adjustments(self):
+        """Метод планової собівартості: різниця до фактичної (Дт 27 — Кт 23)
+        розноситься на оприбуткування посіву пропорційно їх оцінці — так само
+        змінюється й вартість продукції на складі (#603).
+        Повертає {посів: [(оприбуткування, сума), …]}."""
         self.ensure_one()
+        result = {}
+        if self.valuation_method == 'fair_value':
+            return result
+        currency = self.currency_id
+        for calc_line in self.line_ids.filtered(lambda l: not l.is_wip):
+            amount = calc_line.closing_amount
+            receipts = self._harvest_receipts(calc_line.planting_id)
+            base = sum(receipts.mapped('valuation_amount'))
+            if currency.is_zero(amount) or not receipts or currency.is_zero(base):
+                continue
+            parts = [(r, currency.round(amount * r.valuation_amount / base)) for r in receipts]
+            # копійчаний залишок — на найбільше оприбуткування
+            biggest = max(range(len(parts)), key=lambda i: parts[i][0].valuation_amount)
+            receipt, part = parts[biggest]
+            parts[biggest] = (receipt, part + currency.round(amount - sum(p for _r, p in parts)))
+            result[calc_line.planting_id] = parts
+        return result
+
+    def _apply_harvest_adjustments(self, adjustments):
+        receipts = self.env['l10n_ua.agro.harvest.receipt']
+        for parts in adjustments.values():
+            for receipt, amount in parts:
+                receipt.write({'cost_adjustment': amount, 'cost_calculation_id': self.id})
+                receipts |= receipt
+        receipts._revalue_stock()
+
+    def _prepare_move_vals(self, adjustments=None):
+        self.ensure_one()
+        adjustments = adjustments or {}
         company = self.company_id
         currency = self.currency_id
         production = self._production_account()
@@ -219,7 +262,13 @@ class AgroCostCalculation(models.Model):
             name = self.env._('Cost of %(planting)s, %(season)s',
                               planting=planting.display_name, season=self.season_id.name)
             line(production, -calc_line.closing_amount, name, planting)
-            line(target, calc_line.closing_amount, name)
+            parts = adjustments.get(planting)
+            if parts:
+                # на рахунок оцінки продукції кожного оприбуткування
+                for receipt, amount in parts:
+                    line(receipt._produce_account(), amount, name)
+            else:
+                line(target, calc_line.closing_amount, name)
         return {
             'move_type': 'entry',
             'journal_id': self.journal_id.id,
@@ -231,6 +280,9 @@ class AgroCostCalculation(models.Model):
         }
 
     def action_cancel(self):
+        receipts = self.env['l10n_ua.agro.harvest.receipt'].search([('cost_calculation_id', 'in', self.ids)])
+        receipts.write({'cost_adjustment': 0.0, 'cost_calculation_id': False})
+        receipts._revalue_stock()
         for calc in self:
             if calc.move_id:
                 calc.move_id._reverse_moves(

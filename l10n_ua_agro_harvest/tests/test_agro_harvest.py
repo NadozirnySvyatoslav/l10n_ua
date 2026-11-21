@@ -15,8 +15,12 @@ class TestAgroHarvest(TransactionCase):
         cls.company = cls.env.company
         cls.warehouse = cls.env['stock.warehouse'].search([('company_id', '=', cls.company.id)], limit=1)
         cls.wheat = cls.env.ref('l10n_ua_agro_base.crop_wheat_winter')
+        categ = cls.env['product.category'].create({'name': 'Сільгосппродукція (тест)'})
+        if 'property_cost_method' in categ._fields:
+            # з l10n_ua_agro_account врожай не оцінюється за стандартною ціною (#603)
+            categ.property_cost_method = 'average'
         cls.grain = cls.env['product.product'].create({
-            'name': 'Пшениця (тест)', 'is_storable': True, 'tracking': 'lot',
+            'name': 'Пшениця (тест)', 'is_storable': True, 'tracking': 'lot', 'categ_id': categ.id,
             'uom_id': cls.env.ref('uom.product_uom_ton').id})
         cls.wheat.product_id = cls.grain
         season = cls.env['l10n_ua.agro.season'].create({
