@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Stock Reports',
-    'version': '20.0.1.1.0',
+    'version': '20.0.1.1.1',
     'category': 'Inventory/Localization',
     'summary': 'Ukrainian warehouse forms: the material report',
     'description': """
