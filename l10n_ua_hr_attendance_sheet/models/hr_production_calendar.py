@@ -1,5 +1,12 @@
+from datetime import date as Date
+
 from odoo import models, fields, api
 from dateutil.relativedelta import relativedelta
+
+# Martial law was imposed on 24.02.2022 (Указ Президента №64/2022). While it
+# lasts, the days off of art. 73 КЗпП do not apply (Закон №2136-IX, ст. 12):
+# public holidays are ordinary working days.
+MARTIAL_LAW_START = Date(2022, 2, 24)
 
 
 class HrProductionCalendar(models.Model):
@@ -22,7 +29,14 @@ class HrProductionCalendar(models.Model):
         string='Company',
         default=lambda self: self.env.company
     )
-    
+    martial_law = fields.Boolean(
+        string='Martial Law (holidays are working days)',
+        default=True,
+        help='Under martial law (since 24.02.2022) public holidays are not '
+             'days off: they are generated as ordinary working days, with no '
+             'shortened pre-holiday day. Untick once martial law is lifted.'
+    )
+
     line_ids = fields.One2many(
         'hr.production.calendar.line',
         'calendar_id',
@@ -70,6 +84,12 @@ class HrProductionCalendar(models.Model):
         
         # Ukrainian public holidays
         holidays = self._get_ua_holidays(self.year)
+        # Under martial law they are working days; the name stays on the
+        # line for reference only.
+        days_off = {
+            day: name for day, name in holidays.items()
+            if not (self.martial_law and day >= MARTIAL_LAW_START)
+        }
         
         date = fields.Date.from_string(f'{self.year}-01-01')
         year_end = fields.Date.from_string(f'{self.year}-12-31')
@@ -77,7 +97,7 @@ class HrProductionCalendar(models.Model):
         lines = []
         while date <= year_end:
             is_weekend = date.weekday() >= 5
-            is_holiday = date in holidays
+            is_holiday = date in days_off
             
             if is_holiday:
                 day_type = 'holiday'
@@ -94,7 +114,7 @@ class HrProductionCalendar(models.Model):
                 
                 # Check for pre-holiday shortened day
                 next_day = date + relativedelta(days=1)
-                if next_day in holidays and is_working:
+                if next_day in days_off and is_working:
                     hours = 7.0
             
             lines.append({
@@ -112,19 +132,33 @@ class HrProductionCalendar(models.Model):
         return True
 
     def _get_ua_holidays(self, year):
-        """Get Ukrainian public holidays for the year"""
+        """Get Ukrainian public holidays for the year (art. 73 КЗпП).
+
+        Since 2023 (Закон №3005-IX of 14.07.2023) Christmas is 25 December
+        only, 8 May is the Day of Remembrance and Victory over Nazism (9 May
+        is no longer a holiday) and the Defenders Day is 1 October. Movable
+        Easter and Trinity are not generated.
+        """
         holidays = {
-            fields.Date.from_string(f'{year}-01-01'): 'Новий рік',
-            fields.Date.from_string(f'{year}-01-07'): 'Різдво Христове (за юліанським календарем)',
-            fields.Date.from_string(f'{year}-03-08'): 'Міжнародний жіночий день',
-            fields.Date.from_string(f'{year}-05-01'): 'День праці',
-            fields.Date.from_string(f'{year}-05-08'): 'День памʼяті та примирення',
-            fields.Date.from_string(f'{year}-05-09'): 'День перемоги над нацизмом',
-            fields.Date.from_string(f'{year}-06-28'): 'День Конституції України',
-            fields.Date.from_string(f'{year}-08-24'): 'День Незалежності України',
-            fields.Date.from_string(f'{year}-10-14'): 'День захисників і захисниць України',
-            fields.Date.from_string(f'{year}-12-25'): 'Різдво Христове (за григоріанським календарем)',
+            Date(year, 1, 1): 'Новий рік',
+            Date(year, 3, 8): 'Міжнародний жіночий день',
+            Date(year, 5, 1): 'День праці',
+            Date(year, 6, 28): 'День Конституції України',
+            Date(year, 8, 24): 'День Незалежності України',
+            Date(year, 12, 25): 'Різдво Христове',
         }
+        if year >= 2023:
+            holidays.update({
+                Date(year, 5, 8): 'День пам\'яті та перемоги над нацизмом '
+                                  'у Другій світовій війні 1939–1945 років',
+                Date(year, 10, 1): 'День захисників і захисниць України',
+            })
+        else:
+            holidays.update({
+                Date(year, 1, 7): 'Різдво Христове (за юліанським календарем)',
+                Date(year, 5, 9): 'День перемоги над нацизмом у Другій світовій війні',
+                Date(year, 10, 14): 'День захисників і захисниць України',
+            })
         return holidays
 
     _unique_year_company_id = models.Constraint(
