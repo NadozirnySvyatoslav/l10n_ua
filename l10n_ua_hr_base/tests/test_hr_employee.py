@@ -713,3 +713,22 @@ class TestHrEmployeeHireDate(TestHrUaBase):
         # No experience before the hire date.
         self.assertEqual(
             employee._get_company_experience_years(date(2019, 1, 1)), 0.0)
+
+    def test_contracted_between_uses_the_period(self):
+        """Only a contract overlapping the period counts — not one that ended
+        before it or starts after it, and not a card with no contract."""
+        ended = self._create_employee()
+        self._set_contract(ended, date(2024, 1, 1), date(2025, 2, 28))
+        future = self._create_employee()
+        self._set_contract(future, date(2025, 4, 1))
+        hired_mid = self._create_employee()
+        self._set_contract(hired_mid, date(2025, 3, 17))
+        left_mid = self._create_employee()
+        self._set_contract(left_mid, date(2024, 1, 1), date(2025, 3, 10))
+        never = self._create_employee()
+        never.version_ids.write({'contract_date_start': False})
+        everyone = ended | future | hired_mid | left_mid | never
+        self.assertEqual(
+            everyone._l10n_ua_contracted_between(
+                date(2025, 3, 1), date(2025, 3, 31)),
+            hired_mid | left_mid)

@@ -112,11 +112,13 @@ class HrPayslipRun(models.Model):
         """Generate payslips for all employees with active contracts"""
         self.ensure_one()
         
-        # Find employees with active versions (contract_date_start set, no end date)
-        employees = self.env['hr.employee'].search([
+        # Employees under a contract on some day of the period. Archived ones
+        # are included: an employee dismissed within the month is archived
+        # by the dismissal order and still has the final payslip to get.
+        employees = self.env['hr.employee'].with_context(active_test=False).search([
             ('company_id', '=', self.company_id.id),
-            ('version_ids.contract_date_start', '!=', False),
-        ])
+            ('version_ids.contract_date_start', '<=', self.date_end),
+        ])._l10n_ua_contracted_between(self.date_start, self.date_end)
         
         for employee in employees:
             existing = self.slip_ids.filtered(lambda s: s.employee_id == employee)
@@ -145,7 +147,9 @@ class HrPayslipRun(models.Model):
         self.write({'state': 'verify'})
 
     def action_close(self):
-        self.slip_ids.filtered(lambda s: s.state == 'verify').write({'state': 'done'})
+        # Go through the payslip's own confirmation: it marks the advances
+        # (and, in other modules, bonuses) as paid and posts the entries.
+        self.slip_ids.filtered(lambda s: s.state == 'verify').action_payslip_done()
         self.write({'state': 'close'})
 
     def action_draft(self):

@@ -1221,3 +1221,28 @@ class HrEmployee(models.Model):
             start <= day and (not version.contract_date_end
                               or version.contract_date_end >= day)
             for start, version in latest.items())
+
+    def _l10n_ua_contracted_between(self, date_from, date_to):
+        """Employees of `self` under a contract on some day of the period.
+
+        Contract periods are read as in :meth:`_l10n_ua_employed_on` (the
+        start from any version, the end from the latest version of that
+        contract), but an employee without any contract period does not
+        count: payroll, advances and the attendance sheet must not invent a
+        month of work for a card that was never hired.
+        """
+        result = self.browse()
+        for employee in self:
+            latest = {}
+            for version in employee.sudo().with_context(
+                    active_test=False).version_ids.filtered(
+                    'contract_date_start'):
+                known = latest.get(version.contract_date_start)
+                if not known or version.date_version > known.date_version:
+                    latest[version.contract_date_start] = version
+            if any(start <= date_to
+                   and (not version.contract_date_end
+                        or version.contract_date_end >= date_from)
+                   for start, version in latest.items()):
+                result |= employee
+        return result

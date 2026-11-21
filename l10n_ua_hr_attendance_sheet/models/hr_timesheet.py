@@ -104,15 +104,21 @@ class HrTimesheet(models.Model):
         domain = [('company_id', '=', self.company_id.id)]
         if self.department_id:
             domain.append(('department_id', '=', self.department_id.id))
-        
-        employees = self.env['hr.employee'].search(domain)
-        
-        for employee in employees:
-            # Check if employee has active contract via hr.version
-            version = employee.current_version_id
-            if version and version.contract_date_start and not version.is_in_contract:
-                continue
 
+        year, month = self.year, int(self.month)
+        month_start = fields.Date.from_string(f'{year}-{month:02d}-01')
+        month_end = month_start.replace(day=calendar.monthrange(year, month)[1])
+
+        # Only employees under a contract on some day of the month. Archived
+        # ones are included: whoever was dismissed within the month is
+        # archived by the order and still has the days worked before it.
+        # A card without any contract gets no line at all, rather than a
+        # full month of work it never did.
+        employees = self.env['hr.employee'].with_context(
+            active_test=False).search(domain)._l10n_ua_contracted_between(
+            month_start, month_end)
+
+        for employee in employees:
             line = self.env['hr.timesheet.line'].create({
                 'timesheet_id': self.id,
                 'employee_id': employee.id,
@@ -222,7 +228,9 @@ class HrTimesheetLine(models.Model):
     def _compute_totals(self):
         for line in self:
             days = line.day_ids
-            line.scheduled_days = len(days.filtered(lambda d: d.code_id.code_type == 'work' or d.is_scheduled))
+            # The norm of the month: its working days by the production
+            # calendar (see action_generate_days), not the days worked.
+            line.scheduled_days = len(days.filtered('is_scheduled'))
             line.worked_days = len(days.filtered(lambda d: d.code_id.is_worked))
             line.worked_hours = sum(days.mapped('hours'))
             line.overtime_hours = sum(days.mapped('overtime_hours'))
@@ -254,10 +262,8 @@ class HrTimesheetLine(models.Model):
         if not not_employed_code:
             not_employed_code = self.env['hr.timesheet.code'].search([('code', '=', 'ІН')], limit=1)
 
-        # Get employee version (contract) info
-        version = self.employee_id.current_version_id
-        contract_start = version.contract_date_start if version else None
-        contract_end = version.contract_date_end if version else None
+        employee = self.employee_id
+        version = employee.current_version_id
         # `work_rate` додає l10n_ua_hr_contract, якого цей модуль не вимагає.
         work_rate = (version.work_rate
                      if version and 'work_rate' in version._fields else 1.0)
@@ -296,23 +302,25 @@ class HrTimesheetLine(models.Model):
             # Check production calendar
             cal_line = prod_calendar.line_ids.filtered(lambda l: l.date == date) if prod_calendar else False
 
+            # `is_scheduled` is the month's norm: a working day of the
+            # production calendar (Monday to Friday without one), whatever
+            # the employee did on it. Vacation, sick leave and days outside
+            # the contract stay in the norm and only miss from the worked
+            # days, so the payslip pays the part of the month actually
+            # worked. Excluding them made worked == scheduled, a full salary.
+            if cal_line:
+                is_scheduled = cal_line.day_type not in ('holiday', 'weekend')
+            else:
+                is_scheduled = date.weekday() < 5
+
             # Determine code and hours
             code = work_code
             hours = standard_hours
-            is_scheduled = True
 
-            # Check if employee was employed on this date
-            is_employed = True
-            if contract_start and date < contract_start:
-                is_employed = False
-            if contract_end and date > contract_end:
-                is_employed = False
-
-            if not is_employed:
+            if not employee._l10n_ua_employed_on(date):
                 # Employee not yet hired or already terminated
                 code = not_employed_code or weekend_code
                 hours = 0
-                is_scheduled = False
             else:
                 # Check if it's a leave day
                 leave_day = leaves.filtered(
@@ -325,27 +333,22 @@ class HrTimesheetLine(models.Model):
                 if sick_day:
                     code = sick_code
                     hours = 0
-                    is_scheduled = False
                 elif leave_day:
                     code = vacation_code
                     hours = 0
-                    is_scheduled = False
                 elif cal_line:
                     if cal_line.day_type == 'holiday':
                         code = holiday_code
                         hours = 0
-                        is_scheduled = False
                     elif cal_line.day_type == 'weekend':
                         code = weekend_code
                         hours = 0
-                        is_scheduled = False
                     else:
                         # Apply work_rate to calendar hours
                         hours = cal_line.working_hours * work_rate
                 elif date.weekday() >= 5:
                     code = weekend_code
                     hours = 0
-                    is_scheduled = False
 
             days.append({
                 'line_id': self.id,

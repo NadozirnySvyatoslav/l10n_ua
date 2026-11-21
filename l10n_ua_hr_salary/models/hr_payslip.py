@@ -389,7 +389,8 @@ class HrPayslip(models.Model):
         Single parent gets double base PSP × dependents_count (covers «двойна ПСП»).
         """
         for payslip in self:
-            params = self.env['hr.psp.parameters'].get_parameters(payslip.date_to)
+            params = self.env['hr.psp.parameters'].get_parameters(
+                payslip.date_to, company_id=payslip.company_id.id)
             if not params:
                 payslip.psp_eligible = False
                 payslip.psp_amount = 0.0
@@ -465,7 +466,8 @@ class HrPayslip(models.Model):
             # Натуральний коефіцієнт (п. 164.5 ПКУ) для гросс-апу негрошового
             # доходу: К = 100 / (100 − ставка ПДФО). Дохід у натуральній формі
             # приводиться до "брутто" перед оподаткуванням ПДФО/ВЗ (#153).
-            params = self.env['hr.psp.parameters'].get_parameters(payslip.date_to)
+            params = self.env['hr.psp.parameters'].get_parameters(
+                payslip.date_to, company_id=payslip.company_id.id)
             natural_coef = 100.0 / (100.0 - pdfo_rate) if pdfo_rate < 100 else 1.0
             mil_natural = (params.natural_coef_for_military
                            if params else True)
@@ -548,7 +550,8 @@ class HrPayslip(models.Model):
             if payslip.state != 'draft':
                 continue
             payslip._check_psp_parameters_known(
-                self.env['hr.psp.parameters'].get_parameters(payslip.date_to))
+                self.env['hr.psp.parameters'].get_parameters(
+                payslip.date_to, company_id=payslip.company_id.id))
 
             payslip._compute_working_days()
             payslip._generate_accruals()
@@ -660,11 +663,13 @@ class HrPayslip(models.Model):
                     self.scheduled_hours = ts_line.scheduled_days * daily_norm
                 return
 
-        # default if there is no timesheets
+        # default if there is no timesheets: the working days of the period
+        # the employee was under contract — hired or dismissed mid-month
+        # gets the part of the month, not the full norm.
         worked = 0
         curr = self.date_from
         while curr <= self.date_to:
-            if curr.weekday() < 5:
+            if curr.weekday() < 5 and self.employee_id._l10n_ua_employed_on(curr):
                 worked += 1
             curr += relativedelta(days=1)
         self.worked_days = worked
@@ -843,7 +848,8 @@ class HrPayslip(models.Model):
         version = self.version_id
 
         salary_type = self.env['hr.accrual.type'].search([('code', '=', 'SALARY')], limit=1)
-        params = self.env['hr.psp.parameters'].get_parameters(self.date_to)
+        params = self.env['hr.psp.parameters'].get_parameters(
+            self.date_to, company_id=self.company_id.id)
 
         # Форма оплати праці: відрядна замінює окладну/тарифну (#143).
         is_piece = getattr(version, 'salary_form', 'time') == 'piece'
@@ -920,7 +926,8 @@ class HrPayslip(models.Model):
         # Version allowances
         allowance_type = self.env['hr.accrual.type'].search([('code', '=', 'ALLOWANCE')], limit=1)
         if allowance_type:
-            for allowance in version.allowance_ids.filtered('is_active'):
+            for allowance in version.allowance_ids._l10n_ua_active_between(
+                    self.date_from, self.date_to):
                 self.env['hr.payslip.accrual'].create({
                     'payslip_id': self.id,
                     'accrual_type_id': allowance_type.id,
@@ -1175,12 +1182,15 @@ class HrPayslip(models.Model):
         cap_percent = max(exec_docs.mapped('max_deduction_percent') or [50.0])
         max_total = net_after_tax * cap_percent / 100
         allocated = 0.0
-        params = self.env['hr.psp.parameters'].get_parameters(self.date_to)
+        params = self.env['hr.psp.parameters'].get_parameters(
+            self.date_to, company_id=self.company_id.id)
         min_wage = params.min_wage if params else 8000
 
         for doc in exec_docs:
             if doc.calculation_method == 'percent':
-                amount = self.gross_salary * doc.percent_value / 100
+                # Alimony is a share of the income left after ПДФО and
+                # військовий збір, not of the gross.
+                amount = net_after_tax * doc.percent_value / 100
             elif doc.calculation_method == 'fixed':
                 amount = doc.fixed_amount
             else:
@@ -1204,7 +1214,7 @@ class HrPayslip(models.Model):
             self.env['hr.payslip.deduction'].create({
                 'payslip_id': self.id,
                 'deduction_type_id': alimony_type.id if alimony_type else False,
-                'base_amount': self.gross_salary,
+                'base_amount': net_after_tax,
                 'rate': doc.percent_value if doc.calculation_method == 'percent' else 0,
                 'amount': amount,
                 'execution_doc_id': doc.id,

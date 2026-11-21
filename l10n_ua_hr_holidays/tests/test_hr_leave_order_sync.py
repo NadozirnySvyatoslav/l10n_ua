@@ -87,7 +87,7 @@ class TestHrLeaveOrderSync(common.TransactionCase):
             'work_entry_type_id': ctx['default_work_entry_type_id'],
             'request_date_from': ctx['default_request_date_from'],
             'request_date_to': ctx['default_request_date_to'],
-            'order_id': ctx['default_order_id'],
+            'order_id': ctx['l10n_ua_leave_order_id'],
         })
 
     def test_no_leave_created_on_order_save(self):
@@ -114,7 +114,10 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         self.assertEqual(ctx['default_work_entry_type_id'], self.leave_type.id)
         self.assertEqual(ctx['default_request_date_from'], date(2027, 8, 1))
         self.assertEqual(ctx['default_request_date_to'], date(2027, 8, 5))
-        self.assertEqual(ctx['default_order_id'], order.id)
+        self.assertEqual(ctx['l10n_ua_leave_order_id'], order.id)
+        # No `default_order_id`: it would leak into every record created in
+        # this context (account.analytic.line.order_id is a sale order).
+        self.assertNotIn('default_order_id', ctx)
         # Nothing exists until the user saves.
         self.assertFalse(order.leave_id)
 
@@ -127,6 +130,14 @@ class TestHrLeaveOrderSync(common.TransactionCase):
         self.assertEqual(self.env['hr.leave'].search_count(
             [('employee_id', '=', self.employee.id)]), 1,
             "No duplicate leave must be created.")
+
+    def test_new_time_off_form_prefills_the_order(self):
+        """The leave form opened by the button shows its order, though the
+        context carries no `default_order_id` for other models to pick up."""
+        order = self._make_vacation_order(date(2027, 9, 1), date(2027, 9, 3))
+        ctx = order.action_create_leave()['context']
+        defaults = self.env['hr.leave'].with_context(**ctx).default_get(['order_id'])
+        self.assertEqual(defaults.get('order_id'), order.id)
 
     def test_leave_keeps_the_order_when_the_form_drops_it(self):
         """The link survives even if the form loses order_id — navigating away

@@ -435,6 +435,13 @@ class HrLeave(models.Model):
             if company.l10n_ua_default_leave_type_id:
                 res['work_entry_type_id'] = \
                     company.l10n_ua_default_leave_type_id.id
+        # The order a "New Time Off" button opened the form from. Not passed
+        # as `default_order_id`: that default reaches every record created
+        # in the same context, and account.analytic.line.order_id is a sale
+        # order — the timesheet of the leave failed on the foreign key.
+        order_from_ctx = self.env.context.get('l10n_ua_leave_order_id')
+        if order_from_ctx and 'order_id' in fields_list:
+            res['order_id'] = order_from_ctx
         return res
 
     @api.model_create_multi
@@ -451,7 +458,7 @@ class HrLeave(models.Model):
         # order in the context. Re-apply it here as well: navigating away from
         # the unsaved form and back can drop the field, which would silently
         # save an unlinked leave and let the order offer to create a second one.
-        order_from_ctx = self.env.context.get('default_order_id')
+        order_from_ctx = self.env.context.get('l10n_ua_leave_order_id')
         if order_from_ctx:
             for vals in vals_list:
                 vals.setdefault('order_id', order_from_ctx)
@@ -978,8 +985,10 @@ class HrLeave(models.Model):
         """
         self.ensure_one()
 
-        date_to = self.date_from.date() - relativedelta(days=1)
-        date_from = date_to - relativedelta(months=12) + relativedelta(days=1)
+        # Billing period: the 12 calendar months before the month the
+        # vacation starts in (Порядок №100, п. 2).
+        date_to = self.date_from.date().replace(day=1) - relativedelta(days=1)
+        date_from = (date_to - relativedelta(months=11)).replace(day=1)
 
         # Get payslips for the period
         # Розрахунковий листок дає `l10n_ua_hr_salary`, якого цей модуль не
@@ -994,15 +1003,28 @@ class HrLeave(models.Model):
         if not payslips:
             # Fallback to version wage (Odoo 19 uses version_ids instead of contract_id)
             version = self.employee_id.current_version_id
-            if version and version.wage:
-                # Оклад може бути у валюті — курс на початок відпустки.
-                wage = version._l10n_ua_wage_in_company_currency(date_to)
-                return round(wage / 29.3, 2)
+            if version:
+                # Оклад може бути у валюті — курс на початок відпустки. Без
+                # окладу у версії — посадовий оклад зі штатного розпису:
+                # саме там він і живе в українській практиці.
+                wage = version._l10n_ua_effective_wage(date_to)
+                if wage:
+                    return round(wage / 29.3, 2)
             return 0.0
 
         # Calculate total earnings from payslip lines
         total_earnings = 0.0
         excluded_days = 0
+
+        # Only the months the employee actually worked in the period count
+        # (Порядок №100, п. 2): whoever has worked fewer than 12 months gets
+        # the average of those months, not their earnings spread over a year.
+        covered_days = set()
+        for payslip in payslips:
+            day = payslip.date_from
+            while day <= payslip.date_to:
+                covered_days.add(day)
+                day += relativedelta(days=1)
 
         for payslip in payslips:
             # УВАГА: береться весь нарахований дохід — див. коментар-близнюк
@@ -1030,15 +1052,17 @@ class HrLeave(models.Model):
             excluded_days = sum(excluded_leaves.mapped('number_of_days'))
 
         # Count public holidays in the calculation period
-        public_holidays = self.env['resource.calendar.leaves'].search_count([
-            ('resource_id', '=', False),
-            ('date_from', '>=', date_from),
-            ('date_to', '<=', date_to),
+        public_holidays = len([
+            holiday for holiday in self.env['resource.calendar.leaves'].search([
+                ('resource_id', '=', False),
+                ('date_from', '>=', date_from),
+                ('date_to', '<=', date_to),
+            ]) if holiday.date_from.date() in covered_days
         ])
 
         # Calculate calendar days in period (excluding public holidays and excluded periods)
         # Formula per CMU Resolution No. 100: earnings / (calendar days - public holidays - excluded days)
-        calendar_days = (date_to - date_from).days + 1 - public_holidays - excluded_days
+        calendar_days = len(covered_days) - public_holidays - excluded_days
 
         if calendar_days > 0:
             return round(total_earnings / calendar_days, 2)
