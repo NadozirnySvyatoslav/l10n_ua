@@ -134,3 +134,59 @@ class TestCurrencyRevaluation(TransactionCase):
         reval.action_compute()
         with self.assertRaises(UserError):
             reval.action_post()
+
+    def test_second_revaluation_uses_previous_one(self):
+        """#624: друга переоцінка рахує різницю від попередньої, а не від
+        дати обліку."""
+        Rate = self.env['res.currency.rate']
+        Rate.create({'currency_id': self.fx.id, 'name': date(2025, 9, 30),
+                     'rate': 1.0 / 43.5, 'company_id': self.company.id})
+        self._book_receivable(100.0, 4000.0)
+
+        first = self._reval()
+        first.action_compute()
+        self.assertAlmostEqual(first.total_gain, 200.0)
+        first.action_post()
+
+        second = self.env['l10n_ua.currency.revaluation'].create({
+            'date': date(2025, 9, 30),
+            'journal_id': self.journal.id,
+            'company_id': self.company.id,
+        })
+        second.action_compute()
+        line = second.line_ids.filtered(lambda l: l.account_id == self.acc_recv)
+        self.assertEqual(len(line), 1)
+        # Балансова вартість = 4000 + 200 (перша переоцінка) = 4200;
+        # 100 × 43.5 = 4350 → різниця 150, а не 350.
+        self.assertAlmostEqual(line.book_balance, 4200.0)
+        self.assertAlmostEqual(line.revalued_balance, 4350.0)
+        self.assertAlmostEqual(line.fx_difference, 150.0)
+        second.action_post()
+
+        # Після двох переоцінок залишок рахунку в гривні = валюта × курс.
+        recv_balance = sum(self.env['account.move.line'].search([
+            ('account_id', '=', self.acc_recv.id),
+            ('parent_state', '=', 'posted'),
+        ]).mapped('balance'))
+        self.assertAlmostEqual(recv_balance, 4350.0)
+
+        # Повторна переоцінка на ту саму дату різниць не дає.
+        third = self.env['l10n_ua.currency.revaluation'].create({
+            'date': date(2025, 9, 30),
+            'journal_id': self.journal.id,
+            'company_id': self.company.id,
+        })
+        third.action_compute()
+        self.assertFalse(third.line_ids)
+
+    def test_cancelled_revaluation_is_ignored(self):
+        """#624: скасована (повернена в чернетку) переоцінка не впливає на базу."""
+        self._book_receivable(100.0, 4000.0)
+        first = self._reval()
+        first.action_compute()
+        first.action_post()
+        first.action_draft()
+
+        second = self._reval()
+        second.action_compute()
+        self.assertAlmostEqual(second.total_gain, 200.0)
