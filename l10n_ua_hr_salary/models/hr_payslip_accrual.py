@@ -71,3 +71,26 @@ class HrPayslipAccrual(models.Model):
         help='Indicates if this accrual was automatically generated during payslip computation. '
              'Auto-generated accruals are recreated on recomputation, manual ones are preserved.'
     )
+
+    # The document an automatic accrual was made from: the approved vacation
+    # (hr.leave), the sick leave certificate (hr.sick.leave) or the vacation
+    # balance compensated on dismissal (hr.vacation.balance). All three come
+    # from l10n_ua_hr_holidays, which this module does not depend on, so the
+    # link is a reference over whichever of them are installed. It is what
+    # keeps a document from being paid twice, by two payslips.
+    source_ref = fields.Reference(
+        selection='_selection_source_ref',
+        string='Source Document',
+        readonly=True,
+        copy=False,
+        index=True,
+    )
+
+    @api.model
+    def _selection_source_ref(self):
+        models_ = [
+            ('hr.leave', 'Time Off'),
+            ('hr.sick.leave', 'Sick Leave'),
+            ('hr.vacation.balance', 'Vacation Balance'),
+        ]
+        return [(name, label) for name, label in models_ if name in self.env]

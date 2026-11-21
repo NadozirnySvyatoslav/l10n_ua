@@ -9,6 +9,25 @@ from dateutil.relativedelta import relativedelta
 MARTIAL_LAW_START = Date(2022, 2, 24)
 
 
+def orthodox_easter(year):
+    """Orthodox Easter Sunday (Gregorian date) of the year.
+
+    Julian computus (Meeus), then shifted to the Gregorian calendar. The
+    calendar reform of the OCU (2023) moved the fixed feasts only: Easter is
+    still reckoned by the Julian computus, so it stays a common date with the
+    other Orthodox churches.
+    """
+    a, b, c = year % 4, year % 7, year % 19
+    d = (19 * c + 15) % 30
+    e = (2 * a + 4 * b - d + 34) % 7
+    month = (d + e + 114) // 31
+    day = (d + e + 114) % 31 + 1
+    # Julian to Gregorian: 13 days in 1900–2099, one more per century not
+    # divisible by 400 after that.
+    shift = year // 100 - year // 400 - 2
+    return Date(year, month, day) + relativedelta(days=shift)
+
+
 class HrProductionCalendar(models.Model):
     _name = 'hr.production.calendar'
     _description = 'Production Calendar'
@@ -90,6 +109,7 @@ class HrProductionCalendar(models.Model):
             day: name for day, name in holidays.items()
             if not (self.martial_law and day >= MARTIAL_LAW_START)
         }
+        transferred = self._get_transferred_days_off(days_off)
         
         date = fields.Date.from_string(f'{self.year}-01-01')
         year_end = fields.Date.from_string(f'{self.year}-12-31')
@@ -101,6 +121,10 @@ class HrProductionCalendar(models.Model):
             
             if is_holiday:
                 day_type = 'holiday'
+                is_working = False
+                hours = 0
+            elif date in transferred:
+                day_type = 'transferred'
                 is_working = False
                 hours = 0
             elif is_weekend:
@@ -123,7 +147,7 @@ class HrProductionCalendar(models.Model):
                 'day_type': day_type,
                 'is_working_day': is_working,
                 'working_hours': hours,
-                'holiday_name': holidays.get(date, ''),
+                'holiday_name': holidays.get(date, '') or transferred.get(date, ''),
             })
             
             date += relativedelta(days=1)
@@ -136,9 +160,10 @@ class HrProductionCalendar(models.Model):
 
         Since 2023 (Закон №3005-IX of 14.07.2023) Christmas is 25 December
         only, 8 May is the Day of Remembrance and Victory over Nazism (9 May
-        is no longer a holiday) and the Defenders Day is 1 October. Movable
-        Easter and Trinity are not generated.
+        is no longer a holiday) and the Defenders Day is 1 October. Easter
+        and Trinity (49 days after it) are movable, see orthodox_easter().
         """
+        easter = orthodox_easter(year)
         holidays = {
             Date(year, 1, 1): 'Новий рік',
             Date(year, 3, 8): 'Міжнародний жіночий день',
@@ -146,6 +171,8 @@ class HrProductionCalendar(models.Model):
             Date(year, 6, 28): 'День Конституції України',
             Date(year, 8, 24): 'День Незалежності України',
             Date(year, 12, 25): 'Різдво Христове',
+            easter: 'Великдень (Пасха)',
+            easter + relativedelta(days=49): 'Трійця',
         }
         if year >= 2023:
             holidays.update({
@@ -160,6 +187,26 @@ class HrProductionCalendar(models.Model):
                 Date(year, 10, 14): 'День захисників і захисниць України',
             })
         return holidays
+
+    @api.model
+    def _get_transferred_days_off(self, days_off):
+        """Days off moved from a holiday that falls on a weekend.
+
+        Art. 67 КЗпП: when a holiday coincides with a day off, the day off
+        moves to the next working day after the holiday. Easter and Trinity
+        always fall on a Sunday, so without this they would never change the
+        norm. Returns ``{date: name}``.
+        """
+        transferred = {}
+        for day in sorted(days_off):
+            if day.weekday() < 5:
+                continue
+            target = day + relativedelta(days=1)
+            while (target.weekday() >= 5 or target in days_off
+                   or target in transferred):
+                target += relativedelta(days=1)
+            transferred[target] = 'Перенесений вихідний (%s)' % days_off[day]
+        return transferred
 
     _unique_year_company_id = models.Constraint(
         'unique(year, company_id)',

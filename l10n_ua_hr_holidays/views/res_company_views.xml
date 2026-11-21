@@ -13,6 +13,7 @@
                 <group string="Time Off (UA)" name="l10n_ua_holidays">
                     <field name="l10n_ua_default_leave_type_id"
                            options="{'no_quick_create': True}"/>
+                    <field name="l10n_ua_vacation_accounting_start"/>
                 </group>
             </xpath>
         </field>

@@ -3331,3 +3331,8 @@ msgstr "по"
 #: code:addons/l10n_ua_hr_salary/models/hr_payslip.py:0
 msgid "сторнування"
 msgstr "сторнування"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_payslip_accrual__source_ref
+msgid "Source Document"
+msgstr "Документ-підстава"

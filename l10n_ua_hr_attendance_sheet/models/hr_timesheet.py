@@ -295,6 +295,11 @@ class HrTimesheetLine(models.Model):
             ('date_to', '>=', date_from),
         ])
 
+        # An employee on a schedule of their own (six-day week, shifts)
+        # takes the norm from that schedule; the production calendar then
+        # only says which days are public holidays off.
+        own_hours = employee._l10n_ua_schedule_hours(date_from, date_to)
+
         days = []
         for day in range(1, last_day + 1):
             date = fields.Date.from_string(f'{year}-{month:02d}-{day:02d}')
@@ -308,8 +313,15 @@ class HrTimesheetLine(models.Model):
             # the contract stay in the norm and only miss from the worked
             # days, so the payslip pays the part of the month actually
             # worked. Excluding them made worked == scheduled, a full salary.
-            if cal_line:
-                is_scheduled = cal_line.day_type not in ('holiday', 'weekend')
+            day_off = bool(cal_line) and cal_line.day_type in ('holiday', 'transferred')
+            if own_hours is not None:
+                # A holiday moved off a weekend (`transferred`) frees a day
+                # of the five-day week only; on an own schedule the holiday
+                # itself is the day off.
+                day_off = bool(cal_line) and cal_line.day_type == 'holiday'
+                is_scheduled = own_hours[date] > 0 and not day_off
+            elif cal_line:
+                is_scheduled = cal_line.day_type not in ('holiday', 'weekend', 'transferred')
             else:
                 is_scheduled = date.weekday() < 5
 
@@ -336,11 +348,25 @@ class HrTimesheetLine(models.Model):
                 elif leave_day:
                     code = vacation_code
                     hours = 0
+                elif own_hours is not None:
+                    if day_off:
+                        code = holiday_code
+                        hours = 0
+                    elif not own_hours[date]:
+                        code = weekend_code
+                        hours = 0
+                    else:
+                        hours = own_hours[date] * work_rate
+                        # The eve of a holiday is an hour shorter on any
+                        # schedule (art. 53 КЗпП).
+                        if cal_line and cal_line.is_working_day \
+                                and cal_line.working_hours < 8.0:
+                            hours = max(hours - 1.0, 0.0)
                 elif cal_line:
                     if cal_line.day_type == 'holiday':
                         code = holiday_code
                         hours = 0
-                    elif cal_line.day_type == 'weekend':
+                    elif cal_line.day_type in ('weekend', 'transferred'):
                         code = weekend_code
                         hours = 0
                     else:
