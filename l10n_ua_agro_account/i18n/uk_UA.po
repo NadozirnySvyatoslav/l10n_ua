@@ -828,11 +828,13 @@ msgstr ""
 msgid "Stock Move"
 msgstr "Складський рух"
 
+#. module: l10n_ua_agro_account
 #. odoo-python
 #: code:addons/l10n_ua_agro_account/models/stock_move.py:0
 msgid "Harvest %(receipt)s valued under P(S)BO 30"
 msgstr "Оприбуткування %(receipt)s за оцінкою П(С)БО 30"
 
+#. module: l10n_ua_agro_account
 #. odoo-python
 #: code:addons/l10n_ua_agro_account/models/harvest_receipt.py:0
 msgid ""
@@ -846,6 +848,7 @@ msgstr ""
 "категорію з методом собівартості AVCO або FIFO (Склад → Налаштування → "
 "Категорії товарів): інакше вартість на складі й рахунок 27 розійдуться."
 
+#. module: l10n_ua_agro_account
 #. odoo-python
 #: code:addons/l10n_ua_agro_account/models/harvest_receipt.py:0
 msgid "none"
