@@ -1,5 +1,6 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import float_is_zero
 
 
 class L10nUaOsv(models.Model):
@@ -9,6 +10,12 @@ class L10nUaOsv(models.Model):
 
     # Типи аналітики рахунку, для яких ОСВ розгортається по контрагентах.
     _EXPAND_ANALYTICS = ('partner', 'employee')
+    # Тип аналітики рахунку, для якого ОСВ розгортається по номенклатурі.
+    _EXPAND_PRODUCT_ANALYTICS = 'product'
+    _MONEY_FIELDS = ('opening_debit', 'opening_credit', 'turnover_debit',
+                     'turnover_credit', 'closing_debit', 'closing_credit')
+    _QTY_FIELDS = ('opening_qty', 'turnover_qty_in', 'turnover_qty_out',
+                   'closing_qty')
 
     name = fields.Char(
         string='Name',
@@ -43,7 +50,7 @@ class L10nUaOsv(models.Model):
     detail_line_ids = fields.One2many(
         'l10n_ua.osv.line',
         'osv_id',
-        string='Partner Breakdown',
+        string='Breakdown',
         domain=[('is_detail', '=', True)],
     )
     expand_partners = fields.Boolean(
@@ -53,6 +60,14 @@ class L10nUaOsv(models.Model):
              'показати розгортку по кожному контрагенту і розгорнуте сальдо: '
              'дебетове і кредитове сальдо рахунку — окремо, як суми сальдо '
              'контрагентів. Решта рахунків — як у синтетичній ОСВ.',
+    )
+    expand_products = fields.Boolean(
+        string='Expand by Products',
+        help='Для рахунків з аналітикою по номенклатурі (20х, 22, 26, 28 — '
+             'поле «Тип аналітики» рахунку = «By product») показати розгортку '
+             'по кожному товару: сальдо й обороти в сумі і в кількості '
+             '(кількість — з рядків проводок). Решта рахунків — як у '
+             'синтетичній ОСВ.',
     )
     state = fields.Selection(
         selection=[
@@ -124,8 +139,9 @@ class L10nUaOsv(models.Model):
         # Вимір розбивки: None (синтетична) / 'partner_id' (аналітична) /
         # quick-поле субконто (розбивка по обраному виду субконто).
         dim_field = None
-        expand = self.osv_type == 'synthetic' and self.expand_partners
-        if self.osv_type == 'analytic' or expand:
+        expand = self.osv_type == 'synthetic' and (
+            self.expand_partners or self.expand_products)
+        if self.osv_type == 'analytic':
             dim_field = 'partner_id'
         elif self.osv_type == 'subconto':
             if not self.subconto_type_id:
@@ -150,6 +166,11 @@ class L10nUaOsv(models.Model):
         if self.osv_type == 'subconto':
             # Лише рядки, що мають значення обраного субконто.
             base_domain.append((dim_field, '!=', False))
+
+        if expand:
+            self.line_ids = self._expanded_lines(
+                self._expanded_buckets(base_domain), currency)
+            return True
 
         # key -> accumulator
         data = {}
@@ -190,10 +211,6 @@ class L10nUaOsv(models.Model):
             acc = bucket(account, dim)
             acc['turnover_debit'] += row[-2] or 0.0
             acc['turnover_credit'] += row[-1] or 0.0
-
-        if expand:
-            self.line_ids = self._expanded_lines(data.values(), currency)
-            return True
 
         is_partner_dim = dim_field == 'partner_id'
         is_subconto = self.osv_type == 'subconto'
@@ -239,46 +256,139 @@ class L10nUaOsv(models.Model):
             'closing_credit': -closing if closing < 0 else 0.0,
         }
 
-    def _expanded_lines(self, buckets, currency):
-        """Синтетична ОСВ з розгорткою по контрагентах (#588).
+    def _expanded_buckets(self, base_domain):
+        """Накопичувачі (рахунок, контрагент, товар) для ОСВ з розгорткою.
 
-        ``buckets`` — накопичувачі (рахунок, контрагент). Рахунки з аналітикою
-        по контрагентах/працівниках дають рядок рахунку з розгорнутим сальдо
-        (Дт і Кт — суми сальдо контрагентів окремо) і рядки-розгортку
-        ``is_detail``; решта рахунків — один рядок зі згорнутим сальдо, як у
-        звичайній синтетичній ОСВ.
+        Суми — як у синтетичній ОСВ; кількість (``quantity`` рядків проводок)
+        — лише для рахунків з аналітикою по номенклатурі, якщо ввімкнено
+        розгортку по номенклатурі: дебетові рядки — надходження, кредитові —
+        вибуття.
         """
-        money = ('opening_debit', 'opening_credit', 'turnover_debit',
-                 'turnover_credit', 'closing_debit', 'closing_credit')
+        AML = self.env['account.move.line']
+        groupby = ['account_id', 'partner_id', 'product_id']
+        before = [('date', '<', self.period_start)]
+        period = [('date', '>=', self.period_start),
+                  ('date', '<=', self.period_end)]
+        data = {}
+
+        def bucket(account, partner, product):
+            return data.setdefault((account.id, partner.id, product.id), {
+                'account': account,
+                'partner': partner,
+                'product': product,
+                'opening': 0.0,
+                'turnover_debit': 0.0,
+                'turnover_credit': 0.0,
+                'opening_qty': 0.0,
+                'turnover_qty_in': 0.0,
+                'turnover_qty_out': 0.0,
+            })
+
+        for account, partner, product, balance in AML._read_group(
+                base_domain + before, groupby, ['balance:sum']):
+            bucket(account, partner, product)['opening'] += balance or 0.0
+        for account, partner, product, debit, credit in AML._read_group(
+                base_domain + period, groupby, ['debit:sum', 'credit:sum']):
+            acc = bucket(account, partner, product)
+            acc['turnover_debit'] += debit or 0.0
+            acc['turnover_credit'] += credit or 0.0
+
+        if self.expand_products:
+            # Кількість іде на бік рядка (Дт — надійшло, Кт — вибуло) зі знаком
+            # його суми: |quantity| для звичайного рядка, −|quantity| для
+            # сторно (debit < 0 / credit < 0). Знак самої quantity не важить:
+            # рядок рахунку з −1 шт на кредиті — це вибуття 1 шт (#594).
+            qty_domain = base_domain + [
+                ('account_id.ua_analytics_type', '=', self._EXPAND_PRODUCT_ANALYTICS)]
+            for dates, field, key, side_sign in (
+                    (before, 'debit', 'opening_qty', 1),
+                    (before, 'credit', 'opening_qty', -1),
+                    (period, 'debit', 'turnover_qty_in', 1),
+                    (period, 'credit', 'turnover_qty_out', 1)):
+                for amount_op, amount_sign in (('>', 1), ('<', -1)):
+                    for qty_op, qty_sign in (('>', 1), ('<', -1)):
+                        sign = side_sign * amount_sign * qty_sign
+                        for account, partner, product, qty in AML._read_group(
+                                qty_domain + dates + [(field, amount_op, 0),
+                                                      ('quantity', qty_op, 0)],
+                                groupby, ['quantity:sum']):
+                            bucket(account, partner, product)[key] += (
+                                sign * (qty or 0.0))
+        return data.values()
+
+    def _expand_dim(self, account):
+        """Вимір розгортки рахунку: 'partner' / 'product' / None (без розгортки)."""
+        if self.expand_partners and account.ua_analytics_type in self._EXPAND_ANALYTICS:
+            return 'partner'
+        if (self.expand_products
+                and account.ua_analytics_type == self._EXPAND_PRODUCT_ANALYTICS):
+            return 'product'
+        return None
+
+    def _expanded_lines(self, buckets, currency):
+        """Синтетична ОСВ з розгорткою по контрагентах / номенклатурі (#588).
+
+        ``buckets`` — накопичувачі (рахунок, контрагент, товар). Рахунки з
+        аналітикою по контрагентах/працівниках (прапорець «по контрагентах»)
+        або по номенклатурі (прапорець «по номенклатурі») дають рядок рахунку
+        з розгорнутим сальдо (Дт і Кт — суми сальдо розгортки окремо) і
+        рядки-розгортку ``is_detail``; для номенклатури — ще й кількість.
+        Решта рахунків — один рядок зі згорнутим сальдо, як у звичайній
+        синтетичній ОСВ.
+        """
+        precision = self.env['decimal.precision'].precision_get('Product Unit')
+        amounts = ('opening', 'turnover_debit', 'turnover_credit')
+        qtys = ('opening_qty', 'turnover_qty_in', 'turnover_qty_out')
+
+        # рахунок -> {значення виміру (запис або порожній) -> суми}
         by_account = {}
         for acc in buckets:
-            if (currency.is_zero(acc['opening'])
-                    and currency.is_zero(acc['turnover_debit'])
-                    and currency.is_zero(acc['turnover_credit'])):
-                continue
-            by_account.setdefault(acc['account'], []).append(acc)
+            account = acc['account']
+            dim = self._expand_dim(account)
+            value = acc[dim] if dim else None
+            groups = by_account.setdefault(account, {})
+            total = groups.setdefault(
+                value.id if value is not None else None,
+                dict.fromkeys(amounts + qtys, 0.0) | {'value': value})
+            for field in amounts + qtys:
+                total[field] += acc[field]
+
+        def is_empty(row):
+            return (all(currency.is_zero(row[f]) for f in amounts)
+                    and all(float_is_zero(row[f], precision_digits=precision)
+                            for f in qtys))
 
         lines = []
-        for account, rows in by_account.items():
-            if account.ua_analytics_type not in self._EXPAND_ANALYTICS:
+        for account in sorted(by_account, key=lambda a: a.code or ''):
+            dim = self._expand_dim(account)
+            rows = [r for r in by_account[account].values() if not is_empty(r)]
+            if not rows:
+                continue
+            if not dim:
                 lines.append((0, 0, dict(self._balance_vals(
-                    sum(r['opening'] for r in rows),
-                    sum(r['turnover_debit'] for r in rows),
-                    sum(r['turnover_credit'] for r in rows),
-                ), account_id=account.id)))
+                    rows[0]['opening'], rows[0]['turnover_debit'],
+                    rows[0]['turnover_credit']), account_id=account.id)))
                 continue
 
-            summary = dict.fromkeys(money, 0.0)
+            summary = dict.fromkeys(self._MONEY_FIELDS + self._QTY_FIELDS, 0.0)
             details = []
-            for row in sorted(rows, key=lambda r: r['dim'].display_name or ''):
+            for row in sorted(rows, key=lambda r: r['value'].display_name or ''):
                 vals = self._balance_vals(
                     row['opening'], row['turnover_debit'], row['turnover_credit'])
-                for field in money:
-                    summary[field] += vals[field]
+                if dim == 'product':
+                    vals.update(
+                        opening_qty=row['opening_qty'],
+                        turnover_qty_in=row['turnover_qty_in'],
+                        turnover_qty_out=row['turnover_qty_out'],
+                        closing_qty=(row['opening_qty'] + row['turnover_qty_in']
+                                     - row['turnover_qty_out']),
+                    )
+                for field, value in vals.items():
+                    summary[field] += value
                 details.append((0, 0, dict(
                     vals,
                     account_id=account.id,
-                    partner_id=row['dim'].id or False,
+                    **{f'{dim}_id': row['value'].id or False},
                     is_detail=True,
                 )))
             lines.append((0, 0, dict(summary, account_id=account.id)))
@@ -330,10 +440,19 @@ class L10nUaOsvLine(models.Model):
         'res.partner',
         string='Partner',
     )
+    product_id = fields.Many2one(
+        'product.product',
+        string='Product',
+        help='Товар рядка розгортки (ОСВ з розгорткою по номенклатурі).',
+    )
     subconto_label = fields.Char(
         string='Subconto',
         help='Значення субконто (для ОСВ по субконто).',
     )
+    opening_qty = fields.Float(string='Opening Qty', digits='Product Unit')
+    turnover_qty_in = fields.Float(string='Qty In', digits='Product Unit')
+    turnover_qty_out = fields.Float(string='Qty Out', digits='Product Unit')
+    closing_qty = fields.Float(string='Closing Qty', digits='Product Unit')
     opening_debit = fields.Monetary(
         string='Opening Debit',
         currency_field='currency_id',

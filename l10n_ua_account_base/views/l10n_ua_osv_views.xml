@@ -22,6 +22,7 @@
                                    required="osv_type == 'subconto'"/>
                             <field name="account_id"/>
                             <field name="expand_partners" invisible="osv_type != 'synthetic'"/>
+                            <field name="expand_products" invisible="osv_type != 'synthetic'"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
@@ -46,17 +47,22 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Partner Breakdown" name="partner_breakdown"
-                              invisible="not expand_partners or osv_type != 'synthetic'">
+                        <page string="Breakdown" name="partner_breakdown"
+                              invisible="not (expand_partners or expand_products) or osv_type != 'synthetic'">
                             <field name="detail_line_ids">
                                 <list>
                                     <field name="currency_id" column_invisible="True"/>
                                     <field name="account_id"/>
-                                    <field name="partner_id"/>
+                                    <field name="partner_id" column_invisible="not parent.expand_partners"/>
+                                    <field name="product_id" column_invisible="not parent.expand_products"/>
+                                    <field name="opening_qty" column_invisible="not parent.expand_products"/>
                                     <field name="opening_debit" sum="Total"/>
                                     <field name="opening_credit" sum="Total"/>
+                                    <field name="turnover_qty_in" column_invisible="not parent.expand_products"/>
                                     <field name="turnover_debit" sum="Total"/>
+                                    <field name="turnover_qty_out" column_invisible="not parent.expand_products"/>
                                     <field name="turnover_credit" sum="Total"/>
+                                    <field name="closing_qty" column_invisible="not parent.expand_products"/>
                                     <field name="closing_debit" sum="Total"/>
                                     <field name="closing_credit" sum="Total"/>
                                 </list>
@@ -95,11 +101,16 @@
                 <field name="is_detail" column_invisible="True"/>
                 <field name="account_id"/>
                 <field name="partner_id"/>
+                <field name="product_id" optional="show"/>
                 <field name="subconto_label" optional="hide"/>
+                <field name="opening_qty" optional="show"/>
                 <field name="opening_debit"/>
                 <field name="opening_credit"/>
+                <field name="turnover_qty_in" optional="show"/>
                 <field name="turnover_debit"/>
+                <field name="turnover_qty_out" optional="show"/>
                 <field name="turnover_credit"/>
+                <field name="closing_qty" optional="show"/>
                 <field name="closing_debit"/>
                 <field name="closing_credit"/>
             </list>
