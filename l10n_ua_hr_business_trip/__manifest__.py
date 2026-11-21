@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Business Trip Report (Звіт про відрядження)',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Localization',
     'summary': 'Звіт про відрядження: добові за нормами, проїзд/проживання, '
                'друкована форма, зв’язок з наказом та авансовим звітом',

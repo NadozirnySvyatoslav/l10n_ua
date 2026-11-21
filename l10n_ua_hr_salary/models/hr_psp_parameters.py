@@ -164,9 +164,11 @@ class HrPspParameters(models.Model):
             '|', ('date_to', '>=', date), ('date_to', '=', False),
             '|', ('company_id', '=', company_id), ('company_id', '=', False),
             ('active', '=', True),
-        ], order='date_from desc', limit=1)
-        
-        return params or self.browse()
+        ], order='date_from desc')
+        # The latest period wins; within it the company's own record beats
+        # the shared one supplied with the module.
+        return params.sorted(
+            lambda p: (p.date_from, bool(p.company_id)), reverse=True)[:1]
 
     _unique_year_date_from_company_id = models.Constraint(
         'unique(year, date_from, company_id)',
