@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Salary Accounting',
-    'version': '20.0.1.1.2',
+    'version': '20.0.1.1.3',
     'category': 'Human Resources/Localization',
     'summary': 'Автоматичне створення проводок при нарахуванні зарплати',
     'author': 'NDEV',
