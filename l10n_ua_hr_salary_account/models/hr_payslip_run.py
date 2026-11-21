@@ -67,8 +67,18 @@ class HrPayslipRun(models.Model):
         total_pdfo = 0.0
         total_military = 0.0
         total_other = 0.0
+        # 661/685 go one line per employee (partner), so the trial balance
+        # can show 661 per employee (#578). {partner: {...}}
+        per_partner = {}
 
         for slip in done_slips:
+            partner = slip._l10n_ua_wages_partner()
+            emp = per_partner.setdefault(partner, {
+                'gross': 0.0, 'pdfo': 0.0, 'military': 0.0, 'other': 0.0})
+            emp['gross'] += slip.gross_salary
+            emp['pdfo'] += slip.pdfo_amount
+            emp['military'] += slip.military_tax_amount
+            emp['other'] += slip._l10n_ua_other_deductions_to_post()
             expense_account = slip._get_expense_account(config)
             dist = slip._get_salary_analytic_distribution()
             key = (expense_account.id, self._analytic_key(dist))
@@ -110,15 +120,23 @@ class HrPayslipRun(models.Model):
                     'analytic_distribution': dist,
                 })
 
-        # --- Credit: wages payable (total gross) ---
-        total_gross = round(sum(d['gross'] for d in expense_totals.values()), 2)
-        if total_gross:
-            lines.append({
-                'name': 'Заробітна плата до виплати',
-                'account_id': config.wages_payable_account_id.id,
-                'debit': 0.0,
-                'credit': total_gross,
-            })
+        def wages_lines(name, key, side, account):
+            """One 661/685 line per employee for the given amount."""
+            for partner, emp in per_partner.items():
+                amount = round(emp[key], 2)
+                if not amount:
+                    continue
+                lines.append({
+                    'name': '%s: %s' % (name, partner.name),
+                    'account_id': account.id,
+                    'partner_id': partner.id,
+                    'debit': amount if side == 'debit' else 0.0,
+                    'credit': amount if side == 'credit' else 0.0,
+                })
+
+        # --- Credit: wages payable (gross), per employee ---
+        wages_lines('Заробітна плата до виплати', 'gross', 'credit',
+                    config.wages_payable_account_id)
 
         # --- Credit: ESV payable ---
         total_esv = round(sum(d['esv'] for d in expense_totals.values()), 2)
@@ -133,12 +151,8 @@ class HrPayslipRun(models.Model):
         # --- PDFO withholding: Дт 661 / Кт 6411 ---
         total_pdfo = round(total_pdfo, 2)
         if total_pdfo:
-            lines.append({
-                'name': 'ПДФО утримано',
-                'account_id': config.wages_payable_account_id.id,
-                'debit': total_pdfo,
-                'credit': 0.0,
-            })
+            wages_lines('ПДФО утримано', 'pdfo', 'debit',
+                        config.wages_payable_account_id)
             lines.append({
                 'name': 'ПДФО утримано',
                 'account_id': config.pdfo_payable_account_id.id,
@@ -149,12 +163,8 @@ class HrPayslipRun(models.Model):
         # --- Military tax: Дт 661 / Кт 6415 ---
         total_military = round(total_military, 2)
         if total_military:
-            lines.append({
-                'name': 'Військовий збір утримано',
-                'account_id': config.wages_payable_account_id.id,
-                'debit': total_military,
-                'credit': 0.0,
-            })
+            wages_lines('Військовий збір утримано', 'military', 'debit',
+                        config.wages_payable_account_id)
             lines.append({
                 'name': 'Військовий збір утримано',
                 'account_id': config.military_tax_payable_account_id.id,
@@ -165,18 +175,10 @@ class HrPayslipRun(models.Model):
         # --- Other deductions: Дт 661 / Кт 685 ---
         total_other = round(total_other, 2)
         if total_other and config.other_payable_account_id:
-            lines.append({
-                'name': 'Інші утримання',
-                'account_id': config.wages_payable_account_id.id,
-                'debit': total_other,
-                'credit': 0.0,
-            })
-            lines.append({
-                'name': 'Інші утримання',
-                'account_id': config.other_payable_account_id.id,
-                'debit': 0.0,
-                'credit': total_other,
-            })
+            wages_lines('Інші утримання', 'other', 'debit',
+                        config.wages_payable_account_id)
+            wages_lines('Інші утримання', 'other', 'credit',
+                        config.other_payable_account_id)
 
         if not lines:
             return
