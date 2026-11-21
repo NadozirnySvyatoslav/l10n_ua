@@ -69,6 +69,12 @@
               action="action_reconciliation_act_wizard"
               sequence="40"/>
 
+    <menuitem id="menu_ua_debt_netting"
+              name="Debt Netting"
+              parent="menu_ua_cash_bank"
+              action="l10n_ua_debt_netting_action"
+              sequence="45"/>
+
     <menuitem id="menu_ua_currency_exchange"
               name="Currency Purchase / Sale"
               parent="menu_ua_cash_bank"

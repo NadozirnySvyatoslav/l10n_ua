@@ -11,3 +11,4 @@ from . import l10n_ua_currency_revaluation
 from . import l10n_ua_currency_exchange
 from . import l10n_ua_aging_report
 from . import l10n_ua_tax_period
+from . import l10n_ua_debt_netting
