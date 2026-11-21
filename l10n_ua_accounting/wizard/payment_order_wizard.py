@@ -119,7 +119,7 @@ class PaymentOrderWizard(models.TransientModel):
                 'currency_id': line.currency_id.id,
                 'journal_id': self.journal_id.id,
                 'date': self.payment_date,
-                'ref': line.bill_id.name or '',
+                'memo': line.bill_id.name or '',
                 'ua_payment_purpose': purpose,
             }
             payment = self.env['account.payment'].create(payment_vals)
