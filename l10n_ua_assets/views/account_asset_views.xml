@@ -70,7 +70,7 @@
                         <group>
                             <field name="inventory_number"/>
                             <field name="acquisition_date"/>
-                            <field name="commission_date" readonly="1"/>
+                            <field name="commission_date" readonly="state != 'draft'"/>
                             <field name="commission_act_number" readonly="1"
                                    invisible="not commission_act_number"/>
                             <field name="group_id"/>

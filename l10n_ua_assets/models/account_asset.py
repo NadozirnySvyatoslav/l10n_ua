@@ -1,7 +1,10 @@
 """Ukrainian fixed assets (Основні засоби) — standalone model."""
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import date_utils
 
 
 class L10nUaAsset(models.Model):
@@ -556,6 +559,18 @@ class L10nUaAsset(models.Model):
                 initial_residual = max(0, depreciable - accumulated)
             running_residual = initial_residual
 
+            # П(С)БО 7 п.29: depreciation starts in the month following the
+            # commissioning month. Rows are dated at the end of their month.
+            # A board that already has posted rows continues right after the
+            # last of them (keeps legacy boards without a gap).
+            posted_dates = asset.depreciation_line_ids.filtered(
+                lambda l: l.state == 'posted' and l.line_type == 'depreciation'
+            ).mapped('date')
+            if posted_dates:
+                anchor_date, anchor_offset = max(posted_dates), posted_count
+            else:
+                anchor_date, anchor_offset = start_date, 0
+
             for month_num in range(posted_count + 1, asset.useful_life + 1):
                 month_in_remaining = month_num - posted_count
                 amount = asset._get_future_amount(
@@ -572,13 +587,9 @@ class L10nUaAsset(models.Model):
                     break
                 accumulated += amount
                 running_residual = max(0, running_residual - amount)
-                # Calculate date
-                dt = start_date
-                month = dt.month + (month_num - 1)
-                year = dt.year + (month - 1) // 12
-                month = (month - 1) % 12 + 1
-                day = min(dt.day, 28)  # safe day
-                line_date = dt.replace(year=year, month=month, day=day)
+                line_date = date_utils.end_of(
+                    anchor_date + relativedelta(months=month_num - anchor_offset),
+                    'month')
 
                 DepLine.create({
                     'asset_id': asset.id,
