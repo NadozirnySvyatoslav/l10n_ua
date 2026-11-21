@@ -663,11 +663,13 @@ class HrPayslip(models.Model):
                     self.scheduled_hours = ts_line.scheduled_days * daily_norm
                 return
 
-        # default if there is no timesheets
+        # default if there is no timesheets: the working days of the period
+        # the employee was under contract — hired or dismissed mid-month
+        # gets the part of the month, not the full norm.
         worked = 0
         curr = self.date_from
         while curr <= self.date_to:
-            if curr.weekday() < 5:
+            if curr.weekday() < 5 and self.employee_id._l10n_ua_employed_on(curr):
                 worked += 1
             curr += relativedelta(days=1)
         self.worked_days = worked

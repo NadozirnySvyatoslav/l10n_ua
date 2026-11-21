@@ -161,3 +161,102 @@ class TestTimesheetMultiCompany(TransactionCase):
         # та сама компанія — нічого не скидається
         ts._onchange_company_id()
         self.assertEqual(ts.department_id, self.dept_a)
+
+
+@tagged('post_install', '-at_install')
+class TestTimesheetNorm(TransactionCase):
+    """The month's norm is its working days; worked days are those worked.
+
+    June 2025 has 21 working days (Mon–Fri, no production calendar).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        from datetime import date
+        cls.date = date
+        cls.company = cls.env.company
+        cls.department = cls.env['hr.department'].create({
+            'name': 'Цех (норма табеля)', 'company_id': cls.company.id,
+        })
+        cls.leave_type = cls.env['hr.work.entry.type'].create({
+            'code': 'UA_T_TS_NORM_1',
+            'name': 'Щорічна (табель)',
+            'ua_leave_category': 'annual_basic',
+            'is_calendar_days': True,
+            'annual_days': 24,
+            'is_paid': True,
+            'requires_allocation': False,
+        })
+
+    def _employee(self, name, start=None, end=False, active=True):
+        employee = self.env['hr.employee'].create({
+            'name': name,
+            'company_id': self.company.id,
+            'department_id': self.department.id,
+        })
+        if start:
+            version = self.env['hr.version'].create({
+                'employee_id': employee.id,
+                'contract_date_start': start,
+                'contract_date_end': end,
+                'date_version': start,
+                'company_id': self.company.id,
+                'department_id': self.department.id,
+            })
+            employee.write({'current_version_id': version.id})
+        if not active:
+            employee.write({'active': False})
+        return employee
+
+    def _generate(self):
+        sheet = self.env['hr.timesheet'].create({
+            'year': 2025, 'month': '6',
+            'department_id': self.department.id,
+            'company_id': self.company.id,
+        })
+        sheet.action_generate_lines()
+        return {line.employee_id: line for line in sheet.line_ids}
+
+    def test_norm_and_worked_days(self):
+        d = self.date
+        full = self._employee('Повний місяць', d(2024, 1, 1))
+        hired = self._employee('Прийнятий 16.06', d(2025, 6, 16))
+        left = self._employee('Звільнений 10.06', d(2024, 1, 1), d(2025, 6, 10),
+                              active=False)
+        on_leave = self._employee('Відпустка 9–13.06', d(2024, 1, 1))
+        sick = self._employee('Лікарняний 23–27.06', d(2024, 1, 1))
+        leave = self.env['hr.leave'].create({
+            'name': 'Відпустка',
+            'employee_id': on_leave.id,
+            'work_entry_type_id': self.leave_type.id,
+            'request_date_from': d(2025, 6, 9),
+            'request_date_to': d(2025, 6, 13),
+        })
+        if leave.state != 'validate':
+            leave.sudo().write({'state': 'validate'})
+        self.env['hr.sick.leave'].create({
+            'employee_id': sick.id,
+            'date_from': d(2025, 6, 23),
+            'date_to': d(2025, 6, 27),
+            'sick_leave_type': 'illness',
+        }).write({'state': 'confirmed'})
+
+        lines = self._generate()
+        for employee, worked in ((full, 21), (hired, 11), (left, 7),
+                                 (on_leave, 16), (sick, 16)):
+            self.assertIn(employee, lines, employee.name)
+            self.assertEqual(lines[employee].scheduled_days, 21, employee.name)
+            self.assertEqual(lines[employee].worked_days, worked, employee.name)
+        self.assertEqual(lines[on_leave].vacation_days, 5)
+        self.assertEqual(lines[sick].sick_days, 5)
+
+    def test_employees_without_contract_in_month_skipped(self):
+        d = self.date
+        never = self._employee('Без договору')
+        ended = self._employee('Звільнений у травні', d(2024, 1, 1), d(2025, 5, 31))
+        future = self._employee('Прийнятий у липні', d(2025, 7, 1))
+        lines = self._generate()
+        self.assertNotIn(never, lines)
+        self.assertNotIn(ended, lines)
+        self.assertNotIn(future, lines)
