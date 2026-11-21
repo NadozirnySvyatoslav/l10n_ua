@@ -12,6 +12,8 @@
                 <field name="total_protein"/>
                 <field name="total_fat"/>
                 <field name="total_carbohydrate"/>
+                <field name="portion_count" optional="show"/>
+                <field name="total_cost" optional="show"/>
                 <field name="state" widget="badge"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide"/>
             </list>
@@ -28,12 +30,15 @@
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_reset_to_draft" type="object" string="У чернетку"
                             invisible="state == 'draft'"/>
+                    <button name="action_compute_consumption" type="object"
+                            string="Розрахувати витрату продуктів"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <group>
                         <field name="menu_date"/>
                         <field name="age_group"/>
+                        <field name="portion_count"/>
                         <field name="company_id" groups="base.group_multi_company"/>
                     </group>
                     <notebook>
@@ -48,6 +53,7 @@
                                     <field name="protein"/>
                                     <field name="fat"/>
                                     <field name="carbohydrate"/>
+                                    <field name="cost" optional="show"/>
                                 </list>
                             </field>
                             <group class="oe_subtotal_footer oe_right">
@@ -55,7 +61,20 @@
                                 <field name="total_protein"/>
                                 <field name="total_fat"/>
                                 <field name="total_carbohydrate"/>
+                                <field name="cost_per_child"/>
+                                <field name="total_cost"/>
                             </group>
+                        </page>
+                        <page string="Витрата продуктів" name="consumption">
+                            <field name="consumption_ids" readonly="1">
+                                <list>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_cost"/>
+                                    <field name="cost" sum="Разом"/>
+                                </list>
+                            </field>
                         </page>
                         <page string="Примітки" name="note">
                             <field name="note" nolabel="1"/>

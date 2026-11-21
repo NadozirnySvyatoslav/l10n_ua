@@ -1,5 +1,7 @@
 from odoo import api, fields, models
 
+from .l10n_ua_meal_recipe import MENU_AGE_GROUP
+
 
 class L10nUaMealMenu(models.Model):
     """Меню (один день)."""
@@ -9,12 +11,7 @@ class L10nUaMealMenu(models.Model):
 
     name = fields.Char(string='Назва', compute='_compute_name', store=True)
     menu_date = fields.Date(string='Дата', required=True, default=fields.Date.context_today)
-    age_group = fields.Selection([
-        ('zdo_1_3', 'ЗДО 1-3 роки'),
-        ('zdo_3_6', 'ЗДО 3-6 років'),
-        ('school_1_4', 'Школа 1-4 класи'),
-        ('school_5_11', 'Школа 5-11 класи'),
-    ], string='Вікова група', required=True)
+    age_group = fields.Selection(MENU_AGE_GROUP, string='Вікова група', required=True)
     company_id = fields.Many2one('res.company', required=True,
                                    default=lambda self: self.env.company)
     line_ids = fields.One2many('l10n_ua.meal.menu.line', 'menu_id', string='Страви',
@@ -27,6 +24,17 @@ class L10nUaMealMenu(models.Model):
                                compute='_compute_totals', store=True)
     total_carbohydrate = fields.Float(string='Усього вуглеводи, г',
                                         compute='_compute_totals', store=True)
+    portion_count = fields.Integer(
+        string='Кількість порцій',
+        help='Кількість дітей (порцій), на яку готується меню. Використовується '
+             'для розрахунку загальної вартості та витрати продуктів.')
+    cost_per_child = fields.Float(string='Вартість на 1 дитину', digits='Product Price',
+                                  compute='_compute_cost')
+    total_cost = fields.Float(string='Загальна вартість', digits='Product Price',
+                              compute='_compute_cost')
+    consumption_ids = fields.One2many(
+        'l10n_ua.meal.menu.consumption', 'menu_id', string='Витрата продуктів',
+        copy=False)
     state = fields.Selection([
         ('draft', 'Чернетка'),
         ('approved', 'Затверджено'),
@@ -47,6 +55,39 @@ class L10nUaMealMenu(models.Model):
             rec.total_protein = sum(rec.line_ids.mapped('protein'))
             rec.total_fat = sum(rec.line_ids.mapped('fat'))
             rec.total_carbohydrate = sum(rec.line_ids.mapped('carbohydrate'))
+
+    @api.depends('line_ids.cost', 'portion_count')
+    def _compute_cost(self):
+        for rec in self:
+            rec.cost_per_child = sum(rec.line_ids.mapped('cost'))
+            rec.total_cost = rec.cost_per_child * (rec.portion_count or 0)
+
+    def _get_product_consumption(self):
+        """Total products needed for the menu (`portion_count` portions).
+
+        :return: dict {product.product: quantity in the product's UoM}
+        """
+        self.ensure_one()
+        result = {}
+        for line in self.line_ids:
+            factor = line._get_recipe_factor() * (self.portion_count or 0)
+            for product, qty in line.recipe_id._get_product_consumption(factor).items():
+                result[product] = result.get(product, 0.0) + qty
+        return result
+
+    def action_compute_consumption(self):
+        """(Re)build the product consumption lines of the menu."""
+        for rec in self:
+            rec.consumption_ids.unlink()
+            rec.consumption_ids = [
+                fields.Command.create({
+                    'product_id': product.id,
+                    'quantity': qty,
+                    'unit_cost': product.standard_price,
+                })
+                for product, qty in sorted(rec._get_product_consumption().items(),
+                                           key=lambda item: item[0].display_name)
+            ]
 
     def action_approve(self):
         self.write({'state': 'approved'})
@@ -82,6 +123,24 @@ class L10nUaMealMenuLine(models.Model):
     carbohydrate = fields.Float(
         string='В, г', compute='_compute_recipe_data', store=True, readonly=False)
 
+    cost = fields.Float(string='Вартість', digits='Product Price',
+                        compute='_compute_cost',
+                        help='Собівартість однієї порції (з урахуванням маси порції).')
+
+    def _get_recipe_factor(self):
+        """Share of the recipe yield in this line's portion (1.0 = as in the recipe)."""
+        self.ensure_one()
+        recipe = self.recipe_id
+        if recipe.yield_grams and self.portion_grams:
+            return self.portion_grams / recipe.yield_grams
+        return 1.0
+
+    @api.depends('recipe_id.cost_per_portion', 'recipe_id.yield_grams', 'portion_grams')
+    def _compute_cost(self):
+        for line in self:
+            line.cost = line.recipe_id.cost_per_portion * line._get_recipe_factor() \
+                if line.recipe_id else 0.0
+
     @api.depends('recipe_id')
     def _compute_recipe_data(self):
         for line in self:
@@ -91,3 +150,25 @@ class L10nUaMealMenuLine(models.Model):
                 line.protein = line.recipe_id.protein_g
                 line.fat = line.recipe_id.fat_g
                 line.carbohydrate = line.recipe_id.carbohydrate_g
+
+
+class L10nUaMealMenuConsumption(models.Model):
+    """Product consumption of a menu (built by "Розрахувати витрату")."""
+    _name = 'l10n_ua.meal.menu.consumption'
+    _description = 'Витрата продуктів за меню'
+    _order = 'menu_id, product_id'
+
+    menu_id = fields.Many2one('l10n_ua.meal.menu', required=True, ondelete='cascade',
+                              index=True)
+    product_id = fields.Many2one('product.product', string='Товар', required=True,
+                                 ondelete='restrict')
+    uom_id = fields.Many2one(related='product_id.uom_id', string='Од. виміру')
+    quantity = fields.Float(string='Кількість', digits=(16, 4))
+    unit_cost = fields.Float(string='Ціна за од.', digits='Product Price')
+    cost = fields.Float(string='Вартість', digits='Product Price',
+                        compute='_compute_cost', store=True)
+
+    @api.depends('quantity', 'unit_cost')
+    def _compute_cost(self):
+        for line in self:
+            line.cost = line.quantity * line.unit_cost
