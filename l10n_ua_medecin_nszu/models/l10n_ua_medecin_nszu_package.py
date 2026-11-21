@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 PACKAGE_TYPE = [
@@ -47,6 +47,10 @@ class L10nUaMedecinNszuPackage(models.Model):
         string='Базовий тариф', currency_field='currency_id',
         help='Базовий тариф НСЗУ на одиницю (наприклад, на одну декларацію в рік для ПМД-капітації).')
     currency_id = fields.Many2one('res.currency', default=lambda self: self.env.company.currency_id)
+    tariff_to_confirm = fields.Boolean(
+        string='Тариф потребує підтвердження',
+        help='Тариф не звірено з чинною постановою КМУ / наказом НСЗУ про ПМГ '
+             '(або взято з попереднього року). Перевірте перед укладанням договору.')
     description = fields.Html(string='Специфікація')
     is_active = fields.Boolean(default=True)
     display_name = fields.Char(compute='_compute_display_name', store=True)
@@ -60,3 +64,17 @@ class L10nUaMedecinNszuPackage(models.Model):
         'unique(code, year)',
         'Код пакету має бути унікальним для одного року!',
     )
+
+    def action_open_copy_wizard(self):
+        """Open the wizard that copies packages to another (next) year."""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Копіювати пакети на інший рік'),
+            'res_model': 'l10n_ua.medecin.nszu.package.copy.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'active_model': self._name,
+                'active_ids': self.ids,
+            },
+        }
