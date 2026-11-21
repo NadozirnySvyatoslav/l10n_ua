@@ -924,7 +924,8 @@ class HrPayslip(models.Model):
         # Version allowances
         allowance_type = self.env['hr.accrual.type'].search([('code', '=', 'ALLOWANCE')], limit=1)
         if allowance_type:
-            for allowance in version.allowance_ids.filtered('is_active'):
+            for allowance in version.allowance_ids._l10n_ua_active_between(
+                    self.date_from, self.date_to):
                 self.env['hr.payslip.accrual'].create({
                     'payslip_id': self.id,
                     'accrual_type_id': allowance_type.id,

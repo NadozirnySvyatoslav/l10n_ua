@@ -158,3 +158,13 @@ class HrVersionAllowance(models.Model):
             date_from_ok = not allowance.date_from or allowance.date_from <= today
             date_to_ok = not allowance.date_to or allowance.date_to >= today
             allowance.is_active = date_from_ok and date_to_ok
+
+    def _l10n_ua_active_between(self, date_from, date_to):
+        """Allowances in force on some day of the period.
+
+        `is_active` answers for today, and is stored besides: a payslip for
+        a past or a future month has to ask about its own period instead.
+        """
+        return self.filtered(
+            lambda a: (not a.date_from or a.date_from <= date_to)
+            and (not a.date_to or a.date_to >= date_from))
