@@ -16,8 +16,9 @@ Not meant for production databases.
     'author': 'Svyatoslav Nadozirny',
     'website': 'https://1c-to-odoo.many2one.online',
     'license': 'LGPL-3',
-    # Repository modules that add menus. l10n_ua_agreement is left out: it
-    # needs the OCA agreement/contract/sign_oca addons, absent from 20.0.
+    # Repository modules that add menus. Left out: l10n_ua_agreement (needs
+    # the OCA agreement/contract/sign_oca addons, absent from 20.0) and
+    # telegram_bot_m2o (still a 19.0 module, not installable on 20.0).
     'depends': [
         'l10n_ua_account_base',
         'l10n_ua_account_vat',
@@ -63,7 +64,6 @@ Not meant for production databases.
         'l10n_ua_tax',
         'l10n_ua_tax_4df',
         'l10n_ua_tax_cabinet',
-        'telegram_bot_m2o',
     ],
     'data': [],
     'installable': True,
