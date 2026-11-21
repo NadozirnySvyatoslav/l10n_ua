@@ -7613,6 +7613,7 @@ msgstr "Скасовано"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__closing_qty
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__closing_qty
 msgid "Closing Qty"
 msgstr "Кількість на кінець"
 
@@ -7769,6 +7770,7 @@ msgstr "Рядок ОСВ по позабалансових рахунках"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__opening_qty
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__opening_qty
 msgid "Opening Qty"
 msgstr "Кількість на початок"
 
@@ -7797,12 +7799,14 @@ msgstr "Друк"
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__quantity_in
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__quantity_in
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__turnover_qty_in
 msgid "Qty In"
 msgstr "Надійшло, к-сть"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_move_line__quantity_out
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_offbalance_osv_line__quantity_out
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__turnover_qty_out
 msgid "Qty Out"
 msgstr "Вибуло, к-сть"
 
@@ -8166,8 +8170,18 @@ msgstr "Рядки рахунків"
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__detail_line_ids
 #: model_terms:ir.ui.view,arch_db:l10n_ua_account_base.l10n_ua_osv_view_form
-msgid "Partner Breakdown"
-msgstr "Розгортка по контрагентах"
+msgid "Breakdown"
+msgstr "Розгортка"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv__expand_products
+msgid "Expand by Products"
+msgstr "Розгорнути по номенклатурі"
+
+#. module: l10n_ua_account_base
+#: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__product_id
+msgid "Product"
+msgstr "Номенклатура"
 
 #. module: l10n_ua_account_base
 #: model:ir.model.fields,field_description:l10n_ua_account_base.field_l10n_ua_osv_line__is_detail
