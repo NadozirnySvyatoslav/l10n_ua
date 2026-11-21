@@ -102,6 +102,12 @@ class L10nUaMshp(models.Model):
         copy=False,
     )
     # --- Write-off ---
+    document_date = fields.Date(
+        string='Дата документа',
+        default=fields.Date.context_today,
+        copy=False,
+        help='Дата акту списання. Порожнє — сьогоднішня дата.',
+    )
     writeoff_date = fields.Date(
         string='Дата списання',
         tracking=True,
@@ -171,7 +177,9 @@ class L10nUaMshp(models.Model):
         for rec in self:
             if rec.state != 'draft':
                 continue
-            vals = {'state': 'in_use'}
+            # The transfer is dated by «date»; the document date is kept for
+            # the coming write-off act and must not carry the creation day.
+            vals = {'state': 'in_use', 'document_date': False}
             if not rec.transfer_number:
                 vals['transfer_number'] = self.env['ir.sequence'].next_by_code(
                     'l10n_ua.mshp.transfer') or _('New')
@@ -184,9 +192,16 @@ class L10nUaMshp(models.Model):
             if rec.state != 'in_use':
                 raise UserError(_(
                     'Списати можна лише МШП в експлуатації: %s') % rec.name)
+            writeoff_date = rec.document_date or fields.Date.context_today(self)
+            if writeoff_date < rec.date:
+                raise UserError(_(
+                    'Дата списання МШП "%(name)s" (%(writeoff)s) не може бути '
+                    'раніше дати передачі в експлуатацію (%(date)s).',
+                    name=rec.display_name, writeoff=writeoff_date, date=rec.date))
             vals = {
                 'state': 'written_off',
-                'writeoff_date': fields.Date.context_today(self),
+                'writeoff_date': writeoff_date,
+                'document_date': False,
             }
             if not rec.writeoff_act_number:
                 vals['writeoff_act_number'] = self.env['ir.sequence'].next_by_code(

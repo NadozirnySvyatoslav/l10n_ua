@@ -62,9 +62,14 @@
                         </group>
                     </group>
                     <group string="Списання"
-                           invisible="state != 'written_off'">
-                        <field name="writeoff_date" readonly="1"/>
-                        <field name="writeoff_act_number" readonly="1"/>
+                           invisible="state == 'draft'">
+                        <field name="document_date"
+                               invisible="state != 'in_use'"
+                               placeholder="сьогодні"/>
+                        <field name="writeoff_date" readonly="1"
+                               invisible="state != 'written_off'"/>
+                        <field name="writeoff_act_number" readonly="1"
+                               invisible="state != 'written_off'"/>
                         <field name="writeoff_reason"/>
                     </group>
                     <field name="notes" placeholder="Примітки..."/>

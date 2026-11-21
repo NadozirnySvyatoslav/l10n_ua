@@ -96,6 +96,16 @@
                                     <field name="surplus_value"
                                            readonly="not is_surplus or processed"
                                            invisible="not is_surplus"/>
+                                    <field name="surplus_inventory_number"
+                                           readonly="not is_surplus or processed"
+                                           invisible="not is_surplus"
+                                           optional="show"/>
+                                    <field name="surplus_group_id"
+                                           readonly="not is_surplus or processed"
+                                           invisible="not is_surplus"/>
+                                    <field name="surplus_useful_life"
+                                           readonly="not is_surplus or processed"
+                                           invisible="not is_surplus"/>
                                     <field name="found"
                                            readonly="is_surplus or processed"/>
                                     <field name="is_surplus" readonly="processed"/>

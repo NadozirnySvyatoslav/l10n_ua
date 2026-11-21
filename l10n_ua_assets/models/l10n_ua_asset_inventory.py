@@ -444,6 +444,18 @@ class L10nUaAssetInventoryLine(models.Model):
         string='Справедлива вартість лишку',
         currency_field='currency_id',
     )
+    surplus_inventory_number = fields.Char(string='Інв. номер лишку')
+    surplus_group_id = fields.Many2one(
+        'l10n_ua.asset.group',
+        string='Група ОЗ лишку',
+        help='Група створюваного ОЗ: з неї беруться строк і рахунки '
+             'амортизації. Без групи ОЗ створюється в чернетці.',
+    )
+    surplus_useful_life = fields.Integer(
+        string='Строк корисного використання (міс.)',
+        help='Строк корисного використання створюваного ОЗ. Порожнє — '
+             'мінімальний строк групи. Без строку ОЗ створюється в чернетці.',
+    )
     created_asset_id = fields.Many2one(
         'l10n_ua.asset',
         string='Створений ОЗ',
@@ -488,6 +500,11 @@ class L10nUaAssetInventoryLine(models.Model):
             else:
                 line.discrepancy = 'shortage'
 
+    @api.onchange('surplus_group_id')
+    def _onchange_surplus_group_id(self):
+        if self.surplus_group_id.min_useful_life and not self.surplus_useful_life:
+            self.surplus_useful_life = self.surplus_group_id.min_useful_life * 12
+
     def _process_shortage(self):
         """Списати ОЗ як нестачу."""
         for line in self:
@@ -502,18 +519,41 @@ class L10nUaAssetInventoryLine(models.Model):
             line.processed = True
 
     def _process_surplus(self):
-        """Створити новий ОЗ для лишку."""
+        """Створити новий ОЗ для лишку.
+
+        With a group and a useful life the asset is commissioned on the
+        inventory date (commissioning act number assigned); otherwise it is
+        left in draft for the accountant to complete and commission. The
+        inventory entry Дт 10 / Кт 746 is its acquisition entry, so the
+        asset never gets a separate commissioning entry Дт 10 / Кт 152.
+        """
         Asset = self.env['l10n_ua.asset']
         for line in self:
             if not line.surplus_value:
                 continue
+            inventory = line.inventory_id
+            group = line.surplus_group_id
+            useful_life = line.surplus_useful_life or (
+                group.min_useful_life * 12 if group else 0)
             new_asset = Asset.create({
-                'name': line.surplus_name or _('Лишок %s') % line.inventory_id.name,
-                'acquisition_date': line.inventory_id.date,
+                'name': line.surplus_name or _('Лишок %s') % inventory.name,
+                'inventory_number': line.surplus_inventory_number,
+                'acquisition_date': inventory.date,
                 'original_value': line.surplus_value,
-                'company_id': line.inventory_id.company_id.id,
-                'state': 'open',
-                'commission_date': line.inventory_id.date,
+                'company_id': inventory.company_id.id,
+                'group_id': group.id,
+                'useful_life': useful_life,
+                'fixed_asset_account_id': inventory.fixed_asset_account_id.id,
+                'depreciation_account_id': (
+                    group.depreciation_account_id
+                    or inventory.accumulated_depreciation_account_id).id,
+                'responsible_id': inventory.filter_responsible_id.id,
+                'location': inventory.filter_location,
+                'no_commission_move': True,
+                'notes': _('Лишок за інвентаризацією %s') % inventory.name,
             })
+            if group and useful_life:
+                new_asset.commission_date = inventory.date
+                new_asset.action_commission()
             line.created_asset_id = new_asset
             line.processed = True
