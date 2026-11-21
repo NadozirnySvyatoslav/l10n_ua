@@ -435,6 +435,13 @@ class HrLeave(models.Model):
             if company.l10n_ua_default_leave_type_id:
                 res['work_entry_type_id'] = \
                     company.l10n_ua_default_leave_type_id.id
+        # The order a "New Time Off" button opened the form from. Not passed
+        # as `default_order_id`: that default reaches every record created
+        # in the same context, and account.analytic.line.order_id is a sale
+        # order — the timesheet of the leave failed on the foreign key.
+        order_from_ctx = self.env.context.get('l10n_ua_leave_order_id')
+        if order_from_ctx and 'order_id' in fields_list:
+            res['order_id'] = order_from_ctx
         return res
 
     @api.model_create_multi
@@ -451,7 +458,7 @@ class HrLeave(models.Model):
         # order in the context. Re-apply it here as well: navigating away from
         # the unsaved form and back can drop the field, which would silently
         # save an unlinked leave and let the order offer to create a second one.
-        order_from_ctx = self.env.context.get('default_order_id')
+        order_from_ctx = self.env.context.get('l10n_ua_leave_order_id')
         if order_from_ctx:
             for vals in vals_list:
                 vals.setdefault('order_id', order_from_ctx)

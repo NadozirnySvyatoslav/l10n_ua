@@ -174,7 +174,10 @@ class HrOrder(models.Model):
         """"New Time Off" button. Opens a leave form pre-filled from this
         order so the user can review and save it — the same explicit flow the
         leave form uses to issue an order. Nothing is created until they save;
-        default_order_id links the two sides back together."""
+        l10n_ua_leave_order_id links the two sides back together. It is not
+        `default_order_id`: a default reaches every record created in that
+        context, and account.analytic.line.order_id (the leave's timesheet)
+        is a sale order."""
         self.ensure_one()
         if self.leave_id:
             raise UserError(_('This order already has a linked time off.'))
@@ -191,7 +194,7 @@ class HrOrder(models.Model):
                 'default_work_entry_type_id': self.work_entry_type_id.id,
                 'default_request_date_from': self.vacation_date_from,
                 'default_request_date_to': self.vacation_date_to,
-                'default_order_id': self.id,
+                'l10n_ua_leave_order_id': self.id,
             },
         }
 
