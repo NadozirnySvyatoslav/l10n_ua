@@ -72,7 +72,13 @@ class TestExecutionDocumentLimit(SalaryTestCase):
         payslip.action_compute_sheet()
         deds = self._exec_deductions(payslip)
         self.assertEqual(len(deds), 1)
-        self.assertAlmostEqual(deds.amount, payslip.gross_salary * 0.25, places=2)
+        # Alimony is a share of the income after ПДФО and військовий збір.
+        net_after_tax = (payslip.gross_salary - payslip.pdfo_amount
+                         - payslip.military_tax_amount)
+        self.assertGreater(payslip.pdfo_amount, 0)
+        self.assertAlmostEqual(deds.amount, round(net_after_tax * 0.25, 2), places=2)
+        self.assertAlmostEqual(deds.base_amount, net_after_tax, places=2)
+        self.assertLess(deds.amount, payslip.gross_salary * 0.25)
 
     def test_cumulative_ceiling_enforced_by_priority(self):
         """Two orders that jointly exceed 70% net: priority 1 is paid, priority 3 is capped."""
@@ -93,8 +99,9 @@ class TestExecutionDocumentLimit(SalaryTestCase):
                                msg='Total withholding must equal the 70% ceiling')
 
         by_doc = {d.execution_doc_id.name: d.amount for d in deds}
-        # Priority-1 order gets its full 50% of gross; priority-3 gets the leftover.
-        self.assertAlmostEqual(by_doc['ВД-A'], payslip.gross_salary * 0.50, places=2)
+        # Priority-1 order gets its full 50% of the income after taxes;
+        # priority-3 gets the leftover.
+        self.assertAlmostEqual(by_doc['ВД-A'], round(net_after_tax * 0.50, 2), places=2)
         self.assertLess(by_doc['ВД-B'], by_doc['ВД-A'])
 
     def test_finite_debt_repaid_gradually(self):

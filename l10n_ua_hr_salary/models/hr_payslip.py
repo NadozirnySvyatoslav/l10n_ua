@@ -1186,7 +1186,9 @@ class HrPayslip(models.Model):
 
         for doc in exec_docs:
             if doc.calculation_method == 'percent':
-                amount = self.gross_salary * doc.percent_value / 100
+                # Alimony is a share of the income left after ПДФО and
+                # військовий збір, not of the gross.
+                amount = net_after_tax * doc.percent_value / 100
             elif doc.calculation_method == 'fixed':
                 amount = doc.fixed_amount
             else:
@@ -1210,7 +1212,7 @@ class HrPayslip(models.Model):
             self.env['hr.payslip.deduction'].create({
                 'payslip_id': self.id,
                 'deduction_type_id': alimony_type.id if alimony_type else False,
-                'base_amount': self.gross_salary,
+                'base_amount': net_after_tax,
                 'rate': doc.percent_value if doc.calculation_method == 'percent' else 0,
                 'amount': amount,
                 'execution_doc_id': doc.id,
