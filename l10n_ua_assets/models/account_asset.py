@@ -1,7 +1,10 @@
 """Ukrainian fixed assets (Основні засоби) — standalone model."""
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import date_utils
 
 
 class L10nUaAsset(models.Model):
@@ -213,6 +216,38 @@ class L10nUaAsset(models.Model):
         help='Рахунок накопиченого зносу (131). За замовч. з групи ОЗ.',
     )
 
+    # --- Commissioning entry (Дт 10х / Кт 152) ---
+    fixed_asset_account_id = fields.Many2one(
+        'account.account',
+        string='Рахунок ОЗ (Дт 10х)',
+        domain="[('company_ids', 'in', company_id)]",
+        check_company=True,
+        help='Рахунок обліку ОЗ (103–109) для проводки введення в експлуатацію. '
+             'За замовч. з групи ОЗ.',
+    )
+    commission_account_id = fields.Many2one(
+        'account.account',
+        string='Рахунок джерела (Кт 152/631)',
+        domain="[('company_ids', 'in', company_id)]",
+        check_company=True,
+        help='Рахунок, з якого ОЗ надходить при введенні в експлуатацію '
+             '(152 «Придбання ОЗ», 631 тощо). За замовч. з групи ОЗ.',
+    )
+    no_commission_move = fields.Boolean(
+        string='Без проводки введення',
+        copy=False,
+        help='Первісну вартість уже відображено іншим документом (вхідні '
+             'залишки, рахунок постачальника, інвентаризація) — при введенні '
+             'в експлуатацію проводка Дт 10 / Кт 152 не формується.',
+    )
+    commission_move_id = fields.Many2one(
+        'account.move',
+        string='Проводка введення',
+        readonly=True,
+        copy=False,
+        help='Проводка введення в експлуатацію (Дт 10х / Кт 152)',
+    )
+
     @api.onchange('group_id')
     def _onchange_group_id(self):
         if self.group_id and self.group_id.min_useful_life:
@@ -225,6 +260,10 @@ class L10nUaAsset(models.Model):
                 self.expense_account_id = self.group_id.expense_account_id
             if not self.depreciation_account_id:
                 self.depreciation_account_id = self.group_id.depreciation_account_id
+            if not self.fixed_asset_account_id:
+                self.fixed_asset_account_id = self.group_id.fixed_asset_account_id
+            if not self.commission_account_id:
+                self.commission_account_id = self.group_id.commission_account_id
 
     def _get_depreciation_accounts(self):
         """Resolve (journal, expense account, accumulated-depreciation account).
@@ -253,6 +292,85 @@ class L10nUaAsset(models.Model):
                 missing=', '.join(missing),
             ))
         return journal, expense, accumulated
+
+    def _needs_commission_move(self):
+        """Whether commissioning must book the Дт 10х / Кт 152 entry."""
+        self.ensure_one()
+        return bool(
+            self.group_id.create_commission_move
+            and not self.no_commission_move
+            and not self.commission_move_id
+            and not self.currency_id.is_zero(self.original_value)
+        )
+
+    def _get_commission_accounts(self):
+        """Resolve (journal, fixed-asset account, counterpart account).
+
+        Same resolution as for depreciation: asset field, falling back to the
+        group default; the journal is the depreciation journal.
+        """
+        self.ensure_one()
+        group = self.group_id
+        journal = self.depreciation_journal_id or group.depreciation_journal_id
+        fixed = self.fixed_asset_account_id or group.fixed_asset_account_id
+        counterpart = self.commission_account_id or group.commission_account_id
+        missing = []
+        if not journal:
+            missing.append(_('журнал амортизації'))
+        if not fixed:
+            missing.append(_('рахунок ОЗ (Дт 10х)'))
+        if not counterpart:
+            missing.append(_('рахунок джерела (Кт 152/631)'))
+        if missing:
+            raise UserError(_(
+                'Неможливо сформувати проводку введення ОЗ "%(asset)s": '
+                'не налаштовано %(missing)s. Вкажіть на основному засобі або '
+                'на групі ОЗ, або позначте «Без проводки введення».',
+                asset=self.display_name,
+                missing=', '.join(missing),
+            ))
+        return journal, fixed, counterpart
+
+    def _create_commission_move(self):
+        """Create and post the commissioning entry Дт 10х / Кт 152."""
+        self.ensure_one()
+        journal, fixed, counterpart = self._get_commission_accounts()
+        ref = _('Введення в експлуатацію %(asset)s, акт %(act)s',
+                asset=self.display_name, act=self.commission_act_number or '')
+        amount = self.original_value
+        move = self.env['account.move'].create({
+            'journal_id': journal.id,
+            'date': self.commission_date,
+            'ref': ref,
+            'company_id': self.company_id.id,
+            'line_ids': [
+                (0, 0, {
+                    'account_id': fixed.id,
+                    'name': ref,
+                    'debit': amount if amount > 0 else 0.0,
+                    'credit': -amount if amount < 0 else 0.0,
+                }),
+                (0, 0, {
+                    'account_id': counterpart.id,
+                    'name': ref,
+                    'debit': -amount if amount < 0 else 0.0,
+                    'credit': amount if amount > 0 else 0.0,
+                }),
+            ],
+        })
+        move.action_post()
+        return move
+
+    def _remove_commission_move(self):
+        """Drop the commissioning entry, like a depreciation line reset."""
+        for asset in self:
+            move = asset.commission_move_id
+            if not move:
+                continue
+            asset.commission_move_id = False
+            if move.state == 'posted':
+                move.button_draft()
+            move.unlink()
 
     @api.depends('revaluation_line_ids', 'revaluation_line_ids.state')
     def _compute_revaluation_count(self):
@@ -476,6 +594,8 @@ class L10nUaAsset(models.Model):
                     'l10n_ua.asset.commission.act'
                 ) or _('New')
             asset.write(vals)
+            if asset._needs_commission_move():
+                asset.commission_move_id = asset._create_commission_move()
 
     def action_pause(self):
         """Pause depreciation."""
@@ -505,6 +625,7 @@ class L10nUaAsset(models.Model):
                     'Не можна повернути ОЗ "%s" в чернетку: існують підтверджені переоцінки. '
                     'Спочатку скасуйте документи переоцінки.'
                 ) % asset.display_name)
+        self._remove_commission_move()
         self.write({
             'state': 'draft',
             'commission_date': False,
@@ -556,6 +677,18 @@ class L10nUaAsset(models.Model):
                 initial_residual = max(0, depreciable - accumulated)
             running_residual = initial_residual
 
+            # П(С)БО 7 п.29: depreciation starts in the month following the
+            # commissioning month. Rows are dated at the end of their month.
+            # A board that already has posted rows continues right after the
+            # last of them (keeps legacy boards without a gap).
+            posted_dates = asset.depreciation_line_ids.filtered(
+                lambda l: l.state == 'posted' and l.line_type == 'depreciation'
+            ).mapped('date')
+            if posted_dates:
+                anchor_date, anchor_offset = max(posted_dates), posted_count
+            else:
+                anchor_date, anchor_offset = start_date, 0
+
             for month_num in range(posted_count + 1, asset.useful_life + 1):
                 month_in_remaining = month_num - posted_count
                 amount = asset._get_future_amount(
@@ -572,13 +705,9 @@ class L10nUaAsset(models.Model):
                     break
                 accumulated += amount
                 running_residual = max(0, running_residual - amount)
-                # Calculate date
-                dt = start_date
-                month = dt.month + (month_num - 1)
-                year = dt.year + (month - 1) // 12
-                month = (month - 1) % 12 + 1
-                day = min(dt.day, 28)  # safe day
-                line_date = dt.replace(year=year, month=month, day=day)
+                line_date = date_utils.end_of(
+                    anchor_date + relativedelta(months=month_num - anchor_offset),
+                    'month')
 
                 DepLine.create({
                     'asset_id': asset.id,

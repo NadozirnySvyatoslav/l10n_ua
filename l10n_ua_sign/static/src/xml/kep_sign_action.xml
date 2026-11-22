@@ -6,29 +6,29 @@
             <div class="o_kep_sign_card mx-auto">
                 <h3 class="mb-3">Підпис КЕП</h3>
 
-                <t t-if="state.phase === 'loading'">
+                <t t-if="this.state.phase === 'loading'">
                     <div class="text-muted">
                         <i class="fa fa-spinner fa-spin me-2"/>Підготовка даних…
                     </div>
                 </t>
 
-                <t t-elif="state.phase === 'error'">
+                <t t-elif="this.state.phase === 'error'">
                     <div class="alert alert-danger" role="alert">
-                        <t t-out="state.error"/>
+                        <t t-out="this.state.error"/>
                     </div>
-                    <button class="btn btn-secondary" t-on-click="onClose">Назад</button>
+                    <button class="btn btn-secondary" t-on-click="this.onClose">Назад</button>
                 </t>
 
-                <t t-elif="state.phase === 'done'">
+                <t t-elif="this.state.phase === 'done'">
                     <div class="alert alert-success" role="alert">
                         <div><strong>Готово.</strong></div>
-                        <div class="mt-1"><small t-out="state.receipt"/></div>
+                        <div class="mt-1"><small t-out="this.state.receipt"/></div>
                     </div>
-                    <button class="btn btn-primary" t-on-click="onClose">Закрити</button>
+                    <button class="btn btn-primary" t-on-click="this.onClose">Закрити</button>
                 </t>
 
                 <t t-else="">
-                    <t t-if="!state.libAvailable">
+                    <t t-if="!this.state.libAvailable">
                         <div class="alert alert-warning" role="alert">
                             Файли бібліотеки підпису IIT не знайдено у
                             <code>l10n_ua_sign/static/src/lib/euscp</code>. Потрібні
@@ -39,19 +39,19 @@
                     </t>
 
                     <p class="text-muted">
-                        <t t-if="authOnly">
+                        <t t-if="this.authOnly">
                             Буде підписано лише код платника — для авторизації в
                             електронному кабінеті.
                         </t>
                         <t t-else="">
-                            Документів до підпису: <strong t-out="docCount"/>.
+                            Документів до підпису: <strong t-out="this.docCount"/>.
                         </t>
                         Ключ і пароль обробляються лише у вашому браузері й не
                         передаються на сервер.
                     </p>
 
-                    <t t-if="state.error">
-                        <div class="alert alert-danger" role="alert" t-out="state.error"/>
+                    <t t-if="this.state.error">
+                        <div class="alert alert-danger" role="alert" t-out="this.state.error"/>
                     </t>
 
                     <!-- Крок 1: зчитати ключ -->
@@ -59,18 +59,18 @@
                         <h5>1. Зчитати ключ</h5>
                         <div class="mb-2">
                             <label class="form-label">Оберіть АЦСК</label>
-                            <select class="form-select" t-on-change="onCaChange"
-                                    t-att-disabled="state.busy">
-                                <option value="" t-att-selected="!state.caName">
+                            <select class="form-select" t-on-change="this.onCaChange"
+                                    t-att-disabled="this.state.busy">
+                                <option value="" t-att-selected="!this.state.caName">
                                     Визначати автоматично
                                 </option>
-                                <t t-foreach="state.caList" t-as="ca" t-key="ca.name">
+                                <t t-foreach="this.state.caList" t-as="ca" t-key="ca.name">
                                     <option t-att-value="ca.name"
-                                            t-att-selected="ca.name === state.caName"
+                                            t-att-selected="ca.name === this.state.caName"
                                             t-out="ca.name"/>
                                 </t>
                             </select>
-                            <small t-if="!state.caName" class="text-muted">
+                            <small t-if="!this.state.caName" class="text-muted">
                                 Бібліотека по черзі перепитає всі ЦСК — це довго. Оберіть
                                 свій ЦСК, щоб зчитати ключ одразу.
                             </small>
@@ -79,20 +79,20 @@
                             <label class="form-label">Файл-ключ (.dat / .jks / .pfx)</label>
                             <input type="file" class="form-control"
                                    accept=".dat,.jks,.pfx,.pk8,.zs2"
-                                   t-on-change="onKeyFileChange"/>
-                            <small t-if="state.keyFileName" class="text-muted"
-                                   t-out="state.keyFileName"/>
+                                   t-on-change="this.onKeyFileChange"/>
+                            <small t-if="this.state.keyFileName" class="text-muted"
+                                   t-out="this.state.keyFileName"/>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">Пароль до ключа</label>
                             <input type="password" class="form-control"
                                    autocomplete="off"
-                                   t-att-value="state.password"
-                                   t-on-input="onPasswordInput"/>
+                                   t-att-value="this.state.password"
+                                   t-on-input="this.onPasswordInput"/>
                         </div>
-                        <button class="btn btn-outline-primary" t-on-click="onReadKey"
-                                t-att-disabled="state.busy or !state.libAvailable">
-                            <t t-if="state.busy and !state.ownerRows">
+                        <button class="btn btn-outline-primary" t-on-click="this.onReadKey"
+                                t-att-disabled="this.state.busy or !this.state.libAvailable">
+                            <t t-if="this.state.busy and !this.state.ownerRows">
                                 <i class="fa fa-spinner fa-spin me-2"/>Зчитування…
                             </t>
                             <t t-else="">Зчитати ключ</t>
@@ -100,12 +100,12 @@
                     </div>
 
                     <!-- Дані власника ключа (після кроку 1) -->
-                    <t t-if="state.ownerRows">
+                    <t t-if="this.state.ownerRows">
                         <div class="alert alert-info" role="alert">
                             <div class="fw-bold mb-1">Ключ зчитано — перевірте власника:</div>
                             <table class="table table-sm mb-0">
                                 <tbody>
-                                    <tr t-foreach="state.ownerRows" t-as="row" t-key="row.label">
+                                    <tr t-foreach="this.state.ownerRows" t-as="row" t-key="row.label">
                                         <td class="text-muted" style="width: 40%">
                                             <t t-out="row.label"/>
                                         </td>
@@ -118,35 +118,35 @@
                         <!-- Крок 2: підписати -->
                         <div class="o_kep_step mb-3">
                             <h5>2. Підписати</h5>
-                            <button class="btn btn-primary" t-on-click="onSign"
-                                    t-att-disabled="state.busy">
-                                <t t-if="state.busy and !state.signed">
+                            <button class="btn btn-primary" t-on-click="this.onSign"
+                                    t-att-disabled="this.state.busy">
+                                <t t-if="this.state.busy and !this.state.signed">
                                     <i class="fa fa-spinner fa-spin me-2"/>Підписання…
                                 </t>
                                 <t t-else="">Підписати</t>
                             </button>
-                            <span t-if="state.signed" class="badge text-bg-success ms-2">
+                            <span t-if="this.state.signed" class="badge text-bg-success ms-2">
                                 <i class="fa fa-check me-1"/>Підписано
                             </span>
                         </div>
                     </t>
 
                     <!-- Крок 3: відправити (після кроку 2) -->
-                    <t t-if="state.signed">
+                    <t t-if="this.state.signed">
                         <div class="o_kep_step mb-3">
-                            <h5>3. <t t-out="submitLabel"/></h5>
-                            <button class="btn btn-success" t-on-click="onSend"
-                                    t-att-disabled="state.busy">
-                                <t t-if="state.busy">
+                            <h5>3. <t t-out="this.submitLabel"/></h5>
+                            <button class="btn btn-success" t-on-click="this.onSend"
+                                    t-att-disabled="this.state.busy">
+                                <t t-if="this.state.busy">
                                     <i class="fa fa-spinner fa-spin me-2"/>Відправлення…
                                 </t>
-                                <t t-else=""><t t-out="submitLabel"/></t>
+                                <t t-else=""><t t-out="this.submitLabel"/></t>
                             </button>
                         </div>
                     </t>
 
                     <hr/>
-                    <button class="btn btn-link text-muted p-0" t-on-click="onClose">
+                    <button class="btn btn-link text-muted p-0" t-on-click="this.onClose">
                         Скасувати
                     </button>
                 </t>

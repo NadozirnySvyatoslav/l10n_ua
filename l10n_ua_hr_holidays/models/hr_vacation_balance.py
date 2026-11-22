@@ -161,7 +161,7 @@ class HrVacationBalance(models.Model):
     def _ensure_periods_up_to(self, employee, leave_type, up_to_date,
                               select_date=None):
         """Create every missing accounting period for (employee, leave_type)
-        from the employee's hire anchor up to up_to_date, refresh the carry-over
+        from the start of its chain (_chain_start) up to up_to_date, refresh the carry-over
         chain, and return the period that contains select_date (default:
         up_to_date). Empty recordset when it cannot be resolved (e.g. a
         work-year type without a hire anchor).
@@ -171,7 +171,8 @@ class HrVacationBalance(models.Model):
         into, which may be a future period when a vacation is planned ahead."""
         if not employee or not leave_type:
             return self.browse()
-        self._generate_period_chain(employee, leave_type, up_to_date)
+        self._generate_period_chain(employee, leave_type, up_to_date,
+                                    select_date=select_date)
         chain = self.search([
             ('employee_id', '=', employee.id),
             ('leave_type_id', '=', leave_type.id),
@@ -216,6 +217,73 @@ class HrVacationBalance(models.Model):
         year was carried over from another company — so no separate version
         fallback is needed here or in hr.employee._get_work_year_for_date."""
         return employee._get_vacation_anchor_date() if employee else False
+
+    @api.model
+    def _chain_start(self, employee, leave_type, select_date=None,
+                     up_to_date=None):
+        """Where the carry-over chain of (employee, leave_type) starts.
+
+        Returns ``(start_date, opening_days)``. Periods ending before
+        ``start_date`` stay as they are but feed nothing forward; the period
+        containing it gets ``opening_days`` as Carried Over, or keeps its own
+        Carried Over when ``opening_days`` is None.
+
+        The chain used to start at the hire date, so an employee hired in
+        2017 whose earlier vacations were never entered in Odoo accrued 24
+        "unused" days for every year of that unknown history. The start is
+        now, by priority:
+
+        1. the employee's opening balance (date + days of annual basic
+           leave) — the days already known to be unused at that point;
+        2. the company's vacation accounting start date — what was before
+           it is not in the system, so nothing is carried from there;
+        3. otherwise the recorded history: the earliest of the existing
+           accounting periods of this type, the first leave of this type,
+           the leave being recorded, today and the date the chain is built
+           up to (a report "as of" a past date) — so without any history the
+           chain starts at the current period.
+
+        Never before the hire anchor.
+        """
+        hire = self._employee_hire_anchor(employee)
+        today = fields.Date.today()
+        emp = employee.sudo()
+
+        def bound(day):
+            return max(day, hire) if hire else day
+
+        if emp.l10n_ua_vacation_opening_date:
+            days = (emp.l10n_ua_vacation_opening_days
+                    if leave_type.ua_leave_category == 'annual_basic' else 0.0)
+            return bound(emp.l10n_ua_vacation_opening_date), days or 0.0
+        company = emp.company_id or self.env.company
+        if company.l10n_ua_vacation_accounting_start:
+            start = bound(company.l10n_ua_vacation_accounting_start)
+            earlier = self.sudo().search_count([
+                ('employee_id', '=', employee.id),
+                ('leave_type_id', '=', leave_type.id),
+                ('period_end', '<', start),
+            ])
+            return start, (0.0 if earlier else None)
+        candidates = [today]
+        for day in (select_date, up_to_date):
+            if day:
+                candidates.append(day)
+        first_period = self.sudo().search([
+            ('employee_id', '=', employee.id),
+            ('leave_type_id', '=', leave_type.id),
+        ], order='period_start', limit=1)
+        if first_period:
+            candidates.append(first_period.period_start)
+        first_leave = self.env['hr.leave'].sudo().search([
+            ('employee_id', '=', employee.id),
+            ('work_entry_type_id', '=', leave_type.id),
+            ('state', 'not in', ('refuse', 'cancel')),
+            ('request_date_from', '!=', False),
+        ], order='request_date_from', limit=1)
+        if first_leave:
+            candidates.append(first_leave.request_date_from)
+        return bound(min(candidates)), None
 
     @api.model
     def _ref_date_for_year(self, year):
@@ -400,10 +468,11 @@ class HrVacationBalance(models.Model):
             rec.planned_days = sum(planned_leaves.mapped('calendar_days'))
 
     @api.model
-    def _generate_period_chain(self, employee, leave_type, up_to_date=None):
+    def _generate_period_chain(self, employee, leave_type, up_to_date=None,
+                               select_date=None):
         """Create every missing accounting period for (employee, leave_type)
-        from the employee's first period (on/after the hire anchor) up to the
-        period containing up_to_date (default: today).
+        from the start of its chain (see _chain_start — not the hire date)
+        up to the period containing up_to_date (default: today).
 
         Filling the gaps is what lets carry-over cascade across a year in
         which no leave was taken: without the missing year's row, its unused
@@ -415,9 +484,14 @@ class HrVacationBalance(models.Model):
             return self.browse()
         if up_to_date is None:
             up_to_date = fields.Date.today()
-        # Walk from the employment anchor forward so the whole history is
-        # filled; with no anchor at all we can only handle the current period.
-        cursor = self._employee_hire_anchor(employee) or up_to_date
+        # Walk from the start of the chain forward so the recorded history
+        # is filled; with no anchor at all we can only handle the current
+        # period (and a work-year type resolves none).
+        if self._employee_hire_anchor(employee):
+            cursor = self._chain_start(
+                employee, leave_type, select_date, up_to_date)[0]
+        else:
+            cursor = up_to_date
         created = self.browse()
         guard = 0
         while cursor <= up_to_date and guard < 200:
@@ -457,10 +531,12 @@ class HrVacationBalance(models.Model):
 
         Runs for transferable, day-accruing leave types that are additionally
         flagged with ua_auto_calc_balance; for each of them, every period from
-        the employee's hire anchor up to the reference date is created if
-        missing — so a year with no leave taken no longer breaks the carry-over
-        chain. Employees without a hire anchor get only the currently
-        resolvable period (work-year types: none).
+        the start of the employee's chain (_chain_start: opening balance,
+        company accounting start or recorded history — not the hire date) up
+        to the reference date is created if missing — so a year with no leave
+        taken no longer breaks the carry-over chain. Employees without a hire
+        anchor get only the currently resolvable period (work-year types:
+        none).
 
         The reference date is `up_to_date` when given (used by the "as of a
         date" summary report), otherwise the reference date of `year`, or today.
@@ -491,8 +567,7 @@ class HrVacationBalance(models.Model):
                 # only ever get one balance per type and period.
                 created |= self._generate_period_chain(
                     employee, leave_type, up_to_date)
-        # Refresh the rollups for EVERY period of the processed types back to
-        # the hire date — not only the newly created rows — so "Recalculate"
+        # Refresh the rollups for EVERY period of the processed types — not only the newly created rows — so "Recalculate"
         # actually re-runs used/planned/remaining and the carry-over chain for
         # all historical periods, not just the current one.
         if leave_types and employees:
@@ -542,8 +617,9 @@ class HrVacationBalance(models.Model):
 
         Lets a back-dated period feed its unused days into the following
         periods (e.g. a leave entered late for last year updates this
-        year's Carried Over). The first period keeps its own (possibly
-        manual) carried_over untouched.
+        year's Carried Over). The chain starts where _chain_start says: its
+        first period gets the opening balance, or keeps its own (possibly
+        manual) carried_over when there is none.
         """
         seen = set()
         for rec in self:
@@ -557,6 +633,11 @@ class HrVacationBalance(models.Model):
                 ('employee_id', '=', rec.employee_id.id),
                 ('leave_type_id', '=', rec.leave_type_id.id),
             ], order='period_start')
+            start, opening = self._chain_start(
+                rec.employee_id, rec.leave_type_id)
+            # Periods before the start of the chain are left alone and feed
+            # nothing forward (see _chain_start).
+            chain = chain.filtered(lambda b: b.period_end >= start)
             prev = None
             for bal in chain:
                 if prev is not None:
@@ -564,6 +645,8 @@ class HrVacationBalance(models.Model):
                         bal.leave_type_id, prev.remaining_days)
                     if bal.carried_over != allowed:
                         bal.carried_over = allowed
+                elif opening is not None and bal.carried_over != opening:
+                    bal.carried_over = opening
                 prev = bal
 
     def _recompute_related_leaves(self):
@@ -695,6 +778,24 @@ class HrVacationBalance(models.Model):
 
         compensation = compensable_days * avg_salary
         return round(compensation, 2)
+
+    def _l10n_ua_unused_days_on(self, day):
+        """Unused days of this period on `day` — the last day of work.
+
+        A work year interrupted by the dismissal gives only the part of its
+        entitlement earned up to that day (art. 24 of the Vacation Law
+        compensates the days the employee is entitled to, not the whole
+        year); a calendar-year type is granted for the year as a whole.
+        """
+        self.ensure_one()
+        entitled = self.entitled_days or 0.0
+        if (self.period_type == 'work' and self.period_start <= day
+                < self.period_end):
+            span = (self.period_end - self.period_start).days + 1
+            earned = (day - self.period_start).days + 1
+            entitled = round(entitled * earned / span, 2)
+        return round((self.carried_over or 0.0) + entitled
+                     - (self.used_days or 0.0), 2)
 
     def action_calculate_compensation(self):
         """Action to calculate and display compensation amount."""

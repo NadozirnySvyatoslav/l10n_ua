@@ -21,6 +21,15 @@
                             <field name="depreciation_account_id"/>
                         </group>
                     </group>
+                    <group>
+                        <group string="Проводка введення в експлуатацію">
+                            <field name="create_commission_move"/>
+                            <field name="fixed_asset_account_id"
+                                   required="create_commission_move"/>
+                            <field name="commission_account_id"
+                                   required="create_commission_move"/>
+                        </group>
+                    </group>
                     <field name="description" placeholder="Опис..."/>
                 </sheet>
             </form>

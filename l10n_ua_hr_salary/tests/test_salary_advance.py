@@ -209,3 +209,38 @@ class TestSalaryAdvance(SalaryTestCase):
         # Net advance, not gross
         self.assertLess(deduction.amount, advance.gross_amount)
 
+
+    def test_generate_advances_only_contracts_on_payment_date(self):
+        """A contract that ended before the payment date or starts after it
+        gives no advance."""
+        made = {}
+        for key, start, end in (
+                ('ended', date(2024, 1, 1), date(2025, 5, 31)),
+                ('future', date(2025, 7, 1), False),
+                ('active', date(2025, 6, 2), False)):
+            employee = self.env['hr.employee'].create({
+                'name': f'Аванс {key}', 'company_id': self.company.id,
+            })
+            version = self.env['hr.version'].create({
+                'employee_id': employee.id,
+                'contract_date_start': start,
+                'contract_date_end': end,
+                'date_version': start,
+                'wage': 20000,
+                'contract_type_ua': 'permanent',
+                'employment_type_ua': 'primary',
+                'company_id': self.company.id,
+            })
+            employee.write({'current_version_id': version.id})
+            made[key] = employee
+        run = self.env['hr.salary.advance.run'].create({
+            'name': 'Тест Аванс за договорами',
+            'date': date(2025, 6, 15),
+            'wage_percent': 50.0,
+            'company_id': self.company.id,
+        })
+        run.action_generate_advances()
+        employees = run.advance_ids.employee_id
+        self.assertIn(made['active'], employees)
+        self.assertNotIn(made['ended'], employees)
+        self.assertNotIn(made['future'], employees)

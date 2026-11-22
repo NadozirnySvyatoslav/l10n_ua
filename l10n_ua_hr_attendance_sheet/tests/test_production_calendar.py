@@ -20,10 +20,11 @@ class TestProductionCalendar(TransactionCase):
         super().setUpClass()
         cls.company = cls.env.company
 
-    def _create_calendar(self, year=2025):
+    def _create_calendar(self, year=2025, **kwargs):
         return self.env['hr.production.calendar'].create({
             'year': year,
             'company_id': self.company.id,
+            **kwargs,
         })
 
     def test_calendar_creation(self):
@@ -51,8 +52,8 @@ class TestProductionCalendar(TransactionCase):
         self.assertLess(cal.working_days, 270)
 
     def test_calendar_holidays(self):
-        """Should detect Ukrainian public holidays."""
-        cal = self._create_calendar(2025)
+        """Should detect Ukrainian public holidays (outside martial law)."""
+        cal = self._create_calendar(2025, martial_law=False)
         cal.action_generate_calendar()
         self.assertGreater(cal.holidays, 0)
 
@@ -63,8 +64,8 @@ class TestProductionCalendar(TransactionCase):
         # New Year
         from datetime import date as d
         self.assertIn(d(2025, 1, 1), holidays)
-        # Christmas (Julian)
-        self.assertIn(d(2025, 1, 7), holidays)
+        # Since 2023 there is no Julian Christmas
+        self.assertNotIn(d(2025, 1, 7), holidays)
         # Independence Day
         self.assertIn(d(2025, 8, 24), holidays)
         # Constitution Day
@@ -87,7 +88,7 @@ class TestProductionCalendar(TransactionCase):
 
     def test_calendar_line_day_type(self):
         """Lines should have correct day types."""
-        cal = self._create_calendar(2025)
+        cal = self._create_calendar(2025, martial_law=False)
         cal.action_generate_calendar()
         day_types = set(cal.line_ids.mapped('day_type'))
         self.assertIn('working', day_types)
@@ -100,3 +101,43 @@ class TestProductionCalendar(TransactionCase):
         cal.action_generate_calendar()
         jan_lines = cal.line_ids.filtered(lambda l: l.month == 1)
         self.assertEqual(len(jan_lines), 31)
+
+    def test_ua_holidays_since_2023(self):
+        """Law 3005-IX: Christmas only on 25.12, 8 May instead of 9 May,
+        Defenders Day on 1 October instead of 14 October."""
+        from datetime import date as d
+        holidays = self._create_calendar(2026)._get_ua_holidays(2026)
+        self.assertIn(d(2026, 12, 25), holidays)
+        self.assertNotIn(d(2026, 1, 7), holidays)
+        self.assertIn(d(2026, 5, 8), holidays)
+        self.assertNotIn(d(2026, 5, 9), holidays)
+        self.assertIn(d(2026, 10, 1), holidays)
+        self.assertNotIn(d(2026, 10, 14), holidays)
+        old = self._create_calendar(2021)._get_ua_holidays(2021)
+        self.assertIn(d(2021, 1, 7), old)
+        self.assertIn(d(2021, 5, 9), old)
+        self.assertIn(d(2021, 10, 14), old)
+
+    def test_martial_law_by_default_no_days_off(self):
+        """Under martial law (the default) 2026 has no non-working holidays:
+        every weekday is an 8-hour working day."""
+        from datetime import date as d
+        cal = self._create_calendar(2026)
+        self.assertTrue(cal.martial_law)
+        cal.action_generate_calendar()
+        self.assertEqual(cal.holidays, 0)
+        self.assertEqual(cal.working_days, 261)
+        self.assertEqual(cal.working_hours, 261 * 8.0)
+        independence = cal.line_ids.filtered(lambda l: l.date == d(2026, 8, 24))
+        self.assertEqual(independence.day_type, 'working')
+        self.assertTrue(independence.holiday_name)
+
+    def test_without_martial_law_holidays_are_days_off(self):
+        from datetime import date as d
+        cal = self._create_calendar(2026, martial_law=False)
+        cal.action_generate_calendar()
+        defenders = cal.line_ids.filtered(lambda l: l.date == d(2026, 10, 1))
+        self.assertEqual(defenders.day_type, 'holiday')
+        # 30 September is the shortened pre-holiday day
+        eve = cal.line_ids.filtered(lambda l: l.date == d(2026, 9, 30))
+        self.assertEqual(eve.working_hours, 7.0)

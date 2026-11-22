@@ -55,7 +55,13 @@ class L10nUaMedecinPatient(models.Model):
         compute='_compute_active_declaration', store=True)
     active_doctor_id = fields.Many2one(
         'hr.employee', string='Поточний лікар',
-        related='active_declaration_id.doctor_id', store=True, readonly=True)
+        related='active_declaration_id.doctor_id', store=True, readonly=True,
+        # A related field inherits `tracking` from its target
+        # (declaration.doctor_id is tracked), so it would post a "Поточний
+        # лікар" note on the patient every time a declaration changes, even
+        # under `tracking_disable` (recompute runs in the flush context).
+        # The change is already tracked on the declaration itself.
+        tracking=False)
     note = fields.Text(string='Примітки')
     display_name = fields.Char(compute='_compute_display_name', store=True)
     active = fields.Boolean(default=True)

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Medecin Base',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Human Resources/Healthcare',
     'summary': 'Базис для українських закладів охорони здоров\'я',
     'description': """

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_l10n_ua_education_root"
-              name="Освіта (UA)"
+              name="Освіта"
               sequence="55"
               web_icon="l10n_ua_education_base,static/description/icon.png"
               groups="group_ua_education_user"/>

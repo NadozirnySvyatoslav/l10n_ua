@@ -3,13 +3,13 @@
 
     <!-- Inherits web.PivotView, which lives in web.assets_backend_lazy, so the
          template must travel in the same bundle — otherwise t-inherit will not
-         find its parent. The pivot leaves the control-panel-always-buttons slot
+         find its parent. The pivot leaves the control-panel-buttons slot
          empty, so it is added here. -->
     <t t-name="l10n_ua_stock_forms.MaterialReportPivotView"
        t-inherit="web.PivotView" t-inherit-mode="primary">
-        <xpath expr="//t[@t-set-slot='layout-actions']" position="before">
-            <t t-set-slot="control-panel-always-buttons">
-                <MaterialReportPeriodRange t-props="materialReportPeriodProps"/>
+        <xpath expr="//t[@t-set-slot='control-panel-additional-actions']" position="before">
+            <t t-set-slot="control-panel-buttons">
+                <MaterialReportPeriodRange t-props="this.materialReportPeriodProps"/>
             </t>
         </xpath>
     </t>

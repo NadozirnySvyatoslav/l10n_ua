@@ -11,6 +11,11 @@
                 <field name="vacation_anchor_date"
                        placeholder="Дата прийняття"
                        groups="hr.group_hr_user"/>
+                <field name="l10n_ua_vacation_opening_date"
+                       groups="hr.group_hr_user"/>
+                <field name="l10n_ua_vacation_opening_days"
+                       invisible="not l10n_ua_vacation_opening_date"
+                       groups="hr.group_hr_user"/>
             </field>
         </field>
     </record>

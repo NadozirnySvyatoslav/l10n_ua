@@ -99,3 +99,30 @@ class TestReport1DF(TransactionCase):
             'income_type': '101',
         })
         self.assertEqual(len(report.line_ids), 1)
+
+    def test_generate_includes_payslips_ending_on_31st(self):
+        """A quarter ends on its real last day, not on the 28th: payslips of
+        March (ending 31.03) and of the 30-day months belong to the report."""
+        from datetime import date
+        for month_end in (date(2025, 1, 31), date(2025, 3, 31)):
+            slip = self.env['hr.payslip'].create({
+                'employee_id': self.employee.id,
+                'date_from': month_end.replace(day=1),
+                'date_to': month_end,
+                'company_id': self.company.id,
+            })
+            slip.write({'state': 'done'})
+        report = self._create_report(year=2025, quarter='1')
+        report.action_generate()
+        self.assertEqual(report.total_employees, 1)
+
+        q2 = self._create_report(year=2025, quarter='2')
+        slip = self.env['hr.payslip'].create({
+            'employee_id': self.employee.id,
+            'date_from': date(2025, 6, 1),
+            'date_to': date(2025, 6, 30),
+            'company_id': self.company.id,
+        })
+        slip.write({'state': 'done'})
+        q2.action_generate()
+        self.assertEqual(q2.total_employees, 1)

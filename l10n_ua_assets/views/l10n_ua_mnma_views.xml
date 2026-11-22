@@ -35,6 +35,9 @@
                             <field name="name"/>
                             <field name="inventory_number"/>
                             <field name="date"/>
+                            <field name="document_date"
+                                   invisible="state == 'written_off'"
+                                   placeholder="сьогодні"/>
                             <field name="commission_date" readonly="1"/>
                             <field name="commission_act_number" readonly="1"
                                    invisible="not commission_act_number"/>

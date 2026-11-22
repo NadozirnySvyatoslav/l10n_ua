@@ -112,3 +112,19 @@ class TestVersionAllowance(ContractTestCase):
         version.invalidate_recordset()
         self.assertEqual(version.total_allowances, 7000)
         self.assertEqual(version.total_wage, 32000)
+
+    def test_allowance_active_between_uses_the_period(self):
+        """An allowance is judged by the period asked about, not by today."""
+        version = self._create_version(wage=25000)
+        past = self._create_allowance(
+            version=version, date_from=date(2020, 1, 1), date_to=date(2020, 12, 31))
+        later = self._create_allowance(
+            version=version, allowance_type_id=self.allowance_hazard.id,
+            date_from=date(2021, 1, 1))
+        allowances = past | later
+        self.assertEqual(
+            allowances._l10n_ua_active_between(date(2020, 6, 1), date(2020, 6, 30)),
+            past)
+        self.assertEqual(
+            allowances._l10n_ua_active_between(date(2020, 12, 1), date(2021, 1, 31)),
+            allowances)

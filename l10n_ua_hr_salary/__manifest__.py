@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Salary',
-    'version': '20.0.1.4.4',
+    'version': '20.0.1.5.0',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian salary calculation',
     'description': """

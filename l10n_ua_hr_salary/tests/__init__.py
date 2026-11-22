@@ -20,3 +20,6 @@ from . import test_ifobs_employee
 from . import test_seniority_piece
 from . import test_salary_currency
 from . import test_advance_currency
+from . import test_esv_min_base
+from . import test_payslip_period
+from . import test_absence_accruals

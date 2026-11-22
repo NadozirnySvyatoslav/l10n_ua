@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Budget Base (Public Sector)',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.0.1',
     'category': 'Accounting/Localization',
     'summary': 'Foundation for Ukrainian public-sector accounting: budget classifications and fund accounting',
     'description': """

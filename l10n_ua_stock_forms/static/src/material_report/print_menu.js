@@ -18,8 +18,6 @@ const cogMenuRegistry = registry.category("cogMenu");
 export class MaterialReportPrintMenu extends Component {
     static template = "l10n_ua_stock_forms.MaterialReportPrintMenu";
     static components = { DropdownItem };
-    static props = {};
-
     setup() {
         this.action = useService("action");
     }
