@@ -818,10 +818,14 @@ class L10nUaTaxInvoiceLine(models.Model):
         string='Ставка ПДВ',
         default='20',
     )
+    # readonly=False: ПН з рахунку передає ПДВ рядка з tax-рядків документа
+    # (#599), бо перерахунок база × ставка розходиться з ним на копійки.
+    # Ручний рядок, як і раніше, рахується від бази.
     vat_amount = fields.Monetary(
         string='Сума ПДВ',
-        compute='_compute_amounts',
+        compute='_compute_vat_amount',
         store=True,
+        readonly=False,
         currency_field='currency_id',
     )
     price_unit_display = fields.Char(
@@ -845,12 +849,20 @@ class L10nUaTaxInvoiceLine(models.Model):
             decimals = len(text.partition('.')[2])
             line.price_unit_display = text + '0' * max(0, 2 - decimals)
 
-    @api.depends('quantity', 'price_unit', 'vat_rate')
+    @api.depends('quantity', 'price_unit')
     def _compute_amounts(self):
-        rates = {'20': 0.20, '14': 0.14, '7': 0.07, '0': 0.0}
         for line in self:
             currency = line.currency_id
             base = line.quantity * line.price_unit
             line.base_amount = currency.round(base) if currency else base
+
+    # Окремий метод: vat_amount редагований (ПДВ з рахунку, #599), а поля
+    # одного compute-методу Odoo захищає від перерахунку разом — переданий
+    # ПДВ лишав би базу непорахованою.
+    @api.depends('base_amount', 'vat_rate')
+    def _compute_vat_amount(self):
+        rates = {'20': 0.20, '14': 0.14, '7': 0.07, '0': 0.0}
+        for line in self:
+            currency = line.currency_id
             vat = line.base_amount * rates.get(line.vat_rate, 0.0)
             line.vat_amount = currency.round(vat) if currency else vat
