@@ -117,18 +117,88 @@ class TestPeriodClosingLock(AccountingTestCase):
         closing.action_reverse()
         self.assertFalse(self.company.fiscalyear_lock_date)
 
-    def test_later_lock_is_not_moved_back(self):
-        """A lock set beyond the period stays as it is, on closing and on reversal."""
+    def _assert_moves_in_period(self, moves, period):
+        for move in moves:
+            self.assertGreaterEqual(move.date, period.date_start)
+            self.assertLessEqual(move.date, period.date_end)
+
+    def test_locked_period_cannot_be_closed(self):
+        """QA #641 п.1: a lock on or past the period end would move the closing
+        entries into the next period — the closing is refused, nothing posted."""
         period = self._period(2033, 4, 30)
         self._expense(date(2033, 4, 10))
-        closing = self._closing(period)
-        self.company.fiscalyear_lock_date = date(2033, 5, 31)
+        for lock in (date(2033, 4, 30), date(2033, 5, 31)):
+            self.company.fiscalyear_lock_date = lock
+            closing = self._closing(period)
+            with self.assertRaises(UserError):
+                closing.action_close()
+            self.assertEqual(closing.state, 'draft')
+            self.assertFalse(closing.closing_move_id)
+            self.assertEqual(self.company.fiscalyear_lock_date, lock)
+            # Also without locking: the entries would still be moved.
+            closing.lock_period = False
+            with self.assertRaises(UserError):
+                closing.action_close()
+
+    def test_manual_lock_is_not_removed_by_reversal(self):
+        """QA #641 п.2: a lock date set by hand equal to the period end is
+        not cleared by the reversal, and the reversal is refused instead of
+        being posted after the lock."""
+        period = self._period(2033, 8, 31)
+        self._expense(date(2033, 8, 10))
+        closing = self._closing(period, lock_period=False)
         closing.action_close()
-        self.assertEqual(self.company.fiscalyear_lock_date, date(2033, 5, 31))
-        self.assertFalse(closing.previous_lock_date)
-        self.company.fiscalyear_lock_date = date(2033, 3, 31)
+        self.assertFalse(closing.lock_date_set)
+        self.company.fiscalyear_lock_date = date(2033, 8, 31)
+        with self.assertRaises(UserError):
+            closing.action_reverse()
+        self.assertEqual(closing.state, 'closed')
+        self.assertEqual(self.company.fiscalyear_lock_date, date(2033, 8, 31))
+        # Once the accountant moves the lock back, the reversal stays in the period.
+        self.company.fiscalyear_lock_date = date(2033, 7, 31)
         closing.action_reverse()
-        self.assertEqual(self.company.fiscalyear_lock_date, date(2033, 3, 31))
+        self.assertEqual(self.company.fiscalyear_lock_date, date(2033, 7, 31))
+        reversals = self.env['account.move'].search([
+            ('reversed_entry_id', 'in', (closing.closing_move_id | closing.retained_move_id).ids),
+        ])
+        self.assertEqual(len(reversals), 2)
+        self._assert_moves_in_period(reversals, period)
+
+    def test_earlier_closing_reversed_only_after_later_one(self):
+        """QA #641 п.3: with June closed, May cannot be reversed (its reversal
+        would be dated 01.07); reversing June first, then May, works."""
+        may, june = self._period(2033, 9, 30), self._period(2033, 10, 31)
+        self._expense(date(2033, 9, 10))
+        self._expense(date(2033, 10, 10))
+        closing_may = self._closing(may)
+        closing_may.action_close()
+        closing_june = self._closing(june)
+        closing_june.action_close()
+        self.assertEqual(closing_june.previous_lock_date, date(2033, 9, 30))
+
+        with self.assertRaises(UserError):
+            closing_may.action_reverse()
+        self.assertEqual(closing_may.state, 'closed')
+        self.assertEqual(self.company.fiscalyear_lock_date, date(2033, 10, 31))
+
+        closing_june.action_reverse()
+        self.assertEqual(self.company.fiscalyear_lock_date, date(2033, 9, 30))
+        closing_may.action_reverse()
+        self.assertFalse(self.company.fiscalyear_lock_date)
+        reversals = self.env['account.move'].search([
+            ('reversed_entry_id', 'in',
+             (closing_may.closing_move_id | closing_may.retained_move_id).ids),
+        ])
+        self.assertEqual(len(reversals), 2)
+        self._assert_moves_in_period(reversals, may)
+
+    def test_closing_entries_dated_in_period(self):
+        period = self._period(2033, 11, 30)
+        self._expense(date(2033, 11, 10))
+        closing = self._closing(period)
+        closing.action_close()
+        self._assert_moves_in_period(
+            closing.closing_move_id | closing.retained_move_id, period)
 
     def test_unreconciled_statement_line_blocks_closing(self):
         """Odoo will not lock a period with unreconciled bank statement lines;

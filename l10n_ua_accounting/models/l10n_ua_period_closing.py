@@ -95,6 +95,13 @@ class L10nUaPeriodClosing(models.Model):
         help='The global lock date of the company before this closing set it; '
              'reversing the closing puts it back.',
     )
+    lock_date_set = fields.Boolean(
+        string='Lock Date Set by Closing',
+        readonly=True,
+        copy=False,
+        help='The global lock date of the company was set by this closing. '
+             'Only then reversing the closing puts the previous one back.',
+    )
     note = fields.Text(string='Notes')
 
     # --- Config accounts (with smart defaults) ---
@@ -392,6 +399,9 @@ class L10nUaPeriodClosing(models.Model):
 
         self._set_default_accounts()
         self._validate_accounts()
+        # A lock date already covering the period would silently move the
+        # closing entries into the next one.
+        self._check_period_not_locked()
         # Fail before posting anything if the period cannot be locked —
         # Odoo refuses while bank statement lines of it are unreconciled.
         lock_vals = self._lock_values()
@@ -425,7 +435,10 @@ class L10nUaPeriodClosing(models.Model):
 
         # Lock period
         if lock_vals:
-            self.previous_lock_date = self.company_id.fiscalyear_lock_date
+            self.write({
+                'previous_lock_date': self.company_id.fiscalyear_lock_date,
+                'lock_date_set': True,
+            })
             self.company_id.sudo().write(lock_vals)
 
         # Close the tax period
@@ -571,6 +584,19 @@ class L10nUaPeriodClosing(models.Model):
         if self.state != 'closed':
             raise UserError(_('Can only reverse a closed period.'))
 
+        # Closings are undone newest first: a later closed period keeps the
+        # lock date past this one, and the reversals would land after it.
+        later = self.search([
+            ('company_id', '=', self.company_id.id),
+            ('state', '=', 'closed'),
+            ('date', '>', self.date),
+        ], order='date asc', limit=1)
+        if later:
+            raise UserError(_(
+                'The period %(later)s is closed after %(period)s. '
+                'Reverse the closing of %(later)s first.',
+                later=later.period_id.name, period=self.period_id.name))
+
         # Unlock first: the reversals are dated in the period, and a lock
         # date still covering it would move them past the lock.
         self._unlock_period()
@@ -599,7 +625,28 @@ class L10nUaPeriodClosing(models.Model):
 
         # Reopen period
         self.period_id.write({'state': 'open'})
-        self.write({'state': 'reversed'})
+        self.write({'state': 'reversed', 'lock_date_set': False})
+
+    def _check_period_not_locked(self):
+        """Refuse to close a period the company lock dates already cover.
+
+        Odoo moves an entry dated on or before the lock date to the day after
+        it, so the closing entries would be posted into the next period.
+        """
+        self.ensure_one()
+        company = self.company_id
+        end = self.period_id.date_end
+        lock = max(
+            (d for d in (company.fiscalyear_lock_date, company.hard_lock_date) if d),
+            default=False,
+        )
+        if lock and lock >= end:
+            raise UserError(_(
+                'The period %(period)s is already locked by the lock date '
+                '%(date)s, so the closing entries would be posted after it. '
+                'Reverse the later closings or move the lock date back '
+                'before closing.',
+                period=self.period_id.name, date=lock))
 
     def _lock_values(self):
         """The lock date to set when closing, or an empty dict.
@@ -619,9 +666,10 @@ class L10nUaPeriodClosing(models.Model):
     def _unlock_period(self):
         """Put back the lock date the closing replaced, if it is still ours.
 
-        A lock date moved on since — by a later closing or by hand — is left
-        as it is: that later closing must be reversed first, and a manual
-        lock is the accountant's decision.
+        Only a lock date this closing set is touched; one set by hand is the
+        accountant's decision. If any lock date still covers the period after
+        that, the reversal is refused: the reversing entries would be moved
+        past the lock, out of the period.
         """
         self.ensure_one()
         company = self.company_id
@@ -631,7 +679,15 @@ class L10nUaPeriodClosing(models.Model):
                 'The period %(period)s is under the hard lock date %(date)s, '
                 'which cannot be removed. The closing cannot be reversed.',
                 period=self.period_id.name, date=company.hard_lock_date))
-        if not self.lock_period or company.fiscalyear_lock_date != end:
+        current = company.fiscalyear_lock_date
+        ours = self.lock_date_set and current == end
+        if current and current >= end and not ours:
+            raise UserError(_(
+                'The lock date %(date)s was not set by this closing and covers '
+                'the period %(period)s, so the reversing entries would be '
+                'posted after it. Move the lock date back before reversing.',
+                period=self.period_id.name, date=current))
+        if not ours:
             return
         previous = self.previous_lock_date
         if previous and previous >= end:

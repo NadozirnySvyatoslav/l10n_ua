@@ -6253,3 +6253,51 @@ msgid ""
 msgstr ""
 "Період %(period)s підпадає під остаточну дату блокування %(date)s, яку не "
 "можна зняти. Закриття неможливо скасувати."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__lock_date_set
+msgid "Lock Date Set by Closing"
+msgstr "Дату блокування встановило закриття"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__lock_date_set
+msgid ""
+"The global lock date of the company was set by this closing. Only then "
+"reversing the closing puts the previous one back."
+msgstr ""
+"Глобальну дату блокування компанії встановило це закриття. Лише тоді "
+"скасування закриття повертає попередню дату."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid ""
+"The period %(later)s is closed after %(period)s. Reverse the closing of "
+"%(later)s first."
+msgstr ""
+"Період %(later)s закрито пізніше за %(period)s. Спершу скасуйте закриття "
+"%(later)s."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid ""
+"The period %(period)s is already locked by the lock date %(date)s, so the "
+"closing entries would be posted after it. Reverse the later closings or move "
+"the lock date back before closing."
+msgstr ""
+"Період %(period)s уже заблоковано датою %(date)s, тож проводки закриття "
+"потрапили б після неї. Скасуйте пізніші закриття або перенесіть дату "
+"блокування назад і тоді закривайте."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid ""
+"The lock date %(date)s was not set by this closing and covers the period "
+"%(period)s, so the reversing entries would be posted after it. Move the lock "
+"date back before reversing."
+msgstr ""
+"Дату блокування %(date)s встановило не це закриття, і вона охоплює період "
+"%(period)s, тож сторно потрапило б після неї. Перенесіть дату блокування "
+"назад і тоді скасовуйте."
