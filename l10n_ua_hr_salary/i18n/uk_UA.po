@@ -3723,3 +3723,37 @@ msgstr "Для премії — період, за який її нарахов�
 #: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_payslip_accrual__l10n_ua_bonus_period_to
 msgid "For a bonus for a quarter, half-year or year: the last month of the period it is for, when that is not the month of the payslip (a bonus for the first quarter accrued in April: March). The average salary divides the bonus by the working days worked in that period (Порядок № 100, п. 3, абз. 3)."
 msgstr "Для премії за квартал, півріччя чи рік — останній місяць періоду, за який її нараховано, якщо це не місяць листка (премія за I квартал, нарахована у квітні, — березень). Середня зарплата ділить премію на робочі дні, відпрацьовані в цьому періоді (Порядок № 100, п. 3, абз. 3)."
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip_run.py:0
+msgid ""
+"No payslip for %(count)s employee(s), fix and generate again:\n"
+"%(lines)s"
+msgstr ""
+"Без листка лишились %(count)s працівник(ів), виправте й згенеруйте ще раз:\n"
+"%(lines)s"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_payslip_run.py:0
+msgid "Payslips generated partially"
+msgstr "Пакет згенеровано частково"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_salary_advance_run.py:0
+msgid "%(employee)s: skipped, zero wage"
+msgstr "%(employee)s: пропущено — нульовий оклад"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_salary_advance_run.py:0
+msgid "%(employee)s: skipped, no month norm of hours"
+msgstr "%(employee)s: пропущено — немає норми годин"
+
+#. module: l10n_ua_hr_salary
+#. odoo-python
+#: code:addons/l10n_ua_hr_salary/models/hr_salary_advance_run.py:0
+msgid "No advance for %(count)s employee(s): %(lines)s"
+msgstr "Без авансу лишились %(count)s працівник(ів): %(lines)s"
