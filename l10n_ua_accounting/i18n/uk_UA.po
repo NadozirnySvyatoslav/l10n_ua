@@ -5138,6 +5138,8 @@ msgstr ""
 #: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_cashflow_report__method__indirect
 msgid "Indirect (Form No.3-n)"
 msgstr "Непрямий (Форма № 3-н)"
+
+#. module: l10n_ua_accounting
 #: model:ir.actions.report,print_report_name:l10n_ua_accounting.action_report_equity
 msgid "'Ф4_власний_капітал_%s' % object.date_to"
 msgstr "'Ф4_власний_капітал_%s' % object.date_to"
