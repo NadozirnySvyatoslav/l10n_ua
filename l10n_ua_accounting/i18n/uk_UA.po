@@ -2747,10 +2747,12 @@ msgstr ""
 
 #. module: l10n_ua_accounting
 #: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__lock_period
-msgid "Set period lock date on company to prevent backdated entries"
+msgid ""
+"On closing, move the global lock date of the company to the end of the "
+"period, so that no entry is posted into it afterwards."
 msgstr ""
-"Встановити дату блокування періоду в компанії, щоб унеможливити проведення "
-"записів минулою датою"
+"Під час закриття перенести глобальну дату блокування компанії на кінець "
+"періоду, щоб у нього більше нічого не проводилось."
 
 #. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_balance_report_form
@@ -6227,3 +6229,27 @@ msgstr "доходів"
 #: model:ir.actions.server,name:l10n_ua_accounting.ir_cron_l10n_ua_deferral_post_ir_actions_server
 msgid "Списання витрат/доходів майбутніх періодів"
 msgstr "Списання витрат/доходів майбутніх періодів"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_period_closing__previous_lock_date
+msgid "Previous Lock Date"
+msgstr "Попередня дата блокування"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_period_closing__previous_lock_date
+msgid ""
+"The global lock date of the company before this closing set it; reversing "
+"the closing puts it back."
+msgstr ""
+"Глобальна дата блокування компанії до того, як її змінило це закриття; "
+"скасування закриття її повертає."
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid ""
+"The period %(period)s is under the hard lock date %(date)s, which cannot be "
+"removed. The closing cannot be reversed."
+msgstr ""
+"Період %(period)s підпадає під остаточну дату блокування %(date)s, яку не "
+"можна зняти. Закриття неможливо скасувати."
