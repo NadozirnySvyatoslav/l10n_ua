@@ -160,6 +160,24 @@ class AccountPayment(models.Model):
             else:
                 payment.ua_payment_order_type = 'other'
 
+    # --- Outstanding account of cash orders ---
+
+    def _get_outstanding_account(self, payment_type):
+        """ПКО/ВКО проводяться прямо по рахунку каси (301), без транзиту.
+
+        Стокове ядро бере рахунок неоплачених надходжень/платежів компанії, а в
+        плані ua_psbo це субрахунки 311 (банк): ПКО ставало Дт 311 замість
+        Дт 301, і касова книга, ліміт каси та ОСВ по 301 показували 0 (#598).
+        Каса не має виписки, яку треба звіряти, тож платіж одразу «оплачено».
+        Рахунок, явно вказаний у способі оплати журналу, має пріоритет — його
+        ядро бере в _compute_outstanding_account_id, сюди черга не доходить.
+        """
+        journal = self.journal_id
+        if (journal.type == 'cash' and journal.default_account_id
+                and self.company_id._l10n_ua_is_ukrainian()):
+            return journal.default_account_id
+        return super()._get_outstanding_account(payment_type)
+
     # --- Analytic distribution propagation ---
 
     def _prepare_move_line_default_vals(self, write_off_line_vals=None, force_balance=None):
