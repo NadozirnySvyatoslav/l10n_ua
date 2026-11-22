@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
 
     <t t-name="l10n_ua_stock_forms.MaterialReportPrintMenu">
-        <DropdownItem class="'o_l10n_ua_material_report_print'" onSelected.bind="onPrint">
+        <DropdownItem class="'o_l10n_ua_material_report_print'" onSelected.bind="this.onPrint">
             <i class="fa fa-fw fa-print me-1"/>Print Report
         </DropdownItem>
     </t>

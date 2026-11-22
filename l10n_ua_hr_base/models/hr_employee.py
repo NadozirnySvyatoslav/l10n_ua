@@ -1198,3 +1198,117 @@ class HrEmployee(models.Model):
         """Clears the job position field if it does not belong to the newly selected department"""
         if self.job_id and self.job_id not in self.allowed_job_ids:
             self.job_id = False
+
+    def _l10n_ua_employed_on(self, day):
+        """Whether the employee was under contract on that day.
+
+        A contract runs from the start date its versions carry to the end
+        date of the latest of them: every version of a contract repeats its
+        start, and only the last one is sure to know its end. A day inside no
+        contract is before the hire, after the dismissal or between two
+        contracts. An employee whose versions carry no contract period at all
+        — data imported without one — is taken to be under contract.
+        """
+        self.ensure_one()
+        latest = {}
+        for version in self.sudo().version_ids.filtered('contract_date_start'):
+            known = latest.get(version.contract_date_start)
+            if not known or version.date_version > known.date_version:
+                latest[version.contract_date_start] = version
+        if not latest:
+            return True
+        return any(
+            start <= day and (not version.contract_date_end
+                              or version.contract_date_end >= day)
+            for start, version in latest.items())
+
+    def _l10n_ua_contracted_between(self, date_from, date_to):
+        """Employees of `self` under a contract on some day of the period.
+
+        Contract periods are read as in :meth:`_l10n_ua_employed_on` (the
+        start from any version, the end from the latest version of that
+        contract), but an employee without any contract period does not
+        count: payroll, advances and the attendance sheet must not invent a
+        month of work for a card that was never hired.
+        """
+        result = self.browse()
+        for employee in self:
+            latest = {}
+            for version in employee.sudo().with_context(
+                    active_test=False).version_ids.filtered(
+                    'contract_date_start'):
+                known = latest.get(version.contract_date_start)
+                if not known or version.date_version > known.date_version:
+                    latest[version.contract_date_start] = version
+            if any(start <= date_to
+                   and (not version.contract_date_end
+                        or version.contract_date_end >= date_from)
+                   for start, version in latest.items()):
+                result |= employee
+        return result
+
+    def _l10n_ua_dismissal_date_between(self, date_from, date_to):
+        """The day the employment ends inside the period, or False.
+
+        That is the end of a contract falling within the period after which
+        the employee is no longer under any contract — a contract followed by
+        a new one the next day (a transfer, a rehire) is not a dismissal.
+        """
+        self.ensure_one()
+        ends = {
+            version.contract_date_end
+            for version in self.sudo().with_context(
+                active_test=False).version_ids
+            if version.contract_date_end
+            and date_from <= version.contract_date_end <= date_to
+        }
+        for end in sorted(ends, reverse=True):
+            if (self._l10n_ua_employed_on(end)
+                    and not self._l10n_ua_employed_on(end + timedelta(days=1))):
+                return end
+        return False
+
+    def _l10n_ua_own_calendar(self, day, version=None):
+        """The employee's own working schedule on that day, when it differs
+        from the company's.
+
+        The production calendar of the company describes the five-day week
+        of the company schedule. An employee working six days, in shifts or
+        part of the week has a resource calendar of their own on their
+        version, and the norm of the month is that calendar, not the
+        company's. Returns an empty recordset when the employee follows the
+        company schedule, or the schedule is flexible and so has no planned
+        days to count.
+        """
+        self.ensure_one()
+        version = (version or self.sudo()._get_version(day)).sudo()
+        calendar = version.resource_calendar_id or self.sudo().resource_calendar_id
+        company_calendar = (self.company_id or self.env.company).resource_calendar_id
+        if not calendar or calendar == company_calendar or calendar._is_flexible():
+            return self.env['resource.calendar']
+        return calendar
+
+    def _l10n_ua_schedule_hours(self, date_from, date_to, version=None):
+        """Planned hours per day of the period by the employee's own schedule.
+
+        Returns ``{date: hours}`` for every day of the period (0 for a day
+        off), or None when the employee follows the company schedule — the
+        caller then keeps its own norm (production calendar, or Monday to
+        Friday). Public holidays are not deducted here: whether they are days
+        off depends on the production calendar (and martial law), which the
+        caller knows about. `version` is the contract version to read the
+        schedule from (by default the one in effect on `date_from`).
+        """
+        self.ensure_one()
+        calendar = self._l10n_ua_own_calendar(date_from, version=version)
+        if not calendar:
+            return None
+        # The calendar reads dates in the timezone of the current company.
+        calendar = calendar.with_company(self.company_id or self.env.company)
+        hours = {}
+        day = date_from
+        while day <= date_to:
+            hours[day] = calendar.get_work_hours_count(
+                day, day, compute_leaves=False)
+            day += timedelta(days=1)
+        return hours

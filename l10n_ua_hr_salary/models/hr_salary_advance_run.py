@@ -93,10 +93,12 @@ class HrSalaryAdvanceRun(models.Model):
         self.advance_ids.filtered(lambda a: a.state == 'draft').unlink()
         # Build lookup of employees with confirmed/paid advances to skip
         existing_employee_ids = set(self.advance_ids.mapped('employee_id').ids)
+        # Only employees under a contract on the payment date: not those
+        # dismissed earlier, nor those whose contract starts later.
         employees = self.env['hr.employee'].search([
             ('company_id', '=', self.company_id.id),
-            ('version_ids.contract_date_start', '!=', False),
-        ])
+            ('version_ids.contract_date_start', '<=', self.date),
+        ])._l10n_ua_contracted_between(self.date, self.date)
         # Працівник із валютним окладом без курсу зриває перерахунок винятком.
         # У пакеті це означало б, що через одну незаповнену дату в довіднику
         # без авансу лишається вся установа. Тому такого пропускаємо, але

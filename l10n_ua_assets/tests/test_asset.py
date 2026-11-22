@@ -112,3 +112,66 @@ class TestAsset(TransactionCase):
         self.assertTrue(self.asset_group.code)
         self.assertTrue(self.asset_group.name)
         self.assertGreaterEqual(self.asset_group.min_useful_life, 0)
+
+    # --- #625: П(С)БО 7 п.29 — амортизація з наступного місяця ---
+
+    def test_depreciation_starts_month_after_commissioning(self):
+        """Введено 31.10 → перший рядок у листопаді, на кінець місяця."""
+        asset = self._create_asset(commission_date=date(2025, 10, 31),
+                                   acquisition_date=date(2025, 10, 20))
+        asset.action_commission()
+        self.assertEqual(asset.commission_date, date(2025, 10, 31))
+        asset.action_compute_depreciation()
+        lines = asset.depreciation_line_ids.sorted('date')
+        self.assertEqual(len(lines), 60)
+        self.assertEqual(lines[0].date, date(2025, 11, 30))
+        self.assertEqual(lines[1].date, date(2025, 12, 31))
+        self.assertEqual(lines[3].date, date(2026, 2, 28))
+        self.assertEqual(lines[-1].date, date(2030, 10, 31))
+        # Жодного рядка в місяці введення.
+        self.assertFalse(lines.filtered(
+            lambda l: (l.date.year, l.date.month) == (2025, 10)))
+
+    def test_depreciation_start_first_day_of_month(self):
+        """Введено 01.03 → перший рядок у квітні, а не в березні."""
+        asset = self._create_asset(commission_date=date(2025, 3, 1))
+        asset.action_compute_depreciation()
+        first = asset.depreciation_line_ids.sorted('date')[0]
+        self.assertEqual(first.date, date(2025, 4, 30))
+
+    def test_cumulative_depreciation_dates_and_total(self):
+        """Кумулятивний метод: ті самі дати, повна сума амортизації."""
+        asset = self._create_asset(commission_date=date(2025, 1, 15),
+                                   depreciation_method='cumulative',
+                                   useful_life=36)
+        asset.action_compute_depreciation()
+        lines = asset.depreciation_line_ids.sorted('date')
+        self.assertEqual(lines[0].date, date(2025, 2, 28))
+        # Перший рік — найбільша сума: 110000 × 3/6 / 12.
+        self.assertAlmostEqual(lines[0].amount, round(110000 * 3 / 6 / 12, 2),
+                               places=2)
+        self.assertAlmostEqual(sum(lines.mapped('amount')), 110000, delta=1.0)
+        self.assertLessEqual(lines[-1].date, date(2028, 1, 31))
+
+    def test_recompute_continues_after_posted_lines(self):
+        """Існуючий графік (старі рядки з місяця введення) продовжується
+        без розриву після останнього проведеного рядка."""
+        asset = self._create_asset(commission_date=date(2025, 1, 15),
+                                   useful_life=12, salvage_value=0,
+                                   original_value=12000)
+        Dep = self.env['l10n_ua.asset.depreciation']
+        for i in range(2):
+            Dep.create({
+                'asset_id': asset.id,
+                'date': date(2025, 1 + i, 28),
+                'amount': 1000,
+                'accumulated': 1000 * (i + 1),
+                'remaining': 12000 - 1000 * (i + 1),
+                'state': 'posted',
+            })
+        asset.action_compute_depreciation()
+        drafts = asset.depreciation_line_ids.filtered(
+            lambda l: l.state == 'draft').sorted('date')
+        self.assertEqual(len(drafts), 10)
+        self.assertEqual(drafts[0].date, date(2025, 3, 31))
+        self.assertEqual(drafts[-1].date, date(2025, 12, 31))

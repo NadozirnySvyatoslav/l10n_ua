@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Base',
-    'version': '20.0.1.7.0',
+    'version': '20.0.1.7.2',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR localization base module',
     'description': """

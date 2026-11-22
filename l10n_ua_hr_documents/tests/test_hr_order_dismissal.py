@@ -54,14 +54,16 @@ class TestHrOrderDismissal(TransactionCase):
             self.assertEqual(v.termination_order_number, order.name)
             self.assertEqual(v.termination_order_date, order.date)
         self.assertFalse(self.employee.active)
-        if 'departure_date' in self.employee._fields:
-            self.assertEqual(self.employee.departure_date, date(2026, 3, 15))
+        # Read from the database, not from the cache the assignment filled:
+        # in Odoo 20 departure_date lives on hr.employee.departure.
+        self.env.invalidate_all()
+        employee = self.employee.with_context(active_test=False)
+        self.assertEqual(employee.departure_date, date(2026, 3, 15))
+        self.assertEqual(order.departure_id, employee.departure_id)
+        self.assertTrue(order.departure_id.apply_date)
 
     def test_cancel_restores_everything(self):
         """action_cancel must restore versions, departure_date and archive state."""
-        if 'departure_date' in self.employee._fields:
-            self.employee.departure_date = date(2024, 12, 31)
-
         order = self._make_dismissal(date(2026, 3, 15))
         order.action_confirm()
         order.action_cancel()
@@ -74,9 +76,10 @@ class TestHrOrderDismissal(TransactionCase):
             self.assertFalse(v.termination_order_date)
         self.assertTrue(self.employee.with_context(active_test=False).active,
                         "Employee must be unarchived after cancel")
-        if 'departure_date' in self.employee._fields:
-            self.assertEqual(
-                self.employee.with_context(active_test=False).departure_date,
-                date(2024, 12, 31),
-                "departure_date must be restored to its pre-apply value",
-            )
+        # The employee had no departure before the order: the one the order
+        # created is gone again, and so is the departure date.
+        self.env.invalidate_all()
+        employee = self.employee.with_context(active_test=False)
+        self.assertFalse(employee.departure_id)
+        self.assertFalse(employee.departure_date)
+        self.assertFalse(order.departure_id)

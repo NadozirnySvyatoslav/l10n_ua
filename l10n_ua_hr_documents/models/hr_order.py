@@ -76,6 +76,15 @@ class HrOrder(models.Model):
         help='Internal: True if previous_departure_date holds a backed-up value '
              '(needed because False is a legitimate previous value).',
     )
+    departure_id = fields.Many2one(
+        'hr.employee.departure',
+        string='Employee Departure',
+        copy=False,
+        readonly=True,
+        ondelete='set null',
+        help='Internal: the departure record this dismissal order created, '
+             'removed again when the order is cancelled.',
+    )
     termination_reason_id = fields.Many2one(
         'hr.termination.reason',
         string='Termination Reason (from catalog)',
@@ -174,7 +183,10 @@ class HrOrder(models.Model):
         """"New Time Off" button. Opens a leave form pre-filled from this
         order so the user can review and save it — the same explicit flow the
         leave form uses to issue an order. Nothing is created until they save;
-        default_order_id links the two sides back together."""
+        l10n_ua_leave_order_id links the two sides back together. It is not
+        `default_order_id`: a default reaches every record created in that
+        context, and account.analytic.line.order_id (the leave's timesheet)
+        is a sale order."""
         self.ensure_one()
         if self.leave_id:
             raise UserError(_('This order already has a linked time off.'))
@@ -191,7 +203,7 @@ class HrOrder(models.Model):
                 'default_work_entry_type_id': self.work_entry_type_id.id,
                 'default_request_date_from': self.vacation_date_from,
                 'default_request_date_to': self.vacation_date_to,
-                'default_order_id': self.id,
+                'l10n_ua_leave_order_id': self.id,
             },
         }
 
@@ -737,9 +749,39 @@ class HrOrder(models.Model):
                 'previous_departure_date': employee.departure_date or False,
                 'previous_departure_date_saved': True,
             })
-        employee.departure_date = dismissal_date
+        if versions:
+            # Core refuses a departure of an employee without a contract.
+            self._l10n_ua_set_departure(dismissal_date)
         if employee.active:
             employee.active = False
+
+    def _l10n_ua_set_departure(self, dismissal_date):
+        """Record the departure date on the employee.
+
+        Since Odoo 20 `departure_date` is a related field of the version's
+        `departure_id` (`hr.employee.departure`): written while there is no
+        departure record it goes nowhere, and the card kept no departure
+        date at all. A departure not applied yet is moved to the order's
+        date; otherwise the order creates one, marked as applied, since the
+        order itself closes the contract and archives the employee.
+        """
+        self.ensure_one()
+        employee = self.employee_id
+        departure = employee.departure_id
+        if departure and not departure.apply_date:
+            departure.write({
+                'dismissal_date': dismissal_date,
+                'departure_date': dismissal_date,
+            })
+            return
+        departure = self.env['hr.employee.departure'].create({
+            'employee_id': employee.id,
+            'dismissal_date': dismissal_date,
+            'departure_date': dismissal_date,
+            'action_date': dismissal_date + timedelta(days=1),
+        })
+        departure.apply_date = fields.Date.context_today(self)
+        self.departure_id = departure
 
     def action_cancel(self):
         self.write({'state': 'cancelled'})
@@ -800,9 +842,15 @@ class HrOrder(models.Model):
                 'termination_order_number': False,
                 'termination_order_date': False,
             })
+        if self.departure_id:
+            # Created by this order: the employee had no departure before.
+            self.departure_id.unlink()
+        elif self.previous_departure_date_saved and self.previous_departure_date:
+            employee.with_context(active_test=False).departure_id.write({
+                'dismissal_date': self.previous_departure_date,
+                'departure_date': self.previous_departure_date,
+            })
         if self.previous_departure_date_saved:
-            employee.with_context(active_test=False).departure_date = \
-                self.previous_departure_date or False
             self.write({
                 'previous_departure_date': False,
                 'previous_departure_date_saved': False,

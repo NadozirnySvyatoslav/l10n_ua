@@ -7,8 +7,8 @@
          balance. -->
     <t t-name="l10n_ua_stock_forms.MaterialReportListView"
        t-inherit="web.ListView" t-inherit-mode="primary">
-        <xpath expr="//t[@t-set-slot='control-panel-always-buttons']" position="inside">
-            <MaterialReportPeriodRange t-props="materialReportPeriodProps"/>
+        <xpath expr="//t[@t-set-slot='control-panel-buttons']" position="inside">
+            <MaterialReportPeriodRange t-props="this.materialReportPeriodProps"/>
         </xpath>
     </t>
 

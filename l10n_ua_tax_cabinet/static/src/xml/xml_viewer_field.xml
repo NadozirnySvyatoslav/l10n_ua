@@ -3,14 +3,14 @@
 
     <t t-name="l10n_ua_tax_cabinet.XmlViewerField">
         <div class="o_xml_viewer_field">
-            <t t-if="state.loading">
+            <t t-if="this.state.loading">
                 <div class="text-muted p-3">Loading...</div>
             </t>
-            <t t-elif="state.error">
-                <div class="text-danger p-3">Error: <t t-out="state.error"/></div>
+            <t t-elif="this.state.error">
+                <div class="text-danger p-3">Error: <t t-out="this.state.error"/></div>
             </t>
-            <t t-elif="hasContent">
-                <pre class="xml-content" t-out="highlightedXml"/>
+            <t t-elif="this.hasContent">
+                <pre class="xml-content" t-out="this.highlightedXml"/>
             </t>
             <t t-else="">
                 <div class="text-muted p-3">No XML content</div>

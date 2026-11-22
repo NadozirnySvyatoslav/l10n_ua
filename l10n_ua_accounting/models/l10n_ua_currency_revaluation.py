@@ -97,9 +97,20 @@ class L10nUaCurrencyRevaluation(models.Model):
             ['amount_currency:sum', 'balance:sum'],
         )
 
-        lines = []
+        # Own revaluation entries are booked in company currency only, so the
+        # grouping above does not see them. Add the differences already posted
+        # by earlier revaluations, otherwise each run re-counts the whole
+        # difference from the booking date (#624).
+        balances = {}
         for account, partner, currency, fc_balance, book_balance in rows:
-            if not fc_balance and not book_balance:
+            balances[(account, partner, currency)] = [fc_balance, book_balance]
+        for key, fx_diff in self._previous_revaluation_differences().items():
+            balances.setdefault(key, [0.0, 0.0])[1] += fx_diff
+
+        lines = []
+        for (account, partner, currency), (fc_balance, book_balance) \
+                in balances.items():
+            if not fc_balance and company_currency.is_zero(book_balance):
                 continue
             # Переоцінена вартість = валютний залишок за курсом на дату.
             revalued = currency._l10n_ua_convert(
@@ -119,6 +130,30 @@ class L10nUaCurrencyRevaluation(models.Model):
             }))
         self.line_ids = lines
         return True
+
+    def _previous_revaluation_differences(self):
+        """Posted fx differences of earlier revaluations of the company.
+
+        Returns {(account, partner, foreign currency): sum of fx_difference}
+        for revaluations posted on or before this revaluation date whose
+        journal entry is still posted.
+        """
+        self.ensure_one()
+        groups = self.env['l10n_ua.currency.revaluation.line']._read_group(
+            [
+                ('revaluation_id', '!=', self.id),
+                ('revaluation_id.company_id', '=', self.company_id.id),
+                ('revaluation_id.state', '=', 'posted'),
+                ('revaluation_id.move_id.state', '=', 'posted'),
+                ('revaluation_id.date', '<=', self.date),
+            ],
+            ['account_id', 'partner_id', 'foreign_currency_id'],
+            ['fx_difference:sum'],
+        )
+        return {
+            (account, partner, currency): fx_diff
+            for account, partner, currency, fx_diff in groups
+        }
 
     def _fx_result_account(self, is_gain, is_nonoperational):
         """Рахунок доходу/витрат курсової різниці за конфігом компанії."""

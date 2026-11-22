@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from dateutil.relativedelta import relativedelta
 from odoo.exceptions import ValidationError
 
 
@@ -103,7 +104,8 @@ class HrReport1DF(models.Model):
         months = quarter_months[self.quarter]
         
         date_from = fields.Date.from_string(f'{self.year}-{months[0]:02d}-01')
-        date_to = fields.Date.from_string(f'{self.year}-{months[-1]:02d}-28')
+        # The real last day of the quarter: payslips end on the 30th/31st.
+        date_to = date_from + relativedelta(months=3, days=-1)
         
         # Get all payslips for the quarter
         payslips = self.env['hr.payslip'].search([

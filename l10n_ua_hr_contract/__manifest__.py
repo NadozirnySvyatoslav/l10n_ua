@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - HR Contracts',
-    'version': '20.0.8.2.0',
+    'version': '20.0.8.2.1',
     'category': 'Human Resources/Localization',
     'summary': 'Ukrainian HR contracts localization (extends hr.version)',
     'description': """

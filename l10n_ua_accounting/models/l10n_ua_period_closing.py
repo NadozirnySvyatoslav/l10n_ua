@@ -412,8 +412,10 @@ class L10nUaPeriodClosing(models.Model):
 
         # Lock period
         if self.lock_period:
+            # Odoo 18+ replaced period_lock_date with per-journal-type locks
             self.company_id.sudo().write({
-                'period_lock_date': self.period_id.date_end,
+                'sale_lock_date': self.period_id.date_end,
+                'purchase_lock_date': self.period_id.date_end,
             })
 
         # Close the tax period
@@ -584,7 +586,7 @@ class L10nUaPeriodClosing(models.Model):
         # Reset lock date if we set it
         if self.lock_period:
             # Only reset if our date is the current lock date
-            if self.company_id.period_lock_date == self.period_id.date_end:
+            if self.company_id.sale_lock_date == self.period_id.date_end:
                 # Set to previous period end or False
                 prev_period = self.env['l10n_ua.tax.period'].search([
                     ('date_end', '<', self.period_id.date_start),
@@ -593,7 +595,8 @@ class L10nUaPeriodClosing(models.Model):
                 ], order='date_end desc', limit=1)
                 new_lock_date = prev_period.date_end if prev_period else False
                 self.company_id.sudo().write({
-                    'period_lock_date': new_lock_date,
+                    'sale_lock_date': new_lock_date,
+                    'purchase_lock_date': new_lock_date,
                 })
 
         # Reopen period

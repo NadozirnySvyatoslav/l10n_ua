@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Fixed Assets',
-    'version': '20.0.3.1.0',
+    'version': '20.0.3.1.2',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian fixed assets: depreciation, OZ-6, acts, MNMA, revaluation, modernization, inventory',
     'description': """

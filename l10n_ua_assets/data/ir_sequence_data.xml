@@ -3,6 +3,7 @@
 
     <!-- Sequence: Asset Commissioning Act -->
     <record id="seq_asset_commission_act" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Акт введення ОЗ в експлуатацію</field>
         <field name="code">l10n_ua.asset.commission.act</field>
         <field name="prefix">АВ-</field>
@@ -11,6 +12,7 @@
 
     <!-- Sequence: Asset Write-off Act -->
     <record id="seq_asset_writeoff_act" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Акт списання ОЗ</field>
         <field name="code">l10n_ua.asset.writeoff.act</field>
         <field name="prefix">АС-</field>
@@ -19,6 +21,7 @@
 
     <!-- Sequence: MNMA Commissioning Act -->
     <record id="seq_mnma_commission_act" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Акт введення МНМА в експлуатацію</field>
         <field name="code">l10n_ua.mnma.commission.act</field>
         <field name="prefix">МВ-</field>
@@ -27,6 +30,7 @@
 
     <!-- Sequence: MNMA Write-off Act -->
     <record id="seq_mnma_writeoff_act" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Акт списання МНМА</field>
         <field name="code">l10n_ua.mnma.writeoff.act</field>
         <field name="prefix">МС-</field>
@@ -35,6 +39,7 @@
 
     <!-- Sequence: МШП transfer to operation -->
     <record id="seq_mshp_transfer" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Передача МШП в експлуатацію</field>
         <field name="code">l10n_ua.mshp.transfer</field>
         <field name="prefix">МШП-</field>
@@ -43,6 +48,7 @@
 
     <!-- Sequence: МШП Write-off Act -->
     <record id="seq_mshp_writeoff" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Акт списання МШП</field>
         <field name="code">l10n_ua.mshp.writeoff</field>
         <field name="prefix">МШПС-</field>
@@ -51,6 +57,7 @@
 
     <!-- Sequence: Asset Revaluation -->
     <record id="seq_asset_revaluation" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Переоцінка ОЗ</field>
         <field name="code">l10n_ua.asset.revaluation</field>
         <field name="prefix">ПО-</field>
@@ -59,6 +66,7 @@
 
     <!-- Sequence: Asset Modernization -->
     <record id="seq_asset_modernization" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Модернізація ОЗ</field>
         <field name="code">l10n_ua.asset.modernization</field>
         <field name="prefix">МД-</field>
@@ -67,6 +75,7 @@
 
     <!-- Sequence: Asset Inventory -->
     <record id="seq_asset_inventory" model="ir.sequence">
+        <field name="company_id" eval="False"/>
         <field name="name">Інвентаризація ОЗ</field>
         <field name="code">l10n_ua.asset.inventory</field>
         <field name="prefix">ІНВ-</field>

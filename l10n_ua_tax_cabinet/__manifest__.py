@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Tax Cabinet Integration',
-    'version': '20.0.2.0.0',
+    'version': '20.0.2.0.1',
     'category': 'Accounting/Localization',
     'summary': 'Integration with cabinet.tax.gov.ua for document sync',
     'description': """

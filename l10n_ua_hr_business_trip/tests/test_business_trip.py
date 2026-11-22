@@ -49,6 +49,22 @@ class TestBusinessTrip(TransactionCase):
         self.assertNotEqual(rec.name, '/')
         self.assertTrue(rec.name.startswith('ЗВ-'))
 
+    def test_sequence_number_in_second_company(self):
+        """The report sequence is shared: another company gets a number too."""
+        company_b = self.env['res.company'].create({'name': 'Друга компанія відряджень'})
+        self.assertFalse(
+            self.env.ref('l10n_ua_hr_business_trip.seq_business_trip_report').company_id)
+        employee = self.env['hr.employee'].create({
+            'name': 'Відряджений Друга', 'company_id': company_b.id})
+        rec = self.env['l10n_ua.business.trip.report'].with_company(company_b).create({
+            'employee_id': employee.id,
+            'destination': 'Київ',
+            'date_from': date(2025, 6, 2),
+            'date_to': date(2025, 6, 3),
+            'company_id': company_b.id,
+        })
+        self.assertTrue(rec.name.startswith('ЗВ-'))
+
     def test_invalid_dates(self):
         with self.assertRaises(UserError):
             self._report(date_from=date(2025, 6, 5), date_to=date(2025, 6, 2))
