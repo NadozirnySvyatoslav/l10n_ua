@@ -23,3 +23,4 @@ from . import test_small_report
 from . import test_notes_report
 from . import test_trade_markup
 from . import test_inventory_writedown
+from . import test_cash_301

@@ -182,6 +182,15 @@ class TestPsboChart(TransactionCase):
         self.assertEqual(len(self._account('021')), 1,
                          'повторний запуск хука не дублює рахунки')
 
+    def test_cash_journal_on_301(self):
+        """Шаблон створює журнал «Каса» на 301 «Готівка в нац. валюті» (#598)."""
+        journal = self.env['account.journal'].search([
+            ('company_id', '=', self.company.id), ('type', '=', 'cash'),
+        ])
+        self.assertEqual(len(journal), 1)
+        self.assertEqual(journal.default_account_id, self._account('301'))
+        self.assertEqual(journal.default_account_id.account_type, 'asset_cash')
+
     def test_hook_respects_manual_analytics(self):
         account = self._account('631')
         account.ua_analytics_type = 'contract'
