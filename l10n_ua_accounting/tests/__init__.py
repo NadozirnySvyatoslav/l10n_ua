@@ -14,3 +14,4 @@ from . import test_currency_exchange
 from . import test_cashflow
 from . import test_balance_form
 from . import test_pnl_form
+from . import test_equity_report
