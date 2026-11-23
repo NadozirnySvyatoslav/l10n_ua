@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+"""Перевірки безпеки Odoo, яких не вміє semgrep. Код повернення 1 = збірка червона.
+
+1. ACL (ir.model.access*.csv): запис/створення/видалення для portal, public або без групи.
+   Виняток — рядок у .security-exceptions.txt:  <id запису ACL> -- причина
+2. Record rules (XML): правило для portal/public з domain [(1,'=',1)].
+   Виняток — те саме, за xml id правила.
+3. sudo() у контролерах auth='public'/'none' без маркера на тому ж або попередньому рядку:
+       # sudo-ok: причина
+4. nosemgrep без пояснення (" -- причина").
+
+Запуск:
+  python3 tools/sec/check_odoo.py <корінь>               — повний аудит (щотижневий огляд)
+  python3 tools/sec/check_odoo.py <корінь> --diff <BASE>  — лише рядки, додані/змінені
+                                                            між BASE і HEAD (CI на PR)
+У режимі --diff спрацювання в старому коді не валять PR: їх розбирає щотижневий аудит.
+"""
+import argparse
+import ast
+import csv
+import pathlib
+import re
+import subprocess
+import sys
+
+ap = argparse.ArgumentParser()
+ap.add_argument("root", nargs="?", default=".")
+ap.add_argument("--diff", metavar="BASE", help="перевіряти лише зміни BASE..HEAD")
+args = ap.parse_args()
+
+ROOT = pathlib.Path(args.root).resolve()
+SKIP = {".git", "node_modules", "__pycache__"}
+RISKY_GROUPS = {"", "base.group_portal", "base.group_public", "group_portal", "group_public"}
+EXC_FILE = ".security-exceptions.txt"
+errors = []  # (шлях відносно ROOT, перший рядок, останній рядок, текст)
+
+
+def changed_lines(base):
+    """{шлях: множина номерів рядків у HEAD, доданих або змінених відносно base}."""
+    out = subprocess.run(
+        ["git", "-C", str(ROOT), "diff", "-U0", "--no-color", "--no-ext-diff", base, "HEAD"],
+        check=True, capture_output=True, text=True).stdout
+    result, cur = {}, None
+    for line in out.splitlines():
+        if line.startswith("+++ "):
+            cur = None if line == "+++ /dev/null" else line[6:]  # "+++ b/шлях"
+            if cur is not None:
+                result.setdefault(cur, set())
+        elif line.startswith("@@") and cur is not None:
+            m = re.match(r"@@ -\S+ \+(\d+)(?:,(\d+))? @@", line)
+            start, count = int(m.group(1)), int(m.group(2) or 1)
+            result[cur].update(range(start, start + count))
+    return result
+
+
+CHANGED = changed_lines(args.diff) if args.diff else None
+
+
+def files(pattern):
+    for p in ROOT.rglob(pattern):
+        if SKIP.intersection(p.relative_to(ROOT).parts):
+            continue
+        if CHANGED is not None and rel(p) not in CHANGED:
+            continue
+        yield p
+
+
+def rel(p):
+    return p.relative_to(ROOT).as_posix()
+
+
+def report(path, first, last, msg):
+    errors.append((path, first, last, msg))
+
+
+def load_exceptions():
+    ex = {}
+    f = ROOT / EXC_FILE
+    if f.exists():
+        for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            key, _, reason = line.partition(" -- ")
+            if not reason.strip():
+                report(EXC_FILE, n, n, "виняток без причини")
+            ex[key.strip()] = reason.strip()
+    return ex
+
+
+EXC = load_exceptions()
+
+
+def check_acl():
+    for p in files("ir.model.access*.csv"):
+        with p.open(encoding="utf-8") as fh:
+            for n, row in enumerate(csv.DictReader(fh), 2):
+                group = (row.get("group_id:id") or row.get("group_id/id") or "").strip()
+                if group not in RISKY_GROUPS:
+                    continue
+                perms = [k for k in ("perm_write", "perm_create", "perm_unlink") if (row.get(k) or "").strip() == "1"]
+                rid = (row.get("id") or "").strip()
+                if perms and rid not in EXC:
+                    who = group or "усі користувачі (група порожня)"
+                    report(rel(p), n, n, f"{rid}: {','.join(perms)} для {who}")
+
+
+RULE_RE = re.compile(r'<record[^>]+id="([^"]+)"[^>]+model="ir\.rule".*?</record>', re.S)
+
+
+def check_rules():
+    for p in files("*.xml"):
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        for m in RULE_RE.finditer(text):
+            body = m.group(0)
+            if re.search(r"group_(portal|public)", body) and re.search(r"\[\s*\(\s*1\s*,\s*'='\s*,\s*1\s*\)\s*\]", body):
+                if m.group(1) not in EXC:
+                    first = text.count("\n", 0, m.start()) + 1
+                    last = text.count("\n", 0, m.end()) + 1
+                    report(rel(p), first, last, f"правило {m.group(1)} відкриває всі записи portal/public")
+
+
+def route_auth(fn):
+    for d in fn.decorator_list:
+        if isinstance(d, ast.Call) and getattr(d.func, "attr", getattr(d.func, "id", "")) == "route":
+            for kw in d.keywords:
+                if kw.arg == "auth" and isinstance(kw.value, ast.Constant):
+                    return kw.value.value
+            return "user"
+    return None
+
+
+MARK = re.compile(r"#\s*sudo-ok:\s*\S")
+
+
+def check_sudo_and_nosemgrep():
+    for p in files("*.py"):
+        src = p.read_text(encoding="utf-8", errors="ignore")
+        lines = src.splitlines()
+        for n, line in enumerate(lines, 1):
+            m = re.search(r"#\s*nosemgrep\b(.*)", line)
+            if m and " -- " not in m.group(1):
+                report(rel(p), n, n, "nosemgrep без пояснення (' -- причина')")
+        try:
+            tree = ast.parse(src)
+        except SyntaxError as e:
+            report(rel(p), e.lineno or 1, e.lineno or 1, f"не парситься ({e.msg})")
+            continue
+        for fn in ast.walk(tree):
+            if not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            auth = route_auth(fn)
+            if auth not in ("public", "none"):
+                continue
+            # Зміна декоратора (напр. auth='user' -> 'public') теж робить старий sudo() новим ризиком.
+            deco_first = min(d.lineno for d in fn.decorator_list)
+            deco_last = max(d.end_lineno for d in fn.decorator_list)
+            for node in ast.walk(fn):
+                if isinstance(node, ast.Call) and getattr(node.func, "attr", "") == "sudo":
+                    ln = node.lineno
+                    near = lines[ln - 1] + "\n" + (lines[ln - 2] if ln > 1 else "")
+                    if MARK.search(near):
+                        continue
+                    msg = f"sudo() у маршруті auth='{auth}' ({fn.name}) без '# sudo-ok: причина'"
+                    report(rel(p), ln, ln, msg)
+                    report(rel(p), deco_first, deco_last, msg + f" [декоратор, sudo на рядку {ln}]")
+
+
+check_acl()
+check_rules()
+check_sudo_and_nosemgrep()
+
+if CHANGED is not None:
+    errors = [e for e in errors if CHANGED.get(e[0], set()).intersection(range(e[1], e[2] + 1))]
+    # одне спрацювання на sudo(): якщо змінено і рядок, і декоратор — лишаємо рядок sudo()
+    seen, uniq = set(), []
+    for e in errors:
+        m = re.search(r"\[декоратор, sudo на рядку (\d+)\]", e[3])
+        key = (e[0], int(m.group(1)) if m else e[1], e[3].split(" [декоратор")[0])
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(e)
+    errors = uniq
+else:
+    errors = [e for e in errors if "[декоратор" not in e[3]]
+
+if errors:
+    print("Перевірка безпеки не пройдена:")
+    for path, first, _last, msg in errors:
+        print(f"  - {path}:{first}: {msg}")
+    sys.exit(1)
+print("check_odoo: ок" + (f" (зміни від {args.diff})" if args.diff else " (повний аудит)"))

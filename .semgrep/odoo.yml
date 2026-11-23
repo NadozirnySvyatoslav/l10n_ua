@@ -1,0 +1,80 @@
+# Правила безпеки під Odoo. Виняток — лише з поясненням на тому ж рядку:
+#   cr.execute(query)  # nosemgrep: odoo-sql-string-build -- ім'я таблиці з _table, не від користувача
+# check_odoo.py валить збірку, якщо після nosemgrep немає пояснення (" -- причина").
+# У CI semgrep запускається з --baseline-commit: валять лише нові спрацювання PR.
+rules:
+  - id: odoo-sql-string-build
+    languages: [python]
+    severity: ERROR
+    message: SQL складено з рядків. Параметри передавайте другим аргументом cr.execute(q, params), імена — через psycopg2.sql / odoo.tools.SQL.
+    pattern-either:
+      - pattern: $CR.execute(f"...", ...)
+      - pattern: $CR.execute("..." % $X, ...)
+      - pattern: $CR.execute("..." + $X, ...)
+      - pattern: $CR.execute("...".format(...), ...)
+      - pattern: |
+          $Q = f"..."
+          ...
+          $CR.execute($Q, ...)
+      - pattern: |
+          $Q = "..." % $X
+          ...
+          $CR.execute($Q, ...)
+
+  - id: python-eval-exec
+    languages: [python]
+    severity: ERROR
+    message: eval/exec виконує довільний код.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+
+  - id: odoo-safe-eval-request-data
+    languages: [python]
+    severity: ERROR
+    message: safe_eval з даними із запиту користувача.
+    patterns:
+      - pattern-inside: |
+          @http.route(...)
+          def $F(...):
+            ...
+      - pattern-either:
+          - pattern: safe_eval(<... request ...>, ...)
+          - pattern: safe_eval(<... kw ...>, ...)
+          - pattern: safe_eval(<... kwargs ...>, ...)
+          - pattern: safe_eval(<... post ...>, ...)
+
+  - id: python-shell-exec
+    languages: [python]
+    severity: ERROR
+    message: Виклик shell. Використовуйте subprocess.run([...]) без shell=True.
+    pattern-either:
+      - pattern: subprocess.$F(..., shell=True, ...)
+      - pattern: os.system(...)
+      - pattern: os.popen(...)
+
+  - id: tls-verify-disabled
+    languages: [python]
+    severity: ERROR
+    message: Вимкнено перевірку TLS-сертифіката.
+    pattern-either:
+      - pattern: requests.$F(..., verify=False, ...)
+      - pattern: $S.$F(..., verify=False, ...)
+      - pattern: ssl._create_unverified_context(...)
+
+  - id: odoo-csrf-disabled
+    languages: [python]
+    severity: ERROR
+    message: csrf=False на маршруті. Допустимо лише для вебхуків з перевіркою підпису (тоді nosemgrep з причиною).
+    pattern: |
+      @http.route(..., csrf=False, ...)
+      def $F(...):
+        ...
+
+  - id: python-pickle
+    languages: [python]
+    severity: ERROR
+    message: pickle на недовірених даних = виконання коду.
+    pattern-either:
+      - pattern: pickle.loads(...)
+      - pattern: pickle.load(...)
