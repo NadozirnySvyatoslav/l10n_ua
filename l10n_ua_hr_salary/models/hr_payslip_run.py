@@ -1,5 +1,10 @@
+import logging
+
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
+
+_logger = logging.getLogger(__name__)
 
 
 class HrPayslipRun(models.Model):
@@ -118,21 +123,55 @@ class HrPayslipRun(models.Model):
             ('version_ids.contract_date_start', '!=', False),
         ])
         
+        # Кожен працівник у власному savepoint (#577): одна помилка (напр.
+        # валютний оклад без курсу на дату) раніше відкочувала весь пакет, і
+        # бухгалтер не отримував жодного листка. Тепер листки, що
+        # порахувались, лишаються, а проблемні йдуть у чаттер пакета й у
+        # сповіщення; повторний запуск підхопить їх без дублів.
+        failed = []
         for employee in employees:
             existing = self.slip_ids.filtered(lambda s: s.employee_id == employee)
             if existing:
                 continue
-            
-            payslip = self.env['hr.payslip'].create({
-                'employee_id': employee.id,
-                'payslip_run_id': self.id,
-                'date_from': self.date_start,
-                'date_to': self.date_end,
-                'company_id': self.company_id.id,
-            })
-            payslip.action_compute_sheet()
-        
-        return True
+            try:
+                with self.env.cr.savepoint():
+                    payslip = self.env['hr.payslip'].create({
+                        'employee_id': employee.id,
+                        'payslip_run_id': self.id,
+                        'date_from': self.date_start,
+                        'date_to': self.date_end,
+                        'company_id': self.company_id.id,
+                    })
+                    payslip.action_compute_sheet()
+            except UserError as error:
+                self.env.invalidate_all()
+                failed.append('%s: %s' % (
+                    employee.name or employee.id,
+                    error.args[0] if error.args else error))
+
+        return self._failed_notification(failed)
+
+    def _failed_notification(self, failed):
+        """Post the employees left without a payslip and warn the user."""
+        if not failed:
+            return True
+        _logger.warning('Пакет %s: без листка %s працівник(ів): %s',
+                        self.name, len(failed), '; '.join(failed))
+        body = _('No payslip for %(count)s employee(s), fix and generate '
+                 'again:\n%(lines)s', count=len(failed),
+                 lines='\n'.join('- ' + line for line in failed))
+        self.message_post(body=body)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Payslips generated partially'),
+                'message': body,
+                'type': 'warning',
+                'sticky': True,
+                'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'},
+            },
+        }
 
     def action_compute_all(self):
         """Compute all payslips in batch"""

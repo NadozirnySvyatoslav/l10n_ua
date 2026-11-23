@@ -141,7 +141,7 @@ class HrSalaryAdvanceRun(models.Model):
         # мовчки не забуваємо: імена йдуть у повідомлення й у лог, а
         # повторний запуск (він перестворює чернетки) підхопить їх, щойно
         # курс внесуть.
-        skipped = []
+        skipped, empty = [], []
         for employee in employees:
             if employee.id in existing_employee_ids:
                 continue
@@ -151,6 +151,8 @@ class HrSalaryAdvanceRun(models.Model):
                 skipped.append(employee.name or str(employee.id))
                 continue
             if not wage:
+                empty.append(_('%(employee)s: skipped, zero wage',
+                               employee=employee.name or employee.id))
                 continue
             self.env['hr.salary.advance'].create({
                 'employee_id': employee.id,
@@ -160,14 +162,16 @@ class HrSalaryAdvanceRun(models.Model):
                 'wage_percent': self.wage_percent,
             })
 
-        return self._skipped_notification(skipped)
+        return self._skipped_notification(skipped, empty=empty)
 
-    def _skipped_notification(self, skipped, piece=()):
+    def _skipped_notification(self, skipped, piece=(), empty=()):
         """The warning about the employees left without an advance, or True.
 
         `skipped` are those without the rate of the currency of their wage,
         `piece` those paid by piece work, whose advance is not computed from
-        the hours of the timesheet.
+        the hours of the timesheet, `empty` lines "employee: reason" for
+        those skipped for a zero wage or month norm (#577). Everything is
+        also posted to the chatter of the batch, not only shown once.
         """
         messages = []
         if skipped:
@@ -188,8 +192,13 @@ class HrSalaryAdvanceRun(models.Model):
                 'based on actual days worked is not computed for piece work. '
                 '%(names)s',
                 count=len(piece), names=', '.join(piece)))
+        if empty:
+            messages.append(_(
+                'No advance for %(count)s employee(s): %(lines)s',
+                count=len(empty), lines='; '.join(empty)))
         if not messages:
             return True
+        self.message_post(body='\n'.join(messages))
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -261,7 +270,7 @@ class HrSalaryAdvanceRun(models.Model):
                 date=format_date(self.env, sheet.partial_approval_date)))
         in_early_sheets = early.line_ids.employee_id
 
-        skipped, piece, values = [], [], []
+        skipped, piece, empty, values = [], [], [], []
         period = [period_start + relativedelta(days=n)
                   for n in range((self.date - period_start).days + 1)]
         for employee in employees:
@@ -297,6 +306,11 @@ class HrSalaryAdvanceRun(models.Model):
                     skipped.append(employee.name or str(employee.id))
                     continue
                 if not wage or norm_hours <= 0:
+                    empty.append(_(
+                        '%(employee)s: skipped, zero wage',
+                        employee=employee.name or employee.id) if not wage
+                        else _('%(employee)s: skipped, no month norm of '
+                               'hours', employee=employee.name or employee.id))
                     continue
                 hourly_rate = wage / norm_hours
             line = self._approved_timesheet_line(employee)
@@ -334,7 +348,7 @@ class HrSalaryAdvanceRun(models.Model):
                 date=format_date(self.env, self.date),
                 problems='\n'.join('- ' + problem for problem in problems)))
         self.env['hr.salary.advance'].create(values)
-        return self._skipped_notification(skipped, piece)
+        return self._skipped_notification(skipped, piece, empty)
 
     def action_confirm_all(self):
         self.ensure_one()
