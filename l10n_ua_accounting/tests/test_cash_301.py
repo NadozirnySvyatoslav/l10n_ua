@@ -99,6 +99,26 @@ class TestCashOrders301(TransactionCase):
         pko = self._pay(self.cash, 'inbound', 100.0, date(2026, 11, 10))
         self.assertEqual(pko.outstanding_account_id, own)
 
+    def test_cash_journal_not_class_30_unchanged(self):
+        """Журнал типу «Каса» на рахунку поза класом 30 — стокова логіка (#642, З3)."""
+        other = self.env['account.account'].create({
+            'name': 'Грошові документи (не готівка)',
+            'code': '333902',
+            'account_type': 'asset_cash',
+            'company_ids': [(4, self.company.id)],
+        })
+        journal = self.env['account.journal'].create({
+            'name': 'Каса не 30',
+            'type': 'cash',
+            'code': 'CSHX',
+            'company_id': self.company.id,
+            'default_account_id': other.id,
+        })
+        payment = self._pay(journal, 'inbound', 100.0, date(2026, 11, 10))
+        self.assertNotEqual(payment.outstanding_account_id, other)
+        self.assertFalse(payment.move_id.line_ids.filtered(
+            lambda l: l.account_id == other), 'без класу 30 — через рахунок неоплачених')
+
     def test_bank_unchanged(self):
         """Банківський платіж як і раніше — через рахунок неоплачених надходжень."""
         payment = self._pay(self.bank, 'inbound', 100.0, date(2026, 11, 10))
