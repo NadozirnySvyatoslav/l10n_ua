@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Monobank Acquiring',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Accounting/Localization',
     'summary': 'Приймання оплати карткою через Monobank Acquiring (еквайринг)',
     'description': """
