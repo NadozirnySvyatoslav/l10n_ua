@@ -398,6 +398,23 @@ class TestCashflowForm(AccountingTestCase):
         self.assertEqual(values['R3580G4'], 30)
         self.assertEqual(values['R3305G3'], 1000)
 
+    def test_indirect_3195_in_thousands_equals_direct(self):
+        """Rows 123 − 25 = 98, while the unrounded 98 756,79 gives 99: both
+        methods print 98 (QA #651)."""
+        self._post_move(self.acc_bank, self.acc_customers, 123456.78)
+        self._post_move(self.acc_suppliers, self.acc_bank, 20499.99)
+        self._post_move(self.acc_suppliers, self.acc_bank, 4200.0)
+        direct = self._computed_report()._form_values()
+        indirect = self._computed_report(method='indirect')._form_values()
+        self.assertEqual(direct['3195'][0], 98)
+        self.assertEqual(indirect['3195'][0], 98)
+        self.assertEqual(indirect['3570'][0] + indirect['3580'][0], 98)
+        for form in (direct, indirect):
+            self.assertEqual(form['3400'][0], form['3195'][0] + form['3295'][0] + form['3395'][0])
+            self.assertEqual(form['3405'][0] + form['3400'][0] + form['3410'][0], form['3415'][0])
+        self.assertEqual(indirect['3400'], direct['3400'])
+        self.assertEqual(indirect['3410'], direct['3410'])
+
     def test_indirect_report_renders(self):
         self._scenario()
         report = self._computed_report(method='indirect')

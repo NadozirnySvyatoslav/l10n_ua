@@ -595,12 +595,18 @@ class L10nUaCashflowReport(models.Model):
         3400 and 3410 are added up from them, so that 3405 + 3400 + 3410 =
         3415 on the form. In Ф3-н 3550/3560 are the sums of their parts when
         they have any, and 3520 takes what keeps 3195 equal to the direct
-        method."""
+        method: Ф3-н takes 3195 as the sum of the rounded rows of the direct
+        method too (see _direct_operating_net)."""
         self.ensure_one()
         lines = self.line_ids.filtered('flow_key')
         columns = []
-        for field in ('current_amount', 'previous_amount'):
+        periods = ((self.date_from, self.date_to),
+                   (self.comparison_date_from, self.comparison_date_to))
+        for field, (date_from, date_to) in zip(('current_amount', 'previous_amount'), periods):
             v = {line.flow_key: to_thousands(line[field]) for line in lines}
+            if self.method == 'indirect' and 'net_operating' in v:
+                stored = sum(lines.filtered(lambda l: l.flow_key == 'net_operating').mapped(field))
+                v['net_operating'] = self._direct_operating_net(date_from, date_to, stored)
             nets = {}
             for section, directions in SECTION_SIGNS.items():
                 if section == OPERATING and self.method == 'indirect':
@@ -625,6 +631,21 @@ class L10nUaCashflowReport(models.Model):
             columns.append(v)
         return {line.code: (columns[0].get(line.flow_key, 0.0), columns[1].get(line.flow_key, 0.0))
                 for line in lines if line.code}
+
+    def _direct_operating_net(self, date_from, date_to, stored):
+        """3195 of Ф3-н in thousands, as the direct method prints it: the sum
+        of the rounded rows of section I. Ф3-н does not store those rows, so
+        they are read again from the ledger; if the ledger no longer gives the
+        stored 3195 (moves changed after the report was made), the stored
+        amount is rounded as it is."""
+        self.ensure_one()
+        flows = self._collect_flows(date_from, date_to)
+        signs = SECTION_SIGNS[OPERATING]
+        inflow = [flows.get(k, 0.0) for k in signs['in']]
+        outflow = [flows.get(k, 0.0) for k in signs['out']]
+        if not self.company_id.currency_id.is_zero(sum(inflow) - sum(outflow) - stored):
+            return to_thousands(stored)
+        return round_units(sum(map(to_thousands, inflow)) - sum(map(to_thousands, outflow)))
 
     @api.model
     def _ua_fmt(self, amount):
