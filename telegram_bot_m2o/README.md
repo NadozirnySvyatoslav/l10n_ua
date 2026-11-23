@@ -82,6 +82,10 @@ Asking the model for a JSON object (`user_reply`, `needs_human`, `category`, `su
 4. Optional: paste your fallback workflow URL into **Fallback Webhook URL**.
 5. To pick up group messages, disable **Group Privacy** for the bot in `@BotFather` (`/mybots → Bot Settings → Group Privacy → Turn off`) or make the bot a group admin — Telegram bots only see commands / @mentions in groups by default.
 
+## Upgrading to 19.0.1.0.1
+
+The webhook now requires the secret token that **Start Bot** generates. Before upgrading, check that every running bot has a **Webhook Secret**. If a bot has none, click **Stop Bot**, then **Start Bot** again — a new secret is generated and registered with Telegram.
+
 ## Requirements
 
 - Odoo 19.0

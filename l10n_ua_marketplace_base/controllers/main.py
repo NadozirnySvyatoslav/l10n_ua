@@ -4,6 +4,8 @@ import hmac
 import json
 import logging
 
+import werkzeug.exceptions
+
 from odoo import http, _
 from odoo.http import request, Response
 
@@ -79,6 +81,8 @@ class MarketplaceWebhookController(http.Controller):
                 methods=['POST'], csrf=False)
     def webhook(self, backend_id, **kwargs):
         """Handle webhook from marketplace."""
+        # Публічний webhook: бекенд потрібен для перевірки підпису, назовні не віддається.
+        # sudo-ok: читаємо бекенд лише для перевірки підпису
         backend = request.env['marketplace.backend'].sudo().browse(backend_id)
 
         if not backend.exists():
@@ -87,17 +91,17 @@ class MarketplaceWebhookController(http.Controller):
         if not backend.webhook_enabled:
             return {'error': 'Webhook disabled'}
 
+        # Підпис обов'язковий: без секрету або з хибним підписом — 403.
+        # abort(Response) оминає handle_error jsonrpc і дає справжній HTTP 403.
+        if not self._verify_signature(backend, request):
+            _logger.warning("Webhook rejected for backend %s: signature check failed", backend_id)
+            werkzeug.exceptions.abort(Response('Forbidden', status=403))
+
         # Get request data (request.jsonrequest прибрали ще в Odoo 17)
         try:
             data = request.get_json_data()
         except Exception:
             data = kwargs or {}
-
-        # Verify webhook signature if secret is configured
-        if backend.webhook_secret:
-            if not self._verify_signature(backend, request):
-                _logger.warning(f"Invalid webhook signature for backend {backend_id}")
-                return {'error': 'Invalid signature'}
 
         # Log webhook data
         _logger.info(f"Webhook received for backend {backend.name}: {json.dumps(data)[:500]}")
@@ -113,7 +117,14 @@ class MarketplaceWebhookController(http.Controller):
             return {'error': str(e)}
 
     def _verify_signature(self, backend, req):
-        """Verify webhook signature using HMAC."""
+        """Verify webhook signature using HMAC.
+
+        Fail-closed: якщо секрет не задано (або порожній), запит відхиляється.
+        """
+        secret = backend.webhook_secret or ''
+        if not secret.strip():
+            return False
+
         signature_header = req.httprequest.headers.get('X-Webhook-Signature')
         if not signature_header:
             signature_header = req.httprequest.headers.get('X-Signature')
@@ -126,13 +137,13 @@ class MarketplaceWebhookController(http.Controller):
 
         # Calculate expected signature
         expected = hmac.new(
-            backend.webhook_secret.encode('utf-8'),
-            body,
+            secret.encode('utf-8'),
+            body or b'',
             hashlib.sha256
         ).hexdigest()
 
-        # Compare signatures
-        return hmac.compare_digest(signature_header, expected)
+        # Compare signatures (bytes: compare_digest не приймає не-ASCII str)
+        return hmac.compare_digest(signature_header.encode('utf-8'), expected.encode('ascii'))
 
     def _process_webhook(self, backend, data):
         """Process webhook data. Override in specific marketplace modules."""

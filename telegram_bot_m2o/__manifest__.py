@@ -1,6 +1,6 @@
 {
     'name': 'Telegram Bot',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Marketing/Social Marketing',
     'summary': 'Manage Telegram bots with configurable commands, auto-responses, and CRM integration',
     'author': 'Many2one',

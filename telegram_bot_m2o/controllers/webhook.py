@@ -1,3 +1,4 @@
+import hmac
 import json
 import logging
 from odoo import http
@@ -18,11 +19,14 @@ class TelegramWebhookController(http.Controller):
     def telegram_webhook(self, token_hash, **kwargs):
         """Handle incoming Telegram webhook updates"""
 
-        # Find bot by token hash
-        bot = request.env['telegram.bot'].sudo().search([
-            ('token', 'like', f'%{token_hash}'),
+        # Find bot by token hash: точний збіг хвоста токена, без LIKE-шаблонів
+        # (% і _ з URL не мають підходити під довільного бота).
+        # Публічний webhook: бот потрібен для перевірки секрету, токен назовні не віддається.
+        # sudo-ok: шукаємо бота лише для перевірки секрету
+        bots = request.env['telegram.bot'].sudo().search([
             ('state', '=', 'running'),
-        ], limit=1)
+        ])
+        bot = bots.filtered(lambda b: b.token and self._token_hash(b.token) == token_hash)[:1]
 
         if not bot:
             _logger.warning(f"No bot found for token hash: {token_hash}")
@@ -32,10 +36,10 @@ class TelegramWebhookController(http.Controller):
                 status=404
             )
 
-        # Verify secret token if provided
+        # Секрет обов'язковий (fail-closed): без нього або з хибним — 403
         secret_token = request.httprequest.headers.get('X-Telegram-Bot-Api-Secret-Token')
-        if bot.webhook_secret and secret_token != bot.webhook_secret:
-            _logger.warning(f"Invalid secret token for bot {bot.name}")
+        if not self._check_secret(bot.webhook_secret, secret_token):
+            _logger.warning("Webhook rejected for bot %s: secret check failed", bot.name)
             return Response(
                 json.dumps({'ok': False, 'error': 'Invalid secret'}),
                 content_type='application/json',
@@ -67,6 +71,18 @@ class TelegramWebhookController(http.Controller):
             content_type='application/json',
             status=200
         )
+
+    @staticmethod
+    def _token_hash(token):
+        """Те саме, що в telegram.bot._compute_webhook_url."""
+        return token[-10:] if len(token) > 10 else token
+
+    @staticmethod
+    def _check_secret(expected, received):
+        """Fail-closed: порожній/незаданий секрет — завжди відмова."""
+        if not expected or not expected.strip() or not received:
+            return False
+        return hmac.compare_digest(expected.encode('utf-8'), received.encode('utf-8'))
 
     def _process_update(self, bot, update):
         """Process a Telegram update"""
