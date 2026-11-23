@@ -221,6 +221,18 @@ class TestBalanceForm(AccountingTestCase):
         for code in ('1030', '1035', '1090', '1110', '1405', '1500', '1520'):
             self.assertEqual(self._line(report, code).line_type, 'detail', code)
 
+    def test_pdf_prints_sub_rows(self):
+        """Rows «у тому числі» are printed with name and code (Odoo 20 drops
+        t-esc silently, the cells came out empty)."""
+        report = self._report(date(2044, 3, 31))
+        html, _report_type = self.env['ir.actions.report']._render_qweb_html(
+            'l10n_ua_accounting.report_balance_sheet_document', report.ids)
+        rendered = html.decode()
+        for code in self.SUB_CODES:
+            line = self._line(report, code)
+            self.assertIn('>%s<' % code, rendered, code)
+            self.assertIn(line.name, rendered, code)
+
     def test_additional_article_shown_with_amount(self):
         """1605 «Векселі видані» (додаток 3) is in the total and printed only
         when it holds an amount."""
