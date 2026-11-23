@@ -34,7 +34,9 @@ jobs:
         with: { fetch-depth: 0, persist-credentials: false }
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with: { python-version: '3.12' }
-      - run: pip install semgrep==1.95.0
+      # setuptools<81: semgrep 1.95 (через opentelemetry) імпортує pkg_resources,
+      # якого в Python 3.12 без setuptools немає.
+      - run: pip install semgrep==1.95.0 'setuptools<81'
       - name: semgrep з правилами під Odoo (лише нові спрацювання)
         run: semgrep scan --config .semgrep/odoo.yml --error --metrics=off --baseline-commit "$BASE_SHA" .
 
