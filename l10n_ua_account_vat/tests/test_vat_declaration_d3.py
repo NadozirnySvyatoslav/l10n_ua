@@ -69,10 +69,9 @@ class TestVatDeclarationD3(TransactionCase):
         Line.create({'register_id': cls.received.id, 'date': date(2026, 9, 25),
                      'doc_type': 'rk', 'partner_id': cls.supplier.id, 'base_amount': -1000.0,
                      'vat_amount': -200.0, 'base_20': -1000.0, 'vat_20': -200.0})
-        bank = cls.env['res.bank'].create({'name': 'АТ КБ «ПриватБанк»'})
         cls.company_bank = cls.env['res.partner.bank'].create({
-            'partner_id': cls.company.partner_id.id, 'acc_number': IBAN,
-            'bank_id': bank.id, 'sequence': -100,
+            'partner_id': cls.company.partner_id.id, 'account_number': IBAN,
+            'bank_name': 'АТ КБ «ПриватБанк»', 'sequence': -100,
         })
 
     def _declaration(self):

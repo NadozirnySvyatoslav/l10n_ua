@@ -176,8 +176,9 @@ class L10nUaVatDeclarationD3(models.Model):
     def _compute_d3_bank(self):
         for rec in self:
             bank = rec.company_id.partner_id.bank_ids[:1]
-            iban = _iban(bank.acc_number) or False
-            bank_name = bank.bank_id.name or False
+            # Odoo 20: res.bank прибрано — номер у account_number, назва банку в bank_name.
+            iban = _iban(bank.account_number) or False
+            bank_name = bank.bank_name or False
             rec.d3_iban = rec.d3_iban or iban
             rec.d3_bank_name = rec.d3_bank_name or bank_name
             rec.d3_sea_refund_iban = rec.d3_sea_refund_iban or iban
