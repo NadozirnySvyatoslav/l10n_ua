@@ -17,3 +17,4 @@ from . import test_cash_301
 from . import test_debt_netting
 from . import test_deferral
 from . import test_period_closing_lock
+from . import test_pnl_form
