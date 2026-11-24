@@ -55,6 +55,78 @@ class AccountMove(models.Model):
                 return self._L10N_UA_VAT_RATES[tax.amount]
         return 'exempt'
 
+    @api.model
+    def _l10n_ua_vat_tax_from_taxes(self, taxes):
+        """Сам податок ПДВ рядка (той, за яким `_l10n_ua_vat_rate_from_taxes`
+        визначає ставку), або порожній запис."""
+        for tax in taxes:
+            if tax.amount_type == 'group':
+                child = self._l10n_ua_vat_tax_from_taxes(tax.children_tax_ids)
+                if child:
+                    return child
+            elif tax.amount_type == 'percent' and tax.amount in self._L10N_UA_VAT_RATES:
+                return tax
+        return self.env['account.tax']
+
+    def _l10n_ua_vat_amounts(self, ilines, bases, share_before=0.0, share_after=1.0):
+        """ПДВ кожного рядка ПН так, щоб сума по ставці дорівнювала ПДВ
+        рахунку (#599).
+
+        Перерахунок round(база × ставка) по кожному рядку ПН розходиться з
+        документом на 0,01–0,02: Odoo округлює податок або глобально, або
+        від ціни з ПДВ, і копійки виходять інші. Тому ціль — сума tax-рядків
+        проводки за цим податком (у гривні, як і база ПН), а копійчану
+        різницю з порядковим розрахунком розкладаємо по копійці на рядки з
+        найбільшою базою. Для касового методу ціль — така сама кумулятивна
+        частка ПДВ документа, як і бази в `_l10n_ua_split_bases`.
+
+        Межа (З1 BA): від округлення різниця не перевищує копійку на рядок.
+        Більша різниця означає ручну правку податку в рахунку або податок,
+        що входить у базу іншого, — її не розкладаємо, лишаємо база × ставка
+        і повертаємо в ``mismatches`` (податок, ПДВ рахунку, ПДВ рядків),
+        щоб показати попередження в ПН.
+
+        Повертає ({рядок документа: ПДВ} без знаку РК, mismatches).
+        """
+        currency = self.company_currency_id
+        mismatches = []
+
+        def portion(amount):
+            return (currency.round(amount * share_after)
+                    - currency.round(amount * share_before))
+
+        groups = {}
+        for iline in ilines:
+            tax = self._l10n_ua_vat_tax_from_taxes(iline.tax_ids)
+            if tax and tax.amount:
+                groups.setdefault(tax, []).append(iline)
+
+        result = {}
+        for tax, lines in groups.items():
+            rate = tax.amount / 100.0
+            for iline in lines:
+                result[iline] = currency.round(bases[iline] * rate)
+            tax_lines = self.line_ids.filtered(
+                lambda l: l.tax_line_id == tax
+                and (l.tax_repartition_line_id.factor_percent or 0.0) > 0)
+            if not tax_lines:
+                continue
+            target = portion(sum(tax_lines.mapped('balance')) * self.direction_sign)
+            diff = currency.round(target - sum(result[l] for l in lines))
+            if currency.is_zero(diff):
+                continue
+            steps = int(round(abs(diff) / currency.rounding))
+            if steps > len(lines):
+                mismatches.append((tax, target, target - diff))
+                continue
+            # По копійці на рядки з найбільшою базою: жоден рядок не
+            # відхиляється від своєї бази × ставка більше ніж на копійку.
+            ordered = sorted(lines, key=lambda l: -abs(bases[l]))
+            step = currency.rounding if diff > 0 else -currency.rounding
+            for iline in ordered[:steps]:
+                result[iline] = currency.round(result[iline] + step)
+        return result, mismatches
+
     def _l10n_ua_settlement_dates(self):
         """Дати всіх фактичних погашень документа, за зростанням.
 
@@ -273,14 +345,26 @@ class AccountMove(models.Model):
             bases[last] = currency.round(target - others)
         return bases
 
-    def _l10n_ua_tax_invoice_line_vals(self, share=None, bases=None):
+    def _l10n_ua_tax_invoice_line_vals(self, share=None, bases=None, shares=None,
+                                       mismatches=None):
         """Рядки ПН з рядків документа.
 
         Без ``bases`` — на повну суму документа. З ``bases`` (касовий метод)
         — на суму надходження: ціна лишається фактичною ціною постачання, а
         кількість зменшується пропорційно, бо гр. 7 ПН — ціна одиниці, і
-        «розрізати» треба саме обсяг, за який надійшли кошти.
+        «розрізати» треба саме обсяг, за який надійшли кошти. ``shares`` —
+        (частка до, частка після) цього надходження, для ПДВ.
+
+        ПДВ рядка беремо з tax-рядків документа (#599), а не рахуємо заново.
+        Розбіжності понад копійку на рядок дописуються в список ``mismatches``.
         """
+        ilines = self._l10n_ua_tax_invoice_source_lines()
+        line_bases = bases if bases is not None else {
+            iline: iline.balance * self.direction_sign for iline in ilines}
+        vat_amounts, found = self._l10n_ua_vat_amounts(
+            ilines, line_bases, *(shares or (0.0, 1.0)))
+        if mismatches is not None:
+            mismatches.extend(found)
         # Фільтр саме `display_type == 'product'`: у Odoo 17+ звичайний рядок
         # має display_type 'product', а не порожній, тож умова `not display_type`
         # (написана під Odoo <=16) відкидала геть усі рядки й ПН виходила
@@ -294,7 +378,7 @@ class AccountMove(models.Model):
 
         line_vals = []
         seq = 10
-        for iline in self._l10n_ua_tax_invoice_source_lines():
+        for iline in ilines:
             # Суму беремо з проводки, а не з `price_subtotal`: ПН завжди у
             # гривні (`currency_id` — related на валюту компанії), а проводка
             # вже перерахована за курсом документа. Перераховувати кожен рядок
@@ -311,7 +395,7 @@ class AccountMove(models.Model):
                 quantity = (iline.quantity * bases[iline] / subtotal if subtotal
                             else iline.quantity * share)
 
-            line_vals.append((0, 0, {
+            vals = {
                 'sequence': seq,
                 'product_id': iline.product_id.id if iline.product_id else False,
                 'name': iline.name or iline.product_id.display_name or '',
@@ -323,7 +407,10 @@ class AccountMove(models.Model):
                 'uom_id': iline.product_uom_id.id if iline.product_uom_id else False,
                 'price_unit': net_unit_price,
                 'vat_rate': self._l10n_ua_vat_rate_for_line(iline),
-            }))
+            }
+            if iline in vat_amounts:
+                vals['vat_amount'] = sign * vat_amounts[iline]
+            line_vals.append((0, 0, vals))
             seq += 10
         return line_vals
 
@@ -392,15 +479,40 @@ class AccountMove(models.Model):
             bases = self._l10n_ua_split_bases(
                 ilines, settlement['share_before'], settlement['share_after'])
             share = settlement['share_after'] - settlement['share_before']
+            mismatches = []
             vals = self._l10n_ua_tax_invoice_base_vals('issued', False)
             vals.update({
                 'date': settlement['date'],
                 'partial_reconcile_id': settlement['partial'].id,
                 'payment_move_id': settlement['payment_move'].id,
-                'line_ids': self._l10n_ua_tax_invoice_line_vals(share=share, bases=bases),
+                'line_ids': self._l10n_ua_tax_invoice_line_vals(
+                    share=share, bases=bases,
+                    shares=(settlement['share_before'], settlement['share_after']),
+                    mismatches=mismatches),
             })
-            created |= TaxInvoice.create(vals)
+            tax_invoice = TaxInvoice.create(vals)
+            self._l10n_ua_warn_vat_mismatches(tax_invoice, mismatches)
+            created |= tax_invoice
         return created
+
+    def _l10n_ua_warn_vat_mismatches(self, tax_invoice, mismatches):
+        """Попередження в ПН: ПДВ рахунку не сходиться з рядками більше,
+        ніж на копійку на рядок, тож ПДВ рядків лишено база × ставка (#599)."""
+        if not mismatches:
+            return
+        currency = self.company_currency_id
+        details = '; '.join(
+            _('%(tax)s: у рахунку %(move)s, у рядках ПН %(lines)s',
+              tax=tax.name,
+              move=formatLang(self.env, move_vat, currency_obj=currency),
+              lines=formatLang(self.env, lines_vat, currency_obj=currency))
+            for tax, move_vat, lines_vat in mismatches)
+        tax_invoice.message_post(body=_(
+            'Увага: ПДВ рахунку %(move)s не відповідає рядкам більше, ніж на '
+            'копійку на рядок (%(details)s). Так буває після ручної правки '
+            'податку в рахунку. ПДВ рядків ПН лишено «база × ставка» — '
+            'перевірте рахунок і ПН перед реєстрацією.',
+            move=self.name, details=details))
 
     def action_create_tax_invoice(self):
         """Create a tax invoice (ПН) from customer/vendor invoice.
@@ -428,10 +540,11 @@ class AccountMove(models.Model):
         # період декларації. Визначаємо до номера: відмова тут не має
         # спалювати номер у послідовності.
         date = self._l10n_ua_tax_invoice_date()
+        mismatches = []
         vals = self._l10n_ua_tax_invoice_base_vals(invoice_type, is_refund)
         vals.update({
             'date': date,
-            'line_ids': self._l10n_ua_tax_invoice_line_vals(),
+            'line_ids': self._l10n_ua_tax_invoice_line_vals(mismatches=mismatches),
         })
         if is_refund:
             # РК без посилання на оригінал ЄРПН не приймає. Знаходимо ПН
@@ -444,6 +557,7 @@ class AccountMove(models.Model):
             })
 
         tax_invoice = self.env['l10n_ua.tax.invoice'].create(vals)
+        self._l10n_ua_warn_vat_mismatches(tax_invoice, mismatches)
         return self._l10n_ua_tax_invoices_action(tax_invoice)
 
     def _l10n_ua_tax_invoices_action(self, tax_invoices):

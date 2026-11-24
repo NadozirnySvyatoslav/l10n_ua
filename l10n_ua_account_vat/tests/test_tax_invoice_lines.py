@@ -1,5 +1,5 @@
 """Рядки ПН мають відповідати рядкам документа — по складу, базі та ставці."""
-from odoo.tests import tagged
+from odoo.tests import Form, tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
@@ -224,3 +224,166 @@ class TestTaxInvoiceLines(AccountTestInvoicingCommon):
         self.assertEqual(move.invoice_line_ids.price_subtotal, 379.99)
         self.assertEqual(tax_invoice.line_ids.base_amount, 379.99)
         self.assertEqual(tax_invoice.total_vat, move.amount_tax)
+
+    # --- #599: ПДВ ПН = ПДВ рахунку до копійки -------------------------------
+
+    def _assert_vat_matches_move(self, move, tax_invoice):
+        self.assertAlmostEqual(tax_invoice.total_base, abs(move.amount_untaxed_signed), places=2,
+                               msg='база ПН має дорівнювати базі документа')
+        self.assertAlmostEqual(tax_invoice.total_vat, abs(move.amount_tax_signed), places=2,
+                               msg='ПДВ ПН має дорівнювати ПДВ документа до копійки')
+        rates = {'20': 0.20, '7': 0.07, '14': 0.14}
+        for line in tax_invoice.line_ids:
+            expected = line.base_amount * rates.get(line.vat_rate, 0.0)
+            self.assertLessEqual(abs(line.vat_amount - expected), 0.0100001,
+                                 'різниця округлення на рядку — не більше копійки')
+
+    def test_599a_per_line_price_included(self):
+        """(а) «по рядку», ціни з ПДВ 7,77 і 1,05: ПН давала 1,46 замість 1,48."""
+        self.env.company.tax_calculation_rounding_method = 'round_per_line'
+        move = self._invoice([
+            {'name': 'товар 1', 'quantity': 1, 'price_unit': 7.77,
+             'tax_ids': [(6, 0, self.vat_20_incl.ids)]},
+            {'name': 'товар 2', 'quantity': 1, 'price_unit': 1.05,
+             'tax_ids': [(6, 0, self.vat_20_incl.ids)]},
+        ])
+
+        self._assert_vat_matches_move(move, self._tax_invoice(move))
+
+    def _three_small_lines(self):
+        return [{'name': 'товар %s' % i, 'quantity': 1, 'price_unit': 0.33,
+                 'tax_ids': [(6, 0, self.vat_20.ids)]} for i in range(3)]
+
+    def test_599b_global_three_small_lines(self):
+        """(б) «глобально», 3 × 0,33 без ПДВ: рахунок 0,20, ПН давала 0,21."""
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        move = self._invoice(self._three_small_lines())
+
+        tax_invoice = self._tax_invoice(move)
+
+        self.assertAlmostEqual(move.amount_tax, 0.20, places=2)
+        self._assert_vat_matches_move(move, tax_invoice)
+
+    def test_599g_global_price_included(self):
+        """(г) «глобально», 7,77 з ПДВ: рахунок 1,30, ПН давала 1,29."""
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        move = self._invoice([
+            {'name': 'товар', 'quantity': 1, 'price_unit': 7.77,
+             'tax_ids': [(6, 0, self.vat_20_incl.ids)]},
+        ])
+
+        self._assert_vat_matches_move(move, self._tax_invoice(move))
+
+    def test_599_credit_note_keeps_document_vat(self):
+        """РК на рахунок (б): ПДВ РК = −ПДВ документа, без копійчаного зсуву."""
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        move = self._invoice(self._three_small_lines())
+        self._tax_invoice(move)
+        refund = move._reverse_moves([{'invoice_date': '2025-05-10', 'date': '2025-05-10'}])
+        refund.action_post()
+
+        correction = self._tax_invoice(refund)
+
+        self.assertAlmostEqual(correction.total_vat, -refund.amount_tax, places=2)
+
+    def test_599_manual_line_still_computes_vat(self):
+        """Ручний рядок ПН без рахунку рахує ПДВ від бази, як і раніше."""
+        tax_invoice = self.env['l10n_ua.tax.invoice'].create({
+            'invoice_type': 'issued', 'number': 'РУЧН-599', 'partner_id': self.customer.id,
+            'company_id': self.env.company.id, 'date': '2025-05-05',
+            'line_ids': [(0, 0, {'name': 'ручний', 'quantity': 1,
+                                 'price_unit': 100.0, 'vat_rate': '20'})],
+        })
+        self.assertAlmostEqual(tax_invoice.line_ids.vat_amount, 20.0, places=2)
+        tax_invoice.line_ids.price_unit = 50.0
+        self.assertAlmostEqual(tax_invoice.line_ids.vat_amount, 10.0, places=2)
+
+    # --- #599, зауваження BA/pr-review: межа розподілу і касовий метод -------
+
+    def _has_vat_warning(self, tax_invoice):
+        return bool(tax_invoice.message_ids.filtered(
+            lambda m: 'не відповідає рядкам' in (m.body or '')))
+
+    def _bump_move_vat(self, move, delta):
+        """Ручна правка ПДВ у рахунку: tax-рядок і дебіторка на ``delta``."""
+        move.button_draft()
+        ctx = dict(check_move_validity=False, skip_invoice_sync=True)
+        tax_line = move.line_ids.filtered('tax_line_id')
+        receivable = move.line_ids.filtered(
+            lambda l: l.account_id.account_type == 'asset_receivable')
+        tax_line.with_context(**ctx).write({
+            'balance': tax_line.balance - delta,
+            'amount_currency': tax_line.amount_currency - delta,
+        })
+        receivable.with_context(**ctx).write({
+            'balance': receivable.balance + delta,
+            'amount_currency': receivable.amount_currency + delta,
+        })
+        move.action_post()
+
+    def test_599_manual_vat_edit_is_not_spread(self):
+        """ПДВ рахунку правлено на 1,00: різницю не розкидаємо по рядках, а
+        лишаємо база × ставка і пишемо попередження в ПН (З1 BA)."""
+        move = self._invoice([
+            {'name': 'товар %s' % i, 'quantity': 1, 'price_unit': 100.0,
+             'tax_ids': [(6, 0, self.vat_20.ids)]} for i in range(3)])
+        self._bump_move_vat(move, 1.0)
+        self.assertAlmostEqual(abs(move.amount_tax_signed), 61.0, places=2)
+
+        tax_invoice = self._tax_invoice(move)
+
+        self.assertEqual(tax_invoice.line_ids.mapped('vat_amount'), [20.0, 20.0, 20.0],
+                         'ручна різниця не має ховатися в рядках ПН')
+        self.assertTrue(self._has_vat_warning(tax_invoice),
+                        'ПН має містити попередження про розбіжність ПДВ')
+
+    def test_599_rounding_diff_is_spread_without_warning(self):
+        """Звичайна копійка округлення (3 × 0,33) розкладається без попередження."""
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        move = self._invoice(self._three_small_lines())
+
+        tax_invoice = self._tax_invoice(move)
+
+        self._assert_vat_matches_move(move, tax_invoice)
+        self.assertFalse(self._has_vat_warning(tax_invoice))
+
+    def _pay(self, move, payment_date, amount):
+        wizard = self.env['account.payment.register'].with_context(
+            active_model='account.move', active_ids=move.ids,
+        ).create({'payment_date': payment_date, 'amount': amount})
+        return wizard._create_payments()
+
+    def test_599_cash_method_partial_payments_sum_to_move_vat(self):
+        """Касовий метод, 3 × 0,33 «глобально», дві часткові оплати: сума ПДВ
+        усіх ПН = ПДВ рахунку, сума баз = база рахунку (критерій 6 BA)."""
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        self.customer.with_company(self.env.company).l10n_ua_vat_cash_method = True
+        move = self._invoice(self._three_small_lines())
+        self.assertAlmostEqual(move.amount_total, 1.19, places=2)
+
+        self._pay(move, '2025-05-10', 0.50)
+        self._pay(move, '2025-05-20', move.amount_residual)
+        move.action_create_tax_invoice()
+        tax_invoices = self.env['l10n_ua.tax.invoice'].search([('move_id', '=', move.id)])
+
+        self.assertEqual(len(tax_invoices), 2, 'по ПН на кожне надходження')
+        self.assertAlmostEqual(sum(tax_invoices.mapped('total_vat')),
+                               abs(move.amount_tax_signed), places=2)
+        self.assertAlmostEqual(sum(tax_invoices.mapped('total_base')),
+                               abs(move.amount_untaxed_signed), places=2)
+        for tax_invoice in tax_invoices:
+            self.assertFalse(self._has_vat_warning(tax_invoice))
+
+    def test_599_resave_keeps_vat(self):
+        """З2/критерій 8: збереження форми ПН з рахунку без змін не
+        перераховує підігнаний ПДВ рядка."""
+        self.env.company.tax_calculation_rounding_method = 'round_globally'
+        move = self._invoice(self._three_small_lines())
+        tax_invoice = self._tax_invoice(move)
+        before = tax_invoice.line_ids.mapped('vat_amount')
+
+        Form(tax_invoice).save()
+        tax_invoice.invalidate_recordset()
+
+        self.assertEqual(tax_invoice.line_ids.mapped('vat_amount'), before)
+        self.assertAlmostEqual(tax_invoice.total_vat, move.amount_tax, places=2)

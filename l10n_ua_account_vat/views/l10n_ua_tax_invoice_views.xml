@@ -102,7 +102,7 @@
                                     <field name="price_unit"/>
                                     <field name="base_amount" sum="Total"/>
                                     <field name="vat_rate"/>
-                                    <field name="vat_amount" sum="Total"/>
+                                    <field name="vat_amount" sum="Total" readonly="1"/>
                                     <field name="is_import" optional="hide"/>
                                     <field name="is_own_agro" optional="hide"/>
                                     <field name="benefit_code" optional="hide"/>
