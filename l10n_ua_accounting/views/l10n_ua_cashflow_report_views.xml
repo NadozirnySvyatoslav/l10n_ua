@@ -30,6 +30,7 @@
                     </div>
                     <group>
                         <group string="Period">
+                            <field name="method" readonly="state != 'draft'" widget="radio"/>
                             <field name="date_from" readonly="state != 'draft'"/>
                             <field name="date_to" readonly="state != 'draft'"/>
                             <field name="company_id" groups="base.group_multi_company"
@@ -51,6 +52,7 @@
                         <page string="Statement Lines" name="lines">
                             <field name="line_ids" readonly="1">
                                 <list decoration-bf="line_type in ('subtotal', 'total')"
+                                      decoration-it="line_type == 'sub'"
                                       decoration-info="line_type == 'subtotal'"
                                       decoration-primary="line_type == 'total'">
                                     <field name="code"/>
