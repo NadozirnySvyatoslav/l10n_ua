@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '20.0.7.1.2',
+    'version': '20.0.7.2.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
@@ -26,6 +26,12 @@ Complete Ukrainian accounting functionality for Odoo:
 * Receivable/Payable filtering
 * Opening/closing balances
 * Printable format for signing
+
+**Debt Netting (Взаємозалік):**
+* Offset of mutual claims with a partner (361/631, 371/685, ...)
+* Journal entry with automatic (partial) reconciliation of the documents
+* Printable act of netting of counter homogeneous claims
+* Cancellation by reversal entry
 
 **Financial Statements:**
 * Balance Sheet (Баланс, Форма №1)
@@ -74,6 +80,7 @@ Dependencies:
         'data/cash_limit_cron.xml',
         'data/currency_exchange_data.xml',
         'data/account_menu_data.xml',
+        'data/debt_netting_data.xml',
         # Views
         'views/res_company_views.xml',
         'views/account_payment_views.xml',
@@ -87,6 +94,9 @@ Dependencies:
         'views/l10n_ua_currency_revaluation_views.xml',
         'views/l10n_ua_currency_exchange_views.xml',
         'views/l10n_ua_aging_report_views.xml',
+        # Акт взаємозаліку — до форми документа: кнопка друку посилається на звіт
+        'report/debt_netting_report.xml',
+        'views/l10n_ua_debt_netting_views.xml',
         # Wizards
         'wizard/cash_book_wizard_views.xml',
         'wizard/reconciliation_act_wizard_views.xml',
