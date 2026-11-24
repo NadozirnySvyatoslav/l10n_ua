@@ -67,7 +67,7 @@ class TestDeferral(AccountingTestCase):
             'period_id': period.id,
             'company_id': self.company.id,
             'journal_id': self.misc_journal.id,
-            # period_lock_date doesn't exist on res.company in Odoo 19
+            # the lock itself is covered by test_period_closing_lock
             'lock_period': False,
             'account_791_id': self.acc_791.id,
             'account_792_id': self.acc_792.id,
