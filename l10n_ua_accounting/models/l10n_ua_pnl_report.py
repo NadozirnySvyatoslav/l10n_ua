@@ -26,6 +26,8 @@ import io
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+from .l10n_ua_fin_rounding import format_units, round_units, to_thousands
+
 
 # Section I. Line definitions:
 # (sequence, key, name, code, line_type, account_codes, turnover_type)
@@ -409,18 +411,55 @@ class L10nUaPnlReport(models.Model):
                             value = max(value, 0.0)
                         line.with_context(l10n_ua_pnl_no_recompute=True).write({field: value})
 
+    def _form_values(self):
+        """{code: (graph 3, graph 4)} of the printed form: thousands of
+        hryvnias without decimals, the result rows added up from the rounded
+        rows (``pnl_complete``) and split into profit and loss. Section IV is
+        not in thousands: a number of shares, hryvnias per share."""
+        self.ensure_one()
+        lines = self.line_ids.filtered('flow_key')
+        result = {}
+        columns = []
+        for field in ('current_amount', 'previous_amount'):
+            base = {}
+            for line in lines:
+                if line.line_type not in ('detail', 'manual', 'oci', 'element'):
+                    continue
+                if line.code in PNL_SHARE_COUNT_CODES + PNL_DECIMAL2_CODES:
+                    base[line.flow_key] = line[field]
+                else:
+                    base[line.flow_key] = to_thousands(line[field])
+            full = pnl_complete(base)
+            values = {}
+            for line in lines:
+                value = full.get(line.flow_key, 0.0) if line.line_type != 'loss' else 0.0
+                if line.code in PNL_LOSS_CODES:
+                    loss_code = PNL_LOSS_CODES[line.code][0]
+                    values[loss_code] = round_units(max(-value, 0.0))
+                    value = max(value, 0.0)
+                if line.line_type != 'loss':
+                    values[line.code] = value if line.code in PNL_DECIMAL2_CODES else round_units(value)
+            columns.append(values)
+        for code in columns[0]:
+            result[code] = (columns[0][code], columns[1].get(code, 0.0))
+        return result
+
+    @api.model
+    def _ua_fmt(self, amount, code=''):
+        return format_units(amount, 2 if code in PNL_DECIMAL2_CODES else 0, parentheses=False)
+
     def _xml_values(self):
-        """{'R2000G3': 1234, …} for J0900207: whole hryvnias (DGdecimal0),
-        2610–2650 with kopecks (DGdecimal2). Expense and loss rows are
-        positive, as printed in parentheses. Empty cells are left out."""
+        """{'R2000G3': 1234, …} for J0900207: thousands without decimals
+        (DGdecimal0), 2610–2650 with kopecks (DGdecimal2). Expense and loss
+        rows are positive, as printed in parentheses (TODO(#78): confirm the
+        sign against an accepted J0900207). Empty cells are left out."""
         self.ensure_one()
         values = {}
-        for line in self.line_ids.filtered('code'):
-            for field, graph in (('current_amount', 3), ('previous_amount', 4)):
-                amount = line[field]
-                amount = round(amount, 2) if line.code in PNL_DECIMAL2_CODES else round(amount)
+        for code, (g3, g4) in self._form_values().items():
+            for graph, amount in ((3, g3), (4, g4)):
                 if amount:
-                    values[f'R{line.code}G{graph}'] = amount
+                    values[f'R{code}G{graph}'] = round(amount, 2) if code in PNL_DECIMAL2_CODES \
+                        else int(amount)
         return values
 
 

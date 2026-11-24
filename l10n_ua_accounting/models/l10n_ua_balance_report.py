@@ -5,6 +5,8 @@ import io
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+from .l10n_ua_fin_rounding import format_units, round_units, to_thousands
+
 
 # Line definitions: (sequence, key, name, code, section, line_type, account_codes, balance_type)
 #
@@ -164,6 +166,32 @@ def match_balance_sub_lines(code, row_key):
         if sub[4] == row_key and any(
             code.startswith(p.strip()) for p in sub[5].split(',') if p.strip())
     ]
+
+
+def balance_round(details):
+    """One column of Form 1 in thousands of hryvnias from {code: hryvnias}
+    of its detail rows and rows «у тому числі».
+
+    The rows are rounded, the sections and the two totals added up from them.
+    When the rounding leaves 1300 and 1900 apart, the difference goes to 1420
+    «Нерозподілений прибуток» (and so to 1495 and 1900), as it is done by
+    hand. Form 4 takes its balances from here, so that they match."""
+    values = {code: to_thousands(amount) for code, amount in details.items()}
+    sections = {}
+    for line in BALANCE_DETAIL_LINES:
+        sections[line[4]] = sections.get(line[4], 0.0) + values.get(line[3], 0.0)
+    assets = sum(sections.get(s, 0.0) for s in ASSET_SECTIONS)
+    liabilities = sum(sections.get(s, 0.0) for s in LIABILITY_SECTIONS)
+    difference = round_units(assets - liabilities)
+    if difference and abs(difference) <= len(BALANCE_DETAIL_LINES):
+        values['1420'] = values.get('1420', 0.0) + difference
+        sections['equity'] = sections.get('equity', 0.0) + difference
+        liabilities += difference
+    for seq, key, name, code, section, line_type, acct, bal in BALANCE_LINES:
+        if line_type == 'subtotal':
+            values[code] = round_units(sections.get(section, 0.0))
+    values['1300'], values['1900'] = round_units(assets), round_units(liabilities)
+    return values
 
 
 def match_balance_line(code, amount):
@@ -437,6 +465,35 @@ class L10nUaBalanceReport(models.Model):
                 'previous_amount': prev,
             })
         self.env['l10n_ua.balance.report.line'].create(vals_list)
+
+    # ── Form in thousands ───────────────────────────────────
+
+    def _form_values(self):
+        """{code: (graph 3, graph 4)} in thousands of hryvnias: graph 3 at the
+        start of the period (comparison date), graph 4 at its end
+        (``balance_round``)."""
+        self.ensure_one()
+        columns = [
+            balance_round({line.code: line[field] for line in self.line_ids
+                           if line.code and line.line_type in ('detail', 'sub')})
+            for field in ('previous_amount', 'current_amount')
+        ]
+        return {code: (columns[0].get(code, 0.0), columns[1].get(code, 0.0))
+                for code in set(columns[0]) | set(columns[1])}
+
+    @api.model
+    def _ua_fmt(self, amount):
+        return format_units(amount)
+
+    def _xml_values(self):
+        """{'R1000G3': 12, …} for J0900108; empty cells are left out."""
+        self.ensure_one()
+        values = {}
+        for code, (g3, g4) in self._form_values().items():
+            for graph, amount in ((3, g3), (4, g4)):
+                if amount:
+                    values[f'R{code}G{graph}'] = int(amount)
+        return values
 
     # ── XLSX ────────────────────────────────────────────────
 

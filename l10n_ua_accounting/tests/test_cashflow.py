@@ -343,33 +343,33 @@ class TestCashflowForm(AccountingTestCase):
 
     def test_current_investments_are_not_cash(self):
         """35 is row 1160 of the balance, not 1165: buying it is an investment."""
-        self._post_move(self.acc_securities, self.acc_bank, 1000.0)
+        self._post_move(self.acc_securities, self.acc_bank, 1000000.0)
         report = self._computed_report()
-        self.assertEqual(self._amount(report, '3255'), 1000.0)
+        self.assertEqual(self._amount(report, '3255'), 1000000.0)
         self.assertEqual(self._amount(report, '3410'), 0.0)
 
     def test_tax_parts_and_dividends(self):
-        self._post_move(self.acc_profit_tax, self.acc_bank, 300.0)
-        self._post_move(self.acc_dividends, self.acc_bank, 200.0)
+        self._post_move(self.acc_profit_tax, self.acc_bank, 300000.0)
+        self._post_move(self.acc_dividends, self.acc_bank, 200000.0)
         report = self._computed_report()
-        self.assertEqual(self._amount(report, '3115'), 300.0)
-        self.assertEqual(self._amount(report, '3116'), 300.0)
+        self.assertEqual(self._amount(report, '3115'), 300000.0)
+        self.assertEqual(self._amount(report, '3116'), 300000.0)
         self.assertNotIn('3117', report.line_ids.mapped('code'))
-        self.assertEqual(self._amount(report, '3355'), 200.0)
+        self.assertEqual(self._amount(report, '3355'), 200000.0)
         values = report._xml_values()
         self.assertEqual(values['R3116G3'], 300)
         self.assertEqual(values['R3355G3'], 200)
 
     def _scenario(self):
-        self._post_move(self.acc_customers, self.acc_revenue, 1000.0)
-        self._post_move(self.acc_cogs, self.acc_goods, 600.0)
-        self._post_move(self.acc_bank, self.acc_customers, 700.0)
-        self._post_move(self.acc_goods, self.acc_suppliers, 500.0)
-        self._post_move(self.acc_suppliers, self.acc_bank, 400.0)
-        self._post_move(self.acc_admin, self.acc_depr, 50.0)
-        self._post_move(self.acc_tax_expense, self.acc_profit_tax, 30.0)
-        self._post_move(self.acc_profit_tax, self.acc_bank, 30.0)
-        self._post_move(self.acc_bank, self.acc_loans, 1000.0)
+        self._post_move(self.acc_customers, self.acc_revenue, 1000000.0)
+        self._post_move(self.acc_cogs, self.acc_goods, 600000.0)
+        self._post_move(self.acc_bank, self.acc_customers, 700000.0)
+        self._post_move(self.acc_goods, self.acc_suppliers, 500000.0)
+        self._post_move(self.acc_suppliers, self.acc_bank, 400000.0)
+        self._post_move(self.acc_admin, self.acc_depr, 50000.0)
+        self._post_move(self.acc_tax_expense, self.acc_profit_tax, 30000.0)
+        self._post_move(self.acc_profit_tax, self.acc_bank, 30000.0)
+        self._post_move(self.acc_bank, self.acc_loans, 1000000.0)
 
     def test_indirect_method_agrees_with_direct(self):
         self._scenario()
@@ -377,19 +377,19 @@ class TestCashflowForm(AccountingTestCase):
         indirect = self._computed_report(method='indirect')
         amount = lambda code: self._amount(indirect, code)  # noqa: E731
 
-        self.assertEqual(self._amount(direct, '3195'), 270.0)
-        self.assertEqual(amount('3195'), 270.0)
-        self.assertEqual(amount('3500'), 350.0)      # 1000 − 600 − 50, before tax
-        self.assertEqual(amount('3505'), 50.0)
-        self.assertEqual(amount('3551'), 100.0)      # goods: −600 + 500
-        self.assertEqual(amount('3553'), -300.0)     # receivables grew
-        self.assertEqual(amount('3561'), 100.0)      # payables grew
-        self.assertEqual(amount('3550'), -200.0)
-        self.assertEqual(amount('3580'), -30.0)
-        self.assertEqual(amount('3570'), 300.0)
+        self.assertEqual(self._amount(direct, '3195'), 270000.0)
+        self.assertEqual(amount('3195'), 270000.0)
+        self.assertEqual(amount('3500'), 350000.0)      # 1000 − 600 − 50, before tax
+        self.assertEqual(amount('3505'), 50000.0)
+        self.assertEqual(amount('3551'), 100000.0)      # goods: −600 + 500
+        self.assertEqual(amount('3553'), -300000.0)     # receivables grew
+        self.assertEqual(amount('3561'), 100000.0)      # payables grew
+        self.assertEqual(amount('3550'), -200000.0)
+        self.assertEqual(amount('3580'), -30000.0)
+        self.assertEqual(amount('3570'), 300000.0)
         self.assertEqual(amount('3520'), 0.0)        # nothing left unexplained
         self.assertEqual(amount('3400'), self._amount(direct, '3400'))
-        self.assertEqual(amount('3305'), 1000.0)
+        self.assertEqual(amount('3305'), 1000000.0)
         self.assertNotIn('3000', indirect.line_ids.mapped('code'))
 
         values = indirect._xml_values()
@@ -397,6 +397,23 @@ class TestCashflowForm(AccountingTestCase):
         self.assertEqual(values['R3553G4'], 300)     # a decrease of cash: видаток
         self.assertEqual(values['R3580G4'], 30)
         self.assertEqual(values['R3305G3'], 1000)
+
+    def test_indirect_3195_in_thousands_equals_direct(self):
+        """Rows 123 − 25 = 98, while the unrounded 98 756,79 gives 99: both
+        methods print 98 (QA #651)."""
+        self._post_move(self.acc_bank, self.acc_customers, 123456.78)
+        self._post_move(self.acc_suppliers, self.acc_bank, 20499.99)
+        self._post_move(self.acc_suppliers, self.acc_bank, 4200.0)
+        direct = self._computed_report()._form_values()
+        indirect = self._computed_report(method='indirect')._form_values()
+        self.assertEqual(direct['3195'][0], 98)
+        self.assertEqual(indirect['3195'][0], 98)
+        self.assertEqual(indirect['3570'][0] + indirect['3580'][0], 98)
+        for form in (direct, indirect):
+            self.assertEqual(form['3400'][0], form['3195'][0] + form['3295'][0] + form['3395'][0])
+            self.assertEqual(form['3405'][0] + form['3400'][0] + form['3410'][0], form['3415'][0])
+        self.assertEqual(indirect['3400'], direct['3400'])
+        self.assertEqual(indirect['3410'], direct['3410'])
 
     def test_indirect_report_renders(self):
         self._scenario()

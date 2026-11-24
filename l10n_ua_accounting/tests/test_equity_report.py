@@ -10,7 +10,7 @@ from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from odoo.addons.l10n_ua_accounting.models.l10n_ua_equity_report import (
-    EQUITY_FIELDS, EQUITY_LINES, equity_row,
+    EQUITY_FIELDS, EQUITY_FORM1_ROWS, EQUITY_LINES, equity_row,
 )
 
 from .common import AccountingTestCase
@@ -161,11 +161,12 @@ class TestEquityReport(AccountingTestCase):
         self.assertEqual(equity_row('withdrawn', '451', ['40'], 300), '4270')
 
     def test_xml_values(self):
-        self._entry(self.acc_46, self.acc_40, 10000.4)
+        self._entry(self.acc_46, self.acc_40, 10400.4)
         report = self._report()
         values = report._xml_values()
-        self.assertEqual(values['R4240G3'], 10000)
-        self.assertEqual(values['R4240G8'], -10000)
+        # Thousands of hryvnias without decimals
+        self.assertEqual(values['R4240G3'], 10)
+        self.assertEqual(values['R4240G8'], -10)
         self.assertNotIn('R4240G10', values)  # nothing in the total
         self.assertTrue(all(key[1:5] in {line[1] for line in EQUITY_LINES} for key in values))
 
@@ -178,3 +179,32 @@ class TestEquityReport(AccountingTestCase):
         self.assertIn('4300', html)
         action = report.action_export_xlsx()
         self.assertIn('/web/content/', action['url'])
+
+    def test_printed_form_agrees_with_forms_1_and_2(self):
+        """In thousands the balances are those of Form 1, the result that of
+        Form 2, and 4095 + 4295 = 4300 in every graph."""
+        self._entry(self.acc_46, self.acc_40, 100400)
+        self._entry(self.acc_301, self.acc_46, 60600)
+        self._entry(self.acc_361, self.acc_702, 25450)
+        self._entry(self.acc_92, self.acc_301, 1520)
+        self._entry(self.acc_104, self.acc_411, 2600)
+        report = self._report()
+        form = report._form_values()
+
+        balance = self.env['l10n_ua.balance.report'].create({
+            'company_id': self.company.id, 'date_to': date(2041, 12, 31),
+            'comparison_date': date(2040, 12, 31)})
+        balance.action_compute()
+        form1 = balance._form_values()
+        self.assertEqual(form1['1300'], form1['1900'])
+        for field, code in EQUITY_FORM1_ROWS.items():
+            self.assertEqual(form['4300'][field], form1[code][1], field)
+            self.assertEqual(form['4000'][field], form1[code][0], field)
+            self.assertEqual(form['4095'][field] + form['4295'][field], form['4300'][field], field)
+
+        pnl = self.env['l10n_ua.pnl.report'].create({
+            'company_id': self.company.id, 'date_from': date(2041, 1, 1), 'date_to': date(2041, 12, 31)})
+        pnl.action_compute()
+        form2 = pnl._form_values()
+        self.assertEqual(form['4100']['retained'], form2['2350'][0] - form2['2355'][0])
+        self.assertEqual(form['4111']['revaluation'], 3)

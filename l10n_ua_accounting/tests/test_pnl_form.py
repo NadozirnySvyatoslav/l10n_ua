@@ -88,38 +88,38 @@ class TestPnlForm(AccountingTestCase):
             '2600', '2605', '2610', '2615', '2650'])
 
     def test_net_turnover_and_loss_rows(self):
-        self._entry(self.acc_361, self.acc_702, 1000)
-        self._entry(self.acc_702, self.acc_361, 200)      # повернення товару
-        self._entry(self.acc_902, self.acc_281, 500)
-        self._entry(self.acc_92, self.acc_361, 400)
-        self._entry(self.acc_361, self.acc_721, 30)
-        self._entry(self.acc_361, self.acc_732, 20)
+        self._entry(self.acc_361, self.acc_702, 1000000)
+        self._entry(self.acc_702, self.acc_361, 200000)      # повернення товару
+        self._entry(self.acc_902, self.acc_281, 500000)
+        self._entry(self.acc_92, self.acc_361, 400000)
+        self._entry(self.acc_361, self.acc_721, 30000)
+        self._entry(self.acc_361, self.acc_732, 20000)
         # The closing of the year through 79 changes nothing
-        self._entry(self.acc_702, self.acc_79, 800)
-        self._entry(self.acc_79, self.acc_902, 500)
-        self._entry(self.acc_79, self.acc_92, 400)
+        self._entry(self.acc_702, self.acc_79, 800000)
+        self._entry(self.acc_79, self.acc_902, 500000)
+        self._entry(self.acc_79, self.acc_92, 400000)
 
         report = self._report()
         amount = lambda code: self._amount(report, code)  # noqa: E731
-        self.assertEqual(amount('2000'), 800)
-        self.assertEqual(amount('2050'), 500)
-        self.assertEqual((amount('2090'), amount('2095')), (300, 0))
-        self.assertEqual((amount('2190'), amount('2195')), (0, 100))
-        self.assertEqual(amount('2200'), 30)
-        self.assertEqual(amount('2220'), 20)
-        self.assertEqual((amount('2290'), amount('2295')), (0, 50))
-        self.assertEqual((amount('2350'), amount('2355')), (0, 50))
-        self.assertEqual(report.net_profit, -50)
+        self.assertEqual(amount('2000'), 800000)
+        self.assertEqual(amount('2050'), 500000)
+        self.assertEqual((amount('2090'), amount('2095')), (300000, 0))
+        self.assertEqual((amount('2190'), amount('2195')), (0, 100000))
+        self.assertEqual(amount('2200'), 30000)
+        self.assertEqual(amount('2220'), 20000)
+        self.assertEqual((amount('2290'), amount('2295')), (0, 50000))
+        self.assertEqual((amount('2350'), amount('2355')), (0, 50000))
+        self.assertEqual(report.net_profit, -50000)
 
         values = report._xml_values()
-        self.assertEqual(values['R2050G3'], 500)       # expense: positive
+        self.assertEqual(values['R2050G3'], 500)       # thousands; expense positive
         self.assertEqual(values['R2355G3'], 50)        # loss: positive
         self.assertNotIn('R2350G3', values)
 
         # A row entered by hand: profit of a discontinued operation
-        self._row(report, '2305').current_amount = 120
-        self.assertEqual((amount('2350'), amount('2355')), (70, 0))
-        self.assertEqual(report.net_profit, 70)
+        self._row(report, '2305').current_amount = 120000
+        self.assertEqual((amount('2350'), amount('2355')), (70000, 0))
+        self.assertEqual(report.net_profit, 70000)
 
     def test_comprehensive_income(self):
         self._entry(self.acc_361, self.acc_702, 1000)
@@ -147,10 +147,11 @@ class TestPnlForm(AccountingTestCase):
         self.assertEqual(report._xml_values()['R2610G3'], 1.25)
 
     def test_print(self):
-        self._entry(self.acc_361, self.acc_702, 100)
-        self._entry(self.acc_92, self.acc_361, 300)
+        self._entry(self.acc_361, self.acc_702, 100000)
+        self._entry(self.acc_92, self.acc_361, 300000)
         report = self._report()
         html = self.env['ir.actions.report']._render_qweb_html(
             'l10n_ua_accounting.report_pnl_document', report.ids)[0].decode()
         self.assertIn('II. СУКУПНИЙ ДОХІД', html)
-        self.assertIn('(200)', html)  # loss in parentheses
+        self.assertIn('(200)', html)  # loss in parentheses, thousands
+        self.assertIn('тис. грн', html)

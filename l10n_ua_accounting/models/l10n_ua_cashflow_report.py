@@ -27,6 +27,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 
 from .l10n_ua_balance_report import BALANCE_LINES
+from .l10n_ua_fin_rounding import format_units, round_units, to_thousands
 from .l10n_ua_pnl_report import pnl_complete
 
 
@@ -588,23 +589,91 @@ class L10nUaCashflowReport(models.Model):
             return 0.0, amount
         return (amount, 0.0) if amount >= 0 else (0.0, -amount)
 
+    def _form_values(self):
+        """{code: (current, previous)} in thousands of hryvnias without
+        decimals, signed as the stored lines. Rows are rounded; the sections,
+        3400 and 3410 are added up from them, so that 3405 + 3400 + 3410 =
+        3415 on the form. In Ф3-н 3550/3560 are the sums of their parts when
+        they have any, and 3520 takes what keeps 3195 equal to the direct
+        method: Ф3-н takes 3195 as the sum of the rounded rows of the direct
+        method too (see _direct_operating_net)."""
+        self.ensure_one()
+        lines = self.line_ids.filtered('flow_key')
+        columns = []
+        periods = ((self.date_from, self.date_to),
+                   (self.comparison_date_from, self.comparison_date_to))
+        for field, (date_from, date_to) in zip(('current_amount', 'previous_amount'), periods):
+            v = {line.flow_key: to_thousands(line[field]) for line in lines}
+            if self.method == 'indirect' and 'net_operating' in v:
+                stored = sum(lines.filtered(lambda l: l.flow_key == 'net_operating').mapped(field))
+                v['net_operating'] = self._direct_operating_net(date_from, date_to, stored)
+            nets = {}
+            for section, directions in SECTION_SIGNS.items():
+                if section == OPERATING and self.method == 'indirect':
+                    continue
+                inflow = sum(v.get(k, 0.0) for k in directions['in'])
+                outflow = sum(v.get(k, 0.0) for k in directions['out'])
+                nets[section] = round_units(inflow - outflow)
+                v[f'net_{section}'] = nets[section]
+            if self.method == 'indirect':
+                for total, parts in (('ind_current_assets', INDIRECT_ASSET_PARTS),
+                                     ('ind_current_liabilities', INDIRECT_LIABILITY_PARTS)):
+                    keys = [k for k, _codes in parts if k in v]
+                    if keys:
+                        v[total] = round_units(sum(v[k] for k in keys))
+                v['ind_operating_cash'] = round_units(v.get('net_operating', 0.0) - v.get('ind_tax_paid', 0.0))
+                v['ind_noncash'] = round_units(v['ind_operating_cash'] - sum(v.get(k, 0.0) for k in (
+                    'ind_profit', 'ind_depreciation', 'ind_provisions', 'ind_fx',
+                    'ind_current_assets', 'ind_current_liabilities')))
+                nets[OPERATING] = v.get('net_operating', 0.0)
+            v['net_cash_flow'] = round_units(sum(nets.values()))
+            v['fx_effect'] = round_units(v.get('cash_end', 0.0) - v.get('cash_start', 0.0) - v['net_cash_flow'])
+            columns.append(v)
+        return {line.code: (columns[0].get(line.flow_key, 0.0), columns[1].get(line.flow_key, 0.0))
+                for line in lines if line.code}
+
+    def _direct_operating_net(self, date_from, date_to, stored):
+        """3195 of Ф3-н in thousands, as the direct method prints it: the sum
+        of the rounded rows of section I. Ф3-н does not store those rows, so
+        they are read again from the ledger; if the ledger no longer gives the
+        stored 3195 (moves changed after the report was made), the stored
+        amount is rounded as it is."""
+        self.ensure_one()
+        flows = self._collect_flows(date_from, date_to)
+        signs = SECTION_SIGNS[OPERATING]
+        inflow = [flows.get(k, 0.0) for k in signs['in']]
+        outflow = [flows.get(k, 0.0) for k in signs['out']]
+        if not self.company_id.currency_id.is_zero(sum(inflow) - sum(outflow) - stored):
+            return to_thousands(stored)
+        return round_units(sum(map(to_thousands, inflow)) - sum(map(to_thousands, outflow)))
+
+    @api.model
+    def _ua_fmt(self, amount):
+        return format_units(amount, parentheses=False)
+
+    @api.model
+    def _ua_paren(self, amount):
+        """A payment of the direct form: in parentheses, «–» when nothing."""
+        return f'({format_units(amount)})' if amount else '–'
+
     def _xml_values(self):
         """{'R3000G3': 1234, …} for J0900904 (direct: G3 звітний, G4
         попередній; payments positive) or J0901602 (indirect: G3/G4
         надходження/видаток звітного періоду, G5/G6 — попереднього).
-        Whole hryvnias; empty cells are left out."""
+        Thousands without decimals; empty cells are left out."""
         self.ensure_one()
         values = {}
+        form = self._form_values()
         for line in self.line_ids.filtered('code'):
+            current, previous = form.get(line.code, (0.0, 0.0))
             if self.method == 'indirect':
-                cells = list(zip((3, 4), self._split_amount(line, line.current_amount))) + \
-                    list(zip((5, 6), self._split_amount(line, line.previous_amount)))
+                cells = list(zip((3, 4), self._split_amount(line, current))) + \
+                    list(zip((5, 6), self._split_amount(line, previous)))
             else:
-                cells = [(3, line.current_amount), (4, line.previous_amount)]
+                cells = [(3, current), (4, previous)]
             for graph, amount in cells:
-                amount = round(amount)
                 if amount:
-                    values[f'R{line.code}G{graph}'] = amount
+                    values[f'R{line.code}G{graph}'] = int(amount)
         return values
 
     # ── XLSX ────────────────────────────────────────────────
