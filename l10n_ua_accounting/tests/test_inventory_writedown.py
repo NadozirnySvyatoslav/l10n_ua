@@ -12,6 +12,8 @@ from .common import AccountingTestCase
 @tagged('post_install', '-at_install', 'l10n_ua_accounting')
 class TestInventoryWritedown(AccountingTestCase):
 
+    _own_company = True  # #654: demo stock of env.company leaks into action_fill
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -155,9 +157,10 @@ class TestInventoryWritedown(AccountingTestCase):
         self.assertEqual(doc.state, 'cancelled')
         reversal = self.env['account.move'].search([('reversed_entry_id', '=', doc.move_id.id)])
         self.assertEqual(reversal.state, 'posted')
+        # Баланс, а не кредит: план ua_psbo вмикає червоне сторно (дебет −400).
         self.assertAlmostEqual(
-            sum(reversal.line_ids.filtered(lambda l: l.account_id == self.acc_946).mapped('credit')),
-            400.0)
+            sum(reversal.line_ids.filtered(lambda l: l.account_id == self.acc_946).mapped('balance')),
+            -400.0)
         self.assertAlmostEqual(self._value(), 1000.0)
 
     def test_reversal_limited_to_quantity_on_hand(self):
@@ -267,8 +270,10 @@ class TestInventoryWritedown(AccountingTestCase):
             'company_id': other.id, 'company_ids': [(6, 0, other.ids)],
             'group_ids': [(6, 0, self.env.ref('account.group_account_user').ids)],
         })
-        Line = self.env['l10n_ua.inventory.writedown.line'].with_user(user)
-        Doc = self.env['l10n_ua.inventory.writedown'].with_user(user)
+        Line = self.env['l10n_ua.inventory.writedown.line'].with_user(user).with_context(
+            allowed_company_ids=other.ids)
+        Doc = self.env['l10n_ua.inventory.writedown'].with_user(user).with_context(
+            allowed_company_ids=other.ids)
         self.assertFalse(Line.search([('id', '=', line.id)]))
         self.assertFalse(Doc.search([('id', '=', doc.id)]))
         # Свій користувач рядок бачить — правило не ховає все підряд.

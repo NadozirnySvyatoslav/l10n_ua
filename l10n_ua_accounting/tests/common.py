@@ -4,11 +4,30 @@ from odoo.tests import TransactionCase
 
 
 class AccountingTestCase(TransactionCase):
-    """Base class with shared setup for Ukrainian accounting tests."""
+    """Base class with shared setup for Ukrainian accounting tests.
+
+    ``_own_company = True`` runs the class on a fresh UA company with the
+    ua_psbo chart instead of ``env.company``: on a demo database the current
+    company is the generic «My Company» with stock, bank statements and
+    balances that leak into reports read by account-code prefix (#654).
+    """
+
+    _own_company = False
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        if cls._own_company:
+            company = cls.env['res.company'].create({
+                'name': f'UA test ({cls.__name__})',
+                'country_id': cls.env.ref('base.ua').id,
+            })
+            cls.env['account.chart.template'].try_loading(
+                'ua_psbo', company=company, install_demo=False)
+            cls.env.user.company_ids |= company
+            cls.env.user.company_id = company
+            cls.env = cls.env(context=dict(
+                cls.env.context, allowed_company_ids=[company.id]))
         cls.company = cls.env.company
         # UA documents (ПКО/ВКО/ПД) are only generated for Ukrainian companies,
         # so the test company must have the country set before journals are made.
