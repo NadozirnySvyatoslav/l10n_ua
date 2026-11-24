@@ -77,6 +77,27 @@ class ResCompany(models.Model):
         help='Рахунок для відʼємних неопераційних курсових різниць.',
     )
 
+    # --- Витрати / доходи майбутніх періодів (#372) ---
+    l10n_ua_deferred_expense_account_id = fields.Many2one(
+        'account.account', check_company=True,
+        string='Deferred Expense Account (39)',
+        help='Default account for deferred expenses. If empty, the first '
+             'account with code 39… is used.',
+    )
+    l10n_ua_deferred_revenue_account_id = fields.Many2one(
+        'account.account', check_company=True,
+        string='Deferred Revenue Account (69)',
+        help='Default account for deferred revenue. If empty, the first '
+             'account with code 69… is used.',
+    )
+    l10n_ua_deferral_journal_id = fields.Many2one(
+        'account.journal',
+        string='Deferral Journal',
+        domain="[('type', '=', 'general'), ('company_id', '=', id)]",
+        help='Journal for deferral recognition entries. If empty, the first '
+             'miscellaneous journal of the company is used.',
+    )
+
     def _l10n_ua_is_ukrainian(self):
         """Whether Ukrainian accounting rules apply to this company.
 
