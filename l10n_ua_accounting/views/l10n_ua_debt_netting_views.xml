@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form -->
+    <record id="l10n_ua_debt_netting_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.debt.netting.form</field>
+        <field name="model">l10n_ua.debt.netting</field>
+        <field name="arch" type="xml">
+            <form string="Debt Netting">
+                <header>
+                    <button name="action_post" string="Post"
+                            type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_fill_lines" string="Fill Open Items"
+                            type="object"
+                            invisible="state != 'draft' or not partner_id"/>
+                    <button name="%(action_report_debt_netting)d"
+                            string="Print Act" type="action"
+                            invisible="state == 'cancel'"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            confirm="The journal entry will be reversed and the documents will become open again. Continue?"
+                            invisible="state != 'posted'"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            invisible="state != 'draft'"/>
+                    <button name="action_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_move" type="object"
+                                class="oe_stat_button" icon="fa-book"
+                                invisible="not move_id">
+                            <span>Journal Entry</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="commercial_partner_id" invisible="1"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="currency_id"
+                                   groups="base.group_multi_currency"
+                                   readonly="state != 'draft' or line_ids"/>
+                        </group>
+                        <group>
+                            <field name="journal_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"
+                                   readonly="state != 'draft' or line_ids"/>
+                            <field name="company_currency_id" invisible="1"/>
+                            <field name="move_id" invisible="1"/>
+                            <field name="reversal_move_id"
+                                   invisible="not reversal_move_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Amounts">
+                            <field name="amount_receivable"/>
+                            <field name="amount_payable"/>
+                            <field name="amount_max"/>
+                            <field name="amount" readonly="state != 'draft'"
+                                   class="fw-bold"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Partner Debts" name="receivable">
+                            <field name="receivable_line_ids"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="1">
+                                    <field name="move_line_id"
+                                           options="{'no_create': True}"
+                                           domain="[('company_id', '=', parent.company_id), ('partner_id', 'child_of', parent.commercial_partner_id), ('parent_state', '=', 'posted'), ('account_id.reconcile', '=', True), ('account_id.account_type', 'not in', ['asset_cash', 'liability_credit_card']), ('reconciled', '=', False), ('currency_id', '=', parent.currency_id), ('amount_residual_currency', '&gt;', 0)]"/>
+                                    <field name="move_id"/>
+                                    <field name="date"/>
+                                    <field name="date_maturity" optional="hide"/>
+                                    <field name="account_id"/>
+                                    <field name="ref" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="side" column_invisible="1"/>
+                                    <field name="amount_open" sum="Total" readonly="1" force_save="1"/>
+                                    <field name="amount_offset" sum="Total"/>
+                                    <field name="amount_after" sum="Total" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Our Debts" name="payable">
+                            <field name="payable_line_ids"
+                                   readonly="state != 'draft'">
+                                <list editable="bottom" create="1">
+                                    <field name="move_line_id"
+                                           options="{'no_create': True}"
+                                           domain="[('company_id', '=', parent.company_id), ('partner_id', 'child_of', parent.commercial_partner_id), ('parent_state', '=', 'posted'), ('account_id.reconcile', '=', True), ('account_id.account_type', 'not in', ['asset_cash', 'liability_credit_card']), ('reconciled', '=', False), ('currency_id', '=', parent.currency_id), ('amount_residual_currency', '&lt;', 0)]"/>
+                                    <field name="move_id"/>
+                                    <field name="date"/>
+                                    <field name="date_maturity" optional="hide"/>
+                                    <field name="account_id"/>
+                                    <field name="ref" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="side" column_invisible="1"/>
+                                    <field name="amount_open" sum="Total" readonly="1" force_save="1"/>
+                                    <field name="amount_offset" sum="Total"/>
+                                    <field name="amount_after" sum="Total" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note" placeholder="Notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="l10n_ua_debt_netting_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.debt.netting.list</field>
+        <field name="model">l10n_ua.debt.netting</field>
+        <field name="arch" type="xml">
+            <list string="Debt Netting"
+                  decoration-muted="state == 'cancel'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="amount_receivable" optional="hide"/>
+                <field name="amount_payable" optional="hide"/>
+                <field name="amount" sum="Total"/>
+                <field name="currency_id" optional="hide"
+                       groups="base.group_multi_currency"/>
+                <field name="company_id" optional="hide"
+                       groups="base.group_multi_company"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'posted'"
+                       decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="l10n_ua_debt_netting_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.debt.netting.search</field>
+        <field name="model">l10n_ua.debt.netting</field>
+        <field name="arch" type="xml">
+            <search string="Debt Netting">
+                <field name="name"/>
+                <field name="partner_id"/>
+
+                <filter string="Draft" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Posted" name="filter_posted"
+                        domain="[('state', '=', 'posted')]"/>
+                <filter string="Cancelled" name="filter_cancel"
+                        domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter string="Date" name="filter_date" date="date"/>
+
+                <group>
+                    <filter string="Partner" name="groupby_partner" domain="[]"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter string="Status" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Month" name="groupby_date" domain="[]"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="l10n_ua_debt_netting_action" model="ir.actions.act_window">
+        <field name="name">Debt Netting</field>
+        <field name="res_model">l10n_ua.debt.netting</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_debt_netting_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first debt netting
+            </p>
+            <p>
+                Offset mutual claims with a partner: its debts to the company
+                against the company's debts to it. Posting creates the journal
+                entry and reconciles the documents.
+            </p>
+        </field>
+    </record>
+
+</odoo>

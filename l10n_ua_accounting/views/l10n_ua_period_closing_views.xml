@@ -33,6 +33,7 @@
                             <field name="date"/>
                             <field name="journal_id" readonly="state != 'draft'"/>
                             <field name="lock_period" readonly="state != 'draft'"/>
+                            <field name="previous_lock_date" invisible="not previous_lock_date"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="currency_id" invisible="True"/>
                         </group>

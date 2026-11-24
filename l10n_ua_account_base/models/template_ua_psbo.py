@@ -168,6 +168,21 @@ class AccountChartTemplate(models.AbstractModel):
             })
         return data
 
+    @template('ua_psbo', 'account.journal')
+    def _get_ua_psbo_account_journal(self):
+        # Стоковий шаблон створює лише банк (BNK1). Каса — на 301 «Готівка в
+        # національній валюті», щоб касова книга й ліміт каси мали рахунок (#598).
+        return {
+            'cash': {
+                'name': 'Каса',
+                'type': 'cash',
+                'code': 'CSH1',
+                'default_account_id': 'ua_psbp_301',
+                'show_on_dashboard': True,
+                'sequence': 8,
+            },
+        }
+
     def _post_load_data(self, template_code, company, template_data):
         result = super()._post_load_data(template_code, company, template_data)
         if template_code == 'ua_psbo':

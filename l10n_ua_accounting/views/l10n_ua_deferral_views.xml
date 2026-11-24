@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ==================== Графік майбутніх періодів (#372) ==================== -->
+
+    <!-- ==================== Провести до дати ==================== -->
+
+    <record id="l10n_ua_deferral_post_wizard_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.post.wizard.form</field>
+        <field name="model">l10n_ua.deferral.post.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Post Due Deferral Entries">
+                <group>
+                    <field name="date"/>
+                    <field name="deferral_ids" widget="many2many_tags"
+                           domain="[('state', '=', 'running')]"/>
+                </group>
+                <footer>
+                    <button name="action_post" type="object" string="Post"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_post_wizard_action" model="ir.actions.act_window">
+        <field name="name">Post Due Deferral Entries</field>
+        <field name="res_model">l10n_ua.deferral.post.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_l10n_ua_deferral"/>
+        <field name="binding_view_types">list,form</field>
+    </record>
+
+    <record id="l10n_ua_deferral_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.form</field>
+        <field name="model">l10n_ua.deferral</field>
+        <field name="arch" type="xml">
+            <form string="Deferral">
+                <header>
+                    <button name="action_compute_schedule" string="Compute Schedule"
+                            type="object" class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Start" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="%(l10n_ua_deferral_post_wizard_action)d"
+                            string="Post Due Entries" type="action"
+                            class="btn-secondary" invisible="state != 'running'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'running')"
+                            confirm="Cancel this schedule? The reclassification entry will be reversed."/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,running,done"/>
+                </header>
+                <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_open_moves" type="object"
+                                class="oe_stat_button" icon="fa-bars"
+                                string="Journal Entries"
+                                invisible="state == 'draft'"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <field name="description" placeholder="e.g. Insurance policy 2026"
+                               readonly="state != 'draft'"/>
+                    </div>
+                    <group>
+                        <group string="Document">
+                            <field name="kind" widget="radio" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="source_move_id" invisible="not source_move_id"/>
+                            <field name="source_move_line_id" invisible="not source_move_line_id"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Accounting">
+                            <field name="deferral_account_id" readonly="state != 'draft'"/>
+                            <field name="target_account_id" readonly="state != 'draft'"/>
+                            <field name="analytic_distribution" widget="analytic_distribution"
+                                   groups="analytic.group_analytic_accounting"
+                                   readonly="state != 'draft'"/>
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="initial_move_id" invisible="not initial_move_id"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="amount_total" readonly="state != 'draft'"/>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_end" readonly="state != 'draft'"/>
+                            <field name="method" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Balance">
+                            <field name="amount_scheduled"/>
+                            <field name="amount_posted"/>
+                            <field name="amount_residual" class="oe_subtotal_footer_separator"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Schedule" name="schedule">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom"
+                                      decoration-muted="is_posted">
+                                    <field name="date"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="move_id"/>
+                                    <field name="closing_id" optional="show"/>
+                                    <field name="is_posted" widget="boolean"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <button name="action_post" type="object" string="Post"
+                                            icon="fa-check"
+                                            invisible="is_posted or parent.state != 'running'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.list</field>
+        <field name="model">l10n_ua.deferral</field>
+        <field name="arch" type="xml">
+            <list string="Deferrals"
+                  decoration-muted="state in ('done', 'cancelled')"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="kind"/>
+                <field name="partner_id"/>
+                <field name="deferral_account_id" optional="show"/>
+                <field name="target_account_id" optional="show"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="amount_posted" sum="Recognised" optional="show"/>
+                <field name="amount_residual" sum="Remaining"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'running'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.search</field>
+        <field name="model">l10n_ua.deferral</field>
+        <field name="arch" type="xml">
+            <search string="Deferrals">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="partner_id"/>
+                <field name="deferral_account_id"/>
+                <field name="target_account_id"/>
+                <field name="source_move_id"/>
+
+                <filter string="Deferred Expenses (39)" name="filter_expense"
+                        domain="[('kind', '=', 'expense')]"/>
+                <filter string="Deferred Revenue (69)" name="filter_revenue"
+                        domain="[('kind', '=', 'revenue')]"/>
+                <separator/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Running" name="filter_running" domain="[('state', '=', 'running')]"/>
+                <filter string="Done" name="filter_done" domain="[('state', '=', 'done')]"/>
+                <filter string="Cancelled" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+
+                <group>
+                    <filter string="Type" name="groupby_kind" domain="[]" context="{'group_by': 'kind'}"/>
+                    <filter string="Partner" name="groupby_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Deferral Account" name="groupby_deferral_account" domain="[]" context="{'group_by': 'deferral_account_id'}"/>
+                    <filter string="Status" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Start Date" name="groupby_date_start" domain="[]" context="{'group_by': 'date_start:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_action" model="ir.actions.act_window">
+        <field name="name">Deferred Expenses and Revenue</field>
+        <field name="res_model">l10n_ua.deferral</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="l10n_ua_deferral_view_search"/>
+        <field name="context">{'search_default_filter_running': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create a deferral schedule</p>
+            <p>Spread prepaid expenses (account 39) or income received in advance
+               (account 69) over future months. Open a posted vendor bill or
+               customer invoice and use «Defer to Future Periods», or create a
+               schedule here.</p>
+        </field>
+    </record>
+
+    <!-- ==================== Створення з рахунку ==================== -->
+
+    <record id="l10n_ua_deferral_create_wizard_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.create.wizard.form</field>
+        <field name="model">l10n_ua.deferral.create.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Defer to Future Periods">
+                <group>
+                    <group>
+                        <field name="date_start"/>
+                        <field name="date_end"/>
+                        <field name="method"/>
+                        <field name="auto_confirm"/>
+                    </group>
+                    <group>
+                        <field name="company_id" invisible="1"/>
+                        <field name="journal_id"/>
+                        <field name="expense_deferral_account_id"/>
+                        <field name="revenue_deferral_account_id"/>
+                        <field name="target_account_id"/>
+                    </group>
+                </group>
+                <field name="move_line_ids">
+                    <list>
+                        <field name="move_id"/>
+                        <field name="name"/>
+                        <field name="account_id"/>
+                        <field name="partner_id"/>
+                        <field name="balance" string="Amount"/>
+                        <field name="company_currency_id" column_invisible="True"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_create" type="object" string="Create Schedules"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_create_wizard_action_lines" model="ir.actions.act_window">
+        <field name="name">Defer to Future Periods</field>
+        <field name="res_model">l10n_ua.deferral.create.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="account.model_account_move_line"/>
+        <field name="binding_view_types">list</field>
+        <field name="group_ids" eval="[(4, ref('account.group_account_user'))]"/>
+    </record>
+
+    <record id="view_move_form_l10n_ua_deferral" model="ir.ui.view">
+        <field name="name">account.move.form.l10n_ua.deferral</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_l10n_ua_defer" type="object"
+                        string="Defer to Future Periods"
+                        groups="account.group_account_user"
+                        invisible="state != 'posted' or move_type not in ('in_invoice', 'out_invoice', 'entry')"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_l10n_ua_open_deferrals" type="object"
+                        class="oe_stat_button" icon="fa-calendar"
+                        invisible="not l10n_ua_deferral_count">
+                    <field name="l10n_ua_deferral_count" widget="statinfo"
+                           string="Deferrals"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ==================== Залишки на 39/69 ==================== -->
+
+    <record id="l10n_ua_deferral_report_view_pivot" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.report.pivot</field>
+        <field name="model">l10n_ua.deferral.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Deferral Balances" sample="1">
+                <field name="deferral_id" type="row"/>
+                <field name="movement" type="col"/>
+                <field name="amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_report_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.report.list</field>
+        <field name="model">l10n_ua.deferral.report</field>
+        <field name="arch" type="xml">
+            <list string="Deferral Balances" create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="deferral_id"/>
+                <field name="kind"/>
+                <field name="partner_id"/>
+                <field name="deferral_account_id"/>
+                <field name="target_account_id" optional="hide"/>
+                <field name="movement"/>
+                <field name="move_id" optional="show"/>
+                <field name="amount" sum="Balance"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_report_view_search" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.report.search</field>
+        <field name="model">l10n_ua.deferral.report</field>
+        <field name="arch" type="xml">
+            <search string="Deferral Balances">
+                <field name="deferral_id"/>
+                <field name="partner_id"/>
+                <field name="deferral_account_id"/>
+                <field name="date"/>
+
+                <filter string="Deferred Expenses (39)" name="filter_expense"
+                        domain="[('kind', '=', 'expense')]"/>
+                <filter string="Deferred Revenue (69)" name="filter_revenue"
+                        domain="[('kind', '=', 'revenue')]"/>
+                <separator/>
+
+                <group>
+                    <filter string="Type" name="groupby_kind" domain="[]" context="{'group_by': 'kind'}"/>
+                    <filter string="Schedule" name="groupby_deferral" domain="[]" context="{'group_by': 'deferral_id'}"/>
+                    <filter string="Partner" name="groupby_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Deferral Account" name="groupby_deferral_account" domain="[]" context="{'group_by': 'deferral_account_id'}"/>
+                    <filter string="Month" name="groupby_month" domain="[]" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_balance_wizard_view_form" model="ir.ui.view">
+        <field name="name">l10n_ua.deferral.balance.wizard.form</field>
+        <field name="model">l10n_ua.deferral.balance.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Deferral Balances">
+                <group>
+                    <field name="date"/>
+                </group>
+                <footer>
+                    <button name="action_open" type="object" string="Show"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="l10n_ua_deferral_balance_wizard_action" model="ir.actions.act_window">
+        <field name="name">Deferral Balances (39/69)</field>
+        <field name="res_model">l10n_ua.deferral.balance.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ==================== Закриття періоду ==================== -->
+
+    <record id="l10n_ua_period_closing_view_form_deferral" model="ir.ui.view">
+        <field name="name">l10n_ua.period.closing.form.deferral</field>
+        <field name="model">l10n_ua.period.closing</field>
+        <field name="inherit_id" ref="l10n_ua_period_closing_view_form"/>
+        <field name="arch" type="xml">
+            <page name="config_accounts" position="before">
+                <page string="Deferred Expenses and Revenue" name="deferrals"
+                      invisible="not deferral_line_ids">
+                    <field name="deferral_line_ids" readonly="1">
+                        <list>
+                            <field name="deferral_id"/>
+                            <field name="date"/>
+                            <field name="amount" sum="Total"/>
+                            <field name="move_id"/>
+                            <field name="is_posted"/>
+                            <field name="currency_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>
