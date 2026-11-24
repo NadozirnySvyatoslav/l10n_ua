@@ -17,6 +17,8 @@ from .common import AccountingTestCase
 @tagged('post_install', '-at_install', 'l10n_ua_accounting')
 class TestPeriodClosingLock(AccountingTestCase):
 
+    _own_company = True  # #666: demo unreconciled statement lines block the lock
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
