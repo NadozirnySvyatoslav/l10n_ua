@@ -57,7 +57,7 @@
                             <span t-field="report.date_to" t-options='{"widget": "date"}'/> р.
                         </div>
 
-                        <div class="small text-center mb-2">Форма № 2</div>
+                        <div class="small text-center mb-2">Форма № 2 · Код за ДКУД 1801003</div>
 
                         <!-- P&L Table from stored lines -->
                         <table>
@@ -71,34 +71,28 @@
                             </thead>
                             <tbody>
                                 <t t-foreach="report.line_ids.sorted('sequence')" t-as="line">
-                                    <!-- Detail: expenses in parentheses -->
-                                    <tr t-if="line.line_type == 'detail' and line.turnover_type == 'debit'">
-                                        <td t-out="line.name"/>
-                                        <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right" t-out="'(%.0f)' % line.current_amount"/>
-                                        <td class="text-right" t-out="'(%.0f)' % line.previous_amount"/>
+                                    <!-- Section title -->
+                                    <tr t-if="line.line_type == 'section'">
+                                        <td colspan="4" class="bold text-center" t-out="line.name"/>
                                     </tr>
-                                    <!-- Detail: income -->
-                                    <tr t-if="line.line_type == 'detail' and line.turnover_type != 'debit'">
-                                        <td t-out="line.name"/>
-                                        <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
-                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
-                                    </tr>
-                                    <!-- Subtotal -->
-                                    <tr t-if="line.line_type == 'subtotal'" class="bold">
-                                        <td t-out="line.name"/>
-                                        <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
-                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
-                                    </tr>
-                                    <!-- Total (net profit) -->
-                                    <tr t-if="line.line_type == 'total'" class="bold" style="border-top: 2px solid black;">
-                                        <td t-out="line.name"/>
-                                        <td class="text-center" t-out="line.code"/>
-                                        <td class="text-right" t-out="'%.0f' % line.current_amount"/>
-                                        <td class="text-right" t-out="'%.0f' % line.previous_amount"/>
-                                    </tr>
+                                    <t t-else="">
+                                        <t t-set="bold" t-value="line.line_type in ('subtotal', 'loss', 'total')"/>
+                                        <!-- Expenses and losses in parentheses; 2610–2650 with kopecks; 2600/2605 are counts -->
+                                        <t t-set="paren" t-value="line.line_type == 'loss' or line.turnover_type == 'debit'"/>
+                                        <t t-set="fmt" t-value="'%.2f' if line.code in ('2610', '2615', '2650') else '%.0f'"/>
+                                        <tr t-att-class="'bold' if bold else ''"
+                                            t-att-style="'border-top: 2px solid black;' if line.line_type == 'total' else ''">
+                                            <td t-out="line.name"/>
+                                            <td class="text-center" t-out="line.code"/>
+                                            <t t-foreach="(line.current_amount, line.previous_amount)" t-as="amount">
+                                                <td class="text-right">
+                                                    <t t-if="not round(amount, 2)">–</t>
+                                                    <t t-elif="paren and amount &gt; 0" t-out="'(' + (fmt % amount) + ')'"/>
+                                                    <t t-else="" t-out="fmt % amount"/>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
                                 </t>
                             </tbody>
                         </table>

@@ -98,5 +98,51 @@
             <field name="operation">crud</field>
         </record>
 
+        <record id="l10n_ua_debt_netting_company_rule" model="ir.access">
+            <field name="name">Взаємозалік: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_debt_netting"/>
+            <field name="domain">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_debt_netting_line_company_rule" model="ir.access">
+            <field name="name">Рядок взаємозаліку: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_debt_netting_line"/>
+            <field name="domain">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <!-- Витрати/доходи майбутніх періодів (#372) -->
+        <record id="l10n_ua_deferral_company_rule" model="ir.access">
+            <field name="name">Майбутні періоди: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_deferral"/>
+            <field name="domain">
+                [('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_deferral_line_company_rule" model="ir.access">
+            <field name="name">Рядки графіка майбутніх періодів: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_deferral_line"/>
+            <field name="domain">
+                [('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_deferral_report_company_rule" model="ir.access">
+            <field name="name">Залишки майбутніх періодів: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_deferral_report"/>
+            <field name="domain">
+                [('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
     </data>
 </odoo>

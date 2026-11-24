@@ -44,21 +44,28 @@
                     </group>
                     <notebook>
                         <page string="Report Lines" name="lines">
-                            <field name="line_ids" readonly="1">
-                                <list decoration-bf="line_type in ('subtotal', 'total')"
-                                      editable="bottom" no_open="1">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list decoration-bf="line_type in ('subtotal', 'loss', 'total')"
+                                      decoration-info="line_type == 'section'"
+                                      editable="bottom" create="0" delete="0" no_open="1">
                                     <field name="sequence" column_invisible="1"/>
-                                    <field name="name"/>
-                                    <field name="code"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="code" readonly="1"/>
                                     <field name="line_type" column_invisible="1"/>
-                                    <field name="current_amount" string="Current Period"/>
-                                    <field name="previous_amount" string="Previous Period"/>
-                                    <field name="account_codes" optional="hide"/>
+                                    <field name="current_amount" string="Current Period"
+                                           readonly="line_type != 'manual'"/>
+                                    <field name="previous_amount" string="Previous Period"
+                                           readonly="line_type != 'manual'"/>
+                                    <field name="account_codes" optional="hide" readonly="1"/>
                                     <button name="action_view_move_lines" type="object"
                                             string="View Entries" icon="fa-search"
-                                            invisible="not account_codes or line_type in ('subtotal', 'total')"/>
+                                            invisible="not account_codes or line_type not in ('detail', 'oci', 'element')"/>
                                 </list>
                             </field>
+                            <div class="text-muted small">
+                                Rows 2305, 2455 and 2600–2650 are entered by hand. Section III is the debit
+                                turnover of class 8: without class 8 accounts it stays empty.
+                            </div>
                         </page>
                         <page string="Notes" name="notes">
                             <field name="note" placeholder="Internal notes..."/>

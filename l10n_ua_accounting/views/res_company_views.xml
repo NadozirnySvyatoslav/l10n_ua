@@ -29,6 +29,15 @@
                         <field name="l10n_ua_advance_expense_account_id"/>
                     </group>
                 </group>
+                <group string="Deferred Expenses and Revenue (UA)">
+                    <group>
+                        <field name="l10n_ua_deferred_expense_account_id"/>
+                        <field name="l10n_ua_deferred_revenue_account_id"/>
+                    </group>
+                    <group>
+                        <field name="l10n_ua_deferral_journal_id"/>
+                    </group>
+                </group>
                 <group string="Курсові різниці (UA)">
                     <group>
                         <field name="l10n_ua_fx_gain_op_account_id"/>

@@ -123,12 +123,12 @@ class TestCashflowReport(AccountingTestCase):
         self.assertEqual(self._amount(report, '3395'), 5000.0)
 
     def test_capex_payment_is_investing_outflow(self):
-        """Дт 152 / Кт 311 — придбання необоротних активів, рядок 3255."""
+        """Дт 152 / Кт 311 — придбання необоротних активів, рядок 3260."""
         self._post_move(self.acc_capex, self.acc_bank, 2500.0)
 
         report = self._computed_report()
 
-        self.assertEqual(self._amount(report, '3255'), 2500.0)
+        self.assertEqual(self._amount(report, '3260'), 2500.0)
         self.assertEqual(self._amount(report, '3295'), -2500.0)
 
     def test_unclassified_counterpart_falls_into_other_operating(self):
@@ -303,3 +303,105 @@ class TestCashflowReport(AccountingTestCase):
         subtotal = report.line_ids.filtered(lambda l: l.code == '3195')
 
         self.assertFalse(subtotal.action_view_move_lines())
+
+
+@tagged('post_install', '-at_install')
+class TestCashflowForm(AccountingTestCase):
+    """Коди рядків за Додатком 1 до НП(С)БО 1 і непрямий метод (Ф3-н) — #78."""
+
+    _ensure_account = TestCashflowReport.__dict__['_ensure_account']
+    _post_move = TestCashflowReport._post_move
+    _computed_report = TestCashflowReport._computed_report
+    _amount = TestCashflowReport._amount
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        acc = cls._ensure_account
+        cls.acc_bank = acc('311', 'Рахунки в банку', 'asset_cash')
+        cls.acc_customers = acc('361', 'Розрахунки з покупцями', 'asset_receivable')
+        cls.acc_suppliers = acc('631', 'Розрахунки з постачальниками', 'liability_payable')
+        cls.acc_loans = acc('601', 'Короткострокові кредити банків', 'liability_current')
+        cls.acc_goods = acc('281', 'Товари на складі', 'asset_current')
+        cls.acc_revenue = acc('702', 'Дохід від реалізації товарів', 'income')
+        cls.acc_cogs = acc('902', 'Собівартість реалізованих товарів', 'expense_direct_cost')
+        cls.acc_admin = acc('92', 'Адміністративні витрати', 'expense')
+        cls.acc_depr = acc('131', 'Знос основних засобів', 'asset_fixed')
+        cls.acc_profit_tax = acc('6413', 'Розрахунки за податком на прибуток', 'liability_current')
+        cls.acc_tax_expense = acc('981', 'Податок на прибуток', 'expense')
+        cls.acc_securities = acc('351', 'Еквіваленти грошових коштів', 'asset_current')
+        cls.acc_dividends = acc('671', 'Розрахунки за нарахованими дивідендами', 'liability_current')
+
+    def test_official_codes_of_sections_ii_and_iii(self):
+        report = self._computed_report()
+        codes = [line.code for line in report.line_ids.sorted('sequence')]
+        start = codes.index('3200')
+        self.assertEqual(codes[start:], [
+            '3200', '3205', '3215', '3220', '3225', '3250', '3255', '3260', '3270', '3290', '3295',
+            '3300', '3305', '3340', '3345', '3350', '3355', '3390', '3395',
+            '3400', '3405', '3410', '3415'])
+
+    def test_current_investments_are_not_cash(self):
+        """35 is row 1160 of the balance, not 1165: buying it is an investment."""
+        self._post_move(self.acc_securities, self.acc_bank, 1000.0)
+        report = self._computed_report()
+        self.assertEqual(self._amount(report, '3255'), 1000.0)
+        self.assertEqual(self._amount(report, '3410'), 0.0)
+
+    def test_tax_parts_and_dividends(self):
+        self._post_move(self.acc_profit_tax, self.acc_bank, 300.0)
+        self._post_move(self.acc_dividends, self.acc_bank, 200.0)
+        report = self._computed_report()
+        self.assertEqual(self._amount(report, '3115'), 300.0)
+        self.assertEqual(self._amount(report, '3116'), 300.0)
+        self.assertNotIn('3117', report.line_ids.mapped('code'))
+        self.assertEqual(self._amount(report, '3355'), 200.0)
+        values = report._xml_values()
+        self.assertEqual(values['R3116G3'], 300)
+        self.assertEqual(values['R3355G3'], 200)
+
+    def _scenario(self):
+        self._post_move(self.acc_customers, self.acc_revenue, 1000.0)
+        self._post_move(self.acc_cogs, self.acc_goods, 600.0)
+        self._post_move(self.acc_bank, self.acc_customers, 700.0)
+        self._post_move(self.acc_goods, self.acc_suppliers, 500.0)
+        self._post_move(self.acc_suppliers, self.acc_bank, 400.0)
+        self._post_move(self.acc_admin, self.acc_depr, 50.0)
+        self._post_move(self.acc_tax_expense, self.acc_profit_tax, 30.0)
+        self._post_move(self.acc_profit_tax, self.acc_bank, 30.0)
+        self._post_move(self.acc_bank, self.acc_loans, 1000.0)
+
+    def test_indirect_method_agrees_with_direct(self):
+        self._scenario()
+        direct = self._computed_report()
+        indirect = self._computed_report(method='indirect')
+        amount = lambda code: self._amount(indirect, code)  # noqa: E731
+
+        self.assertEqual(self._amount(direct, '3195'), 270.0)
+        self.assertEqual(amount('3195'), 270.0)
+        self.assertEqual(amount('3500'), 350.0)      # 1000 − 600 − 50, before tax
+        self.assertEqual(amount('3505'), 50.0)
+        self.assertEqual(amount('3551'), 100.0)      # goods: −600 + 500
+        self.assertEqual(amount('3553'), -300.0)     # receivables grew
+        self.assertEqual(amount('3561'), 100.0)      # payables grew
+        self.assertEqual(amount('3550'), -200.0)
+        self.assertEqual(amount('3580'), -30.0)
+        self.assertEqual(amount('3570'), 300.0)
+        self.assertEqual(amount('3520'), 0.0)        # nothing left unexplained
+        self.assertEqual(amount('3400'), self._amount(direct, '3400'))
+        self.assertEqual(amount('3305'), 1000.0)
+        self.assertNotIn('3000', indirect.line_ids.mapped('code'))
+
+        values = indirect._xml_values()
+        self.assertEqual(values['R3500G3'], 350)
+        self.assertEqual(values['R3553G4'], 300)     # a decrease of cash: видаток
+        self.assertEqual(values['R3580G4'], 30)
+        self.assertEqual(values['R3305G3'], 1000)
+
+    def test_indirect_report_renders(self):
+        self._scenario()
+        report = self._computed_report(method='indirect')
+        html = self.env['ir.actions.report']._render_qweb_html(
+            'l10n_ua_accounting.report_cashflow_document', report.ids)[0].decode()
+        self.assertIn('за непрямим методом', html)
+        self.assertIn('надходження', html)
