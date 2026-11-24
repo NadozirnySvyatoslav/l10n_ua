@@ -212,7 +212,8 @@ class L10nUaDpsSubmitMixin(models.AbstractModel):
                     files.append((kvt.get('kvtFname') or 'kvt.xml', kvt['kvtBase64']))
         for fname, data in files:
             self.env['ir.attachment'].create({
-                'name': fname, 'datas': data,
+                # Odoo 20: create не приймає datas — лише сирі байти в raw.
+                'name': fname, 'raw': base64.b64decode(data),
                 'res_model': self._name, 'res_id': self.id,
             })
         return len(files)

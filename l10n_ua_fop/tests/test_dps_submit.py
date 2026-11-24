@@ -70,4 +70,4 @@ class TestDpsSubmit(TransactionCase):
         att = self.env['ir.attachment'].search([
             ('res_model', '=', 'l10n_ua.fop.declaration'), ('res_id', '=', self.decl.id),
             ('name', '=', 'kvt1.xml')])
-        self.assertEqual(base64.b64decode(att.datas), b'<KVT/>')
+        self.assertEqual(att.raw.content, b'<KVT/>')
