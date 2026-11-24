@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Форма № 4 має десять граф — друкується на альбомному аркуші -->
+    <record id="paperformat_ua_report_landscape" model="report.paperformat">
+        <field name="name">Ukrainian Report A4 Landscape</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">25</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_equity" model="ir.actions.report">
+        <field name="name">Statement of Changes in Equity (Form No.4)</field>
+        <field name="model">l10n_ua.equity.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_accounting.report_equity_document</field>
+        <field name="print_report_name">'Ф4_власний_капітал_%s' % object.date_to</field>
+        <field name="paperformat_id" ref="paperformat_ua_report_landscape"/>
+    </record>
+
+    <template id="report_equity_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="report">
+                <t t-call="web.external_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <t t-set="cols" t-value="['registered', 'revaluation', 'additional', 'reserve', 'retained', 'unpaid', 'withdrawn', 'total']"/>
+                    <div class="page ua-report">
+                        <div class="row mb-2">
+                            <div class="col-8">
+                                <table class="table-borderless" style="width: 100%;">
+                                    <tr>
+                                        <td style="width: 120px;">Підприємство</td>
+                                        <td class="border-bottom"><span t-field="report.company_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="report.company_id.edrpou">
+                                        <td>за ЄДРПОУ</td>
+                                        <td class="border-bottom"><span t-field="report.company_id.edrpou"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-4 text-right small">
+                                Форма № 4 · Код за ДКУД 1801005
+                            </div>
+                        </div>
+
+                        <div class="ua-report-title">Звіт про власний капітал</div>
+                        <div class="ua-report-subtitle mb-2">
+                            <t t-if="report.date_from.month == 1 and report.date_from.day == 1 and report.date_to.month == 12 and report.date_to.day == 31">
+                                за <t t-out="report.date_to.year"/> рік
+                            </t>
+                            <t t-else="">
+                                за період з <span t-field="report.date_from"/> по <span t-field="report.date_to"/>
+                            </t>
+                        </div>
+
+                        <table class="small">
+                            <thead>
+                                <tr>
+                                    <th style="width: 26%;">Стаття</th>
+                                    <th style="width: 5%;">Код рядка</th>
+                                    <th style="width: 8.6%;">Зареєстрований (пайовий) капітал</th>
+                                    <th style="width: 8.6%;">Капітал у дооцінках</th>
+                                    <th style="width: 8.6%;">Додатковий капітал</th>
+                                    <th style="width: 8.6%;">Резервний капітал</th>
+                                    <th style="width: 8.6%;">Нерозподілений прибуток (непокритий збиток)</th>
+                                    <th style="width: 8.6%;">Неоплачений капітал</th>
+                                    <th style="width: 8.6%;">Вилучений капітал</th>
+                                    <th style="width: 8.6%;">Всього</th>
+                                </tr>
+                                <tr>
+                                    <t t-foreach="range(1, 11)" t-as="graph">
+                                        <th class="text-center" t-out="graph"/>
+                                    </t>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="report.line_ids.sorted('sequence')" t-as="line">
+                                    <t t-set="bold" t-value="line.line_type in ('opening', 'subtotal', 'total', 'closing')"/>
+                                    <tr t-if="line.line_type == 'header'">
+                                        <td t-out="line.name"/>
+                                        <td/>
+                                        <t t-foreach="cols" t-as="col"><td/></t>
+                                    </tr>
+                                    <tr t-else="">
+                                        <td t-att-class="'bold' if bold else ''"
+                                            t-att-style="'padding-left: 2em;' if line.line_type == 'sub' else ''"
+                                            t-out="line.name"/>
+                                        <td class="text-center" t-out="line.code"/>
+                                        <t t-foreach="cols" t-as="col">
+                                            <td t-att-class="'text-right bold' if bold else 'text-right'"
+                                                t-out="('%.0f' % line[col]) if round(line[col]) else '–'"/>
+                                        </t>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div class="signature-row">
+                                    <span>Керівник</span>
+                                    <span class="signature-line"></span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="signature-row">
+                                    <span>Головний бухгалтер</span>
+                                    <span class="signature-line"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

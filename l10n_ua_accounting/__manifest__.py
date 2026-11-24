@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '20.0.7.3.5',
+    'version': '20.0.7.3.6',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
@@ -97,6 +97,7 @@ Dependencies:
         'views/l10n_ua_balance_report_views.xml',
         'views/l10n_ua_pnl_report_views.xml',
         'views/l10n_ua_cashflow_report_views.xml',
+        'views/l10n_ua_equity_report_views.xml',
         'views/l10n_ua_period_closing_views.xml',
         'views/l10n_ua_currency_revaluation_views.xml',
         'views/l10n_ua_currency_exchange_views.xml',
@@ -121,6 +122,7 @@ Dependencies:
         'report/balance_sheet_report.xml',
         'report/pnl_report.xml',
         'report/cashflow_report.xml',
+        'report/equity_report.xml',
         'report/service_act_report.xml',
         'report/advance_report_report.xml',
         'report/payment_order_report.xml',

@@ -156,7 +156,7 @@
               sequence="28"/>
 
     <!-- Три форми фінансової звітності за НП(С)БО 1 друкуються поспіль і в
-         тому ж порядку, що й у наказі Мінфіну № 73: Ф№1, Ф№2, Ф№3. -->
+         тому ж порядку, що й у наказі Мінфіну № 73: Ф№1, Ф№2, Ф№3, Ф№4. -->
     <menuitem id="menu_ua_reports_balance"
               name="Balance Sheet (Form No.1)"
               parent="menu_ua_reports"
@@ -174,6 +174,12 @@
               parent="menu_ua_reports"
               action="action_cashflow_report"
               sequence="50"/>
+
+    <menuitem id="menu_ua_reports_equity"
+              name="Statement of Changes in Equity (Form No.4)"
+              parent="menu_ua_reports"
+              action="action_equity_report"
+              sequence="55"/>
 
     <!-- ==================== Налаштування ==================== -->
     <!-- Тут навмисно порожньо. План рахунків і Журнали дає ядро
