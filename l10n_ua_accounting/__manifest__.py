@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '20.0.7.3.0',
+    'version': '20.0.7.3.7',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
@@ -27,6 +27,12 @@ Complete Ukrainian accounting functionality for Odoo:
 * Opening/closing balances
 * Printable format for signing
 
+**Debt Netting (Взаємозалік):**
+* Offset of mutual claims with a partner (361/631, 371/685, ...)
+* Journal entry with automatic (partial) reconciliation of the documents
+* Printable act of netting of counter homogeneous claims
+* Cancellation by reversal entry
+
 **Financial Statements:**
 * Balance Sheet (Баланс, Форма №1)
 * Profit & Loss Statement (Звіт про фінансові результати, Форма №2)
@@ -34,6 +40,12 @@ Complete Ukrainian accounting functionality for Odoo:
 * Automatic calculation from Chart of Accounts
 * Comparison with previous period
 * PDF export
+
+**Deferred Expenses and Revenue (рах. 39/69):**
+* Schedule per prepaid expense / income received in advance
+* Equal monthly or prorata-by-days split, created from bill/invoice lines
+* Monthly recognition posted by the period closing (or on demand)
+* Balances on 39/69 per schedule as of a date
 
 **Menu "Бухгалтерія UA":**
 * Root menu with sequence 51
@@ -74,6 +86,8 @@ Dependencies:
         'data/cash_limit_cron.xml',
         'data/currency_exchange_data.xml',
         'data/account_menu_data.xml',
+        'data/debt_netting_data.xml',
+        'data/deferral_data.xml',
         # Views
         'views/res_company_views.xml',
         'views/account_payment_views.xml',
@@ -88,6 +102,10 @@ Dependencies:
         'views/l10n_ua_currency_revaluation_views.xml',
         'views/l10n_ua_currency_exchange_views.xml',
         'views/l10n_ua_aging_report_views.xml',
+        # Акт взаємозаліку — до форми документа: кнопка друку посилається на звіт
+        'report/debt_netting_report.xml',
+        'views/l10n_ua_debt_netting_views.xml',
+        'views/l10n_ua_deferral_views.xml',
         # Wizards
         'wizard/cash_book_wizard_views.xml',
         'wizard/reconciliation_act_wizard_views.xml',

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Нумерація графіків витрат/доходів майбутніх періодів (#372) -->
+        <record id="seq_l10n_ua_deferral" model="ir.sequence">
+            <field name="name">Витрати/доходи майбутніх періодів</field>
+            <field name="code">l10n_ua.deferral</field>
+            <field name="prefix">МП/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
+
+        <!-- Основний шлях — закриття періоду, яке саме проводить списання
+             місяця. Cron лише для тих, хто періоди не закриває, тому
+             вимкнений за замовчуванням. -->
+        <record id="ir_cron_l10n_ua_deferral_post" model="ir.cron">
+            <field name="name">Списання витрат/доходів майбутніх періодів</field>
+            <field name="model_id" ref="model_l10n_ua_deferral"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_post_due()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

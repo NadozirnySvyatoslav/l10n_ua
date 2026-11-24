@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Акт взаємозаліку зустрічних однорідних вимог (#371).
+         Друкується мовою документа: форма українська, як і решта первинки. -->
+    <record id="action_report_debt_netting" model="ir.actions.report">
+        <field name="name">Debt Netting Act</field>
+        <field name="model">l10n_ua.debt.netting</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_ua_accounting.report_debt_netting_document</field>
+        <field name="print_report_name">'Акт_взаємозаліку_%s_%s' % (object.name, object.partner_id.name)</field>
+        <field name="binding_model_id" ref="model_l10n_ua_debt_netting"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+    </record>
+
+    <!-- Реквізити сторони: назва, ЄДРПОУ/ІПН, адреса -->
+    <template id="report_debt_netting_party">
+        <strong t-out="party.name"/>
+        <t t-if="party.edrpou">, код ЄДРПОУ: <span t-out="party.edrpou"/></t>
+        <t t-if="party.ipn">, ІПН: <span t-out="party.ipn"/></t>
+        <t t-if="party.l10n_ua_legal_address">
+            <br/>Адреса: <span t-out="party.l10n_ua_legal_address"/>
+        </t>
+        <t t-elif="party.contact_address">
+            <br/>Адреса: <span t-out="party.contact_address"/>
+        </t>
+    </template>
+
+    <!-- Таблиця документів однієї сторони -->
+    <template id="report_debt_netting_lines">
+        <table style="margin-bottom: 10px;">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">№</th>
+                    <th style="width: 30%;">Документ</th>
+                    <th style="width: 11%;">Дата</th>
+                    <th style="width: 9%;">Рахунок</th>
+                    <th style="width: 15%;">Сума заборгованості</th>
+                    <th style="width: 15%;">Зараховується</th>
+                    <th style="width: 15%;">Залишок</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr t-foreach="lines" t-as="line">
+                    <td class="text-center" t-out="line_index + 1"/>
+                    <td>
+                        <span t-out="line.move_id.name"/>
+                        <t t-if="line.ref and line.ref != line.move_id.name">
+                            (<span t-out="line.ref"/>)
+                        </t>
+                    </td>
+                    <td class="text-center"
+                        t-out="o._format_date_short(line.move_id.invoice_date or line.date)"/>
+                    <td class="text-center" t-out="line.account_id.code"/>
+                    <td class="text-right" t-out="o._get_print_amount(line.amount_open)"/>
+                    <td class="text-right" t-out="o._get_print_amount(line.amount_offset)"/>
+                    <td class="text-right" t-out="o._get_print_amount(line.amount_after)"/>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-right bold">Разом:</td>
+                    <td class="text-right bold" t-out="o._get_print_amount(sum(lines.mapped('amount_open')))"/>
+                    <td class="text-right bold" t-out="o._get_print_amount(sum(lines.mapped('amount_offset')))"/>
+                    <td class="text-right bold" t-out="o._get_print_amount(sum(lines.mapped('amount_after')))"/>
+                </tr>
+            </tfoot>
+        </table>
+    </template>
+
+    <template id="report_debt_netting_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
+                    <div class="page ua-report">
+                        <t t-set="company" t-value="o.company_id"/>
+                        <t t-set="comp_partner" t-value="company.partner_id"/>
+                        <t t-set="partner" t-value="o.commercial_partner_id"/>
+                        <t t-set="cur" t-value="o.currency_id.name == 'UAH' and 'грн' or o.currency_id.name"/>
+
+                        <div class="ua-report-title" style="margin: 15px 0 5px 0;">
+                            АКТ<br/>
+                            <span style="font-size: 12pt;">взаємозаліку зустрічних однорідних вимог</span>
+                        </div>
+                        <div class="text-center" style="margin-bottom: 15px; font-size: 11pt;">
+                            № <span t-field="o.name"/>
+                            від <span t-out="o._get_date_long()"/>
+                        </div>
+
+                        <table class="no-border-all" style="margin-bottom: 5px;">
+                            <tr>
+                                <td class="no-border" style="width: 15%; vertical-align: top;"><u>Сторона 1:</u></td>
+                                <td class="no-border" style="width: 85%;">
+                                    <t t-call="l10n_ua_accounting.report_debt_netting_party" party="comp_partner"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="no-border" style="vertical-align: top;"><u>Сторона 2:</u></td>
+                                <td class="no-border">
+                                    <t t-call="l10n_ua_accounting.report_debt_netting_party" party="partner"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div id="netting_basis" style="margin: 10px 0;">
+                            <p style="text-align: justify;">
+                                Сторони, керуючись статтею 601 Цивільного кодексу України,
+                                склали цей акт про зарахування зустрічних однорідних вимог,
+                                строк виконання яких настав, на суму
+                                <strong t-out="o._get_print_amount(o.amount)"/> <t t-out="cur"/>
+                                (<t t-out="o._get_amount_words()"/>).
+                            </p>
+                        </div>
+
+                        <p class="bold">
+                            1. Заборгованість Сторони 2 (<t t-out="partner.name"/>)
+                            перед Стороною 1 (<t t-out="company.name"/>), <t t-out="cur"/>:
+                        </p>
+                        <t t-call="l10n_ua_accounting.report_debt_netting_lines"
+                           o="o" lines="o._get_print_lines('receivable')"/>
+
+                        <p class="bold">
+                            2. Заборгованість Сторони 1 (<t t-out="company.name"/>)
+                            перед Стороною 2 (<t t-out="partner.name"/>), <t t-out="cur"/>:
+                        </p>
+                        <t t-call="l10n_ua_accounting.report_debt_netting_lines"
+                           o="o" lines="o._get_print_lines('payable')"/>
+
+                        <div style="margin: 10px 0;">
+                            <p style="text-align: justify;">
+                                3. Після зарахування зобов'язання Сторін одна перед одною
+                                за наведеними документами припиняються на суму
+                                <strong t-out="o._get_print_amount(o.amount)"/> <t t-out="cur"/>.
+                                Залишок заборгованості за документами, зазначений у графі
+                                «Залишок», підлягає погашенню в порядку, передбаченому
+                                відповідними договорами.
+                            </p>
+                            <p style="text-align: justify;">
+                                4. Акт складено у двох примірниках, що мають однакову
+                                юридичну силу, по одному для кожної зі Сторін.
+                            </p>
+                        </div>
+
+                        <table class="no-border-all" style="margin-top: 25px;">
+                            <tr>
+                                <td class="no-border" style="width: 50%; vertical-align: top;">
+                                    <div class="bold">Сторона 1</div>
+                                    <div t-out="company.name"/>
+                                    <div style="margin-top: 25px;">
+                                        ____________________ / ____________________
+                                    </div>
+                                    <div class="small" style="margin-left: 20px;">(підпис)                     (ПІБ)</div>
+                                    <div style="margin-top: 5px;">М.П.</div>
+                                </td>
+                                <td class="no-border" style="width: 50%; vertical-align: top;">
+                                    <div class="bold">Сторона 2</div>
+                                    <div t-out="partner.name"/>
+                                    <div style="margin-top: 25px;">
+                                        ____________________ / ____________________
+                                    </div>
+                                    <div class="small" style="margin-left: 20px;">(підпис)                     (ПІБ)</div>
+                                    <div style="margin-top: 5px;">М.П.</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
