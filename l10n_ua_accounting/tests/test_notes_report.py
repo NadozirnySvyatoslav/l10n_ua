@@ -16,6 +16,8 @@ D = date(2047, 5, 20)
 @tagged('post_install', '-at_install', 'l10n_ua_accounting')
 class TestNotesReport(AccountingTestCase):
 
+    _own_company = True  # #654: demo balances leak into code-prefix rows
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
