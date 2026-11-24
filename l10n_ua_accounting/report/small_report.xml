@@ -6,7 +6,6 @@
         <field name="model">l10n_ua.small.report</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_small_document</field>
-        <field name="report_file">l10n_ua_accounting.report_small_document</field>
         <field name="print_report_name">'Фінзвітність_%s_%s' % (object.kind, object.date_to)</field>
         <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
     </record>
@@ -20,7 +19,7 @@
                     <t t-set="paren" t-value="('1002', '1012', '1425', '2050', '2180', '2270', '2285', '2300', '2165')"/>
                     <div class="page ua-report">
                         <div class="text-center small mb-2">
-                            Додаток <t t-esc="2 if micro else 1"/> до Національного положення (стандарту)
+                            Додаток <t t-out="2 if micro else 1"/> до Національного положення (стандарту)
                             бухгалтерського обліку 25 «Спрощена фінансова звітність»
                         </div>
                         <table class="table-borderless mb-2" style="width: 100%;">
@@ -28,9 +27,9 @@
                                 <td style="width: 120px;">Підприємство</td>
                                 <td class="border-bottom"><span t-field="report.company_id.name"/></td>
                             </tr>
-                            <tr t-if="report.company_id.company_registry">
+                            <tr t-if="report.company_id.edrpou">
                                 <td>за ЄДРПОУ</td>
-                                <td class="border-bottom"><span t-field="report.company_id.company_registry"/></td>
+                                <td class="border-bottom"><span t-field="report.company_id.edrpou"/></td>
                             </tr>
                         </table>
                         <div class="small">Одиниця виміру: тис. грн. з одним десятковим знаком</div>
@@ -45,7 +44,7 @@
                                 <t t-else="">за період з <span t-field="report.date_from"/> по <span t-field="report.date_to"/></t>
                             </div>
                             <div class="small text-center mb-2">
-                                Форма № <t t-esc="('1' if part == 'balance' else '2') + ('-мс' if micro else '-м')"/>
+                                Форма № <t t-out="('1' if part == 'balance' else '2') + ('-мс' if micro else '-м')"/>
                             </div>
                             <table>
                                 <thead>
@@ -65,17 +64,17 @@
                                 <tbody>
                                     <t t-foreach="report.line_ids.filtered(lambda l: l.part == part).sorted('sequence')" t-as="line">
                                         <tr t-if="line.kind == 'section'">
-                                            <td colspan="4" class="bold text-center" t-esc="line.name"/>
+                                            <td colspan="4" class="bold text-center" t-out="line.name"/>
                                         </tr>
                                         <tr t-else="" t-att-class="'bold' if line.kind == 'sum' else ''">
                                             <td t-att-style="'padding-left: 2em;' if line.kind in ('bal_sub', 'cost', 'finished') else ''"
-                                                t-esc="line.name"/>
-                                            <td class="text-center" t-esc="line.code"/>
+                                                t-out="line.name"/>
+                                            <td class="text-center" t-out="line.code"/>
                                             <t t-foreach="(line.amount_g3, line.amount_g4)" t-as="amount">
                                                 <td class="text-right">
                                                     <t t-if="not amount">–</t>
-                                                    <t t-elif="line.code in paren" t-esc="'(%.1f)' % abs(amount)"/>
-                                                    <t t-else="" t-esc="'%.1f' % amount"/>
+                                                    <t t-elif="line.code in paren" t-out="'(%.1f)' % abs(amount)"/>
+                                                    <t t-else="" t-out="'%.1f' % amount"/>
                                                 </td>
                                             </t>
                                         </tr>
