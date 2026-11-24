@@ -91,6 +91,13 @@
               groups="l10n_ua_account_base.group_ua_accountant"
               sequence="10"/>
 
+    <menuitem id="menu_ua_deferral"
+              name="Deferred Expenses and Revenue"
+              parent="account.account_closing_menu"
+              action="l10n_ua_deferral_action"
+              groups="l10n_ua_account_base.group_ua_accountant"
+              sequence="15"/>
+
     <menuitem id="menu_ua_currency_revaluation"
               name="Currency Revaluation"
               parent="account.account_closing_menu"
@@ -140,6 +147,13 @@
               parent="menu_ua_reports"
               action="l10n_ua_aging_report_action"
               sequence="27"/>
+
+    <!-- Залишки на 39/69 за графіками (#372) -->
+    <menuitem id="menu_ua_reports_deferral_balance"
+              name="Deferral Balances (39/69)"
+              parent="menu_ua_reports"
+              action="l10n_ua_deferral_balance_wizard_action"
+              sequence="28"/>
 
     <!-- Три форми фінансової звітності за НП(С)БО 1 друкуються поспіль і в
          тому ж порядку, що й у наказі Мінфіну № 73: Ф№1, Ф№2, Ф№3. -->
