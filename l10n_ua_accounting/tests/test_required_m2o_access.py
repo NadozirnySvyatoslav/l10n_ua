@@ -16,7 +16,6 @@ ADR_REF = re.compile(r'ADR \d{4}')
 # Розриви, що були до #694: кожен прибирається окремою issue і зникає звідси.
 # Значення — посилання на ADR (перевіряє test_entries_reference_adr).
 KNOWN_GAPS = {
-    ('l10n_ua.subconto.type', 'model_id', 'l10n_ua_account_base.group_ua_user'): '#701, ADR 0005',
     ('l10n_ua.vat.declaration', 'period_id', 'account.group_account_manager'): '#702, ADR 0005',
     ('l10n_ua.vat.register', 'period_id', 'account.group_account_manager'): '#702, ADR 0005',
 }

@@ -13,3 +13,4 @@ from . import test_multicompany
 from . import test_offbalance_accounts
 from . import test_offbalance_register
 from . import test_psbo_chart
+from . import test_subconto_type_selection
