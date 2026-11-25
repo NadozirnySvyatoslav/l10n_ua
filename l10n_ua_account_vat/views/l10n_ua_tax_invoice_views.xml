@@ -64,8 +64,7 @@
                             <field name="payment_move_id" invisible="not payment_move_id"/>
                             <field name="partial_reconcile_id" groups="base.group_no_one"
                                    invisible="not partial_reconcile_id"/>
-                            <field name="erpn_number"
-                                   required="state == 'submitted'"/>
+                            <field name="erpn_number"/>
                             <field name="erpn_submitted_date" invisible="not erpn_submitted_date"/>
                             <field name="erpn_date"/>
                             <field name="erpn_receipt" readonly="1"
