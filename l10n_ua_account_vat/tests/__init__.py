@@ -13,3 +13,4 @@ from . import test_vat_declaration_d6
 from . import test_vat_declaration_d4
 from . import test_vat_declaration_d3
 from . import test_vat_declaration_rare
+from . import test_vat_kind

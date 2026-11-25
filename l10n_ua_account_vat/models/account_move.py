@@ -38,9 +38,18 @@ class AccountMove(models.Model):
         """
         return self._l10n_ua_vat_rate_from_taxes(invoice_line.tax_ids)
 
+    # Вид ставки податку (#560) → ставка рядка ПН. 'taxable' тут немає:
+    # 20/14/7 визначає сам відсоток. 'not_object' у ПН не потрапляє
+    # (`_l10n_ua_tax_invoice_source_lines`), а для інших споживачів
+    # (оренда землі) це, як і звільнення, «без ПДВ».
+    _L10N_UA_VAT_KIND_RATES = {'zero': '0', 'exempt': 'exempt', 'not_object': 'exempt'}
+
     @api.model
     def _l10n_ua_vat_rate_from_taxes(self, taxes):
         """Перший відсотковий податок зі ставкою ПКУ, інакше 'exempt'.
+
+        Якщо на податку заповнено вид ставки ``l10n_ua_vat_kind`` (#560), він
+        визначає 0 % / звільнено. Порожній вид — стара логіка за відсотком.
 
         Групу податків розкриваємо: ПДВ часто входить до групи разом з іншим
         податком (акциз, збір), і без цього кроку оподаткований рядок мовчки
@@ -52,8 +61,25 @@ class AccountMove(models.Model):
                 if rate != 'exempt':
                     return rate
             elif tax.amount_type == 'percent' and tax.amount in self._L10N_UA_VAT_RATES:
+                kind_rate = self._L10N_UA_VAT_KIND_RATES.get(tax.l10n_ua_vat_kind)
+                if kind_rate:
+                    return kind_rate
                 return self._L10N_UA_VAT_RATES[tax.amount]
         return 'exempt'
+
+    @api.model
+    def _l10n_ua_is_not_object(self, taxes):
+        """Чи є серед податків рядка ПДВ виду «не обʼєкт» (#560).
+
+        Рядок з таким податком не є постачанням для ПН (ст. 196 ПКУ).
+        """
+        for tax in taxes:
+            if tax.amount_type == 'group':
+                if self._l10n_ua_is_not_object(tax.children_tax_ids):
+                    return True
+            elif tax.l10n_ua_vat_kind == 'not_object':
+                return True
+        return False
 
     @api.model
     def _l10n_ua_vat_tax_from_taxes(self, taxes):
@@ -415,7 +441,10 @@ class AccountMove(models.Model):
         return line_vals
 
     def _l10n_ua_tax_invoice_source_lines(self):
-        return self.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+        # Операції, що не є об'єктом ПДВ (#560), у ПН не потрапляють.
+        return self.invoice_line_ids.filtered(
+            lambda l: l.display_type == 'product'
+            and not self._l10n_ua_is_not_object(l.tax_ids))
 
     def _l10n_ua_tax_invoice_base_vals(self, invoice_type, is_refund):
         # Стороною операції в ПН є юрособа, а не її контакт: ІПН і назва
