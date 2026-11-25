@@ -44,6 +44,18 @@
             </field>
         </record>
 
+        <!-- Рядки переоцінки ОЗ (#685): компанія береться з документа.
+             Без правила користувач компанії Б бачив і змінював рядки
+             переоцінки компанії А. -->
+        <record id="l10n_ua_asset_revaluation_line_company_rule" model="ir.rule">
+            <field name="name">Рядок переоцінки ОЗ: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_asset_revaluation_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">
+                ['|', ('revaluation_id.company_id', '=', False), ('revaluation_id.company_id', 'in', company_ids)]
+            </field>
+        </record>
+
         <record id="l10n_ua_mnma_company_rule" model="ir.rule">
             <field name="name">МНМА: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_mnma"/>
