@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Tax',
-    'version': '20.0.1.2.7',
+    'version': '20.0.1.3.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian tax documents and reporting',
     'description': """
@@ -48,6 +48,7 @@ Requires l10n_ua_account_base module.
         'views/l10n_ua_min_wage_views.xml',
     ],
     'demo': [],
+    'post_init_hook': 'post_init_hook',
     'images': ['static/description/icon.png'],
     'installable': True,
     'application': True,
