@@ -1,6 +1,5 @@
 """#560, КП1–КП3: коригування звільнених операцій (р.5.1.1, R511GA)."""
 
-import base64
 import os
 from datetime import date
 
@@ -80,7 +79,7 @@ class TestVatDeclarationExemptAdjustment(TransactionCase):
 
     def _main_body(self, decl):
         decl.action_generate_xml()
-        main = etree.fromstring(base64.b64decode(decl.xml_file))
+        main = etree.fromstring(decl.xml_file.content)
         etree.XMLSchema(etree.parse(os.path.join(SCHEMAS, 'J0200126.xsd'))).assertValid(main)
         return main.find('DECLARBODY')
 
