@@ -3,6 +3,7 @@ import io
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import float_round
 
 try:
     import xlsxwriter
@@ -75,31 +76,37 @@ class L10nUaVatDeclaration(models.Model):
         string='р.1.1 ПДВ 20%',
         currency_field='currency_id',
     )
-    # Row 1.2 — operations taxed at 14%
+    # Row 1.2 — operations taxed at 7%
     line_1_2_base = fields.Monetary(
-        string='р.1.2 Обсяг 14%',
-        currency_field='currency_id',
-        help='Операції на митній території, що оподатковуються за ставкою 14%',
-    )
-    line_1_2_vat = fields.Monetary(
-        string='р.1.2 ПДВ 14%',
-        currency_field='currency_id',
-    )
-    # Row 1.3 — operations taxed at 7%
-    line_1_3_base = fields.Monetary(
-        string='р.1.3 Обсяг 7%',
+        string='р.1.2 Обсяг 7%',
         currency_field='currency_id',
         help='Операції на митній території, що оподатковуються за ставкою 7%',
     )
-    line_1_3_vat = fields.Monetary(
-        string='р.1.3 ПДВ 7%',
+    line_1_2_vat = fields.Monetary(
+        string='р.1.2 ПДВ 7%',
         currency_field='currency_id',
     )
-    # Row 2 — export operations at 0%
+    # Row 1.3 — operations taxed at 14%
+    line_1_3_base = fields.Monetary(
+        string='р.1.3 Обсяг 14%',
+        currency_field='currency_id',
+        help='Операції на митній території, що оподатковуються за ставкою 14%',
+    )
+    line_1_3_vat = fields.Monetary(
+        string='р.1.3 ПДВ 14%',
+        currency_field='currency_id',
+    )
+    # Row 2.1 — export operations at 0%
     line_2_base = fields.Monetary(
-        string='р.2 Експорт 0%',
+        string='р.2.1 Експорт 0%',
         currency_field='currency_id',
         help='Операції з вивезення товарів за межі митної території (0%)',
+    )
+    # Row 2.2 — export operations exempt from VAT
+    line_2_2_base = fields.Monetary(
+        string='р.2.2 Експорт, звільнений',
+        currency_field='currency_id',
+        help='Операції з вивезення товарів, звільнені від оподаткування',
     )
     # Row 3 — other operations at 0%
     line_3_base = fields.Monetary(
@@ -107,23 +114,29 @@ class L10nUaVatDeclaration(models.Model):
         currency_field='currency_id',
         help='Інші операції, що оподатковуються за нульовою ставкою',
     )
-    # Row 4 — import operations (base only, VAT paid at customs)
-    line_4_base = fields.Monetary(
-        string='р.4 Імпорт',
-        currency_field='currency_id',
-        help='Операції з імпорту товарів (ПДВ сплачено на митниці)',
-    )
-    # Row 5 — exempt operations
+    # Row 5 — not object of taxation, supplies outside Ukraine, exempt
     line_5_base = fields.Monetary(
-        string='р.5 Звільнені',
+        string='р.5 Не об\'єкт / за межами / звільнені',
         currency_field='currency_id',
-        help='Операції, звільнені від оподаткування',
+        help='Операції, що не є об\'єктом оподаткування, послуги з місцем постачання '
+             'за межами України та операції, звільнені від оподаткування',
     )
-    # Row 6 — operations not subject to VAT / not object of taxation
-    line_6_base = fields.Monetary(
-        string='р.6 Не є об\'єктом',
+    # Row 5.1 — of row 5: exempt operations
+    line_5_1_base = fields.Monetary(
+        string='р.5.1 У т.ч. звільнені',
         currency_field='currency_id',
-        help='Обсяг операцій, що не є об\'єктом оподаткування',
+        help='З рядка 5 — операції, звільнені від оподаткування',
+    )
+    # Row 7.1 — adjustments of supplies and liabilities (issued adjustment calculations)
+    line_7_1_base = fields.Monetary(
+        string='р.7.1 Коригування обсягів',
+        currency_field='currency_id',
+        help='Коригування обсягів постачання за розрахунками коригування (+/-)',
+    )
+    line_7_1_vat = fields.Monetary(
+        string='р.7.1 Коригування ПЗ',
+        currency_field='currency_id',
+        help='Коригування податкових зобов\'язань за розрахунками коригування (+/-)',
     )
     # Row 9 — total tax liabilities (computed)
     line_9_vat = fields.Monetary(
@@ -149,22 +162,22 @@ class L10nUaVatDeclaration(models.Model):
         string='р.10.1 ПК 20%',
         currency_field='currency_id',
     )
-    # Row 10.2 — domestic purchases at 14%
+    # Row 10.2 — domestic purchases at 7%
     line_10_2_base = fields.Monetary(
-        string='р.10.2 Придбання 14%',
+        string='р.10.2 Придбання 7%',
         currency_field='currency_id',
     )
     line_10_2_vat = fields.Monetary(
-        string='р.10.2 ПК 14%',
+        string='р.10.2 ПК 7%',
         currency_field='currency_id',
     )
-    # Row 10.3 — domestic purchases at 7%
+    # Row 10.3 — domestic purchases at 14%
     line_10_3_base = fields.Monetary(
-        string='р.10.3 Придбання 7%',
+        string='р.10.3 Придбання 14%',
         currency_field='currency_id',
     )
     line_10_3_vat = fields.Monetary(
-        string='р.10.3 ПК 7%',
+        string='р.10.3 ПК 14%',
         currency_field='currency_id',
     )
     # Row 11.1 — import purchases at 20%
@@ -176,22 +189,32 @@ class L10nUaVatDeclaration(models.Model):
         string='р.11.1 ПК імпорт 20%',
         currency_field='currency_id',
     )
-    # Row 11.2 — import purchases at 14%
+    # Row 11.2 — import purchases at 7%
     line_11_2_base = fields.Monetary(
-        string='р.11.2 Імпорт 14%',
+        string='р.11.2 Імпорт 7%',
         currency_field='currency_id',
     )
     line_11_2_vat = fields.Monetary(
-        string='р.11.2 ПК імпорт 14%',
+        string='р.11.2 ПК імпорт 7%',
         currency_field='currency_id',
     )
-    # Row 11.3 — import purchases at 7%
+    # Row 11.3 — import purchases at 14%
     line_11_3_base = fields.Monetary(
-        string='р.11.3 Імпорт 7%',
+        string='р.11.3 Імпорт 14%',
         currency_field='currency_id',
     )
     line_11_3_vat = fields.Monetary(
-        string='р.11.3 ПК імпорт 7%',
+        string='р.11.3 ПК імпорт 14%',
+        currency_field='currency_id',
+    )
+    # Row 10.4 — domestic purchases at 0% / without VAT (base only)
+    line_10_4_base = fields.Monetary(
+        string='р.10.4 Придбання 0% / без ПДВ',
+        currency_field='currency_id',
+    )
+    # Row 11.4 — imported goods without VAT (base only)
+    line_11_4_base = fields.Monetary(
+        string='р.11.4 Імпорт без ПДВ',
         currency_field='currency_id',
     )
     # Row 14 — correction of tax credit (adjustment calculations)
@@ -199,6 +222,19 @@ class L10nUaVatDeclaration(models.Model):
         string='р.14 Коригування ПК',
         currency_field='currency_id',
         help='Коригування податкового кредиту',
+    )
+    # Row 15 — correction under 192.1.1 without registered adjustment (decreases credit)
+    line_15_vat = fields.Monetary(
+        string='р.15 Коригування ПК (п.п. 192.1.1)',
+        currency_field='currency_id',
+        help='Повернення товару/послуги або передоплати за відсутності зареєстрованого '
+             'розрахунку коригування; зменшує податковий кредит',
+    )
+    # Row 16.1 — negative value carried from row 21 of the previous period
+    line_16_1_vat = fields.Monetary(
+        string='р.16.1 Від\'ємне значення попереднього періоду',
+        currency_field='currency_id',
+        help='Значення рядка 21 декларації за попередній звітний період',
     )
     # Row 17 — total tax credit (computed)
     line_17_vat = fields.Monetary(
@@ -210,8 +246,8 @@ class L10nUaVatDeclaration(models.Model):
     )
 
     # =====================================================
-    # Section III — Розрахунок (Result)
-    # Rows 18 - 20
+    # Section III — Розрахунки за звітний період
+    # Rows 18 - 21
     # =====================================================
 
     # Row 18 — VAT payable (liabilities > credit)
@@ -222,19 +258,23 @@ class L10nUaVatDeclaration(models.Model):
         currency_field='currency_id',
         help='Позитивне значення різниці (р.9 - р.17) — до сплати в бюджет',
     )
-    # Row 20 — VAT refundable (credit > liabilities)
-    line_20_vat = fields.Monetary(
-        string='р.20 ПДВ до відшкодування',
+    # Row 19 — negative value (credit > liabilities)
+    line_19_vat = fields.Monetary(
+        string='р.19 Від\'ємне значення',
         compute='_compute_totals',
         store=True,
         currency_field='currency_id',
-        help='Від\'ємне значення різниці (р.17 - р.9) — бюджетне відшкодування',
+        help='Від\'ємне значення різниці (р.17 - р.9). Без бюджетного відшкодування '
+             'й погашення боргу воно повністю переходить у рядок 21',
     )
-    # Row 20.2 — carry forward to next period
-    line_20_2_vat = fields.Monetary(
-        string='р.20.2 Зараховується до ПК наступного періоду',
+    # Row 21 — negative value carried to the tax credit of the next period
+    line_21_vat = fields.Monetary(
+        string='р.21 До ПК наступного періоду',
+        compute='_compute_totals',
+        store=True,
         currency_field='currency_id',
-        help='Сума, що зараховується до складу ПК наступного звітного періоду',
+        help='Від\'ємне значення, що зараховується до податкового кредиту наступного '
+             'періоду (переноситься до рядка 16.1)',
     )
 
     # =====================================================
@@ -253,8 +293,8 @@ class L10nUaVatDeclaration(models.Model):
         related='line_18_vat',
     )
     vat_refundable = fields.Monetary(
-        string='ПДВ до відшкодування',
-        related='line_20_vat',
+        string='Від\'ємне значення',
+        related='line_19_vat',
     )
 
     @api.depends('period_id')
@@ -278,31 +318,29 @@ class L10nUaVatDeclaration(models.Model):
             ], limit=1)
 
     @api.depends(
-        'line_1_1_vat', 'line_1_2_vat', 'line_1_3_vat',
+        'line_1_1_vat', 'line_1_2_vat', 'line_1_3_vat', 'line_7_1_vat',
         'line_10_1_vat', 'line_10_2_vat', 'line_10_3_vat',
         'line_11_1_vat', 'line_11_2_vat', 'line_11_3_vat',
-        'line_14_vat',
+        'line_14_vat', 'line_15_vat', 'line_16_1_vat',
     )
     def _compute_totals(self):
         for rec in self:
             # Section I — total liabilities (row 9)
             rec.line_9_vat = (
-                rec.line_1_1_vat + rec.line_1_2_vat + rec.line_1_3_vat
+                rec.line_1_1_vat + rec.line_1_2_vat + rec.line_1_3_vat + rec.line_7_1_vat
             )
-            # Section II — total credit (row 17)
+            # Section II — total credit (row 17 = 10.1..10.3 + 11.1..11.3 + 14 - 15 + 16)
             rec.line_17_vat = (
                 rec.line_10_1_vat + rec.line_10_2_vat + rec.line_10_3_vat
                 + rec.line_11_1_vat + rec.line_11_2_vat + rec.line_11_3_vat
-                + rec.line_14_vat
+                + rec.line_14_vat - rec.line_15_vat + rec.line_16_1_vat
             )
             # Section III — result
             diff = rec.line_9_vat - rec.line_17_vat
-            if diff > 0:
-                rec.line_18_vat = diff
-                rec.line_20_vat = 0.0
-            else:
-                rec.line_18_vat = 0.0
-                rec.line_20_vat = abs(diff)
+            rec.line_18_vat = max(diff, 0.0)
+            rec.line_19_vat = max(-diff, 0.0)
+            # Без відшкодування (20.2) і погашення боргу (20.1): 21 = 19.1 + 20.3 = 19.
+            rec.line_21_vat = rec.line_19_vat
 
     # =====================================================
     # Actions
@@ -317,85 +355,67 @@ class L10nUaVatDeclaration(models.Model):
         self.write({'state': 'calculated'})
 
     def _calculate_from_registers(self):
-        """Fill declaration lines from issued and received registers."""
+        """Заповнити рядки з реєстрів виданих і отриманих ПН/РК за період.
+
+        Рядки декларації — у цілих гривнях (тип DGdecimal0 у XSD J0200126), тож
+        кожен рядок округлюємо, а підсумки 9/17/18/19/21 рахуються вже з округлених.
+        ПН — рядки 1.x / 10.x / 11.x, РК — коригування 7.1 (видані) і 14 (отримані).
+        """
         self.ensure_one()
-        Register = self.env['l10n_ua.vat.register']
+        issued = self.register_issued_id.line_ids
+        received = self.register_received_id.line_ids
 
-        # Find issued register (tax liabilities)
-        issued = Register.search([
-            ('period_id', '=', self.period_id.id),
-            ('register_type', '=', 'issued'),
+        def total(lines, field):
+            return float_round(sum(lines.mapped(field)), precision_digits=0)
+
+        issued_pn = issued.filtered(lambda l: l.doc_type != 'rk')
+        issued_rk = issued.filtered(lambda l: l.doc_type == 'rk')
+        received_pn = received.filtered(lambda l: l.doc_type != 'rk')
+        received_rk = received.filtered(lambda l: l.doc_type == 'rk')
+        imported = received_pn.filtered(lambda l: l.tax_invoice_id.is_import)
+        domestic = received_pn - imported
+
+        self.write({
+            'line_1_1_base': total(issued_pn, 'base_20'),
+            'line_1_1_vat': total(issued_pn, 'vat_20'),
+            'line_1_2_base': total(issued_pn, 'base_7'),
+            'line_1_2_vat': total(issued_pn, 'vat_7'),
+            'line_1_3_base': total(issued_pn, 'base_14'),
+            'line_1_3_vat': total(issued_pn, 'vat_14'),
+            'line_2_base': total(issued_pn, 'base_0'),
+            'line_5_base': total(issued_pn, 'base_exempt'),
+            'line_5_1_base': total(issued_pn, 'base_exempt'),
+            'line_7_1_base': total(issued_rk, 'base_amount'),
+            'line_7_1_vat': total(issued_rk, 'vat_amount'),
+            'line_10_1_base': total(domestic, 'base_20'),
+            'line_10_1_vat': total(domestic, 'vat_20'),
+            'line_10_2_base': total(domestic, 'base_7'),
+            'line_10_2_vat': total(domestic, 'vat_7'),
+            'line_10_3_base': total(domestic, 'base_14'),
+            'line_10_3_vat': total(domestic, 'vat_14'),
+            'line_11_1_base': total(imported, 'base_20'),
+            'line_11_1_vat': total(imported, 'vat_20'),
+            'line_11_2_base': total(imported, 'base_7'),
+            'line_11_2_vat': total(imported, 'vat_7'),
+            'line_11_3_base': total(imported, 'base_14'),
+            'line_11_3_vat': total(imported, 'vat_14'),
+            'line_14_vat': total(received_rk, 'vat_amount'),
+            'line_16_1_vat': self._previous_negative_value(),
+        })
+
+    def _previous_negative_value(self):
+        """Рядок 21 декларації за попередній звітний період (→ рядок 16.1)."""
+        self.ensure_one()
+        start = self.period_id.date_start
+        if not start:
+            return 0.0
+        previous = self.search([
             ('company_id', '=', self.company_id.id),
-        ], limit=1)
-
-        # Find received register (tax credit)
-        received = Register.search([
-            ('period_id', '=', self.period_id.id),
-            ('register_type', '=', 'received'),
-            ('company_id', '=', self.company_id.id),
-        ], limit=1)
-
-        vals = {}
-
-        # Section I — from issued register
-        if issued:
-            lines = issued.line_ids
-            vals.update({
-                'line_1_1_base': sum(lines.mapped('base_20')),
-                'line_1_1_vat': sum(lines.mapped('vat_20')),
-                'line_1_2_base': sum(lines.mapped('base_14')),
-                'line_1_2_vat': sum(lines.mapped('vat_14')),
-                'line_1_3_base': sum(lines.mapped('base_7')),
-                'line_1_3_vat': sum(lines.mapped('vat_7')),
-                'line_2_base': sum(lines.mapped('base_0')),
-                'line_5_base': sum(lines.mapped('base_exempt')),
-            })
-        else:
-            vals.update({
-                'line_1_1_base': 0, 'line_1_1_vat': 0,
-                'line_1_2_base': 0, 'line_1_2_vat': 0,
-                'line_1_3_base': 0, 'line_1_3_vat': 0,
-                'line_2_base': 0, 'line_5_base': 0,
-            })
-
-        # Section II — from received register
-        if received:
-            lines = received.line_ids
-            # Split domestic vs import
-            domestic = lines.filtered(lambda l: not l.tax_invoice_id.is_import if l.tax_invoice_id else True)
-            imported = lines.filtered(lambda l: l.tax_invoice_id.is_import if l.tax_invoice_id else False)
-
-            vals.update({
-                'line_10_1_base': sum(domestic.mapped('base_20')),
-                'line_10_1_vat': sum(domestic.mapped('vat_20')),
-                'line_10_2_base': sum(domestic.mapped('base_14')),
-                'line_10_2_vat': sum(domestic.mapped('vat_14')),
-                'line_10_3_base': sum(domestic.mapped('base_7')),
-                'line_10_3_vat': sum(domestic.mapped('vat_7')),
-                'line_11_1_base': sum(imported.mapped('base_20')),
-                'line_11_1_vat': sum(imported.mapped('vat_20')),
-                'line_11_2_base': sum(imported.mapped('base_14')),
-                'line_11_2_vat': sum(imported.mapped('vat_14')),
-                'line_11_3_base': sum(imported.mapped('base_7')),
-                'line_11_3_vat': sum(imported.mapped('vat_7')),
-            })
-        else:
-            vals.update({
-                'line_10_1_base': 0, 'line_10_1_vat': 0,
-                'line_10_2_base': 0, 'line_10_2_vat': 0,
-                'line_10_3_base': 0, 'line_10_3_vat': 0,
-                'line_11_1_base': 0, 'line_11_1_vat': 0,
-                'line_11_2_base': 0, 'line_11_2_vat': 0,
-                'line_11_3_base': 0, 'line_11_3_vat': 0,
-            })
-
-        self.write(vals)
-
-    def action_submit(self):
-        for rec in self:
-            if rec.state != 'calculated':
-                raise UserError(_('Подати можна тільки розраховану декларацію.'))
-        self.write({'state': 'submitted'})
+            ('period_id.date_end', '<', start),
+            ('state', 'in', ('calculated', 'submitted', 'accepted')),
+            ('id', '!=', self.id),
+        ]).sorted(lambda d: d.period_id.date_end)[-1:]
+        return previous.line_21_vat if previous else 0.0
 
     def action_accept(self):
         for rec in self:
@@ -530,14 +550,15 @@ class L10nUaVatDeclaration(models.Model):
         row += 1
 
         decl_rows = [
-            ('1.1', 'Операції на митній території за ставкою 20%', self.line_1_1_base, self.line_1_1_vat),
-            ('1.2', 'Операції на митній території за ставкою 14%', self.line_1_2_base, self.line_1_2_vat),
-            ('1.3', 'Операції на митній території за ставкою 7%', self.line_1_3_base, self.line_1_3_vat),
-            ('2', 'Операції з вивезення товарів (експорт) 0%', self.line_2_base, None),
+            ('1.1', 'Операції на митній території за основною ставкою', self.line_1_1_base, self.line_1_1_vat),
+            ('1.2', 'Операції на митній території за ставкою 7%', self.line_1_2_base, self.line_1_2_vat),
+            ('1.3', 'Операції на митній території за ставкою 14%', self.line_1_3_base, self.line_1_3_vat),
+            ('2.1', 'Вивезення товарів за нульовою ставкою', self.line_2_base, None),
+            ('2.2', 'Вивезення товарів, звільнене від оподаткування', self.line_2_2_base, None),
             ('3', 'Інші операції за нульовою ставкою', self.line_3_base, None),
-            ('4', 'Операції з імпорту товарів', self.line_4_base, None),
-            ('5', 'Операції, звільнені від оподаткування', self.line_5_base, None),
-            ('6', 'Операції, що не є об\'єктом оподаткування', self.line_6_base, None),
+            ('5', 'Не є об\'єктом / за межами України / звільнені', self.line_5_base, None),
+            ('5.1', 'у т.ч. звільнені від оподаткування', self.line_5_1_base, None),
+            ('7.1', 'Коригування обсягів постачання та податкових зобов\'язань', self.line_7_1_base, self.line_7_1_vat),
         ]
 
         for rnum, desc, base, vat in decl_rows:
@@ -559,13 +580,17 @@ class L10nUaVatDeclaration(models.Model):
         row += 1
 
         credit_rows = [
-            ('10.1', 'Придбання на митній території за ставкою 20%', self.line_10_1_base, self.line_10_1_vat),
-            ('10.2', 'Придбання на митній території за ставкою 14%', self.line_10_2_base, self.line_10_2_vat),
-            ('10.3', 'Придбання на митній території за ставкою 7%', self.line_10_3_base, self.line_10_3_vat),
-            ('11.1', 'Імпорт товарів за ставкою 20%', self.line_11_1_base, self.line_11_1_vat),
-            ('11.2', 'Імпорт товарів за ставкою 14%', self.line_11_2_base, self.line_11_2_vat),
-            ('11.3', 'Імпорт товарів за ставкою 7%', self.line_11_3_base, self.line_11_3_vat),
+            ('10.1', 'Придбання на митній території з основною ставкою', self.line_10_1_base, self.line_10_1_vat),
+            ('10.2', 'Придбання на митній території зі ставкою 7%', self.line_10_2_base, self.line_10_2_vat),
+            ('10.3', 'Придбання на митній території зі ставкою 14%', self.line_10_3_base, self.line_10_3_vat),
+            ('10.4', 'Придбання з нульовою ставкою та/або без ПДВ', self.line_10_4_base, None),
+            ('11.1', 'Ввезені товари з основною ставкою', self.line_11_1_base, self.line_11_1_vat),
+            ('11.2', 'Ввезені товари зі ставкою 7%', self.line_11_2_base, self.line_11_2_vat),
+            ('11.3', 'Ввезені товари зі ставкою 14%', self.line_11_3_base, self.line_11_3_vat),
+            ('11.4', 'Ввезені товари без ПДВ', self.line_11_4_base, None),
             ('14', 'Коригування податкового кредиту', None, self.line_14_vat),
+            ('15', 'Коригування ПК за п.п. 192.1.1 (-)', None, self.line_15_vat),
+            ('16.1', 'Від\'ємне значення попереднього періоду (р.21)', None, self.line_16_1_vat),
         ]
 
         for rnum, desc, base, vat in credit_rows:
@@ -592,13 +617,13 @@ class L10nUaVatDeclaration(models.Model):
         sheet.write(row, 3, self.line_18_vat, total_fmt)
         row += 1
 
-        sheet.write(row, 0, '20', total_fmt)
-        sheet.write(row, 1, 'Від\'ємне значення (р.17 - р.9) — до відшкодування', total_fmt)
+        sheet.write(row, 0, '19', total_fmt)
+        sheet.write(row, 1, 'Від\'ємне значення (р.17 - р.9)', total_fmt)
         sheet.write(row, 2, '', total_fmt)
-        sheet.write(row, 3, self.line_20_vat, total_fmt)
+        sheet.write(row, 3, self.line_19_vat, total_fmt)
         row += 1
 
-        sheet.write(row, 0, '20.2', cell_fmt)
+        sheet.write(row, 0, '21', cell_fmt)
         sheet.write(row, 1, 'Зараховується до ПК наступного періоду', cell_fmt)
         sheet.write(row, 2, '', money_fmt)
-        sheet.write(row, 3, self.line_20_2_vat, money_fmt)
+        sheet.write(row, 3, self.line_21_vat, money_fmt)
