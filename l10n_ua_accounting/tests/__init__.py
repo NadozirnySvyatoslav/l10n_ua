@@ -25,3 +25,4 @@ from . import test_report_line_multicompany
 from . import test_doc_line_multicompany
 from . import test_period_closing_access
 from . import test_required_m2o_access
+from . import test_advance_report_access
