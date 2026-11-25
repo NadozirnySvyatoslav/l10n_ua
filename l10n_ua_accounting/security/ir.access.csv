@@ -35,3 +35,5 @@ access_deferral_balance_wizard_user,l10n_ua.deferral.balance.wizard.user,model_l
 access_deferral_create_wizard_user,l10n_ua.deferral.create.wizard.user,model_l10n_ua_deferral_create_wizard,account.group_account_user,crud,
 access_equity_report_user,l10n_ua.equity.report.user,model_l10n_ua_equity_report,account.group_account_user,crud,
 access_equity_report_line_user,l10n_ua.equity.report.line.user,model_l10n_ua_equity_report_line,account.group_account_user,crud,
+access_small_report_user,l10n_ua.small.report.user,model_l10n_ua_small_report,account.group_account_user,crud,
+access_small_report_line_user,l10n_ua.small.report.line.user,model_l10n_ua_small_report_line,account.group_account_user,crud,
