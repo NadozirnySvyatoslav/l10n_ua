@@ -118,33 +118,151 @@ class TestVatCashMethod(AccountTestInvoicingCommon):
         with self.assertRaises(UserError):
             move._l10n_ua_tax_invoice_date()
 
-    def test_cash_method_refuses_on_partial_payment(self):
-        """Часткова оплата: відмова замість мовчазної ПН на повну суму (#255)."""
+    def test_cash_method_partial_payment_gives_pn_on_paid_amount(self):
+        """Часткова оплата: ПН на суму надходження, а не документа (п. 187.10)."""
         move = self._invoice(self.customer_cash, '2025-03-10')
         self._pay(move, '2025-04-02', amount=400.0)
 
-        with self.assertRaises(UserError):
-            move._l10n_ua_tax_invoice_date()
+        move.action_create_tax_invoice()
+        pn = move.tax_invoice_ids
 
-    def test_cash_method_refuses_on_several_settlements(self):
-        """Кілька надходжень — кілька ПН; однією на всю суму не відбутися.
+        self.assertEqual(len(pn), 1)
+        self.assertEqual(pn.date, fields.Date.to_date('2025-04-02'))
+        self.assertAlmostEqual(pn.total_base, 400.0)
+        # Ціна лишається фактичною ціною постачання, зменшується обсяг.
+        self.assertAlmostEqual(pn.line_ids.price_unit, 1000.0)
+        self.assertAlmostEqual(pn.line_ids.quantity, 0.4)
 
-        Найшкідливіший випадок саме тут: документ погашений повністю, залишку
-        немає, і без цієї перевірки вийшла б одна ПН на 1000 грн від 02.04 —
-        завищене зобов'язання у квітні й нуль у травні замість 600 грн.
-        За п. 187.10 має бути дві ПН; поділ — #255.
+    def test_cash_method_pn_per_settlement(self):
+        """Два надходження — дві ПН, кожна своєю датою і на свою суму.
+
+        Сценарій #255: рахунок 1000 грн, оплати 400 грн 02.04 і 600 грн 06.05.
+        Раніше виходила одна ПН на 1000 грн від 02.04 — завищене зобов'язання
+        у квітні й нуль у травні.
         """
         move = self._invoice(self.customer_cash, '2025-03-10')
         self._pay(move, '2025-04-02', amount=400.0)
         self._pay(move, '2025-05-06', amount=600.0)
 
-        self.assertTrue(move.currency_id.is_zero(move.amount_residual),
-                        'документ оплачений повністю — перевірка залишку тут не спрацює')
+        action = move.action_create_tax_invoice()
+        pns = move.tax_invoice_ids.sorted('date')
+
+        self.assertEqual(move.tax_invoice_count, 2)
+        self.assertEqual(pns.mapped('date'), [fields.Date.to_date('2025-04-02'),
+                                              fields.Date.to_date('2025-05-06')])
+        self.assertEqual(pns.mapped('total_base'), [400.0, 600.0])
+        self.assertEqual(set(pns.mapped('vat_method')), {'cash'})
+        self.assertEqual(len(pns.partial_reconcile_id), 2,
+                         'кожна ПН прив\'язана до свого погашення')
+        self.assertTrue(all(pns.mapped('payment_move_id')))
+        self.assertEqual(action['domain'], [('id', 'in', pns.ids)],
+                         'кілька ПН відкриваються списком')
+        self.assertEqual(move.action_view_tax_invoices()['domain'],
+                         [('move_id', '=', move.id)])
+
+    def test_cash_method_repeated_call_adds_only_missing(self):
+        """Повторне «Створити ПН» складає ПН лише на нові надходження."""
+        move = self._invoice(self.customer_cash, '2025-03-10')
+        self._pay(move, '2025-04-02', amount=400.0)
+        move.action_create_tax_invoice()
+        first = move.tax_invoice_ids
+
+        self._pay(move, '2025-05-06', amount=600.0)
+        move.action_create_tax_invoice()
+
+        self.assertEqual(move.tax_invoice_count, 2)
+        second = move.tax_invoice_ids - first
+        self.assertEqual(second.date, fields.Date.to_date('2025-05-06'))
+        self.assertAlmostEqual(second.total_base, 600.0)
+
         with self.assertRaises(UserError):
-            move._l10n_ua_tax_invoice_date()
-        self.assertEqual(move._l10n_ua_first_payment_date(),
-                         fields.Date.to_date('2025-04-02'),
-                         'сама дата першого надходження визначається правильно')
+            move.action_create_tax_invoice()
+        self.assertEqual(move.tax_invoice_count, 2, 'дубля немає')
+
+    def test_cash_method_cancelled_pn_is_replaced(self):
+        """Скасована ПН надходження не покриває — на нього складається нова."""
+        move = self._invoice(self.customer_cash, '2025-03-10')
+        self._pay(move, '2025-04-02')
+        move.action_create_tax_invoice()
+        move.tax_invoice_ids.action_cancel()
+
+        move.action_create_tax_invoice()
+
+        self.assertEqual(move.tax_invoice_count, 2)
+        self.assertEqual(len(move.tax_invoice_ids.filtered(
+            lambda t: t.state != 'cancelled')), 1)
+
+    def test_cash_method_multiline_rounding(self):
+        """Копійки розкладаються так, що й ПН, і рядки сходяться з документом.
+
+        Три рядки по 100 грн і три оплати по 100: третина рядка — 33,333…
+        Кожна ПН має бути рівно на 100,00, а сума кожного рядка по трьох ПН —
+        рівно 100,00, без копійки «в повітрі».
+        """
+        tax = self.env['account.tax'].create({
+            'name': 'ПДВ 20% (тест)', 'amount': 20.0, 'amount_type': 'percent',
+            'type_tax_use': 'sale', 'price_include_override': 'tax_excluded',
+        })
+        move = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': self.customer_cash.id,
+            'invoice_date': '2025-03-10',
+            'date': '2025-03-10',
+            'invoice_line_ids': [(0, 0, {
+                'name': f'послуга {i}', 'quantity': 1, 'price_unit': 100.0,
+                'tax_ids': [(6, 0, tax.ids)],
+            }) for i in range(3)],
+        })
+        move.action_post()
+        self.assertAlmostEqual(move.amount_total, 360.0)
+        for day in ('2025-04-02', '2025-04-15', '2025-05-06'):
+            self._pay(move, day, amount=120.0)
+
+        move.action_create_tax_invoice()
+        pns = move.tax_invoice_ids.sorted('date')
+
+        self.assertEqual(len(pns), 3)
+        for pn in pns:
+            self.assertAlmostEqual(pn.total_base, 100.0, places=2)
+            # ПДВ рядка ПН рахується від його бази й округлюється по рядку,
+            # тож на «розрізаних» копійках підсумок може відійти на копійку.
+            self.assertAlmostEqual(pn.total_vat, 20.0, delta=0.015)
+            self.assertEqual(set(pn.line_ids.mapped('vat_rate')), {'20'})
+        for name in ('послуга 0', 'послуга 1', 'послуга 2'):
+            lines = pns.line_ids.filtered(lambda l: l.name == name)
+            self.assertAlmostEqual(sum(lines.mapped('base_amount')), 100.0, places=2)
+            self.assertAlmostEqual(sum(lines.mapped('quantity')), 1.0, places=6)
+        self.assertEqual(pns[0].line_ids.mapped('base_amount'), [33.33, 33.33, 33.34])
+
+    def test_cash_method_unreconciled_payment_blocks_generation(self):
+        """ПН, що втратила погашення, не дає мовчки скласти дубль.
+
+        Оплату розʼєднали з рахунком і зіставили знову — без перевірки на те
+        саме надходження вийшла б друга ПН, тобто подвійне зобов'язання.
+        """
+        move = self._invoice(self.customer_cash, '2025-03-10')
+        payment = self._pay(move, '2025-04-02')
+        move.action_create_tax_invoice()
+        pn = move.tax_invoice_ids
+
+        receivable = move.line_ids.filtered(
+            lambda l: l.account_id.account_type == 'asset_receivable')
+        receivable.remove_move_reconcile()
+        self.assertFalse(pn.partial_reconcile_id)
+        self.assertEqual(pn.payment_move_id, payment.move_id,
+                         'видно, яке надходження ПН описувала')
+
+        (receivable | payment.move_id.line_ids.filtered(
+            lambda l: l.account_id == receivable.account_id)).reconcile()
+        with self.assertRaises(UserError):
+            move.action_create_tax_invoice()
+        self.assertEqual(move.tax_invoice_count, 1)
+
+        # Людина вирішила, що стара ПН зайва, — тепер нова складається.
+        pn.action_cancel()
+        move.action_create_tax_invoice()
+        self.assertEqual(len(move.tax_invoice_ids.filtered(
+            lambda t: t.state != 'cancelled')), 1)
 
     def test_settlement_without_payment_object_counts(self):
         """Залік кредит-ноти — теж погашення, хоч account.payment там немає."""
