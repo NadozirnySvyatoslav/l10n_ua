@@ -165,9 +165,10 @@ class L10nUaVatDeclarationD4(models.Model):
         return code or UNKNOWN_BENEFIT_CODE
 
     def _d4_benefit_amounts(self):
-        """Звільнені обсяги виданих ПН періоду за кодом пільги: {код: сума}.
+        """Звільнені обсяги виданих ПН і РК періоду за кодом пільги: {код: сума}.
 
-        Основа — графа «Звільнено» реєстру (та сама, що й рядок 5.1), щоб підсумок
+        Основа — графа «Звільнено» реєстру (та сама, що й рядок 5.1 разом з
+        коригуванням 5.1.1, #560), щоб підсумок
         таблиці 2 збігався з декларацією. Сума рядка реєстру розподіляється між
         кодами пільг пропорційно базі рядків ПН зі ставкою «звільнено»; рядок
         реєстру без ПН або без коду пільги — під умовним кодом 99999999.
@@ -175,8 +176,7 @@ class L10nUaVatDeclarationD4(models.Model):
         self.ensure_one()
         amounts = defaultdict(float)
         lines = self.register_issued_id.line_ids.filtered(
-            lambda l: l.doc_type != 'rk' and float_round(
-                l.base_exempt or 0.0, precision_digits=2))
+            lambda l: float_round(l.base_exempt or 0.0, precision_digits=2))
         for line in lines:
             exempt = line.tax_invoice_id.line_ids.filtered(lambda il: il.vat_rate == 'exempt')
             by_code = defaultdict(float)

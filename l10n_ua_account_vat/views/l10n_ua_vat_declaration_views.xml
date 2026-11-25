@@ -73,6 +73,8 @@
                                 <group string="Не об'єкт / звільнені">
                                     <field name="line_5_base"/>
                                     <field name="line_5_1_base"/>
+                                    <field name="line_5_1_1_base"/>
+                                    <field name="include_not_object_5"/>
                                 </group>
                                 <group string="Коригування (р.7.1)">
                                     <field name="line_7_1_base"/>
