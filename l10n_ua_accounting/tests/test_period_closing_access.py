@@ -94,6 +94,8 @@ class TestPeriodClosingAccess(AccountingTestCase):
     def test_accountant_prepares_closing(self):
         """Бухгалтер відкриває форму і рахує закриття без AccessError."""
         closing = self._closing(self.accountant)
+        # Як у новому запиті форми: значення з кешу не перевіряють права.
+        self.env.invalidate_all()
         closing.read(['name', 'period_id', 'state', 'date'])
         self.assertEqual(closing.period_id.display_name, self.period.display_name)
         closing.action_compute()
