@@ -114,6 +114,89 @@ class L10nUaVatDeclaration(models.Model):
         currency_field='currency_id',
         help='Інші операції, що оподатковуються за нульовою ставкою',
     )
+    # Rows 4.x — liabilities under p. 198.5 / 199.1 (ПН «на себе»), 4.x.1 — їх коригування
+    line_4_1_base = fields.Monetary(
+        string='р.4.1 Обсяг (20%), п. 198.5/199.1',
+        currency_field='currency_id',
+    )
+    line_4_1_vat = fields.Monetary(
+        string='р.4.1 ПЗ (20%), п. 198.5/199.1',
+        currency_field='currency_id',
+    )
+    line_4_1_1_base = fields.Monetary(
+        string='р.4.1.1 Коригування обсягу (20%)',
+        currency_field='currency_id',
+    )
+    line_4_1_1_vat = fields.Monetary(
+        string='р.4.1.1 Коригування ПЗ (20%)',
+        currency_field='currency_id',
+    )
+    line_4_2_base = fields.Monetary(
+        string='р.4.2 Обсяг (7%), п. 198.5/199.1',
+        currency_field='currency_id',
+    )
+    line_4_2_vat = fields.Monetary(
+        string='р.4.2 ПЗ (7%), п. 198.5/199.1',
+        currency_field='currency_id',
+    )
+    line_4_2_1_base = fields.Monetary(
+        string='р.4.2.1 Коригування обсягу (7%)',
+        currency_field='currency_id',
+    )
+    line_4_2_1_vat = fields.Monetary(
+        string='р.4.2.1 Коригування ПЗ (7%)',
+        currency_field='currency_id',
+    )
+    line_4_3_base = fields.Monetary(
+        string='р.4.3 Обсяг (14%), п. 198.5/199.1',
+        currency_field='currency_id',
+    )
+    line_4_3_vat = fields.Monetary(
+        string='р.4.3 ПЗ (14%), п. 198.5/199.1',
+        currency_field='currency_id',
+    )
+    line_4_3_1_base = fields.Monetary(
+        string='р.4.3.1 Коригування обсягу (14%)',
+        currency_field='currency_id',
+    )
+    line_4_3_1_vat = fields.Monetary(
+        string='р.4.3.1 Коригування ПЗ (14%)',
+        currency_field='currency_id',
+    )
+    # Rows 6.x — services from a non-resident (ПН з умовним ІПН 500000000000)
+    line_6_1_base = fields.Monetary(
+        string='р.6.1 Послуги нерезидента, обсяг (20%)',
+        currency_field='currency_id',
+    )
+    line_6_1_vat = fields.Monetary(
+        string='р.6.1 Послуги нерезидента, ПЗ (20%)',
+        currency_field='currency_id',
+    )
+    line_6_2_base = fields.Monetary(
+        string='р.6.2 Послуги нерезидента, обсяг (7%)',
+        currency_field='currency_id',
+    )
+    line_6_2_vat = fields.Monetary(
+        string='р.6.2 Послуги нерезидента, ПЗ (7%)',
+        currency_field='currency_id',
+    )
+    # Rows 13.x — tax credit for services from a non-resident
+    line_13_1_base = fields.Monetary(
+        string='р.13.1 Послуги нерезидента, обсяг (20%)',
+        currency_field='currency_id',
+    )
+    line_13_1_vat = fields.Monetary(
+        string='р.13.1 Послуги нерезидента, ПК (20%)',
+        currency_field='currency_id',
+    )
+    line_13_2_base = fields.Monetary(
+        string='р.13.2 Послуги нерезидента, обсяг (7%)',
+        currency_field='currency_id',
+    )
+    line_13_2_vat = fields.Monetary(
+        string='р.13.2 Послуги нерезидента, ПК (7%)',
+        currency_field='currency_id',
+    )
     # Row 5 — not object of taxation, supplies outside Ukraine, exempt
     line_5_base = fields.Monetary(
         string='р.5 Не об\'єкт / за межами / звільнені',
@@ -290,6 +373,29 @@ class L10nUaVatDeclaration(models.Model):
         store=True,
         currency_field='currency_id',
     )
+    line_20_1_vat = fields.Monetary(
+        string='р.20.1 У зменшення податкового боргу з ПДВ',
+        currency_field='currency_id',
+        help='Частина рядка 20, що зараховується у погашення податкового боргу з ПДВ '
+             '(Д2, графа 8)',
+    )
+    line_20_2_1_vat = fields.Monetary(
+        string='р.20.2.1 Відшкодування на рахунок у банку',
+        currency_field='currency_id',
+        help='Бюджетне відшкодування на рахунок платника (Д2 графа 9, Д3 підпункт «а»)',
+    )
+    line_20_2_2_vat = fields.Monetary(
+        string='р.20.2.2 Відшкодування в рахунок інших платежів',
+        currency_field='currency_id',
+        help='Бюджетне відшкодування в рахунок сплати інших платежів до держбюджету '
+             '(Д3, таблиця 1)',
+    )
+    line_20_2_vat = fields.Monetary(
+        string='р.20.2 Бюджетне відшкодування',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id',
+    )
     line_20_3_vat = fields.Monetary(
         string='р.20.3 Залишок (р.20 − 20.1 − 20.2)',
         compute='_compute_totals',
@@ -354,33 +460,40 @@ class L10nUaVatDeclaration(models.Model):
 
     @api.depends(
         'line_1_1_vat', 'line_1_2_vat', 'line_1_3_vat', 'line_7_1_vat',
+        'line_7_2_2_vat', 'line_7_2_3_vat',
+        'line_4_1_vat', 'line_4_1_1_vat', 'line_4_2_vat', 'line_4_2_1_vat', 'line_4_3_vat', 'line_4_3_1_vat', 'line_6_1_vat', 'line_6_2_vat', 'line_13_1_vat', 'line_13_2_vat',
         'line_10_1_vat', 'line_10_2_vat', 'line_10_3_vat',
         'line_11_1_vat', 'line_11_2_vat', 'line_11_3_vat',
         'line_14_vat', 'line_15_vat', 'line_16_1_vat', 'vat_limit_amount',
+        'line_20_1_vat', 'line_20_2_1_vat', 'line_20_2_2_vat',
     )
     def _compute_totals(self):
         for rec in self:
             # Section I — total liabilities (row 9)
             rec.line_9_vat = (
                 rec.line_1_1_vat + rec.line_1_2_vat + rec.line_1_3_vat + rec.line_7_1_vat
+                + rec.line_7_2_2_vat + rec.line_7_2_3_vat
+                + sum(rec[f] for f in ('line_4_1_vat', 'line_4_1_1_vat', 'line_4_2_vat', 'line_4_2_1_vat', 'line_4_3_vat', 'line_4_3_1_vat', 'line_6_1_vat', 'line_6_2_vat'))
             )
             # Section II — total credit (row 17 = 10.1..10.3 + 11.1..11.3 + 14 - 15 + 16)
             rec.line_17_vat = (
                 rec.line_10_1_vat + rec.line_10_2_vat + rec.line_10_3_vat
                 + rec.line_11_1_vat + rec.line_11_2_vat + rec.line_11_3_vat
+                + rec.line_13_1_vat + rec.line_13_2_vat
                 + rec.line_14_vat - rec.line_15_vat + rec.line_16_1_vat
             )
             # Section III — result
             diff = rec.line_9_vat - rec.line_17_vat
             rec.line_18_vat = max(diff, 0.0)
             rec.line_19_vat = max(-diff, 0.0)
-            # 19.1 — перевищення над Σнакл, 20 — у межах. Без погашення боргу (20.1)
-            # і відшкодування (20.2): 20.3 = 20, а 21 = 19.1 + 20.3 = 19.
+            # 19.1 — перевищення над Σнакл, 20 — у межах; з рядка 20 — погашення
+            # боргу (20.1) і відшкодування (20.2), решта (20.3) разом з 19.1 → 21.
             limit = max(rec.vat_limit_amount or 0.0, 0.0)
             rec.line_19_1_vat = float_round(max(rec.line_19_vat - limit, 0.0),
                                             precision_digits=0)
             rec.line_20_vat = rec.line_19_vat - rec.line_19_1_vat
-            rec.line_20_3_vat = rec.line_20_vat
+            rec.line_20_2_vat = (rec.line_20_2_1_vat or 0.0) + (rec.line_20_2_2_vat or 0.0)
+            rec.line_20_3_vat = rec.line_20_vat - (rec.line_20_1_vat or 0.0) - rec.line_20_2_vat
             rec.line_21_vat = rec.line_19_1_vat + rec.line_20_3_vat
 
     # =====================================================
@@ -409,12 +522,49 @@ class L10nUaVatDeclaration(models.Model):
         def total(lines, field):
             return float_round(sum(lines.mapped(field)), precision_digits=0)
 
+        nonresident = '500000000000'
+
+        def special(line):
+            invoice = line.tax_invoice_id
+            return bool(invoice.vat_special_basis or invoice.original_invoice_id.vat_special_basis
+                        or invoice.vat_199_recalc)
+
+        # Послуги нерезидента (ПН з умовним ІПН) — рядки 6.x і, після реєстрації, 13.x.
+        issued_nr = issued.filtered(lambda l: l.partner_ipn == nonresident)
+        received_nr = received.filtered(lambda l: l.partner_ipn == nonresident)
+        issued = issued - issued_nr
+        received = received - received_nr
+        credit_nr = issued_nr.filtered(
+            lambda l: not l.tax_invoice_id or l.tax_invoice_id.state == 'registered')
+        credit_nr |= received_nr.filtered(
+            lambda l: not l.tax_invoice_id or l.tax_invoice_id not in issued_nr.tax_invoice_id)
+        # ПН/РК за п. 198.5 / 199.1 — рядки 4.x / 4.x.1.
+        issued_sp = issued.filtered(special)
+        issued = issued - issued_sp
+        sp_pn = issued_sp.filtered(lambda l: l.doc_type != 'rk')
+        sp_rk = issued_sp - sp_pn
+
         issued_pn = issued.filtered(lambda l: l.doc_type != 'rk')
         issued_rk = issued.filtered(lambda l: l.doc_type == 'rk')
         received_pn = received.filtered(lambda l: l.doc_type != 'rk')
         received_rk = received.filtered(lambda l: l.doc_type == 'rk')
         imported = received_pn.filtered(lambda l: l.tax_invoice_id.is_import)
         domestic = received_pn - imported
+        special_vals = {}
+        for n, rate in (('1', '20'), ('2', '7'), ('3', '14')):
+            special_vals.update({
+                f'line_4_{n}_base': total(sp_pn, f'base_{rate}'),
+                f'line_4_{n}_vat': total(sp_pn, f'vat_{rate}'),
+                f'line_4_{n}_1_base': total(sp_rk, f'base_{rate}'),
+                f'line_4_{n}_1_vat': total(sp_rk, f'vat_{rate}'),
+            })
+        for n, rate in (('1', '20'), ('2', '7')):
+            special_vals.update({
+                f'line_6_{n}_base': total(issued_nr, f'base_{rate}'),
+                f'line_6_{n}_vat': total(issued_nr, f'vat_{rate}'),
+                f'line_13_{n}_base': total(credit_nr, f'base_{rate}'),
+                f'line_13_{n}_vat': total(credit_nr, f'vat_{rate}'),
+            })
 
         self.write({
             'line_1_1_base': total(issued_pn, 'base_20'),
@@ -442,6 +592,7 @@ class L10nUaVatDeclaration(models.Model):
             'line_11_3_vat': total(imported, 'vat_14'),
             'line_14_vat': total(received_rk, 'vat_amount'),
             'line_16_1_vat': self._previous_negative_value(),
+            **special_vals,
         })
         if not self.vat_limit_amount:
             limit = self.env['l10n_ua.vat.erpn.limit'].search([

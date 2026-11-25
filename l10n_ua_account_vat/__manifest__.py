@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Account VAT',
-    'version': '20.0.6.1.0',
+    'version': '20.0.7.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian VAT: tax invoices, registers, declaration',
     'description': """
@@ -41,6 +41,11 @@ Requires l10n_ua_tax module.
         'views/l10n_ua_tax_invoice_views.xml',
         'views/l10n_ua_vat_register_views.xml',
         'views/l10n_ua_vat_declaration_views.xml',
+        'views/l10n_ua_vat_declaration_d5_views.xml',
+        'views/l10n_ua_vat_declaration_d6_views.xml',
+        'views/l10n_ua_vat_declaration_d4_views.xml',
+        'views/l10n_ua_vat_declaration_d3_views.xml',
+        'views/l10n_ua_vat_declaration_rare_views.xml',
         'views/l10n_ua_vat_erpn_limit_views.xml',
         'views/account_move_views.xml',
         'views/menu_views.xml',
