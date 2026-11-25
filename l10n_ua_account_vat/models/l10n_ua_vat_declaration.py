@@ -208,7 +208,20 @@ class L10nUaVatDeclaration(models.Model):
     line_5_1_base = fields.Monetary(
         string='р.5.1 У т.ч. звільнені',
         currency_field='currency_id',
-        help='З рядка 5 — операції, звільнені від оподаткування',
+        help='З рядка 5 — операції, звільнені від оподаткування, '
+             'з урахуванням коригування (р.5.1.1)',
+    )
+    # Row 5.1.1 — of row 5.1: adjustments of exempt supplies (issued РК)
+    line_5_1_1_base = fields.Monetary(
+        string='р.5.1.1 Коригування звільнених',
+        currency_field='currency_id',
+        help='З рядка 5.1 — коригування обсягів звільнених операцій за виданими '
+             'розрахунками коригування (+/-)',
+    )
+    include_not_object_5 = fields.Boolean(
+        string='«Не обʼєкт» у р.5',
+        help='Додати до рядка 5 базу рядків рахунків з податком виду «Не обʼєкт». '
+             'Типово вимкнено, поки немає рішення Р2 (#547).',
     )
     # Row 7.1 — adjustments of supplies and liabilities (issued adjustment calculations)
     line_7_1_base = fields.Monetary(
@@ -566,6 +579,10 @@ class L10nUaVatDeclaration(models.Model):
                 f'line_13_{n}_vat': total(credit_nr, f'vat_{rate}'),
             })
 
+        exempt = total(issued_pn, 'base_exempt')
+        exempt_rk = total(issued_rk, 'base_exempt')
+        not_object = (float_round(self._not_object_base(), precision_digits=0)
+                      if self.include_not_object_5 else 0.0)
         self.write({
             'line_1_1_base': total(issued_pn, 'base_20'),
             'line_1_1_vat': total(issued_pn, 'vat_20'),
@@ -574,9 +591,11 @@ class L10nUaVatDeclaration(models.Model):
             'line_1_3_base': total(issued_pn, 'base_14'),
             'line_1_3_vat': total(issued_pn, 'vat_14'),
             'line_2_base': total(issued_pn, 'base_0'),
-            'line_5_base': total(issued_pn, 'base_exempt'),
-            'line_5_1_base': total(issued_pn, 'base_exempt'),
-            'line_7_1_base': total(issued_rk, 'base_amount'),
+            'line_5_base': exempt + exempt_rk + not_object,
+            'line_5_1_base': exempt + exempt_rk,
+            'line_5_1_1_base': exempt_rk,
+            # РК до звільнених операцій — у р.5.1.1, не в р.7.1 (#560).
+            'line_7_1_base': total(issued_rk, 'base_amount') - exempt_rk,
             'line_7_1_vat': total(issued_rk, 'vat_amount'),
             'line_10_1_base': total(domestic, 'base_20'),
             'line_10_1_vat': total(domestic, 'vat_20'),
@@ -602,6 +621,29 @@ class L10nUaVatDeclaration(models.Model):
             if limit:
                 self.vat_limit_amount = float_round(limit.limit_amount, precision_digits=0)
         self._fill_d2_lines()
+
+    def _not_object_base(self):
+        """База рядків рахунків періоду з податком ПДВ виду «Не обʼєкт» (#560).
+
+        Такі рядки в ПН не потрапляють, тож беремо їх з проводок: продаж «+»,
+        повернення «−» (кредит мінус дебет), як для рядка 2.
+        """
+        self.ensure_one()
+        period = self.period_id
+        if not (period.date_start and period.date_end):
+            return 0.0
+        lines = self.env['account.move.line'].search([
+            ('company_id', '=', self.company_id.id),
+            ('parent_state', '=', 'posted'),
+            ('move_id.move_type', 'in', ('out_invoice', 'out_refund')),
+            ('date', '>=', period.date_start),
+            ('date', '<=', period.date_end),
+            ('display_type', '=', 'product'),
+            '|', ('tax_ids.l10n_ua_vat_kind', '=', 'not_object'),
+            ('tax_ids.children_tax_ids.l10n_ua_vat_kind', '=', 'not_object'),
+        ])
+        lines = lines.filtered(lambda l: l.move_id._l10n_ua_is_not_object(l.tax_ids))
+        return -sum(lines.mapped('balance'))
 
     def _previous_negative_value(self):
         """Рядок 21 декларації за попередній звітний період (→ рядок 16.1)."""
@@ -761,6 +803,7 @@ class L10nUaVatDeclaration(models.Model):
             ('3', 'Інші операції за нульовою ставкою', self.line_3_base, None),
             ('5', 'Не є об\'єктом / за межами України / звільнені', self.line_5_base, None),
             ('5.1', 'у т.ч. звільнені від оподаткування', self.line_5_1_base, None),
+            ('5.1.1', 'коригування звільнених операцій', self.line_5_1_1_base, None),
             ('7.1', 'Коригування обсягів постачання та податкових зобов\'язань', self.line_7_1_base, self.line_7_1_vat),
         ]
 

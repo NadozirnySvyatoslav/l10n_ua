@@ -107,3 +107,32 @@ class TestVatKind(AccountTestInvoicingCommon):
         Tax._l10n_ua_fill_vat_kind(company)
         self.assertEqual(stock_free.l10n_ua_vat_kind, 'exempt')
         self.assertEqual(stock_not.l10n_ua_vat_kind, 'zero', 'ручну правку не затираємо')
+
+    def test_tk2_not_object_row5_toggle(self):
+        """ТК2: «Не обʼєкт» у р.5 — лише з перемикачем, повернення з мінусом."""
+        self._tax_invoice([('не обʼєкт', 200.0, self.vat_not)])
+        refund = self.env['account.move'].create({
+            'move_type': 'out_refund', 'partner_id': self.customer.id,
+            'invoice_date': '2025-05-06', 'date': '2025-05-06',
+            'invoice_line_ids': [(0, 0, {'name': 'повернення', 'quantity': 1,
+                                         'price_unit': 50.0,
+                                         'tax_ids': [(6, 0, self.vat_not.ids)]})],
+        })
+        refund.action_post()
+        # Податкові періоди створює адміністратор, не бухгалтер тестової компанії.
+        period = self.env['l10n_ua.tax.period'].sudo().create({
+            'name': 'Травень 2025 (#560)', 'date_start': '2025-05-01',
+            'date_end': '2025-05-31', 'period_type': 'month', 'month': 5,
+            'year': 2025, 'quarter': 2, 'company_id': self.env.company.id,
+        })
+        decl = self.env['l10n_ua.vat.declaration'].sudo().create({
+            'period_id': period.id, 'company_id': self.env.company.id,
+        })
+        self.assertEqual(decl._not_object_base(), 150.0)
+        decl.action_calculate()
+        self.assertEqual(decl.line_5_base, 0, 'типово вимкнено (Р2 #547)')
+        decl.action_draft()
+        decl.include_not_object_5 = True
+        decl.action_calculate()
+        self.assertEqual(decl.line_5_base, 150)
+        self.assertEqual(decl.line_5_1_base, 0)
