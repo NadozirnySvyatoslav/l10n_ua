@@ -13,6 +13,8 @@ from unittest.mock import patch
 
 from odoo.tests import TransactionCase, tagged
 
+from .common_pn import set_pn_requisites
+
 _CONFIG = 'l10n_ua.tax.cabinet.config'
 _CONFIG_PATH = ('odoo.addons.l10n_ua_tax_cabinet.models.'
                 'l10n_ua_tax_cabinet_config.L10nUaTaxCabinetConfig')
@@ -28,12 +30,14 @@ class TestTaxInvoice(TransactionCase):
         cls.company = cls.env.company
         cls.partner = cls.env['res.partner'].create({
             'name': 'ТОВ Тестовий покупець',
+            'ipn': '987654321098',
         })
         # Enable VAT payer
         cls.company.write({
             'l10n_ua_is_vat_payer': True,
             'l10n_ua_vat_ipn': '123456789012',
         })
+        set_pn_requisites(cls.env, cls.company)
 
     def _create_tax_invoice(self, invoice_type='issued', **kwargs):
         """Helper to create a tax invoice with one line."""

@@ -39,6 +39,14 @@
                             <field name="vat_method"/>
                             <field name="registration_deadline"/>
                             <field name="is_import"/>
+                            <field name="non_payer_reason" invisible="invoice_type != 'issued'"/>
+                            <field name="contract_number" invisible="non_payer_reason != '07'"/>
+                            <field name="contract_date" invisible="non_payer_reason != '07'"/>
+                            <field name="customs_number" invisible="non_payer_reason != '07'"
+                                   placeholder="26UA500020000123U4"/>
+                            <field name="customs_date" invisible="non_payer_reason != '07'"/>
+                            <field name="signer_name" invisible="invoice_type != 'issued'"/>
+                            <field name="signer_rnokpp" invisible="invoice_type != 'issued'"/>
                         </group>
                         <group>
                             <field name="partner_id"/>
