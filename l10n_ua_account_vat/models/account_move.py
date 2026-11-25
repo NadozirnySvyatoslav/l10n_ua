@@ -559,6 +559,13 @@ class AccountMove(models.Model):
         else:
             raise UserError(_('ПН можна створити тільки для рахунків.'))
 
+        # Без рядків-об'єктів ПДВ (#560) ПН не складається. Перевіряємо до
+        # номера: інакше порожня ПН спалила б номер і потрапила б у реєстр.
+        if not self._l10n_ua_tax_invoice_source_lines():
+            raise UserError(_(
+                'Операції документа %(move)s не є об\'єктом ПДВ, тому '
+                'податкова накладна не складається.', move=self.name))
+
         if self._l10n_ua_tax_invoice_rule() == 'cash':
             return self._l10n_ua_tax_invoices_action(
                 self._l10n_ua_create_cash_tax_invoices())

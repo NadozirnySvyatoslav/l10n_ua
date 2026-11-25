@@ -1,5 +1,6 @@
 """#560: вид ставки ПДВ на податку відрізняє 0 % експорту, звільнення
 та операції, що не є обʼєктом ПДВ."""
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
@@ -28,9 +29,9 @@ class TestVatKind(AccountTestInvoicingCommon):
         cls.vat_not = tax('0% NS (#560)', 0.0, 'not_object')
         cls.vat_0_empty = tax('0% без виду (#560)', 0.0)
 
-    def _tax_invoice(self, lines):
+    def _move(self, lines, partner=None):
         move = self.env['account.move'].create({
-            'move_type': 'out_invoice', 'partner_id': self.customer.id,
+            'move_type': 'out_invoice', 'partner_id': (partner or self.customer).id,
             'invoice_date': '2025-05-05', 'date': '2025-05-05',
             'invoice_line_ids': [
                 (0, 0, {'name': name, 'quantity': 1, 'price_unit': price,
@@ -38,6 +39,10 @@ class TestVatKind(AccountTestInvoicingCommon):
                 for name, price, tax in lines],
         })
         move.action_post()
+        return move
+
+    def _tax_invoice(self, lines):
+        move = self._move(lines)
         move.action_create_tax_invoice()
         return self.env['l10n_ua.tax.invoice'].search([('move_id', '=', move.id)])
 
@@ -110,7 +115,7 @@ class TestVatKind(AccountTestInvoicingCommon):
 
     def test_tk2_not_object_row5_toggle(self):
         """ТК2: «Не обʼєкт» у р.5 — лише з перемикачем, повернення з мінусом."""
-        self._tax_invoice([('не обʼєкт', 200.0, self.vat_not)])
+        self._move([('не обʼєкт', 200.0, self.vat_not)])
         refund = self.env['account.move'].create({
             'move_type': 'out_refund', 'partner_id': self.customer.id,
             'invoice_date': '2025-05-06', 'date': '2025-05-06',
@@ -136,3 +141,29 @@ class TestVatKind(AccountTestInvoicingCommon):
         decl.action_calculate()
         self.assertEqual(decl.line_5_base, 150)
         self.assertEqual(decl.line_5_1_base, 0)
+
+    def _assert_no_pn_for_not_object(self, move):
+        seq = self.env['ir.sequence'].search(
+            [('code', '=', 'l10n_ua.tax.invoice.issued')], limit=1)
+        next_before = seq.number_next_actual
+        with self.assertRaises(UserError):
+            move.action_create_tax_invoice()
+        self.assertFalse(self.env['l10n_ua.tax.invoice'].search(
+            [('move_id', '=', move.id)]), 'порожньої ПН немає')
+        self.assertEqual(seq.number_next_actual, next_before, 'номер не спалено')
+
+    def test_only_not_object_refuses_pn(self):
+        """Рахунок лише з «Не обʼєкт» — ПН не складається, номер не спалено."""
+        move = self._move([('не обʼєкт', 200.0, self.vat_not)])
+        self._assert_no_pn_for_not_object(move)
+
+    def test_only_not_object_refuses_pn_cash(self):
+        """Те саме за касовим методом, навіть коли оплата вже є."""
+        partner = self.env['res.partner'].create({'name': 'Касовий #560'})
+        partner.with_company(self.env.company).l10n_ua_vat_cash_method = True
+        move = self._move([('не обʼєкт', 200.0, self.vat_not)], partner=partner)
+        self.env['account.payment.register'].with_context(
+            active_model='account.move', active_ids=move.ids,
+        ).create({'payment_date': '2025-05-06'})._create_payments()
+        self.assertEqual(move._l10n_ua_tax_invoice_rule(), 'cash')
+        self._assert_no_pn_for_not_object(move)
