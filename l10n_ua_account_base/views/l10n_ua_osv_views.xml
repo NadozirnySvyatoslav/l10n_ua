@@ -10,6 +10,7 @@
                     <button name="action_compute" string="Compute" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_confirm" string="Confirm" type="object" class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_draft" string="Set to Draft" type="object" invisible="state != 'confirmed'"/>
+                    <button name="action_open_lines" string="Lines List / Export" type="object" invisible="not summary_line_ids"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -20,6 +21,8 @@
                                    invisible="osv_type != 'subconto'"
                                    required="osv_type == 'subconto'"/>
                             <field name="account_id"/>
+                            <field name="expand_partners" invisible="osv_type != 'synthetic'"/>
+                            <field name="expand_products" invisible="osv_type != 'synthetic'"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                         <group>
@@ -29,7 +32,7 @@
                     </group>
                     <notebook>
                         <page string="Lines" name="lines">
-                            <field name="line_ids">
+                            <field name="summary_line_ids">
                                 <list>
                                     <field name="currency_id" column_invisible="True"/>
                                     <field name="account_id"/>
@@ -39,6 +42,27 @@
                                     <field name="opening_credit" sum="Total"/>
                                     <field name="turnover_debit" sum="Total"/>
                                     <field name="turnover_credit" sum="Total"/>
+                                    <field name="closing_debit" sum="Total"/>
+                                    <field name="closing_credit" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Breakdown" name="partner_breakdown"
+                              invisible="not (expand_partners or expand_products) or osv_type != 'synthetic'">
+                            <field name="detail_line_ids">
+                                <list>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="account_id"/>
+                                    <field name="partner_id" column_invisible="not parent.expand_partners"/>
+                                    <field name="product_id" column_invisible="not parent.expand_products"/>
+                                    <field name="opening_qty" column_invisible="not parent.expand_products"/>
+                                    <field name="opening_debit" sum="Total"/>
+                                    <field name="opening_credit" sum="Total"/>
+                                    <field name="turnover_qty_in" column_invisible="not parent.expand_products"/>
+                                    <field name="turnover_debit" sum="Total"/>
+                                    <field name="turnover_qty_out" column_invisible="not parent.expand_products"/>
+                                    <field name="turnover_credit" sum="Total"/>
+                                    <field name="closing_qty" column_invisible="not parent.expand_products"/>
                                     <field name="closing_debit" sum="Total"/>
                                     <field name="closing_credit" sum="Total"/>
                                 </list>
@@ -60,6 +84,35 @@
                 <field name="period_start"/>
                 <field name="period_end"/>
                 <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Рядки ОСВ окремим списком (кнопка «Lines List / Export»): рахунок,
+         під ним — розгортка по контрагентах курсивом. Без підсумків: рядок
+         рахунку і його розгортка дали б подвійну суму. -->
+    <record id="l10n_ua_osv_line_view_list" model="ir.ui.view">
+        <field name="name">l10n_ua.osv.line.list</field>
+        <field name="model">l10n_ua.osv.line</field>
+        <field name="arch" type="xml">
+            <list string="Trial Balance Lines" create="false" edit="false" delete="false"
+                  decoration-it="is_detail" decoration-bf="not is_detail">
+                <field name="currency_id" column_invisible="True"/>
+                <field name="is_detail" column_invisible="True"/>
+                <field name="account_id"/>
+                <field name="partner_id"/>
+                <field name="product_id" optional="show"/>
+                <field name="subconto_label" optional="hide"/>
+                <field name="opening_qty" optional="show"/>
+                <field name="opening_debit"/>
+                <field name="opening_credit"/>
+                <field name="turnover_qty_in" optional="show"/>
+                <field name="turnover_debit"/>
+                <field name="turnover_qty_out" optional="show"/>
+                <field name="turnover_credit"/>
+                <field name="closing_qty" optional="show"/>
+                <field name="closing_debit"/>
+                <field name="closing_credit"/>
             </list>
         </field>
     </record>
