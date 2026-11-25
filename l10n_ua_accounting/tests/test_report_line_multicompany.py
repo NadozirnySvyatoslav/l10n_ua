@@ -1,6 +1,6 @@
 """Рядки фінзвітів не видно користувачу іншої компанії (#679).
 
-Заголовки Ф1–Ф4 і спрощеної фінзвітності вже мали правило компанії,
+Заголовки Ф1–Ф5 і спрощеної фінзвітності вже мали правило компанії,
 а моделі рядків — ні: користувач компанії Б через search/read бачив
 суми рядків звітів компанії А.
 """
@@ -19,6 +19,7 @@ LINE_MODELS = {
     'l10n_ua.equity.report': {'date_from': date(2046, 1, 1), 'date_to': date(2046, 12, 31)},
     'l10n_ua.small.report': {
         'kind': 'small', 'date_from': date(2046, 1, 1), 'date_to': date(2046, 12, 31)},
+    'l10n_ua.notes.report': {'date_from': date(2046, 1, 1), 'date_to': date(2046, 12, 31)},
 }
 
 
@@ -92,7 +93,7 @@ class TestReportLineMultiCompany(AccountingTestCase):
 
     def test_rules_exist(self):
         """На кожну модель рядків є обмежувальне правило компанії."""
-        for short in ('balance', 'pnl', 'cashflow', 'equity', 'small'):
+        for short in ('balance', 'pnl', 'cashflow', 'equity', 'small', 'notes'):
             xmlid = 'l10n_ua_accounting.l10n_ua_%s_report_line_company_rule' % short
             with self.subTest(xmlid=xmlid):
                 self.assertEqual(self.env.ref(xmlid).kind, 'restriction')
