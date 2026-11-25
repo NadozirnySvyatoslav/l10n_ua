@@ -12,7 +12,7 @@
             <field name="name">Departments</field>
             <field name="code">DEPARTMENT</field>
             <field name="sequence">50</field>
-            <field name="model_id" ref="hr.model_hr_department"/>
+            <field name="model_name">hr.department</field>
             <field name="field_name">complete_name</field>
             <field name="description">HR departments (Підрозділи)</field>
         </record>

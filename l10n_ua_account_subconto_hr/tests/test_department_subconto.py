@@ -39,6 +39,12 @@ class TestDepartmentSubconto(TransactionCase):
             'l10n_ua_account_subconto_hr.subconto_type_department')
         self.assertEqual(subconto_type.model_name, 'hr.department')
 
+    def test_selection_extended_by_bridge(self):
+        """#701: the bridge extends _selection_subconto_models, not replaces it."""
+        models = dict(self.env['l10n_ua.subconto.type']._selection_subconto_models())
+        self.assertIn('hr.department', models)
+        self.assertIn('res.partner', models)
+
     def test_quick_fields_map_includes_department(self):
         """The base map is extended, not replaced."""
         mapping = self.env['account.move.line']._subconto_quick_fields_map()
