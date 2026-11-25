@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_edo_sync" model="ir.cron">
+        <field name="name">EDO: synchronise statuses and incoming documents</field>
+        <field name="model_id" ref="model_l10n_ua_edo_account"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

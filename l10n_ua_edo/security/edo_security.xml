@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Odoo 20: global ir.rule → ir.access without group (restriction). -->
+    <record id="edo_account_company_rule" model="ir.access">
+        <field name="name">EDO account: multi-company</field>
+        <field name="model_id" ref="model_l10n_ua_edo_account"/>
+        <field name="operation">crud</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="edo_document_company_rule" model="ir.access">
+        <field name="name">EDO document: multi-company</field>
+        <field name="model_id" ref="model_l10n_ua_edo_document"/>
+        <field name="operation">crud</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="edo_category_company_rule" model="ir.access">
+        <field name="name">EDO category: multi-company</field>
+        <field name="model_id" ref="model_l10n_ua_edo_category"/>
+        <field name="operation">crud</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="edo_category_rule_company_rule" model="ir.access">
+        <field name="name">EDO category of a report: multi-company</field>
+        <field name="model_id" ref="model_l10n_ua_edo_category_rule"/>
+        <field name="operation">crud</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
