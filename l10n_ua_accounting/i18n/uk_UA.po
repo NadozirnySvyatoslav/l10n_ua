@@ -6641,3 +6641,141 @@ msgid ""
 msgstr ""
 "Звіт про власний капітал (Форма № 4) розраховується за рахунками власного "
 "капіталу 40–46."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "<strong>The balance does not balance:</strong> row 1300 − row 1900 ="
+msgstr "<strong>Баланс не сходиться:</strong> рядок 1300 − рядок 1900 ="
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "Amounts in thousands of hryvnias with one decimal."
+msgstr "Суми в тисячах гривень з одним десятковим знаком."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report__balance_difference
+msgid "Assets − Liabilities (thous. UAH)"
+msgstr "Актив − пасив (тис. грн)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "At the end of the period"
+msgstr "На кінець звітного періоду"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "At the start of the year"
+msgstr "На початок звітного року"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "Balance (1-m / 1-ms)"
+msgstr "Баланс (1-м / 1-мс)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report__balance_line_ids
+msgid "Balance Lines"
+msgstr "Рядки балансу"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_small_report
+msgid "Create the statements of a small or micro enterprise"
+msgstr "Створіть фінзвітність малого або мікропідприємства"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "For the period"
+msgstr "За звітний період"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report_line__amount_g3
+msgid "Graph 3"
+msgstr "Графа 3"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report_line__amount_g4
+msgid "Graph 4"
+msgstr "Графа 4"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_small_report_line__part__pnl
+msgid "Income Statement"
+msgstr "Звіт про фінансові результати"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "Income Statement (2-m / 2-ms)"
+msgstr "Звіт про фінансові результати (2-м / 2-мс)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report__pnl_line_ids
+msgid "Income Statement Lines"
+msgstr "Рядки звіту про фінансові результати"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report__kind
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report_line__kind
+msgid "Kind"
+msgstr "Вид"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_small_report__kind__micro
+msgid "Micro Enterprise (1-ms, 2-ms)"
+msgstr "Мікропідприємство (1-мс, 2-мс)"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_small_report.py:0
+msgid ""
+"Only row 2310 is entered by hand; the other rows come from the ledger. "
+"Recalculate the report instead."
+msgstr ""
+"Вручну вводиться лише рядок 2310; решта рядків береться з обліку. "
+"Перерахуйте звіт."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_small_report_line__part
+msgid "Part"
+msgstr "Частина"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_small_report__balance_difference
+msgid ""
+"Row 1300 minus row 1900 at the end of the period. Not zero when the ledger "
+"does not balance or a row of Form 1 has accounts without a row."
+msgstr ""
+"Рядок 1300 мінус рядок 1900 на кінець періоду до округлення. Не нуль, коли "
+"облік не збалансований або в Ф1 є рахунки без рядка."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "Same period of the previous year"
+msgstr "За аналогічний період попереднього року"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_small_report
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_small
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_list
+msgid "Simplified Financial Statements"
+msgstr "Спрощена фінансова звітність"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_small_report_line
+msgid "Simplified Financial Statements Line"
+msgstr "Рядок спрощеної фінансової звітності"
+
+#. module: l10n_ua_accounting
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_small
+msgid "Simplified Statements (Small / Micro)"
+msgstr "Спрощена фінзвітність (мале / мікро)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_small_report__kind__small
+msgid "Small Enterprise (1-m, 2-m)"
+msgstr "Мале підприємство (1-м, 2-м)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
+msgid "thous. UAH."
+msgstr "тис. грн."
