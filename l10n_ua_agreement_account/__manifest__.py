@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Agreements Accounting (Взаєморозрахунки за договорами)',
-    'version': '20.0.1.0.0',
+    'version': '20.0.2.0.0',
     'category': 'Accounting/Localization',
     'summary': 'Взаєморозрахунки у розрізі договорів: договір у рахунках, '
                'платежах та акті звірки',
@@ -18,7 +18,9 @@ Ukraine Agreements Accounting
 * Автоматичне проставлення договору на платежі при реєстрації оплати рахунків
   одного договору;
 * Фільтр та групування взаєморозрахунків за договором;
-* Акт звірки за конкретним договором (розширення майстра акту звірки).
+* Акт звірки за конкретним договором (розширення майстра акту звірки);
+* Договір у взаємозаліку: відбір документів за договором, договір на
+  проводці заліку та в друкованому акті.
 
 Міст між ``l10n_ua_agreement`` та ``l10n_ua_accounting``.
     """,
@@ -33,6 +35,7 @@ Ukraine Agreements Accounting
         'views/account_move_views.xml',
         'views/account_payment_views.xml',
         'wizard/reconciliation_act_wizard_views.xml',
+        'views/debt_netting_views.xml',
     ],
     'installable': True,
     'application': False,

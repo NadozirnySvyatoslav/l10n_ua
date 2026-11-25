@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Odoo 20: global ir.rule → ir.access without group (restriction). -->
+    <record id="l10n_ua_agreement_rule_company" model="ir.access">
+        <field name="name">Agreements: multi-company</field>
+        <field name="model_id" ref="model_l10n_ua_agreement"/>
+        <field name="operation">crud</field>
+        <field name="domain">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

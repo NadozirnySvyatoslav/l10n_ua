@@ -1,3 +1,4 @@
+from . import agreement_type
 from . import agreement
-from . import sign_oca_request
-from . import contract_contract
+from . import sale_order
+from . import res_partner

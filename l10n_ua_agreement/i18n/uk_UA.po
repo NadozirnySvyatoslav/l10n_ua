@@ -1,18 +1,13 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# * l10n_ua_agreement
+# 	* l10n_ua_agreement
 #
-# Меню OCA-модуля `contract` українською. Джерельні рядки не чіпаємо
-# (на відміну від `views/agreement_i18n.xml`, де перейменовано самі записи):
-# англійські назви там доречні, бракує тільки перекладу. Значень uk_UA у цих
-# записів немає, тож звичайний імпорт їх проставляє — прапорець
-# i18n-overwrite не потрібен.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0\n"
+"Project-Id-Version: Odoo Server 19.0-20260103\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-24 10:00+0000\n"
-"PO-Revision-Date: 2026-08-24 10:00+0000\n"
+"POT-Creation-Date: 2026-10-17 16:49+0000\n"
+"PO-Revision-Date: 2026-10-17 16:49+0000\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -22,47 +17,919 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.contract_tag_menu
-msgid "Contract Tag"
-msgstr "Мітки договорів"
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "%(number)s of %(date)s"
+msgstr "%(number)s від %(date)s"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.contract_template_menu
-msgid "Contract Templates"
-msgstr "Шаблони договорів"
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "%s (copy)"
+msgstr "%s (копія)"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.menu_config_contract
-#: model:ir.ui.menu,name:contract.menu_contract_reporting
-msgid "Contracts"
+#: model:ir.actions.report,print_report_name:l10n_ua_agreement.action_report_agreement_act
+msgid "'%s-act.pdf' % (object.code or 'agreement')"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model:ir.actions.report,print_report_name:l10n_ua_agreement.action_report_agreement
+msgid "'%s.pdf' % (object.code or 'agreement')"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "(«Виконавець») та"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid ""
+"(«Замовник») склали цей Акт про те,\n"
+"                        що Виконавцем надано, а Замовником прийнято такі послуги:"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "(підпис)"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid ""
+", надалі «Виконавець», з однієї\n"
+"                        сторони, та"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid ""
+", надалі «Замовник», з іншої\n"
+"                        сторони, уклали цей"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "1. Предмет договору"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "2. Вартість послуг"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "3. Строк дії договору"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "4. Реквізити та підписи сторін"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "<strong>ВИКОНАВЕЦЬ</strong>"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "<strong>ЗАМОВНИК</strong>"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "<strong>Усього:</strong>"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_needaction
+msgid "Action Needed"
+msgstr "Потрібна дія"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__active
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__active
+msgid "Active"
+msgstr "Активний"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_ids
+msgid "Activities"
+msgstr "Дії"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Оформлення виключення дії"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_state
+msgid "Activity State"
+msgstr "Стан дії"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Іконка типу дії"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Add Amendment"
+msgstr "Додати додаткову угоду"
+
+#. module: l10n_ua_agreement
+#: model:ir.actions.report,name:l10n_ua_agreement.action_report_agreement
+#: model:ir.model,name:l10n_ua_agreement.model_l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_sale_order__l10n_ua_agreement_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Agreement"
+msgstr "Договір"
+
+#. module: l10n_ua_agreement
+#: model:ir.actions.act_window,name:l10n_ua_agreement.l10n_ua_agreement_action_report
+#: model:ir.ui.menu,name:l10n_ua_agreement.menu_l10n_ua_agreement_report
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_graph
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_pivot
+msgid "Agreement Analysis"
+msgstr "Аналіз договорів"
+
+#. module: l10n_ua_agreement
+#: model:ir.model,name:l10n_ua_agreement.model_l10n_ua_agreement_type
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_type_view_form
+msgid "Agreement Type"
+msgstr "Тип договору"
+
+#. module: l10n_ua_agreement
+#: model:ir.actions.act_window,name:l10n_ua_agreement.l10n_ua_agreement_type_action
+#: model:ir.ui.menu,name:l10n_ua_agreement.menu_l10n_ua_agreement_type
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_type_view_list
+msgid "Agreement Types"
+msgstr "Типи договорів"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Agreement title"
+msgstr "Назва договору"
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/res_partner.py:0
+#: model:ir.actions.act_window,name:l10n_ua_agreement.l10n_ua_agreement_action
+#: model:ir.ui.menu,name:l10n_ua_agreement.menu_l10n_ua_agreement
+#: model:ir.ui.menu,name:l10n_ua_agreement.menu_l10n_ua_agreement_root
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_list
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.view_partner_form_l10n_ua_agreement
+msgid "Agreements"
 msgstr "Договори"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.menu_customer_contract_line_report
-msgid "Customer Contract lines"
-msgstr "Рядки договорів з клієнтами"
+#: model:ir.actions.server,name:l10n_ua_agreement.ir_cron_agreement_expire_ir_actions_server
+msgid "Agreements: mark expired"
+msgstr "Договори: позначити завершені"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.menu_contract_contract_customer
-msgid "Customer Contracts"
-msgstr "Договори з клієнтами"
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "Amendment"
+msgstr "Додаткова угода"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.purchase_contract_manually_create_invoice_menu
-msgid "Manually Invoice Purchase Contracts"
-msgstr "Рахунки за договорами закупівлі (вручну)"
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__amendment_count
+msgid "Amendment Count"
+msgstr "Кількість додаткових угод"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.sale_contract_manually_create_invoice_menu
-msgid "Manually Invoice Sale Contracts"
-msgstr "Рахунки за договорами продажу (вручну)"
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Amendment to"
+msgstr "Додаткова угода до"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.menu_supplier_contract_line_report
-msgid "Supplier Contract lines"
-msgstr "Рядки договорів з постачальниками"
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__amendment_ids
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Amendments"
+msgstr "Додаткові угоди"
 
 #. module: l10n_ua_agreement
-#: model:ir.ui.menu,name:contract.menu_contract_contract_supplier
-msgid "Supplier Contracts"
-msgstr "Договори з постачальниками"
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__amount_total
+msgid "Amount"
+msgstr "Сума"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_type_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Archived"
+msgstr "Архівні"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_attachment_count
+msgid "Attachment Count"
+msgstr "Кількість вкладень"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__state__cancelled
+msgid "Cancelled"
+msgstr "Скасований"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__commercial_partner_id
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_sale_order__l10n_ua_commercial_partner_id
+msgid "Commercial Partner"
+msgstr "Комерційний партнер"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__company_id
+msgid "Company"
+msgstr "Компанія"
+
+#. module: l10n_ua_agreement
+#: model:ir.ui.menu,name:l10n_ua_agreement.menu_l10n_ua_agreement_config
+msgid "Configuration"
+msgstr "Налаштування"
+
+#. module: l10n_ua_agreement
+#: model:ir.model,name:l10n_ua_agreement.model_res_partner
+msgid "Contact"
+msgstr "Контакт"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.actions.act_window,help:l10n_ua_agreement.l10n_ua_agreement_action
+msgid "Create the first agreement"
+msgstr "Створіть перший договір"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__create_uid
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__create_uid
+msgid "Created by"
+msgstr "Створив"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__create_date
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__create_date
+msgid "Created on"
+msgstr "Створено"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__currency_id
+msgid "Currency"
+msgstr "Валюта"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__direction
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__direction
+msgid "Direction"
+msgstr "Сторона договору"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__display_name
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__display_name
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_res_partner__display_name
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_sale_order__display_name
+msgid "Display Name"
+msgstr "Назва для відображення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__state__draft
+msgid "Draft"
+msgstr "Чернетка"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.actions.act_window,help:l10n_ua_agreement.l10n_ua_agreement_action
+msgid ""
+"Draft it, sign it with КЕП and link sales orders, invoices and payments to "
+"it."
+msgstr "Складіть договір, підпишіть його КЕП і пов'яжіть із ним замовлення, рахунки та платежі."
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Drafts"
+msgstr "Чернетки"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__end_date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "End Date"
+msgstr "Дата завершення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__state__expired
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Expired"
+msgstr "Завершений"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_follower_ids
+msgid "Followers"
+msgstr "Підписники"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Підписники (партнери)"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Іконка Font Awesome, напр. fa-tasks"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__has_message
+msgid "Has Message"
+msgstr "Є повідомлення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__id
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__id
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_res_partner__id
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_sale_order__id
+msgid "ID"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_exception_icon
+msgid "Icon"
+msgstr "Іконка"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Іконка для позначення виключення дії."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Якщо позначено, нові повідомлення потребують вашої уваги."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__message_has_error
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Якщо позначено, деякі повідомлення мають помилку доставки."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__note
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Internal Note"
+msgstr "Внутрішня примітка"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__is_amendment
+msgid "Is Amendment"
+msgstr "Додаткова угода"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_is_follower
+msgid "Is Follower"
+msgstr "Підписник"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__kep_signature_filename
+msgid "Kep Signature Filename"
+msgstr "Ім'я файлу підпису КЕП"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_res_partner__l10n_ua_agreement_count
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_res_users__l10n_ua_agreement_count
+msgid "L10N Ua Agreement Count"
+msgstr "Кількість договорів"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__write_uid
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__write_uid
+msgid "Last Updated by"
+msgstr "Останнє оновлення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__write_date
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__write_date
+msgid "Last Updated on"
+msgstr "Останнє оновлення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__end_date
+msgid ""
+"Leave empty for an agreement valid until the obligations are fulfilled."
+msgstr "Залиште порожнім для договору, що діє до повного виконання зобов'язань."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__parent_id
+msgid "Main Agreement"
+msgstr "Основний договір"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Main Agreements"
+msgstr "Основні договори"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Mark as Signed"
+msgstr "Позначити підписаним"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_has_error
+msgid "Message Delivery error"
+msgstr "Помилка доставки повідомлення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_ids
+msgid "Messages"
+msgstr "Повідомлення"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Дедлайн моєї дії"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "My Agreements"
+msgstr "Мої договори"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__name
+msgid "Name"
+msgstr "Назва"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Дедлайн наступної дії"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_summary
+msgid "Next Activity Summary"
+msgstr "Підсумок наступної дії"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_type_id
+msgid "Next Activity Type"
+msgstr "Тип наступної дії"
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "No signature was received for the agreement."
+msgstr "Підпис договору не отримано."
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "No. %s"
+msgstr "№ %s"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Not printed on the agreement."
+msgstr "Не друкується в договорі."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__code
+msgid "Number"
+msgstr "Номер"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Кількість дій"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_has_error_counter
+msgid "Number of errors"
+msgstr "Кількість помилок"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Кількість повідомлень, що потребують дії"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Кількість повідомлень з помилкою доставки"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Number or Title"
+msgstr "Номер або назва"
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "Only a draft agreement or one to sign can be signed."
+msgstr "Підписати можна лише чернетку договору або договір на підписанні."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__kep_signature
+msgid "Our КЕП Signature"
+msgstr "Наш підпис КЕП"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Our КЕП signature"
+msgstr "Наш підпис КЕП"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__partner_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Partner"
+msgstr "Контрагент"
+
+#. module: l10n_ua_agreement
+#: model:l10n_ua.agreement.type,name:l10n_ua_agreement.agreement_type_purchase
+msgid "Purchase"
+msgstr "Закупівля"
+
+#. module: l10n_ua_agreement
+#: model:ir.ui.menu,name:l10n_ua_agreement.menu_l10n_ua_agreement_reporting
+msgid "Reporting"
+msgstr "Звітність"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__user_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Responsible"
+msgstr "Відповідальний"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__activity_user_id
+msgid "Responsible User"
+msgstr "Відповідальний користувач"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Помилка доставки SMS"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__sale_order_count
+msgid "Sale Order Count"
+msgstr "Кількість замовлень"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Sales"
+msgstr "Продажі"
+
+#. module: l10n_ua_agreement
+#: model:ir.model,name:l10n_ua_agreement.model_sale_order
+msgid "Sales Order"
+msgstr "Замовлення на продаж"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__sale_order_ids
+msgid "Sales Orders"
+msgstr "Замовлення на продаж"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__sequence
+msgid "Sequence"
+msgstr "Послідовність"
+
+#. module: l10n_ua_agreement
+#: model:ir.actions.report,name:l10n_ua_agreement.action_report_agreement_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Service Act"
+msgstr "Акт наданих послуг"
+
+#. module: l10n_ua_agreement
+#: model:l10n_ua.agreement.type,name:l10n_ua_agreement.agreement_type_services
+msgid "Services"
+msgstr "Послуги"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__parent_id
+msgid "Set on amendments: the agreement they amend."
+msgstr "Заповнюється для додаткових угод — основний договір."
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Set to Draft"
+msgstr "В чернетку"
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "Sign the agreement"
+msgstr "Підписати договір"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Sign with КЕП"
+msgstr "Підписати КЕП"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__signature_date
+msgid "Signature Date"
+msgstr "Дата підпису"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Signatures"
+msgstr "Підписи"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__state__signed
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Signed"
+msgstr "Підписаний"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__signed_document
+msgid "Signed Document"
+msgstr "Підписаний документ"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__signed_filename
+msgid "Signed Filename"
+msgstr "Ім'я файлу підписаного документа"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__kep_signed_by_id
+msgid "Signed by"
+msgstr "Підписав"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Signed by both parties"
+msgstr "Підписаний обома сторонами"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__kep_signed_on
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Signed on"
+msgstr "Підписано"
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "Signed with КЕП by %s."
+msgstr "Підписано КЕП: %s."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__start_date
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Start Date"
+msgstr "Дата початку"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__state
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Status"
+msgstr "Стан"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr "Стан на основі дій\nПрострочено: термін уже минув\nСьогодні: дата дії сьогодні\nЗаплановано: майбутні дії."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__subject
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "Subject"
+msgstr "Предмет договору"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement_type__subject_template
+msgid "Subject Template"
+msgstr "Шаблон предмета договору"
+
+#. module: l10n_ua_agreement
+#: model:l10n_ua.agreement.type,name:l10n_ua_agreement.agreement_type_support
+msgid "Subscription Service"
+msgstr "Абонентське обслуговування"
+
+#. module: l10n_ua_agreement
+#: model:l10n_ua.agreement.type,name:l10n_ua_agreement.agreement_type_supply
+msgid "Supply of Goods"
+msgstr "Поставка товарів"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__code
+msgid "Taken from the agreement sequence when left as \"/\"."
+msgstr "Береться з нумерації договорів, якщо залишити «/»."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement_type__subject_template
+msgid ""
+"Text put into the subject of a new agreement of this type; edit it in the "
+"agreement as needed."
+msgstr "Текст, яким починається предмет нового договору цього типу; за потреби змініть його в договорі."
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "The agreement is signed with КЕП."
+msgstr "Договір підписано КЕП."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__signed_document
+msgid "The agreement signed by both parties: a scan or a signed file."
+msgstr "Договір, підписаний обома сторонами: скан або підписаний файл."
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+msgid "The subject of the agreement: services, goods, terms…"
+msgstr "Предмет договору: послуги, товари, умови…"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_type_view_form
+msgid "The subject text new agreements of this type start with."
+msgstr "Текст, яким починається предмет нових договорів цього типу."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.constraint,message:l10n_ua_agreement.constraint_l10n_ua_agreement_code_uniq
+msgid "This agreement number already exists for this partner."
+msgstr "Договір із таким номером у цього контрагента вже є."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__name
+msgid "Title"
+msgstr "Назва"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__state__to_sign
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_form
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "To Sign"
+msgstr "На підписанні"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_list
+msgid "Total"
+msgstr "Разом"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__agreement_type_id
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "Type"
+msgstr "Тип"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Тип виключення дії в записі."
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,field_description:l10n_ua_agreement.field_l10n_ua_agreement__website_message_ids
+msgid "Website Messages"
+msgstr "Повідомлення з сайту"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields,help:l10n_ua_agreement.field_l10n_ua_agreement__website_message_ids
+msgid "Website communication history"
+msgstr "Історія спілкування на сайті"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "With Customers"
+msgstr "З покупцями"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.l10n_ua_agreement_view_search
+msgid "With Vendors"
+msgstr "З постачальниками"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__direction__sale
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement_type__direction__sale
+msgid "With a Customer"
+msgstr "З покупцем"
+
+#. module: l10n_ua_agreement
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement__direction__purchase
+#: model:ir.model.fields.selection,name:l10n_ua_agreement.selection__l10n_ua_agreement_type__direction__purchase
+msgid "With a Vendor"
+msgstr "З постачальником"
+
+#. module: l10n_ua_agreement
+#: model:l10n_ua.agreement.type,name:l10n_ua_agreement.agreement_type_contract
+msgid "Work Contract"
+msgstr "Підряд"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "_______________________"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/res_partner.py:0
+msgid "commercial_partner_id"
+msgstr "Комерційний партнер"
+
+#. module: l10n_ua_agreement
+#. odoo-python
+#: code:addons/l10n_ua_agreement/models/agreement.py:0
+msgid "parent_id"
+msgstr "Основний договір"
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "ЄДРПОУ/ІПН:"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "Акт наданих послуг"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid ""
+"Виконавець зобов'язується надати Замовнику послуги, а Замовник —\n"
+"                        прийняти та оплатити їх на умовах цього Договору."
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "Договір"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "Договір (додаткову угоду)"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "Договір набирає чинності з"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "Додаткова угода"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "Загальна вартість послуг за цим Договором становить"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "Найменування послуг"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid ""
+"Послуги надано в повному обсязі та з належною якістю.\n"
+"                        Сторони претензій одна до одної не мають."
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "Сума"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "від"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_act
+msgid "до Договору"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "до Договору №"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "про наступне:"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "і діє до"
+msgstr ""
+
+#. module: l10n_ua_agreement
+#: model_terms:ir.ui.view,arch_db:l10n_ua_agreement.report_agreement_document
+msgid "і діє до повного виконання сторонами своїх зобов'язань"
+msgstr ""

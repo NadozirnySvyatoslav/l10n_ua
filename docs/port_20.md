@@ -24,9 +24,8 @@ cd ~/Projects/odoo-20
 ## Стан
 
 **81 з 83 модулів встановлюються на чистій БД, тести зелені: 0 failed,
-0 error(s) of 1600 tests.** Лишаються `l10n_ua_agreement` і
-`l10n_ua_agreement_account` — чекають на гілку 20.0 в OCA
-(`agreement`, `contract`, `sign_oca`).
+0 error(s) of 1600 tests.** `l10n_ua_agreement` і
+`l10n_ua_agreement_account` тепер версії 2.0 без OCA — див. «Договори 2.0 без OCA».
 
 Прогін тестів:
 
@@ -177,12 +176,13 @@ Binary-поля тепер тримають сирі байти в обгорт�
 (пошук по МФО, ручний вибір не затирається) та `l10n_ua_bank_name` для
 друкованих форм.
 
-### Лишається: OCA-залежності `l10n_ua_agreement`
+### Договори 2.0 без OCA
 
-`agreement`, `contract`, `sign_oca` ще не мають гілки 20.0. Модуль
-чекає на них (або на заміну ядровим функціоналом).
-
-Блокує: `l10n_ua_agreement`, `l10n_ua_agreement_account`.
+`l10n_ua_agreement` і `l10n_ua_agreement_account` перенесені з 19.0 у
+версії 2.0 — власна модель `l10n_ua.agreement`, без OCA `agreement`,
+`contract`, `sign_oca` (#569, П5). Міграції 19.0.2.0.0 (OCA 1.x → 2.0) у
+20.0 не перенесені: у 20.0 версія 1.x не встановлювалась, а база з 19.0
+приходить уже на 2.0.
 
 ## Міграції
 
