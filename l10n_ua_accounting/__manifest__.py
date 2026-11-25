@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Accounting Suite',
-    'version': '20.0.7.3.7',
+    'version': '20.0.7.3.8',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian accounting: PKO/VKO, Cash Book, Balance Sheet, P&L, Cash Flow',
     'description': """
