@@ -7,3 +7,4 @@ from . import test_modernization
 from . import test_revaluation
 from . import test_multicompany
 from . import test_commission_move
+from . import test_revaluation_line_multicompany
