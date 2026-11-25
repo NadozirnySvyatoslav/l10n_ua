@@ -6779,3 +6779,178 @@ msgstr "Мале підприємство (1-м, 2-м)"
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_small_report_form
 msgid "thous. UAH."
 msgstr "тис. грн."
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,print_report_name:l10n_ua_accounting.action_report_notes
+msgid "'Ф5_примітки_%s' % object.date_to.year"
+msgstr "'Ф5_примітки_%s' % object.date_to.year"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.report,print_report_name:l10n_ua_accounting.action_report_small
+msgid "'Фінзвітність_%s_%s' % (object.kind, object.date_to)"
+msgstr "'Фінзвітність_%s_%s' % (object.kind, object.date_to)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_notes_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_small_document
+msgid "<span>Головний бухгалтер</span><span class=\"signature-line\"/>"
+msgstr "<span>Головний бухгалтер</span><span class=\"signature-line\"/>"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_notes_document
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.report_small_document
+msgid "<span>Керівник</span><span class=\"signature-line\"/>"
+msgstr "<span>Керівник</span><span class=\"signature-line\"/>"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_notes_report_form
+msgid ""
+"<strong>Depreciation to split by rows of sections I and II (graphs 4 and "
+"15):</strong>"
+msgstr ""
+"<strong>Знос, який треба розподілити по рядках розділів I і II (графи 4 і "
+"15):</strong>"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_notes_report__depreciation_hint
+msgid ""
+"Balances of 131, 132 and 133 at the end of the year, in thousands. The chart"
+" of accounts keeps no depreciation per kind of asset: enter graphs 4 and 15 "
+"of sections I and II per row so that the rows «Разом» match them."
+msgstr ""
+"Залишки 131, 132 і 133 на кінець року, тис. грн. План рахунків не веде знос "
+"за видами активів: заповніть графи 4 і 15 розділів I і II по рядках так, щоб"
+" рядки «Разом» з ними збігалися."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_notes_report
+msgid "Create the notes to the annual financial statements"
+msgstr "Створіть примітки до річної фінансової звітності"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report__depreciation_hint
+msgid "Depreciation to Split"
+msgstr "Знос до розподілу"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_notes_report_form
+msgid "Form No.5"
+msgstr "Форма № 5"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_notes_report
+msgid ""
+"Form No.5 of order № 302: filled from the ledger where the chart of accounts"
+" allows, the rest by hand."
+msgstr ""
+"Форма № 5 за наказом № 302: що дозволяє план рахунків — з обліку, решта "
+"вручну."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.actions.act_window,help:l10n_ua_accounting.action_small_report
+msgid "Forms 1-m/2-m and 1-ms/2-ms of НП(С)БО 25, built from Forms 1 and 2."
+msgstr "Форми 1-м/2-м і 1-мс/2-мс за НП(С)БО 25, складені з форм № 1 і № 2."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report_line__graphs
+msgid "Graphs"
+msgstr "Графи"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_notes_report_line__graphs
+msgid "Graphs of the form this row has."
+msgstr "Графи форми, які має цей рядок."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_notes_report_line__kind__note
+msgid "Indicator"
+msgstr "Показник"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report_line__is_total
+msgid "Is Total"
+msgstr "Підсумок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,help:l10n_ua_accounting.field_l10n_ua_notes_report_line__label
+msgid "Name of a row the form leaves blank (060, 760, …)."
+msgstr "Назва рядка, який форма лишає порожнім (060, 760, …)."
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_notes_report_form
+msgid "Notes to the Annual Financial Statements"
+msgstr "Примітки до річної фінансової звітності"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_notes_report
+msgid "Notes to the Annual Financial Statements (Form No.5)"
+msgstr "Примітки до річної фінансової звітності (Форма № 5)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_notes_report_list
+msgid "Notes to the Financial Statements"
+msgstr "Примітки до фінансової звітності"
+
+#. module: l10n_ua_accounting
+#: model:ir.actions.act_window,name:l10n_ua_accounting.action_notes_report
+#: model:ir.actions.report,name:l10n_ua_accounting.action_report_notes
+#: model:ir.ui.menu,name:l10n_ua_accounting.menu_ua_reports_notes
+msgid "Notes to the Financial Statements (Form No.5)"
+msgstr "Примітки до фінансової звітності (Форма № 5)"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_notes_report_line
+msgid "Notes to the Financial Statements Line"
+msgstr "Рядок приміток до фінансової звітності"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report_line__label
+msgid "Own Name"
+msgstr "Власна назва"
+
+#. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_notes_report.py:0
+msgid ""
+"Row %(code)s: the totals are added up from their rows, and a graph marked "
+"«Х» on the form has no amount."
+msgstr ""
+"Рядок %(code)s: підсумки додаються з рядків автоматично, а графа, позначена "
+"у формі «Х», суми не має."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_notes_report_line__kind__blank
+msgid "Row Named by the Company"
+msgstr "Рядок із власною назвою"
+
+#. module: l10n_ua_accounting
+#: model:ir.model,name:l10n_ua_accounting.model_l10n_ua_small_report
+msgid "Simplified Financial Statements (НП(С)БО 25)"
+msgstr "Спрощена фінансова звітність (НП(С)БО 25)"
+
+#. module: l10n_ua_accounting
+#: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_notes_report_form
+msgid ""
+"Thousands of hryvnias without decimals. The graphs follow the numbering of the\n"
+"                                printed form, which differs per section (see the PDF). Rows «Разом» are added up\n"
+"                                automatically; sections IV, XI, XIV, XV and the indicators «з рядка …» are entered by hand."
+msgstr ""
+"Тисячі гривень без десяткового знака. Графи пронумеровано як у друкованій "
+"формі, у кожному розділі по-своєму (див. PDF). Рядки «Разом» додаються "
+"автоматично; розділи IV, XI, XIV, XV і показники «з рядка …» заповнюються "
+"вручну."
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields.selection,name:l10n_ua_accounting.selection__l10n_ua_notes_report_line__kind__title
+msgid "Title"
+msgstr "Заголовок"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report__date_to
+msgid "Year End"
+msgstr "Кінець року"
+
+#. module: l10n_ua_accounting
+#: model:ir.model.fields,field_description:l10n_ua_accounting.field_l10n_ua_notes_report__date_from
+msgid "Year Start"
+msgstr "Початок року"

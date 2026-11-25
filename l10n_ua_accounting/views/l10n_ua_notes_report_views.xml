@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_notes_report_form" model="ir.ui.view">
+        <field name="name">l10n_ua.notes.report.form</field>
+        <field name="model">l10n_ua.notes.report</field>
+        <field name="arch" type="xml">
+            <form string="Notes to the Annual Financial Statements">
+                <header>
+                    <button name="action_compute" type="object" string="Calculate"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_draft" type="object" string="Set to Draft"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_print" type="object" string="Print PDF" icon="fa-print"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="alert" invisible="not depreciation_hint">
+                        <strong>Depreciation to split by rows of sections I and II (graphs 4 and 15):</strong>
+                        <field name="depreciation_hint" class="d-inline"/> thous. UAH.
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date_from" readonly="state != 'draft'"/>
+                            <field name="date_to" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Form No.5" name="lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list editable="bottom" create="0" delete="0"
+                                      decoration-info="kind in ('section', 'title')"
+                                      decoration-bf="is_total or kind == 'section'"
+                                      decoration-it="kind == 'note'">
+                                    <field name="kind" column_invisible="1"/>
+                                    <field name="is_total" column_invisible="1"/>
+                                    <field name="graphs" column_invisible="1"/>
+                                    <field name="code" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="label" readonly="kind != 'blank'" optional="show"/>
+                                    <field name="g3" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g4" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g5" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g6" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g7" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g8" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g9" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g10" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g11" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g12" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g13" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g14" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g15" readonly="is_total or kind not in ('row', 'blank', 'note')"/>
+                                    <field name="g16" readonly="is_total or kind not in ('row', 'blank', 'note')" optional="show"/>
+                                    <field name="g17" readonly="is_total or kind not in ('row', 'blank', 'note')" optional="show"/>
+                                    <field name="g18" readonly="is_total or kind not in ('row', 'blank', 'note')" optional="show"/>
+                                    <field name="g19" readonly="is_total or kind not in ('row', 'blank', 'note')" optional="show"/>
+                                </list>
+                            </field>
+                            <div class="text-muted small">
+                                Thousands of hryvnias without decimals. The graphs follow the numbering of the
+                                printed form, which differs per section (see the PDF). Rows «Разом» are added up
+                                automatically; sections IV, XI, XIV, XV and the indicators «з рядка …» are entered by hand.
+                            </div>
+                        </page>
+                        <page string="Notes" name="notes"><field name="note"/></page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_notes_report_list" model="ir.ui.view">
+        <field name="name">l10n_ua.notes.report.list</field>
+        <field name="model">l10n_ua.notes.report</field>
+        <field name="arch" type="xml">
+            <list string="Notes to the Financial Statements" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="date_to"/>
+                <field name="state" widget="badge" decoration-success="state == 'confirmed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_notes_report" model="ir.actions.act_window">
+        <field name="name">Notes to the Financial Statements (Form No.5)</field>
+        <field name="res_model">l10n_ua.notes.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the notes to the annual financial statements</p>
+            <p>Form No.5 of order № 302: filled from the ledger where the chart of accounts allows, the rest by hand.</p>
+        </field>
+    </record>
+
+</odoo>
