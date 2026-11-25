@@ -58,7 +58,7 @@ MAIN_ROWS = [
     ('R421GA', 'line_4_2_1_base'), ('R421GB', 'line_4_2_1_vat'),
     ('R43GA', 'line_4_3_base'), ('R43GB', 'line_4_3_vat'),
     ('R431GA', 'line_4_3_1_base'), ('R431GB', 'line_4_3_1_vat'),
-    ('R50GA', 'line_5_base'), ('R51GA', 'line_5_1_base'),
+    ('R50GA', 'line_5_base'), ('R51GA', 'line_5_1_base'), ('R511GA', 'line_5_1_1_base'),
     ('R61GA', 'line_6_1_base'), ('R61GB', 'line_6_1_vat'),
     ('R62GA', 'line_6_2_base'), ('R62GB', 'line_6_2_vat'),
     ('R71GA', 'line_7_1_base'), ('R71GB', 'line_7_1_vat'),
