@@ -153,5 +153,53 @@
             <field name="operation">crud</field>
         </record>
 
+        <!-- Рядки фінзвітів (#679): компанія береться зі звіту.
+             Без цих правил користувач компанії Б читав суми рядків
+             звітів компанії А через search/read. -->
+        <record id="l10n_ua_balance_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок балансу: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_balance_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_pnl_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок звіту про фінансові результати: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_pnl_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_cashflow_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок звіту про рух грошових коштів: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_cashflow_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_equity_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок звіту про власний капітал: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_equity_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_small_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок спрощеної фінзвітності: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_small_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
     </data>
 </odoo>
