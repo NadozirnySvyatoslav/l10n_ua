@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_salary_wages_partner_fix_view_form" model="ir.ui.view">
+        <field name="name">hr.salary.wages.partner.fix.form</field>
+        <field name="model">hr.salary.wages.partner.fix</field>
+        <field name="arch" type="xml">
+            <form string="Партнер-працівник на 661/685 у старих проводках ЗП">
+                <field name="state" invisible="1"/>
+                <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                    Проводки ЗП, створені до появи розгортки 661 по працівниках,
+                    мають рядки 661/685 без партнера. Майстер проставляє
+                    працівника (проводка на листок) або робить сторно і нову
+                    зведену проводку пакета тією ж датою (проводка на пакет).
+                    Закриті періоди (дата блокування), захешовані проводки і
+                    проводки зі звіреними рядками не змінюються.
+                    Спершу натисніть «Переглянути».
+                </div>
+                <group invisible="state != 'draft'">
+                    <field name="company_id" groups="base.group_multi_company"
+                           options="{'no_create': True}"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <field name="summary" nolabel="1" invisible="state == 'draft'"/>
+                <footer>
+                    <button name="action_preview" type="object" string="Переглянути"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_apply" type="object" string="Виправити"
+                            class="btn-primary" invisible="state != 'preview'"
+                            confirm="Змінити проведені проводки ЗП з переліку?"/>
+                    <button name="action_back" type="object" string="Назад"
+                            invisible="state != 'preview'"/>
+                    <button string="Закрити" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_salary_wages_partner_fix" model="ir.actions.act_window">
+        <field name="name">Партнер 661/685 у старих проводках ЗП</field>
+        <field name="res_model">hr.salary.wages.partner.fix</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hr_salary_wages_partner_fix"
+              name="Партнер 661/685 у старих проводках"
+              parent="l10n_ua_hr_salary.menu_hr_payroll_config"
+              action="action_hr_salary_wages_partner_fix"
+              groups="account.group_account_manager"
+              sequence="20"/>
+
+</odoo>
