@@ -543,9 +543,11 @@ class L10nUaTaxInvoice(models.Model):
 
     def _pn_signer(self):
         """(ім'я, РНОКПП) особи, що склала ПН: з ПН, інакше з налаштувань компанії —
-        ПН, створені до заповнення налаштувань, теж мають формуватися."""
+        ПН, створені до заповнення налаштувань, теж мають формуватися.
+        Якщо на ПН заповнено хоч одне поле — беремо пару з ПН як є: інакше ПІБ
+        без РНОКПП мовчки підмінявся підписантом компанії (#670)."""
         company = self.company_id
-        if self.signer_name and self.signer_rnokpp:
+        if self.signer_name or self.signer_rnokpp:
             return self.signer_name, self.signer_rnokpp
         return company.l10n_ua_vat_signer_name, company.l10n_ua_vat_signer_rnokpp
 
@@ -581,7 +583,12 @@ class L10nUaTaxInvoice(models.Model):
         if not self._pn_number():
             problems.append(_('номер ПН'))
         signer_name, signer_rnokpp = self._pn_signer()
-        if not signer_name or not re.fullmatch(r'\d{10}', signer_rnokpp or ''):
+        if self.signer_name or self.signer_rnokpp:
+            if not self.signer_name or not re.fullmatch(r'\d{10}', self.signer_rnokpp or ''):
+                problems.append(_('на ПН особа, що складає ПН, вказана без РНОКПП (10 цифр) або '
+                                  'РНОКПП без ПІБ — заповніть обидва поля або очистіть обидва, '
+                                  'щоб узяти особу з налаштувань ПДВ компанії'))
+        elif not signer_name or not re.fullmatch(r'\d{10}', signer_rnokpp or ''):
             problems.append(_('особа, що складає ПН, і її РНОКПП (налаштування ПДВ компанії)'))
         _name, ipn, _tin = self._pn_buyer()
         if not re.fullmatch(r'\d{12}', ipn):
