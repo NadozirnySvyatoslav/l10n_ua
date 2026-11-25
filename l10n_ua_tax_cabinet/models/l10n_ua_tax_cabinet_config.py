@@ -363,16 +363,14 @@ class L10nUaTaxCabinetConfig(models.Model):
         headers.pop('Content-Type', None)
         headers['Accept'] = 'application/json, */*'
 
-        # Prepare JSON payload with list array as per API spec
+        # Тіло — сам масив звітів у корені: кабінет десеріалізує його як
+        # ArrayList<InReportDao>; обгортка {"list": [...]} дає 400 «out of
+        # START_OBJECT token» (реальна подача декларації ЄП, 19.10.2026).
         content_b64 = signed_content if isinstance(signed_content, str) else signed_content.decode('utf-8')
-        payload = {
-            'list': [
-                {
-                    'contentBase64': content_b64,
-                    'fname': filename,
-                }
-            ]
-        }
+        payload = [{
+            'contentBase64': content_b64,
+            'fname': filename,
+        }]
 
         _logger.info("Tax Cabinet API [PRODUCTION]: POST %s", url)
         _logger.info("Payload filename: %s, content length: %d chars", filename, len(content_b64))
@@ -381,8 +379,8 @@ class L10nUaTaxCabinetConfig(models.Model):
         submit_headers = {k: v for k, v in headers.items() if k.lower() != 'content-type'}
 
         try:
-            # According to docs: POST /cabinet/public/api/exchange/report
-            # Body: {"list": [{"contentBase64": "...", "fname": "..."}]}
+            # POST /cabinet/public/api/exchange/report
+            # Body: [{"contentBase64": "...", "fname": "..."}]
             # Content-Type: application/json
 
             _logger.info("Request headers (without Content-Type): %s",
@@ -415,7 +413,8 @@ class L10nUaTaxCabinetConfig(models.Model):
             error_msg = response.text
             try:
                 error_data = response.json()
-                error_msg = error_data.get('message', error_data.get('error', str(error_data)))
+                if isinstance(error_data, dict):
+                    error_msg = error_data.get('message', error_data.get('error', str(error_data)))
             except Exception:
                 pass
             raise UserError(_("Submission failed (%s): %s") % (response.status_code, error_msg))

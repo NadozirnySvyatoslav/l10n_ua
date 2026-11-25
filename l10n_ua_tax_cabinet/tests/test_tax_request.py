@@ -86,7 +86,7 @@ class TestTaxRequest(TransactionCase):
         self.assertEqual(len(data['documents']), 1)
         doc = data['documents'][0]
         self.assertEqual(doc['name'], 'doc')
-        self.assertEqual(doc['format'], 'envelope')
+        self.assertEqual(doc['format'], 'dps_transport')
         self.assertTrue(doc['data_b64'])
 
     def test_on_submitted_sets_state(self):
@@ -96,3 +96,14 @@ class TestTaxRequest(TransactionCase):
         self.assertEqual(req.state, 'submitted')
         self.assertTrue(req.submission_date)
         self.assertIn('прийнято', req.response_receipt)
+
+
+@tagged('post_install', '-at_install')
+class TestReceiptText(TransactionCase):
+
+    def test_receipt_from_array_and_object(self):
+        Request = self.env['l10n_ua.tax.request']
+        self.assertEqual(Request._dps_receipt_text([{'message': 'Документ прийнято'}]), 'Документ прийнято')
+        self.assertEqual(Request._dps_receipt_text({'message': 'ok'}), 'ok')
+        self.assertIn('"id": 5', Request._dps_receipt_text([{'id': 5}]))
+        self.assertEqual(Request._dps_receipt_text([]), 'Подано')

@@ -99,7 +99,7 @@ class TestErpnRegister(TransactionCase):
         self.assertEqual(len(data['documents']), 1)
         doc = data['documents'][0]
         self.assertEqual(doc['name'], 'doc')
-        self.assertEqual(doc['format'], 'envelope')
+        self.assertEqual(doc['format'], 'dps_transport')
         self.assertTrue(doc['data_b64'])
         self.assertTrue(doc['recipient_cert_b64'])
         self.assertTrue(doc['filename'].endswith('.xml'))
@@ -186,7 +186,5 @@ class TestPresignedRelay(TransactionCase):
         _args, kwargs = post.call_args
         # Заголовок Authorization = переданий клієнтський підпис (сервер не підписує).
         self.assertEqual(kwargs['headers']['Authorization'], 'CLIENT-AUTH-SIG')
-        # Тіло у форматі API кабінету.
-        self.assertEqual(
-            kwargs['json']['list'][0]['contentBase64'], 'ENVB64')
-        self.assertEqual(kwargs['json']['list'][0]['fname'], 'F1201.xml')
+        # Тіло — масив звітів у корені (кабінет чекає ArrayList<InReportDao>).
+        self.assertEqual(kwargs['json'], [{'contentBase64': 'ENVB64', 'fname': 'F1201.xml'}])
