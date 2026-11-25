@@ -201,5 +201,44 @@
             <field name="operation">crud</field>
         </record>
 
+        <!-- Рядки документів (#685): компанія береться з документа.
+             Без цих правил користувач компанії Б знаходив, читав, змінював
+             і видаляв рядки документів компанії А. -->
+        <record id="l10n_ua_advance_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок авансового звіту: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_advance_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_period_closing_line_company_rule" model="ir.access">
+            <field name="name">Рядок закриття періоду: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_period_closing_line"/>
+            <field name="domain">
+                ['|', ('closing_id.company_id', '=', False), ('closing_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_currency_revaluation_line_company_rule" model="ir.access">
+            <field name="name">Рядок переоцінки валюти: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_currency_revaluation_line"/>
+            <field name="domain">
+                ['|', ('revaluation_id.company_id', '=', False), ('revaluation_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_service_act_line_company_rule" model="ir.access">
+            <field name="name">Рядок акта наданих послуг: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_service_act_line"/>
+            <field name="domain">
+                ['|', ('act_id.company_id', '=', False), ('act_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
     </data>
 </odoo>
