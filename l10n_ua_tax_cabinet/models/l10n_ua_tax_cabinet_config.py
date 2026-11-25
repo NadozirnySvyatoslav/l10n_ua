@@ -326,13 +326,15 @@ class L10nUaTaxCabinetConfig(models.Model):
 
         return base64.b64encode(response.content).decode()
 
-    def _api_submit_document_presigned(self, signed_content, filename, auth_signature):
+    def _api_submit_document_presigned(self, signed_content, filename, auth_signature,
+                                       extra_files=()):
         """Релей уже підписаного документа (клієнтське КЕП-підписування, #146).
 
         Ключ і пароль лишаються в браузері: сюди приходять готові
         ``signed_content`` (base64 sign+encrypt конверта на сертифікат ДПС) і
         ``auth_signature`` (base64 підпис taxpayer_code для заголовка
-        Authorization). Сервер лише пересилає.
+        Authorization). Сервер лише пересилає. ``extra_files`` — додатки
+        ``[(signed_content, filename), ...]``, що йдуть тим самим запитом.
         """
         self.ensure_one()
         auth_header = auth_signature if isinstance(auth_signature, str) \
@@ -342,9 +344,9 @@ class L10nUaTaxCabinetConfig(models.Model):
             'Accept': 'application/json, */*',
             'Lang': 'uk',
         }
-        return self._post_report(signed_content, filename, headers)
+        return self._post_report(signed_content, filename, headers, extra_files)
 
-    def _post_report(self, signed_content, filename, headers):
+    def _post_report(self, signed_content, filename, headers, extra_files=()):
         """Спільний HTTP-релей подачі звіту в кабінет ДПС.
 
         Приймає готові ``headers`` (з Authorization, підписаним у браузері).
@@ -363,16 +365,18 @@ class L10nUaTaxCabinetConfig(models.Model):
         headers.pop('Content-Type', None)
         headers['Accept'] = 'application/json, */*'
 
-        # Prepare JSON payload with list array as per API spec
-        content_b64 = signed_content if isinstance(signed_content, str) else signed_content.decode('utf-8')
-        payload = {
-            'list': [
-                {
-                    'contentBase64': content_b64,
-                    'fname': filename,
-                }
-            ]
-        }
+        # Тіло — сам масив звітів у корені: кабінет десеріалізує його як
+        # ArrayList<InReportDao>; обгортка {"list": [...]} дає 400 «out of
+        # START_OBJECT token» (реальна подача декларації ЄП, 19.10.2026).
+        def as_str(content):
+            return content if isinstance(content, str) else content.decode('utf-8')
+
+        content_b64 = as_str(signed_content)
+        payload = [{
+            'contentBase64': content_b64,
+            'fname': filename,
+        }] + [{'contentBase64': as_str(content), 'fname': fname}
+              for content, fname in extra_files]
 
         _logger.info("Tax Cabinet API [PRODUCTION]: POST %s", url)
         _logger.info("Payload filename: %s, content length: %d chars", filename, len(content_b64))
@@ -381,8 +385,8 @@ class L10nUaTaxCabinetConfig(models.Model):
         submit_headers = {k: v for k, v in headers.items() if k.lower() != 'content-type'}
 
         try:
-            # According to docs: POST /cabinet/public/api/exchange/report
-            # Body: {"list": [{"contentBase64": "...", "fname": "..."}]}
+            # POST /cabinet/public/api/exchange/report
+            # Body: [{"contentBase64": "...", "fname": "..."}]
             # Content-Type: application/json
 
             _logger.info("Request headers (without Content-Type): %s",
@@ -415,7 +419,8 @@ class L10nUaTaxCabinetConfig(models.Model):
             error_msg = response.text
             try:
                 error_data = response.json()
-                error_msg = error_data.get('message', error_data.get('error', str(error_data)))
+                if isinstance(error_data, dict):
+                    error_msg = error_data.get('message', error_data.get('error', str(error_data)))
             except Exception:
                 pass
             raise UserError(_("Submission failed (%s): %s") % (response.status_code, error_msg))

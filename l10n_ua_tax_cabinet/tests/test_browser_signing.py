@@ -142,7 +142,7 @@ class TestCabinetBrowserSigning(TransactionCase):
         with patch(CONFIG_CLASS + '._get_dps_encrypt_certificate', return_value=b'CERT'):
             spec = doc.kep_prepare_signing()
         self.assertEqual(spec['auth_subject'], '1234567890')
-        self.assertEqual(spec['documents'][0]['format'], 'envelope')
+        self.assertEqual(spec['documents'][0]['format'], 'dps_transport')
         self.assertEqual(spec['documents'][0]['recipient_cert_b64'],
                          base64.b64encode(b'CERT').decode())
 

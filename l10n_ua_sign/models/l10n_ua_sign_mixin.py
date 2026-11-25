@@ -49,7 +49,7 @@ class L10nUaSignMixin(models.AbstractModel):
               'documents': [
                  {'name': 'doc',
                   'data_b64': <base64 даних для підпису>,
-                  'format': 'cades' | 'envelope' | 'asic',
+                  'format': 'cades' | 'envelope' | 'asic' | 'dps_transport',
                   'filename': 'file.xml',
                   'recipient_cert_b64': <base64 cert отримувача, для 'envelope'>},
                  ...

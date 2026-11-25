@@ -20,3 +20,4 @@ from . import test_period_closing_lock
 from . import test_pnl_form
 from . import test_equity_report
 from . import test_small_report
+from . import test_wizard_print

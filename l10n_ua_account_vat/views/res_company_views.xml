@@ -18,6 +18,10 @@
                     <group>
                         <field name="l10n_ua_erpn_deadline_mode"
                                invisible="not l10n_ua_is_vat_payer"/>
+                        <field name="l10n_ua_vat_signer_name"
+                               invisible="not l10n_ua_is_vat_payer"/>
+                        <field name="l10n_ua_vat_signer_rnokpp"
+                               invisible="not l10n_ua_is_vat_payer"/>
                     </group>
                 </group>
             </xpath>
