@@ -208,6 +208,16 @@ class TestErpnRegister(TransactionCase):
                 getattr(inv, method)()
         self.assertEqual(inv.state, 'draft')
 
+    def test_form_erpn_number_not_required(self):
+        """Номер ЄРПН у формі не обовʼязковий: інакше web-клієнт перед
+        кнопками «Зупинено»/«Відмовлено»/«Чернетка» вимагає номер, якого
+        при зупинці чи відмові немає. Номер перевіряє action_erpn_registered."""
+        arch = self.env['l10n_ua.tax.invoice'].get_view(view_type='form')['arch']
+        self.assertIn('name="erpn_number"', arch)
+        for line in arch.splitlines():
+            if 'name="erpn_number"' in line:
+                self.assertNotIn('required', line)
+
 
 @tagged('post_install', '-at_install')
 class TestPresignedRelay(TransactionCase):
