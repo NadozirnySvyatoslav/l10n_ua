@@ -267,6 +267,41 @@ class L10nUaVatDeclaration(models.Model):
         help='Від\'ємне значення різниці (р.17 - р.9). Без бюджетного відшкодування '
              'й погашення боргу воно повністю переходить у рядок 21',
     )
+    # Сума за п. 200-1.3 ПКУ (Σнакл у СЕА ПДВ) — службове поле рядка 19.1
+    vat_limit_amount = fields.Monetary(
+        string='Сума за п. 200-1.3 (Σнакл)',
+        currency_field='currency_id',
+        help='Сума, на яку платник має право зареєструвати ПН/РК в ЄРПН, на дату подання '
+             '(кабінет → Дані СЕА ПДВ). Від\'ємне значення понад неї йде в рядок 19.1, '
+             'решта — у рядок 20. При розрахунку береться з останнього розрахунку '
+             'реєстраційного ліміту, якщо не вказана.',
+    )
+    # Row 19.1 — excess of the negative value over the limit (to the next period)
+    line_19_1_vat = fields.Monetary(
+        string='р.19.1 Перевищення над Σнакл',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id',
+    )
+    # Row 20 — negative value within the limit; 20.3 — its remainder after 20.1/20.2
+    line_20_vat = fields.Monetary(
+        string='р.20 У межах Σнакл',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id',
+    )
+    line_20_3_vat = fields.Monetary(
+        string='р.20.3 Залишок (р.20 − 20.1 − 20.2)',
+        compute='_compute_totals',
+        store=True,
+        currency_field='currency_id',
+    )
+    d2_line_ids = fields.One2many(
+        'l10n_ua.vat.declaration.d2.line',
+        'declaration_id',
+        string='Д2: розшифровка від\'ємного значення',
+        copy=False,
+    )
     # Row 21 — negative value carried to the tax credit of the next period
     line_21_vat = fields.Monetary(
         string='р.21 До ПК наступного періоду',
@@ -321,7 +356,7 @@ class L10nUaVatDeclaration(models.Model):
         'line_1_1_vat', 'line_1_2_vat', 'line_1_3_vat', 'line_7_1_vat',
         'line_10_1_vat', 'line_10_2_vat', 'line_10_3_vat',
         'line_11_1_vat', 'line_11_2_vat', 'line_11_3_vat',
-        'line_14_vat', 'line_15_vat', 'line_16_1_vat',
+        'line_14_vat', 'line_15_vat', 'line_16_1_vat', 'vat_limit_amount',
     )
     def _compute_totals(self):
         for rec in self:
@@ -339,8 +374,14 @@ class L10nUaVatDeclaration(models.Model):
             diff = rec.line_9_vat - rec.line_17_vat
             rec.line_18_vat = max(diff, 0.0)
             rec.line_19_vat = max(-diff, 0.0)
-            # Без відшкодування (20.2) і погашення боргу (20.1): 21 = 19.1 + 20.3 = 19.
-            rec.line_21_vat = rec.line_19_vat
+            # 19.1 — перевищення над Σнакл, 20 — у межах. Без погашення боргу (20.1)
+            # і відшкодування (20.2): 20.3 = 20, а 21 = 19.1 + 20.3 = 19.
+            limit = max(rec.vat_limit_amount or 0.0, 0.0)
+            rec.line_19_1_vat = float_round(max(rec.line_19_vat - limit, 0.0),
+                                            precision_digits=0)
+            rec.line_20_vat = rec.line_19_vat - rec.line_19_1_vat
+            rec.line_20_3_vat = rec.line_20_vat
+            rec.line_21_vat = rec.line_19_1_vat + rec.line_20_3_vat
 
     # =====================================================
     # Actions
@@ -402,20 +443,31 @@ class L10nUaVatDeclaration(models.Model):
             'line_14_vat': total(received_rk, 'vat_amount'),
             'line_16_1_vat': self._previous_negative_value(),
         })
+        if not self.vat_limit_amount:
+            limit = self.env['l10n_ua.vat.erpn.limit'].search([
+                ('company_id', '=', self.company_id.id),
+                ('date', '<=', fields.Date.context_today(self)),
+            ], order='date desc', limit=1)
+            if limit:
+                self.vat_limit_amount = float_round(limit.limit_amount, precision_digits=0)
+        self._fill_d2_lines()
 
     def _previous_negative_value(self):
         """Рядок 21 декларації за попередній звітний період (→ рядок 16.1)."""
+        previous = self._previous_declaration()
+        return previous.line_21_vat if previous else 0.0
+
+    def _previous_declaration(self):
         self.ensure_one()
         start = self.period_id.date_start
         if not start:
-            return 0.0
-        previous = self.search([
+            return self.browse()
+        return self.search([
             ('company_id', '=', self.company_id.id),
             ('period_id.date_end', '<', start),
             ('state', 'in', ('calculated', 'submitted', 'accepted')),
             ('id', '!=', self.id),
         ]).sorted(lambda d: d.period_id.date_end)[-1:]
-        return previous.line_21_vat if previous else 0.0
 
     def action_accept(self):
         for rec in self:
