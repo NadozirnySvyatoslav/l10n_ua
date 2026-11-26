@@ -2714,6 +2714,7 @@ msgstr ""
 "Звірте її з колективним договором."
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
 msgid ""
 "%(what)s starts on %(date)s, before the scheme %(scheme)s applies "
@@ -2814,6 +2815,7 @@ msgstr ""
 "величини, зберігається як частка: 1,2 % — це 0,012."
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
 msgid ""
 "No base value is in force on %(date)s. Enter it in Base Values before using "
@@ -2890,6 +2892,7 @@ msgid "Scheme Salary"
 msgstr "Оклад за схемою"
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
 msgid "The base value from %(date)s must be positive."
 msgstr "Базова величина з %(date)s має бути додатною."
@@ -2941,6 +2944,7 @@ msgstr ""
 "лишається для періодів до неї."
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
 msgid "The version of %(employee)s"
 msgstr "Версія договору %(employee)s"
@@ -3062,6 +3066,7 @@ msgid "Assistant educator (10 %)"
 msgstr "Помічник вихователя (10 %)"
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
 #, python-format
 msgid ""
@@ -3072,6 +3077,7 @@ msgstr ""
 "1078, примітка 4); зазначено %(value)s %%."
 
 #. module: l10n_ua_hr_base
+#. odoo-python
 #: code:addons/l10n_ua_hr_base/models/hr_pay_scheme.py:0
 #, python-format
 msgid ""

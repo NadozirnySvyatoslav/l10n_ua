@@ -210,6 +210,25 @@ class TestPayScheme(TransactionCase):
                 self.assertEqual(self._derived(kind, reduction).pay_scheme_reduction,
                                  reduction)
 
+    def test_derived_post_error_is_translated(self):
+        """К3/К1: користувач з uk_UA бачить помилку українською (у .po
+        записи коду мають позначку `#. odoo-python`)."""
+        self.env['res.lang']._activate_lang('uk_UA')
+        uk = self.env(context=dict(self.env.context, lang='uk_UA'))
+        cases = [('assistant_educator', 9.0, 'примітка 4'),
+                 ('deputy_ped', 12.0, 'пп. 2 п. 2')]
+        for kind, reduction, basis in cases:
+            with self.subTest(kind=kind), self.assertRaises(ValidationError) as caught, \
+                    self.cr.savepoint():
+                self.env['hr.staffing.table'].with_env(uk).create({
+                    'company_id': self.company.id, 'department_id': self.department.id,
+                    'job_id': self.job.id, 'date_from': date(2026, 9, 1), 'state': 'draft',
+                    'pay_scheme_derived': kind,
+                    'pay_scheme_line_id': self.teacher_top.id,
+                    'pay_scheme_reduction': reduction})
+            self.assertIn(basis, str(caught.exception))
+            self.assertIn('нижче окладу посади', str(caught.exception))
+
     def test_derived_post_checked_on_write(self):
         line = self._derived('deputy_other', 25.0)
         with self.assertRaises(ValidationError), self.cr.savepoint():
