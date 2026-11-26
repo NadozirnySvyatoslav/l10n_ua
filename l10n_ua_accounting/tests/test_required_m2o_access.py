@@ -5,6 +5,10 @@
 падала з AccessError. Тест ловить увесь клас таких розривів у моделях
 l10n_ua_*: група, яка має read на модель, має мати read і на comodel
 кожного обовʼязкового Many2one (своїм правом, успадкованим або глобальним).
+
+Перевіряються лише моделі й права l10n_ua_accounting та його залежностей
+(транзитивно), щоб результат не залежав від інших встановлених модулів:
+їхні розриви має ловити їхній власний тест.
 """
 
 import re
@@ -16,6 +20,8 @@ ADR_REF = re.compile(r'ADR \d{4}')
 # Розриви, що були до #694: кожен прибирається окремою issue і зникає звідси.
 # Значення — посилання на ADR (перевіряє test_entries_reference_adr).
 KNOWN_GAPS = {
+    # account.group_account_manager не успадковує group_account_user,
+    # тож read на tax.period для group_account_user цей розрив не закриває.
     ('l10n_ua.vat.declaration', 'period_id', 'account.group_account_manager'): '#702, ADR 0005',
     ('l10n_ua.vat.register', 'period_id', 'account.group_account_manager'): '#702, ADR 0005',
 }
@@ -33,14 +39,34 @@ ALLOWED = {
 @tagged('post_install', '-at_install', 'l10n_ua_accounting')
 class TestRequiredMany2oneAccess(TransactionCase):
 
-    def _readers(self, model_name):
+    MODULE = 'l10n_ua_accounting'
+
+    def _scope_modules(self):
+        """Модуль тесту і всі його залежності (транзитивно)."""
+        Module = self.env['ir.module.module'].sudo()
+        scope, todo = set(), [self.MODULE]
+        while todo:
+            name = todo.pop()
+            if name in scope:
+                continue
+            scope.add(name)
+            module = Module.search([('name', '=', name)], limit=1)
+            todo.extend(module.dependencies_id.mapped('name'))
+        return scope
+
+    def _readers(self, model_name, modules=None):
         """Групи з read на модель; None у множині — глобальне право.
 
         Записи ir.access без групи в Odoo 20 — обмеження, а не право.
+        modules — враховувати лише права, оголошені в цих модулях.
         """
         rules = self.env['ir.access'].sudo().search([
             ('model_id.model', '=', model_name), ('operation', 'like', 'r'),
             ('kind', '=', 'permission')])
+        if modules is not None:
+            xmlids = rules._get_external_ids()
+            rules = rules.filtered(lambda r: any(
+                xid.split('.', 1)[0] in modules for xid in xmlids.get(r.id, [])))
         return {rule.group_id.id or None for rule in rules}
 
     def _ref_key(self, entry):
@@ -53,17 +79,20 @@ class TestRequiredMany2oneAccess(TransactionCase):
     def _gaps(self):
         """Усі розриви як {(модель, поле, id групи): опис}."""
         Groups = self.env['res.groups'].sudo()
+        scope = self._scope_modules()
         models = self.env['ir.model'].sudo().search([('transient', '=', False)])
         gaps = {}
         for ir_model in models:
             if not ir_model.model.startswith('l10n_ua.'):
                 continue
             Model = self.env.get(ir_model.model)
-            if Model is None or Model._abstract:
+            if Model is None or Model._abstract or Model._original_module not in scope:
                 continue
-            readers = self._readers(ir_model.model) - {None}
+            readers = self._readers(ir_model.model, scope) - {None}
             for field in Model._fields.values():
                 if field.type != 'many2one' or not field.required or not field.store:
+                    continue
+                if field._module and field._module not in scope:
                     continue
                 comodel_readers = self._readers(field.comodel_name)
                 if None in comodel_readers:
