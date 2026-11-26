@@ -222,7 +222,7 @@ async function buildDpsTransport(eu, doc, xmlBytes) {
         [b64ToBytes(doc.recipient_cert_b64)], signBlock, false, false, false);
     const header = asciiBytes(
         "PRG_TYPE=Odoo l10n_ua\r\n" +
-        "PRG_VER=19.0\r\n" +
+        "PRG_VER=20.0\r\n" +
         `FILENAME=${doc.filename}\r\n` +
         `EDRPOU=${doc.taxpayer_code || ""}\r\n` +
         "STTYPE=1\r\n"
