@@ -483,10 +483,14 @@ class L10nUaTaxInvoice(models.Model):
 
     @api.depends('company_id')
     def _compute_signer(self):
+        # Копіюємо з компанії лише повну пару: ПІБ без РНОКПП на ПН блокує XML
+        # (#670), а порожня пара на XML бере свіжі налаштування компанії.
         for rec in self:
-            if not rec.signer_name:
-                rec.signer_name = rec.company_id.l10n_ua_vat_signer_name
-                rec.signer_rnokpp = rec.company_id.l10n_ua_vat_signer_rnokpp
+            company = rec.company_id
+            if not rec.signer_name and company.l10n_ua_vat_signer_name \
+                    and company.l10n_ua_vat_signer_rnokpp:
+                rec.signer_name = company.l10n_ua_vat_signer_name
+                rec.signer_rnokpp = company.l10n_ua_vat_signer_rnokpp
 
     def action_generate_xml(self):
         """Generate XML for tax invoice per Наказ Мінфіну №1307."""
@@ -544,11 +548,24 @@ class L10nUaTaxInvoice(models.Model):
 
     def _pn_signer(self):
         """(ім'я, РНОКПП) особи, що склала ПН: з ПН, інакше з налаштувань компанії —
-        ПН, створені до заповнення налаштувань, теж мають формуватися."""
+        ПН, створені до заповнення налаштувань, теж мають формуватися.
+        Якщо на ПН заповнено хоч одне поле — беремо пару з ПН як є: інакше ПІБ
+        без РНОКПП мовчки підмінявся підписантом компанії (#670).
+        Виняток — ПІБ без РНОКПП, що збігається з ПІБ підписанта компанії: так
+        compute до #697 копіював неповну пару з компанії, тож це не ручне
+        введення, а успадкування — беремо актуальну пару компанії (без міграції)."""
         company = self.company_id
-        if self.signer_name and self.signer_rnokpp:
-            return self.signer_name, self.signer_rnokpp
-        return company.l10n_ua_vat_signer_name, company.l10n_ua_vat_signer_rnokpp
+        if self._pn_signer_inherited():
+            return company.l10n_ua_vat_signer_name, company.l10n_ua_vat_signer_rnokpp
+        return self.signer_name, self.signer_rnokpp
+
+    def _pn_signer_inherited(self):
+        """True, якщо особу на ПН не вказано вручну і її слід брати з компанії."""
+        if not self.signer_name and not self.signer_rnokpp:
+            return True
+        company_name = (self.company_id.l10n_ua_vat_signer_name or '').strip()
+        return (not self.signer_rnokpp and bool(company_name)
+                and (self.signer_name or '').strip() == company_name)
 
     def _pn_office_code(self):
         # довідник ДПІ доступний лише групам UA — бухгалтеру без них теж треба XML
@@ -583,7 +600,12 @@ class L10nUaTaxInvoice(models.Model):
             problems.append(_('номер ПН'))
         signer_name, signer_rnokpp = self._pn_signer()
         if not signer_name or not re.fullmatch(r'\d{10}', signer_rnokpp or ''):
-            problems.append(_('особа, що складає ПН, і її РНОКПП (налаштування ПДВ компанії)'))
+            if self._pn_signer_inherited():
+                problems.append(_('особа, що складає ПН, і її РНОКПП (налаштування ПДВ компанії)'))
+            else:
+                problems.append(_('на ПН особа, що складає ПН, вказана без РНОКПП (10 цифр) або '
+                                  'РНОКПП без ПІБ — заповніть обидва поля або очистіть обидва, '
+                                  'щоб узяти особу з налаштувань ПДВ компанії'))
         _name, ipn, _tin = self._pn_buyer()
         if not re.fullmatch(r'\d{12}', ipn):
             problems.append(_('ІПН покупця-платника ПДВ (12 цифр) — або позначте ПН як таку, що не '
