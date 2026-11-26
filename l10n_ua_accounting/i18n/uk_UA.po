@@ -865,6 +865,12 @@ msgid "Can only reverse a closed period."
 msgstr "Можна скасувати лише закритий період."
 
 #. module: l10n_ua_accounting
+#. odoo-python
+#: code:addons/l10n_ua_accounting/models/l10n_ua_period_closing.py:0
+msgid "Only the chief accountant can close a period or reverse its closing."
+msgstr "Закрити період або сторнувати закриття може лише головний бухгалтер."
+
+#. module: l10n_ua_accounting
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_advance_report_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_cash_book_wizard_form
 #: model_terms:ir.ui.view,arch_db:l10n_ua_accounting.view_reconciliation_act_wizard_form
