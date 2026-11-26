@@ -1,0 +1,2 @@
+id,name,model_id/id,group_id/id,operation,domain
+access_l10n_ua_print_wizard_user,l10n_ua.print.wizard user,model_l10n_ua_print_wizard,base.group_user,crud,
