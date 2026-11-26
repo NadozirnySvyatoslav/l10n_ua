@@ -15,9 +15,11 @@
                             class="btn-secondary" invisible="state != 'draft'"/>
                     <button name="action_close" string="Закрити період" type="object"
                             class="btn-primary" invisible="state != 'draft'"
+                            groups="l10n_ua_account_base.group_ua_manager"
                             confirm="Ви впевнені? Буде створено проводки закриття та встановлено блокування періоду."/>
                     <button name="action_reverse" string="Сторнувати" type="object"
                             class="btn-warning" invisible="state != 'closed'"
+                            groups="l10n_ua_account_base.group_ua_manager"
                             confirm="Сторнувати закриття? Проводки будуть скасовані, період буде розблоковано."/>
                     <button name="action_draft" string="В чернетку" type="object"
                             invisible="state != 'reversed'"/>

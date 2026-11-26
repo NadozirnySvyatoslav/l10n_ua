@@ -375,9 +375,21 @@ class L10nUaPeriodClosing(models.Model):
                 ', '.join(missing)
             ))
 
+    def _check_chief_accountant(self):
+        """Only the chief accountant closes or reverses a period (#694, ADR 0004).
+
+        Closing writes the tax period state and, through sudo, moves the
+        company lock date; an accountant may prepare the closing (draft,
+        "Compute") but not apply it.
+        """
+        if self.env.su or self.env.user.has_group('l10n_ua_account_base.group_ua_manager'):
+            return
+        raise UserError(_('Only the chief accountant can close a period or reverse its closing.'))
+
     def action_close(self):
         """Generate closing entries and lock the period."""
         self.ensure_one()
+        self._check_chief_accountant()
         if self.state != 'draft':
             raise UserError(_('Can only close from draft state.'))
 
@@ -581,6 +593,7 @@ class L10nUaPeriodClosing(models.Model):
     def action_reverse(self):
         """Reverse the closing and unlock the period."""
         self.ensure_one()
+        self._check_chief_accountant()
         if self.state != 'closed':
             raise UserError(_('Can only reverse a closed period.'))
 
