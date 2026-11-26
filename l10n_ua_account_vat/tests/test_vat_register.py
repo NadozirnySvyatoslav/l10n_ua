@@ -24,21 +24,18 @@ class TestVatRegister(TransactionCase):
             'company_type': 'company',
         })
         cls.company.l10n_ua_is_vat_payer = True
-        # Create tax period
-        cls.period = cls.env['l10n_ua.tax.period'].search([
-            ('company_id', '=', cls.company.id),
-        ], limit=1)
-        if not cls.period:
-            cls.period = cls.env['l10n_ua.tax.period'].create({
-                'name': 'Червень 2025',
-                'date_start': date(2025, 6, 1),
-                'date_end': date(2025, 6, 30),
-                'period_type': 'month',
-                'month': 6,
-                'year': 2025,
-                'quarter': 2,
-                'company_id': cls.company.id,
-            })
+        # Own tax period: test invoices are dated 06.2025, so do not
+        # reuse an arbitrary existing period of the company (#669).
+        cls.period = cls.env['l10n_ua.tax.period'].create({
+            'name': 'Червень 2025 (тест)',
+            'date_start': date(2025, 6, 1),
+            'date_end': date(2025, 6, 30),
+            'period_type': 'month',
+            'month': 6,
+            'year': 2025,
+            'quarter': 2,
+            'company_id': cls.company.id,
+        })
 
     def _create_register(self, register_type='issued'):
         return self.env['l10n_ua.vat.register'].create({
