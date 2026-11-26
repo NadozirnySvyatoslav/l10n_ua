@@ -13,10 +13,17 @@
 
 Години за місяць розрахунку стають нарахуванням «Погодинна оплата за
 навчальні заняття» (TEACH_HOURLY), незалежно від форми оплати основної роботи.
+Відпускні в ставку вже входять, тож TEACH_HOURLY не потрапляє в середню для
+відпусток (is_basic_salary=False, рішення Р1 у #417); ПДФО, ВЗ, ЄСВ і база
+лікарняних — як для зарплати.
+
+Записи за місяць проведеного (done) листка закриті: їх не можна ні додати, ні
+змінити, ні видалити, поки листок не повернуто в чернетку, інакше години
+мовчки розійшлися б із виплаченим.
 """
 
 from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_round
 
 ACADEMICIAN_RAISE = 1.25
@@ -99,3 +106,46 @@ class HrTeachingHoursEntry(models.Model):
                 raise ValidationError(_(
                     'На %s немає базової величини: внесіть її в «Базові величини».',
                     entry.date))
+
+    # ------------------------------------------------------------------
+    # Закритий місяць: записи в періоді проведеного листка (К9 #417)
+    # ------------------------------------------------------------------
+    def _check_payslip_not_done(self):
+        """Відмова, якщо дата запису — у періоді проведеного листка працівника.
+
+        Листок шукаємо з sudo лише для перевірки, чи він є: табельник, який
+        вносить години, може не мати права читати листки.
+        """
+        Payslip = self.env['hr.payslip'].sudo()
+        for entry in self:
+            slip = Payslip.search([
+                ('employee_id', '=', entry.employee_id.id),
+                ('company_id', '=', entry.company_id.id),
+                ('state', '=', 'done'),
+                ('date_from', '<=', entry.date),
+                ('date_to', '>=', entry.date),
+            ], limit=1)
+            if slip:
+                raise UserError(_(
+                    'Години %(emp)s за %(date)s уже в проведеному листку '
+                    '«%(slip)s». Спершу скасуйте листок (поверніть у чернетку), '
+                    'потім змініть години.',
+                    emp=entry.employee_id.name, date=entry.date,
+                    slip=slip.display_name))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        entries = super().create(vals_list)
+        entries._check_payslip_not_done()
+        return entries
+
+    def write(self, vals):
+        self._check_payslip_not_done()
+        res = super().write(vals)
+        if {'date', 'employee_id', 'company_id'} & set(vals):
+            self._check_payslip_not_done()
+        return res
+
+    def unlink(self):
+        self._check_payslip_not_done()
+        return super().unlink()
