@@ -175,6 +175,12 @@
               action="action_cashflow_report"
               sequence="50"/>
 
+    <menuitem id="menu_ua_reports_notes"
+              name="Notes to the Financial Statements (Form No.5)"
+              parent="menu_ua_reports"
+              action="action_notes_report"
+              sequence="57"/>
+
     <menuitem id="menu_ua_reports_small"
               name="Simplified Statements (Small / Micro)"
               parent="menu_ua_reports"

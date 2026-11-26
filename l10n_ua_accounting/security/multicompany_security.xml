@@ -71,6 +71,15 @@
             <field name="operation">crud</field>
         </record>
 
+        <record id="l10n_ua_notes_report_company_rule" model="ir.access">
+            <field name="name">Примітки до фінзвітності: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_notes_report"/>
+            <field name="domain">
+                ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
         <record id="l10n_ua_small_report_company_rule" model="ir.access">
             <field name="name">Спрощена фінзвітність: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_small_report"/>
@@ -195,6 +204,15 @@
         <record id="l10n_ua_small_report_line_company_rule" model="ir.access">
             <field name="name">Рядок спрощеної фінзвітності: multi-company</field>
             <field name="model_id" ref="model_l10n_ua_small_report_line"/>
+            <field name="domain">
+                ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
+            </field>
+            <field name="operation">crud</field>
+        </record>
+
+        <record id="l10n_ua_notes_report_line_company_rule" model="ir.access">
+            <field name="name">Рядок приміток до фінзвітності: multi-company</field>
+            <field name="model_id" ref="model_l10n_ua_notes_report_line"/>
             <field name="domain">
                 ['|', ('report_id.company_id', '=', False), ('report_id.company_id', 'in', company_ids)]
             </field>
