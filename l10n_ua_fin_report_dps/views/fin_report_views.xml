@@ -116,6 +116,29 @@
         </field>
     </record>
 
+    <record id="view_notes_report_form_dps" model="ir.ui.view">
+        <field name="name">l10n_ua.notes.report.form.dps</field>
+        <field name="model">l10n_ua.notes.report</field>
+        <field name="inherit_id" ref="l10n_ua_accounting.view_notes_report_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button name="action_generate_dps_xml" type="object" string="DPS XML"
+                        icon="fa-file-code-o"
+                        invisible="state != 'confirmed' or submission_date"/>
+                <button name="action_kep_submit" type="object" string="Submit to DPS"
+                        class="btn-primary"
+                        invisible="state != 'confirmed' or submission_date"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="DPS" invisible="not xml_file and not submission_date">
+                    <field name="xml_file" filename="xml_filename" invisible="not xml_file"/>
+                    <field name="xml_filename" invisible="1"/>
+                    <field name="submission_date" invisible="not submission_date"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Податки → Звітність до ДПС -->
     <menuitem id="menu_dps_balance_report" name="Balance (Form 1)"
               parent="l10n_ua_tax.menu_ua_tax_reporting"
