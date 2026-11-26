@@ -119,6 +119,21 @@ class TestTaxInvoiceJ1201016(TransactionCase):
         self.assertEqual(root.findtext('DECLARBODY/HBOS'), 'Іван ПЕТРЕНКО')
         self.assertEqual(root.findtext('DECLARBODY/HKBOS'), '2234567891')
 
+    def test_signer_inherited_without_rnokpp_legacy(self):
+        """ПН до #697: compute скопіював ПІБ компанії без РНОКПП. Коли РНОКПП
+        у компанії заповнено — XML формується з пари компанії, без міграції."""
+        self.company.l10n_ua_vat_signer_rnokpp = False
+        pn = self._pn(self.buyer, [{'name': 'Товар', 'uktzed_code': '1001990000', 'quantity': 1,
+                                    'price_unit': 10, 'vat_rate': '20'}])
+        self.assertFalse(pn.signer_name)                 # неповну пару compute не копіює
+        pn.write({'signer_name': 'Олена КОВАЛЬ', 'signer_rnokpp': False})   # стан старих баз
+        with self.assertRaisesRegex(UserError, 'налаштування ПДВ компанії'):
+            pn.action_generate_xml()
+        self.company.l10n_ua_vat_signer_rnokpp = '3124567896'
+        root, _data = self._xml(pn)
+        self.assertEqual(root.findtext('DECLARBODY/HBOS'), 'Олена КОВАЛЬ')
+        self.assertEqual(root.findtext('DECLARBODY/HKBOS'), '3124567896')
+
     def test_missing_requisites(self):
         self.company.l10n_ua_vat_signer_rnokpp = False
         pn = self._pn(self.buyer, [{'name': 'Товар', 'uktzed_code': '1001990000', 'quantity': 1,
