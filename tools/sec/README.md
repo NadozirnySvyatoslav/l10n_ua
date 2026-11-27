@@ -9,11 +9,15 @@
   shell=True/os.system, verify=False, csrf=False, pickle. Запуск з `--baseline-commit`: лише нові спрацювання.
 - check_odoo (`tools/sec/check_odoo.py --diff BASE`) — ACL із записом для portal/public або без групи,
   record rules `[(1,'=',1)]` для portal/public, `sudo()` у маршрутах `auth='public'/'none'` без
-  `# sudo-ok: причина`, `nosemgrep` без причини. Лише рядки, змінені в PR; зміна `auth` у декораторі
-  над старим `sudo()` теж рахується.
-- needs-human — PR змінює `.github/`, правила безпеки, залежності, `external_dependencies`, додає
-  винятки (`nosemgrep`, `sudo-ok:`, `.security-exceptions.txt`) або нові зовнішні хости (точний збіг
-  з білим списком). Тоді CI ставить мітку `needs-human`: PR не мержимо і не запускаємо на боксі, доки
+  `# sudo-ok: причина` (так само `with_user(SUPERUSER_ID)`, `env(su=True)`, `env(user=SUPERUSER_ID)`,
+  `api.Environment(cr, SUPERUSER_ID, …)`), маркер semgrep (повна або коротка форма) без причини.
+  Лише рядки, змінені в PR; зміна `auth` у декораторі над старим `sudo()` теж рахується.
+- needs-human — PR змінює `.github/`, `.semgrep/`, `.semgrepignore`, `tools/sec/`, залежності,
+  `external_dependencies`, додає винятки (маркер semgrep у будь-якій формі, `sudo-ok:`,
+  `.security-exceptions.txt`) або нові зовнішні хости у `.py/.js/.xml/.csv/.json/.html` (точний збіг
+  з білим списком).
+- База diff (`tools/sec/base_sha.sh`): на PR — `base.sha`; на push — попередня голова гілки, а якщо її
+  немає (нова гілка, force-push) — merge-base з базовою гілкою, інакше `HEAD^`. Тоді CI ставить мітку `needs-human`: PR не мержимо і не запускаємо на боксі, доки
   Святослав не перегляне і сам не зніме мітку. CI мітку лише ставить, не знімає.
 
 Actions зафіксовані за SHA коміту. Оновлення версій — окремим PR (він сам отримає needs-human).
@@ -36,6 +40,10 @@ Actions зафіксовані за SHA коміту. Оновлення вер�
   CODEOWNERS технічно можна обійти (`gh pr merge --admin`, зняття мітки). Правило «червоний шлюз або
   needs-human = не мержимо» тримається на `merge_policy.md` і щотижневому аудиті Олега
   (журнал merge vs. статус перевірок), а не на налаштуваннях GitHub.
+- **Шлюз сам себе не захищає.** На `pull_request` GitHub бере `security.yml` і `tools/sec/` з версії PR.
+  PR, що прибирає job needs-human чи послаблює правила, отримає зелені перевірки. Сьогодні це тримає
+  лише людський огляд (будь-яка зміна `.github/`/`tools/sec/` за merge_policy — RED, мержить Святослав).
+  Варіанти технічного захисту — на рішення Святослава (опис PR #655).
 - `sudo()` поза публічними маршрутами CI не ловить (забагато хибних спрацювань) — лишається на огляді.
 - Prompt-injection у тексті issues/PR CI не зупиняє. Захист — шлюз запуску на боксі (trust_gate у
   `m2o_testdb.sh`), вузькі права агентів, окремі користувачі ОС.

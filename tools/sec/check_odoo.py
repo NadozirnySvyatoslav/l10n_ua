@@ -7,7 +7,9 @@
    Виняток — те саме, за xml id правила.
 3. sudo() у контролерах auth='public'/'none' без маркера на тому ж або попередньому рядку:
        # sudo-ok: причина
-4. nosemgrep без пояснення (" -- причина").
+   Те саме для обхідних форм суперкористувача: with_user(SUPERUSER_ID|1), env(su=True),
+   with_env(... su=True), api.Environment(cr, SUPERUSER_ID, ...).
+4. nosemgrep / коротка форма nosem без пояснення (" -- причина").
 
 Запуск:
   python3 tools/sec/check_odoo.py <корінь>               — повний аудит (щотижневий огляд)
@@ -131,6 +133,44 @@ def route_auth(fn):
 
 
 MARK = re.compile(r"#\s*sudo-ok:\s*\S")
+# semgrep приймає і повну форму маркера (nosemgrep), і коротку (nosem), регістр не важливий.
+NOSEM = re.compile(r"#\s*nosem(?:grep)?\b(.*)", re.I)
+SUPERUSER_NAMES = {"SUPERUSER_ID"}
+
+
+def _is_superuser(node):
+    """SUPERUSER_ID, odoo.SUPERUSER_ID, api.SUPERUSER_ID або літерал 1."""
+    if isinstance(node, ast.Name):
+        return node.id in SUPERUSER_NAMES
+    if isinstance(node, ast.Attribute):
+        return node.attr in SUPERUSER_NAMES
+    return isinstance(node, ast.Constant) and node.value == 1 and not isinstance(node.value, bool)
+
+
+def superuser_call(node):
+    """Назва форми, якщо виклик піднімає права до суперкористувача, інакше None."""
+    if not isinstance(node, ast.Call):
+        return None
+    name = getattr(node.func, "attr", getattr(node.func, "id", ""))
+    if name == "sudo":
+        # sudo(False) права не піднімає
+        if node.args and isinstance(node.args[0], ast.Constant) and node.args[0].value is False:
+            return None
+        return "sudo()"
+    for kw in node.keywords:
+        if kw.arg == "su" and not (isinstance(kw.value, ast.Constant) and kw.value.value is False):
+            return f"{name or 'env'}(su=...)"
+    if name == "with_user" and node.args and _is_superuser(node.args[0]):
+        return "with_user(SUPERUSER_ID)"
+    for kw in node.keywords:
+        if kw.arg in ("user", "uid") and _is_superuser(kw.value):
+            return f"{name}({kw.arg}=SUPERUSER_ID)"
+    if name == "Environment" and len(node.args) > 1 and _is_superuser(node.args[1]):
+        return "Environment(cr, SUPERUSER_ID)"
+    if name == "Environment" and len(node.args) > 3 and not (
+            isinstance(node.args[3], ast.Constant) and node.args[3].value is False):
+        return "Environment(..., su)"
+    return None
 
 
 def check_sudo_and_nosemgrep():
@@ -138,9 +178,9 @@ def check_sudo_and_nosemgrep():
         src = p.read_text(encoding="utf-8", errors="ignore")
         lines = src.splitlines()
         for n, line in enumerate(lines, 1):
-            m = re.search(r"#\s*nosemgrep\b(.*)", line)
+            m = NOSEM.search(line)
             if m and " -- " not in m.group(1):
-                report(rel(p), n, n, "nosemgrep без пояснення (' -- причина')")
+                report(rel(p), n, n, "nosemgrep/nosem без пояснення (' -- причина')")
         try:
             tree = ast.parse(src)
         except SyntaxError as e:
@@ -156,12 +196,13 @@ def check_sudo_and_nosemgrep():
             deco_first = min(d.lineno for d in fn.decorator_list)
             deco_last = max(d.end_lineno for d in fn.decorator_list)
             for node in ast.walk(fn):
-                if isinstance(node, ast.Call) and getattr(node.func, "attr", "") == "sudo":
+                form = superuser_call(node)
+                if form:
                     ln = node.lineno
                     near = lines[ln - 1] + "\n" + (lines[ln - 2] if ln > 1 else "")
                     if MARK.search(near):
                         continue
-                    msg = f"sudo() у маршруті auth='{auth}' ({fn.name}) без '# sudo-ok: причина'"
+                    msg = f"{form} у маршруті auth='{auth}' ({fn.name}) без '# sudo-ok: причина'"
                     report(rel(p), ln, ln, msg)
                     report(rel(p), deco_first, deco_last, msg + f" [декоратор, sudo на рядку {ln}]")
 

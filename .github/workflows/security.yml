@@ -14,41 +14,55 @@ env:
   # База для diff: на PR — base.sha, на push — попередня голова гілки.
   BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
   HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+  # Fallback, коли before = 000…0 (push нової гілки) або коміта немає (force-push): merge-base з цією гілкою.
+  BASE_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || github.event.repository.default_branch }}
 jobs:
   gitleaks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: { fetch-depth: 0, persist-credentials: false }
+      - name: База для diff
+        run: |
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - name: gitleaks (секрети в комітах PR)
         run: |
           curl -sSfL -o gitleaks.tgz https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz
           echo "5bc41815076e6ed6ef8fbecc9d9b75bcae31f39029ceb55da08086315316e3ba  gitleaks.tgz" | sha256sum -c -
           tar xzf gitleaks.tgz gitleaks
-          ./gitleaks git --redact --no-banner --log-opts="$BASE_SHA..$HEAD_SHA" .
+          ./gitleaks git --redact --no-banner --log-opts="$DIFF_BASE..$HEAD_SHA" .
 
   semgrep:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: { fetch-depth: 0, persist-credentials: false }
+      - name: База для diff
+        run: |
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with: { python-version: '3.12' }
       # setuptools<81: semgrep 1.95 (через opentelemetry) імпортує pkg_resources,
       # якого в Python 3.12 без setuptools немає.
       - run: pip install semgrep==1.95.0 'setuptools<81'
       - name: semgrep з правилами під Odoo (лише нові спрацювання)
-        run: semgrep scan --config .semgrep/odoo.yml --error --metrics=off --baseline-commit "$BASE_SHA" .
+        run: semgrep scan --config .semgrep/odoo.yml --error --metrics=off --baseline-commit "$DIFF_BASE" .
 
   acl:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: { fetch-depth: 0, persist-credentials: false }
+      - name: База для diff
+        run: |
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with: { python-version: '3.12' }
       - name: ACL, record rules, sudo() у публічних маршрутах, nosemgrep без причини
-        run: python3 tools/sec/check_odoo.py . --diff "$BASE_SHA"
+        run: python3 tools/sec/check_odoo.py . --diff "$DIFF_BASE"
 
   # PR з такими змінами отримує мітку needs-human і чекає Святослава; решта йде без людини.
   # Мітку CI лише ставить. Знімає її людина після огляду, тож пізніший коміт не «сховає» ризик.
@@ -62,25 +76,29 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with: { fetch-depth: 0, persist-credentials: false }
+      - name: База для diff
+        run: |
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - name: Зміни CI, правил безпеки, залежностей, нові винятки й зовнішні адреси
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
         run: |
           reasons=""
-          files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
-          if echo "$files" | grep -qE '^\.github/|^\.semgrep/|^tools/sec/|requirements.*\.txt$|^\.gitleaks|^\.security-exceptions|^\.pre-commit'; then
+          files=$(git diff --name-only "$DIFF_BASE" "$HEAD_SHA")
+          if echo "$files" | grep -qE '^\.github/|^\.semgrep/|(^|/)\.semgrepignore$|^tools/sec/|requirements.*\.txt$|^\.gitleaks|^\.security-exceptions|^\.pre-commit'; then
             reasons="$reasons; змінено CI/правила безпеки/залежності"
           fi
-          if git diff "$BASE_SHA" "$HEAD_SHA" -- '*__manifest__.py' | grep -qE '^\+.*external_dependencies'; then
+          if git diff "$DIFF_BASE" "$HEAD_SHA" -- '*__manifest__.py' | grep -qE '^\+.*external_dependencies'; then
             reasons="$reasons; нові external_dependencies"
           fi
-          if git diff "$BASE_SHA" "$HEAD_SHA" -- '*.py' | grep -qE '^\+.*(nosemgrep|sudo-ok:)'; then
+          if git diff "$DIFF_BASE" "$HEAD_SHA" -- '*.py' | grep -qiE '^\+.*(nosem|sudo-ok:)'; then
             reasons="$reasons; нові винятки з правил безпеки"
           fi
           # Хост порівнюємо точно, а не підрядком: evil-odoo.com не пройде як odoo.com.
           ALLOW='^(odoo\.com|www\.odoo\.com|apps\.odoo\.com|github\.com|www\.w3\.org|localhost|127\.0\.0\.1)$'
-          urls=$(git diff "$BASE_SHA" "$HEAD_SHA" -- '*.py' '*.js' '*.xml' \
+          urls=$(git diff "$DIFF_BASE" "$HEAD_SHA" -- '*.py' '*.js' '*.xml' '*.csv' '*.json' '*.html' \
             | grep -E '^\+' | grep -oE 'https?://[A-Za-z0-9.-]+' | sed -E 's#^https?://##' \
             | tr 'A-Z' 'a-z' | sort -u | grep -vE "$ALLOW" | tr '\n' ' ' || true)
           if [ -n "$urls" ]; then
