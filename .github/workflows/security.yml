@@ -11,11 +11,13 @@ on:
 permissions:
   contents: read
 env:
-  # База для diff: на PR — base.sha, на push — попередня голова гілки.
+  # База для diff — tools/sec/base_sha.sh: на PR — перший батько merge-коміту (base.sha застаріває,
+  # коли базова гілка йде вперед), на push — попередня голова гілки.
   BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
   HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
   # Fallback, коли before = 000…0 (push нової гілки) або коміта немає (force-push): merge-base з цією гілкою.
   BASE_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || github.event.repository.default_branch }}
+  PR_HEAD: ${{ github.event.pull_request.head.sha }}
 jobs:
   gitleaks:
     runs-on: ubuntu-latest
@@ -24,7 +26,7 @@ jobs:
         with: { fetch-depth: 0, persist-credentials: false }
       - name: База для diff
         run: |
-          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH" "$PR_HEAD")
           echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - name: gitleaks (секрети в комітах PR)
         run: |
@@ -40,7 +42,7 @@ jobs:
         with: { fetch-depth: 0, persist-credentials: false }
       - name: База для diff
         run: |
-          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH" "$PR_HEAD")
           echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with: { python-version: '3.12' }
@@ -57,7 +59,7 @@ jobs:
         with: { fetch-depth: 0, persist-credentials: false }
       - name: База для diff
         run: |
-          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH" "$PR_HEAD")
           echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
         with: { python-version: '3.12' }
@@ -78,7 +80,7 @@ jobs:
         with: { fetch-depth: 0, persist-credentials: false }
       - name: База для diff
         run: |
-          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH")
+          base=$(bash tools/sec/base_sha.sh "$BASE_SHA" "$BASE_BRANCH" "$PR_HEAD")
           echo "DIFF_BASE=$base" >> "$GITHUB_ENV"
       - name: Зміни CI, правил безпеки, залежностей, нові винятки й зовнішні адреси
         env:
@@ -86,19 +88,19 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           reasons=""
-          files=$(git diff --name-only "$DIFF_BASE" "$HEAD_SHA")
+          files=$(git diff --name-only "$DIFF_BASE" HEAD)
           if echo "$files" | grep -qE '^\.github/|^\.semgrep/|(^|/)\.semgrepignore$|^tools/sec/|requirements.*\.txt$|^\.gitleaks|^\.security-exceptions|^\.pre-commit'; then
             reasons="$reasons; змінено CI/правила безпеки/залежності"
           fi
-          if git diff "$DIFF_BASE" "$HEAD_SHA" -- '*__manifest__.py' | grep -qE '^\+.*external_dependencies'; then
+          if git diff "$DIFF_BASE" HEAD -- '*__manifest__.py' | grep -qE '^\+.*external_dependencies'; then
             reasons="$reasons; нові external_dependencies"
           fi
-          if git diff "$DIFF_BASE" "$HEAD_SHA" -- '*.py' | grep -qiE '^\+.*(nosem|sudo-ok:)'; then
+          if git diff "$DIFF_BASE" HEAD -- '*.py' | grep -qiE '^\+.*(nosem|sudo-ok:)'; then
             reasons="$reasons; нові винятки з правил безпеки"
           fi
           # Хост порівнюємо точно, а не підрядком: evil-odoo.com не пройде як odoo.com.
           ALLOW='^(odoo\.com|www\.odoo\.com|apps\.odoo\.com|github\.com|www\.w3\.org|localhost|127\.0\.0\.1)$'
-          urls=$(git diff "$DIFF_BASE" "$HEAD_SHA" -- '*.py' '*.js' '*.xml' '*.csv' '*.json' '*.html' \
+          urls=$(git diff "$DIFF_BASE" HEAD -- '*.py' '*.js' '*.xml' '*.csv' '*.json' '*.html' \
             | grep -E '^\+' | grep -oE 'https?://[A-Za-z0-9.-]+' | sed -E 's#^https?://##' \
             | tr 'A-Z' 'a-z' | sort -u | grep -vE "$ALLOW" | tr '\n' ' ' || true)
           if [ -n "$urls" ]; then
