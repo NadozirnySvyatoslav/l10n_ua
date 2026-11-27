@@ -1079,7 +1079,9 @@ class HrLeave(models.Model):
         (l10n_ua_hr_vacation_reserve).
 
         Include:
-        - Accrual types marked as is_basic_salary (п. 3, less п. 4)
+        - Accrual types marked as is_basic_salary (п. 3, less п. 4), except
+          those whose rate already includes vacation pay
+          (l10n_ua_vacation_included, #417)
         - Vacation pay and sickness benefits (п. 3, last paragraph)
 
         Exclude periods:
@@ -1135,12 +1137,21 @@ class HrLeave(models.Model):
         return 0.0
 
     @api.model
+    @api.model
+    def _l10n_ua_vacation_counts(self, kind):
+        """Whether an accrual type counts in the vacation average."""
+        if kind.category in ('vacation', 'sick'):
+            return True
+        return kind.is_basic_salary and not kind.l10n_ua_vacation_included
+
     def _l10n_ua_vacation_earnings(self, employee, payslips, date_from, date_to):
         """(earnings, days without pay) of the payslips of the period.
 
         The earnings are the lines of the types marked `is_basic_salary` —
         the wage of п. 3 of Порядок № 100, less the payments of п. 4
-        (одноразові виплати, матеріальна допомога, соціальні виплати...).
+        (одноразові виплати, матеріальна допомога, соціальні виплати...),
+        and less the types whose rate already includes the vacation pay
+        (`l10n_ua_vacation_included`: hourly pay of ПКМУ № 1078, примітка 4).
         For a vacation or its compensation п. 3 also counts the pay of the
         days the average was kept (an earlier vacation, a business trip) and
         the sickness benefit: those types go in by their category, with their
@@ -1175,8 +1186,7 @@ class HrLeave(models.Model):
         excluded_days = 0
         for payslip in payslips:
             earnings = payslip.accrual_ids.filtered(
-                lambda line: line.accrual_type_id.is_basic_salary
-                or line.accrual_type_id.category in ('vacation', 'sick'))
+                lambda line: self._l10n_ua_vacation_counts(line.accrual_type_id))
             for line in earnings:
                 month = retro_month.get(line.id)
                 if month is not None:
@@ -1198,8 +1208,7 @@ class HrLeave(models.Model):
             ])
             for retro in later:
                 line = retro.accrual_line_id
-                if line and (line.accrual_type_id.is_basic_salary
-                             or line.accrual_type_id.category in ('vacation', 'sick')):
+                if line and self._l10n_ua_vacation_counts(line.accrual_type_id):
                     total_earnings += line.amount
         return total_earnings, excluded_days
 

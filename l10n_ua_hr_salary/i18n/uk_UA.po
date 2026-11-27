@@ -284,6 +284,25 @@ msgid "Basic Salary Component"
 msgstr "Компонент основної зарплати"
 
 #. module: l10n_ua_hr_salary
+#: model:ir.model.fields,field_description:l10n_ua_hr_salary.field_hr_accrual_type__l10n_ua_vacation_included
+msgid "Rate Includes Vacation Pay"
+msgstr "Ставка вже включає відпускні"
+
+#. module: l10n_ua_hr_salary
+#: model:ir.model.fields,help:l10n_ua_hr_salary.field_hr_accrual_type__l10n_ua_vacation_included
+msgid ""
+"The rate already includes the pay for the vacation days (e.g. hourly pay of "
+"teachers, ПКМУ № 1078, примітка 4). Not included in the average salary for "
+"vacations and their compensation; still included in the two-month average "
+"(severance pay and other cases of Порядок № 100, п. 2, абз. 4)."
+msgstr ""
+"Ставка вже включає оплату за дні відпустки (наприклад, погодинна оплата "
+"педагогів, ПКМУ № 1078, примітка 4). Не враховується в середній заробітній "
+"платі для оплати відпусток і компенсації за невикористані відпустки; "
+"враховується в середньомісячному заробітку за 2 місяці (вихідна допомога та "
+"інші випадки п. 2 абз. 4 Порядку № 100)."
+
+#. module: l10n_ua_hr_salary
 #: model_terms:ir.ui.view,arch_db:l10n_ua_hr_salary.hr_salary_advance_view_form
 msgid "Batch & Payroll Integration"
 msgstr "Пакет та інтеграція з розрахунком"
