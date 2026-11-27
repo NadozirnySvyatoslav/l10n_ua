@@ -1,26 +1,32 @@
-from odoo import api, models
-
-from odoo.addons.l10n_ua_account_base.tools.formatters import (
-    amount_to_words_ua,
-    format_date_ua,
-)
+from odoo import models
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _name = 'account.move'
+    _inherit = ['account.move', 'l10n_ua.doc.report.mixin']
 
     def _get_ua_report_lines(self):
-        """Return invoice lines excluding sections and notes."""
-        return self.invoice_line_ids.filtered(
-            lambda l: l.display_type not in ('line_section', 'line_note')
-        )
+        """Return product lines only: no sections, subsections or notes."""
+        return self.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
 
-    def _get_ua_date_formatted(self, dt=None):
-        """Format date in Ukrainian long format: "15" січня 2026 р."""
-        return format_date_ua(dt or self.invoice_date or self.date)
+    def _get_ua_doc_date(self):
+        """Document date: invoice date, for drafts without it the accounting date."""
+        return self.invoice_date or self.date
 
-    def _get_ua_tax_amount_words(self):
-        """Amount in words for VAT portion."""
-        if self.amount_tax and self.currency_id.name == 'UAH':
-            return amount_to_words_ua(self.amount_tax)
-        return ''
+    def _get_ua_line_qty(self, line):
+        return line.quantity
+
+    def _get_ua_buyer(self):
+        return self.commercial_partner_id
+
+    def _get_ua_partner_bank(self):
+        return self.partner_bank_id
+
+    def _get_ua_due_date(self):
+        return self.invoice_date_due
+
+    def _get_ua_note(self):
+        return self.narration
+
+    def _get_ua_discount_total(self):
+        return self.l10n_ua_discount_total

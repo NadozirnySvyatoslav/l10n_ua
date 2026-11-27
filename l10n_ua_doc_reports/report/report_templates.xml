@@ -2,9 +2,26 @@
 <odoo>
 
     <!-- Paper format for Ukrainian accounting reports - A4, minimal margins.
-         Forms use web.basic_layout (no company header/footer): requisites are part of the form itself. -->
+         For reports with web.external_layout: leaves room for the company header.
+         Used by other l10n_ua modules (accounting, assets, FOP, business trips). -->
     <record id="paperformat_ua_report" model="report.paperformat">
         <field name="name">Ukrainian Report A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">20</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Paper format for forms with web.basic_layout (no company header/footer):
+         requisites are part of the form itself, so no room for a header is needed. -->
+    <record id="paperformat_ua_form" model="report.paperformat">
+        <field name="name">Ukrainian Form A4 (no header)</field>
         <field name="default" eval="False"/>
         <field name="format">A4</field>
         <field name="orientation">Portrait</field>
@@ -28,7 +45,7 @@
 
             /* Ukrainian accounting report styles */
             .ua-report {
-                font-family: 'Times New Roman', Times, serif;
+                font-family: 'Times New Roman', 'Liberation Serif', Times, serif;
                 font-size: 10pt;
                 width: 100%;
                 max-width: 100%;
@@ -129,6 +146,85 @@
                 border: none !important;
                 padding: 1px 5px;
             }
+
+            /* Requisites (supplier, buyer, due date) and signature blocks.
+               'separate' keeps wkhtmltopdf from drawing a frame around them. */
+            .ua-report table.ua-requisites,
+            .ua-report table.ua-signatures {
+                border-collapse: separate;
+                border-spacing: 0;
+                border: none !important;
+            }
+            .ua-report table.ua-requisites td,
+            .ua-report table.ua-signatures td {
+                border: none !important;
+                padding: 1px 5px;
+            }
+            .ua-report table.ua-requisites {
+                margin-bottom: 10px;
+            }
+            .ua-report table.ua-requisites td {
+                padding-bottom: 6px;
+            }
+            .ua-report td.ua-requisites-label {
+                width: 18%;
+                font-weight: bold;
+                text-decoration: underline;
+                white-space: nowrap;
+            }
+            .ua-report .ua-report-date {
+                font-size: 11pt;
+                margin-top: 3px;
+            }
+            /* Lines and totals in one table. 'separate' + explicit right/bottom
+               borders let the merged label cells of the totals rows stay
+               borderless in wkhtmltopdf ('collapse' redraws neighbour borders). */
+            .ua-report table.ua-lines {
+                table-layout: fixed;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-bottom: 10px;
+            }
+            .ua-report table.ua-lines th,
+            .ua-report table.ua-lines td {
+                border: none;
+                border-right: 1px solid black;
+                border-bottom: 1px solid black;
+            }
+            .ua-report table.ua-lines tr > :first-child {
+                border-left: 1px solid black;
+            }
+            .ua-report table.ua-lines thead th {
+                border-top: 1px solid black;
+            }
+            .ua-report table.ua-lines td.ua-totals-label {
+                border: none;
+                text-align: right;
+                font-weight: bold;
+            }
+            .ua-report table.ua-lines td.ua-totals-value {
+                border-left: 1px solid black;
+                text-align: right;
+                font-weight: bold;
+                white-space: nowrap;
+            }
+            .ua-report table.ua-lines td.ua-totals-value.text-center {
+                text-align: center;
+            }
+            .ua-report table.ua-signatures {
+                width: auto;
+                margin-top: 30px;
+            }
+            .ua-report table.ua-signatures .signature-line {
+                min-width: 200px;
+            }
+            .ua-report table.ua-signatures td {
+                padding-right: 15px;
+            }
+            .ua-report td.ua-stamp {
+                padding-top: 10px;
+                font-size: 9pt;
+            }
         </style>
     </template>
 
@@ -165,7 +261,7 @@
                 <span>ЄДРПОУ: <span t-field="partner.edrpou"/></span>
             </t>
             <t t-if="partner.ipn">
-                <span>, ІПН: <span t-field="partner.ipn"/></span>
+                <span><t t-if="partner.edrpou">, </t>ІПН: <span t-field="partner.ipn"/></span>
             </t>
             <t t-if="partner.is_vat_payer">
                 <span>, платник ПДВ</span>
@@ -194,7 +290,7 @@
                 <span>ЄДРПОУ: <span t-field="partner.edrpou"/></span>
             </t>
             <t t-if="partner.ipn">
-                <span>, ІПН: <span t-field="partner.ipn"/></span>
+                <span><t t-if="partner.edrpou">, </t>ІПН: <span t-field="partner.ipn"/></span>
             </t>
         </div>
     </template>
