@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Statutory values: State Budget Laws No. 3460-IX (2024), No. 4059-IX (2025),
-         No. 4695-IX of 03.12.2025 (2026).
+         No. 4695-IX of 03.12.2025 (2026); 2027 — bill No. 16000 (TODO: law number
+         after adoption; figures from the first reading of 28.10.2026, #351).
          The maximum ESV base is 15 minimum wages by the ESV law (No. 2464-VI,
          art. 1 p. 4); the budget laws for 2025 and 2026 raised it to 20.
          A reference that belongs to no company. Every company gets its own
@@ -55,9 +56,25 @@
         <record id="psp_template_2026_01" model="hr.psp.parameters.template">
             <field name="year">2026</field>
             <field name="date_from">2026-01-01</field>
+            <field name="date_to">2026-12-31</field>
             <field name="subsistence_minimum">3328</field>
             <field name="min_wage">8647</field>
             <field name="min_hourly_wage">52.00</field>
+            <field name="pdfo_rate">18</field>
+            <field name="military_tax_rate">5</field>
+            <field name="esv_rate">22</field>
+            <field name="max_esv_base_multiplier">20</field>
+        </record>
+
+        <!-- 2027: мінзарплата 9546 (57,50 грн/год), прожитковий мінімум для
+             працездатних 3691 — проєкт Держбюджету-2027 (№ 16000), перше
+             читання 28.10.2026. Звірити з ухваленим законом. -->
+        <record id="psp_template_2027_01" model="hr.psp.parameters.template">
+            <field name="year">2027</field>
+            <field name="date_from">2027-01-01</field>
+            <field name="subsistence_minimum">3691</field>
+            <field name="min_wage">9546</field>
+            <field name="min_hourly_wage">57.50</field>
             <field name="pdfo_rate">18</field>
             <field name="military_tax_rate">5</field>
             <field name="esv_rate">22</field>
