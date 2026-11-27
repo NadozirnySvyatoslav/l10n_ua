@@ -245,6 +245,18 @@ msgstr "Підключено до корпоративного API monobank, а�
 #. module: l10n_ua_bank_mono
 #. odoo-python
 #: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Connected to monobank corporate API, but account %(iban)s is in %(account_currency)s and the journal in %(journal_currency)s: the statement will not be imported."
+msgstr "Підключено до корпоративного API monobank, але рахунок %(iban)s у валюті %(account_currency)s, а журнал — у %(journal_currency)s: виписку не буде імпортовано."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "monobank account %(account)s is in %(account_currency)s, while journal %(journal)s is in %(journal_currency)s. Select a journal in the account currency."
+msgstr "Рахунок monobank %(account)s у валюті %(account_currency)s, а журнал %(journal)s — у %(journal_currency)s. Оберіть журнал у валюті рахунку."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
 msgid "Connected to monobank corporate API. Accounts: %d"
 msgstr "Підключено до корпоративного API monobank. Рахунків: %d"
 

@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - monobank Integration',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.2.1',
     'category': 'Accounting/Localization',
     'summary': 'monobank API integration for bank statements',
     'description': """

@@ -10,6 +10,7 @@ from odoo.tests import TransactionCase, tagged
 
 MODULE = 'odoo.addons.l10n_ua_bank_mono.models.l10n_ua_bank_mono_config'
 OWN_IBAN = 'UA213223130000026007233566001'
+USD_IBAN = 'UA293220010000026002700000002'
 KYIV = pytz.timezone('Europe/Kyiv')
 
 
@@ -96,6 +97,7 @@ class TestMonoCorporate(TransactionCase):
         second = [_item(499, start + 499)] + [
             _item(n, start + n) for n in range(500, 520)]
         with patch(f'{MODULE}.requests.get', side_effect=[
+                _response(json_data=[]),    # accounts, for the currency check
                 _response(json_data=first), _response(json_data=second),
                 _response(json_data=[])]) as get:
             raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
@@ -134,7 +136,7 @@ class TestMonoCorporate(TransactionCase):
                             headers={'x-rate-limit-retry-after-seconds': '17'})
         with patch(f'{MODULE}.sleep') as sleep, \
                 patch(f'{MODULE}.requests.get', side_effect=[
-                    limited, _response(json_data=[]),
+                    _response(json_data=[]), limited, _response(json_data=[]),
                     _response(json_data=[])]) as get:
             self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         sleep.assert_called_once_with(17)
@@ -235,6 +237,7 @@ class TestMonoCorporate(TransactionCase):
         ts = int(_kyiv(2026, 9, 2, 12).timestamp())
         page = [_item(n, ts) for n in range(500)]
         with patch(f'{MODULE}.requests.get', side_effect=[
+                _response(json_data=[]),
                 _response(json_data=page), _response(json_data=page)]):
             with self.assertRaisesRegex(UserError, 'one second'):
                 self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
@@ -372,3 +375,66 @@ class TestMonoCorporate(TransactionCase):
         self.assertNotEqual(first['description'], 'Операція 1')
         self.assertIn('Операція 1', first['description'])
         self.assertEqual(second['description'], 'Операція 2')
+
+    # --- account currency and repeated import (#719) --------------------------
+
+    def test_account_in_another_currency_is_refused(self):
+        """A USD account read into a UAH journal would book 100 dollars as
+        100 hryvnias: refused before any statement request."""
+        with patch(f'{MODULE}.requests.get', return_value=_response(json_data=[
+                {'iban': OWN_IBAN, 'currency': 840, 'balance': 42.0}])) as get:
+            with self.assertRaisesRegex(UserError, 'USD'):
+                self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertEqual(_statement_calls(get), [])
+
+    def test_connection_warns_on_another_currency(self):
+        with patch(f'{MODULE}.requests.get', return_value=_response(json_data=[
+                {'iban': OWN_IBAN, 'currency': '840', 'balance': 42.0}])):
+            action = self.config.action_test_connection()
+        self.assertEqual(action['params']['type'], 'warning')
+        self.assertIn('USD', action['params']['message'])
+
+    def test_usd_account_is_imported_into_a_usd_journal(self):
+        usd = self.env.ref('base.USD')
+        usd.active = True
+        bank_account = self.env['res.partner.bank'].create({
+            'acc_number': USD_IBAN, 'partner_id': self.env.company.partner_id.id})
+        journal = self.env['account.journal'].create({
+            'name': 'mono corp USD', 'type': 'bank', 'code': 'MNU',
+            'bank_account_id': bank_account.id, 'currency_id': usd.id,
+            'company_id': self.env.company.id})
+        config = self.env['l10n_ua.bank.sync.config'].create({
+            'name': 'mono corp USD', 'provider': 'mono',
+            'mono_api_type': 'corporate', 'mono_api_token': 'corp-token',
+            'journal_id': journal.id})
+        ts = int(_kyiv(2026, 9, 2, 12).timestamp())
+
+        def fake_get(url, **kwargs):
+            if url.endswith('/ext/v1/accounts'):
+                return _response(json_data=[
+                    {'iban': OWN_IBAN, 'currency': 980, 'balance': 1.0},
+                    {'iban': USD_IBAN, 'currency': 840, 'balance': 123.45}])
+            if '/ext/v1/statement/' in url:
+                self.assertIn(f'/statement/{USD_IBAN}/', url)
+                return _response(json_data=[_item(1, ts, amount=12345)])
+            return _response(json_data=[])
+
+        with patch(f'{MODULE}.requests.get', side_effect=fake_get):
+            raw = config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        job = self.env['l10n_ua.bank.sync.job'].create({
+            'config_id': config.id,
+            'date_from': '2026-09-01', 'date_to': '2026-09-07'})
+        statement = job._create_native_statement(config._parse_transactions(raw))
+        self.assertEqual(statement.line_ids.currency_id, usd)
+        self.assertEqual(statement.line_ids.amount, 123.45)
+        self.assertFalse(statement.line_ids.foreign_currency_id)
+
+    def test_repeated_import_of_the_same_statement_adds_nothing(self):
+        raw = self._overlap_raw(self._balances())
+        first = self._import(raw, '2026-09-01', '2026-09-07')
+        self.assertEqual(len(first.line_ids), 2)
+        second = self._import(raw, '2026-09-01', '2026-09-07')
+        self.assertFalse(second)
+        lines = self.env['account.bank.statement.line'].search([
+            ('journal_id', '=', self.journal.id)])
+        self.assertEqual(sorted(lines.mapped('l10n_ua_import_uid')), ['op-1', 'op-2'])

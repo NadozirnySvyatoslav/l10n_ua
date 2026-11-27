@@ -184,6 +184,18 @@ class TestMonoPersonal(TransactionCase):
                 self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         self.assertEqual(get.call_count, 1)
 
+    def test_account_in_another_currency_is_refused(self):
+        """The FOP's USD account under the journal IBAN of a UAH journal:
+        refused, and not remembered for the next sync (#719)."""
+        self.config.mono_account_id = False
+        info = _client_info(('acc-usd', OWN_IBAN, 840))
+        with patch(f'{MODULE}.requests.get',
+                   return_value=_response(json_data=info)) as get:
+            with self.assertRaisesRegex(UserError, 'USD'):
+                self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertEqual(get.call_count, 1)
+        self.assertFalse(self.config.mono_account_id)
+
     # --- rate limit -----------------------------------------------------------
 
     def test_rate_limit_is_waited_out_once(self):
