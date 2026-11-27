@@ -3,9 +3,12 @@
 
 1. ACL (ir.model.access*.csv): запис/створення/видалення для portal, public або без групи.
    Виняток — рядок у .security-exceptions.txt:  <id запису ACL> -- причина
-2. Record rules (XML): правило для portal/public з domain [(1,'=',1)].
-   Виняток — те саме, за xml id правила.
-3. sudo() у контролерах auth='public'/'none' без маркера на тому ж або попередньому рядку:
+2. Record rules (XML): правило для portal/public, домен якого нічого не обмежує —
+   [(1,'=',1)] (будь-які лапки), [], порожній або відсутній domain_force. Порядок атрибутів
+   <record> не важливий. Виняток — те саме, за xml id правила.
+3. sudo() у контролерах auth='public'/'none' або з auth не-літералом (змінна, **kwargs —
+   вважаємо публічним; константу модуля AUTH = '...' розпізнаємо) без маркера на тому ж
+   або попередньому рядку:
        # sudo-ok: причина
    Те саме для обхідних форм суперкористувача: with_user(SUPERUSER_ID|1), env(su=True),
    with_env(... su=True), api.Environment(cr, SUPERUSER_ID, ...).
@@ -107,27 +110,71 @@ def check_acl():
                     report(rel(p), n, n, f"{rid}: {','.join(perms)} для {who}")
 
 
-RULE_RE = re.compile(r'<record[^>]+id="([^"]+)"[^>]+model="ir\.rule".*?</record>', re.S)
+# Атрибути <record> — у будь-якому порядку і з будь-якими лапками.
+RECORD_RE = re.compile(r"<record\b([^>]*)>(.*?)</record>", re.S)
+ATTR_RE = re.compile(r"""\b([\w:.-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')""")
+DOMAIN_RE = re.compile(r"""<field\b[^>]*\bname\s*=\s*["']domain_force["'][^>]*?(?:/>|>(.*?)</field>)""", re.S)
+EVAL_RE = re.compile(r"""\beval\s*=\s*(?:"([^"]*)"|'([^']*)')""")
+# Домен, що нічого не обмежує: [] або [(N, '=', N)] з будь-якими лапками.
+OPEN_DOMAIN_RE = re.compile(r"""^\[\s*(?:\(\s*(\d+)\s*,\s*["']=["']\s*,\s*\1\s*\)\s*,?\s*)?\]$""")
+
+
+def _attrs(s):
+    return {m.group(1): m.group(2) if m.group(2) is not None else m.group(3) for m in ATTR_RE.finditer(s)}
+
+
+def _open_domain(body):
+    """True, якщо domain_force правила не обмежує записів (немає, порожній, [], [(1,'=',1)])."""
+    m = DOMAIN_RE.search(body)
+    if not m:
+        return True  # правило без domain_force — доступ до всіх записів
+    tag = m.group(0)[:m.group(0).find(">") + 1]
+    ev = EVAL_RE.search(tag)
+    value = (ev.group(1) if ev and ev.group(1) is not None else ev.group(2)) if ev else (m.group(1) or "")
+    value = value.strip()
+    return not value or bool(OPEN_DOMAIN_RE.match(value))
 
 
 def check_rules():
     for p in files("*.xml"):
         text = p.read_text(encoding="utf-8", errors="ignore")
-        for m in RULE_RE.finditer(text):
-            body = m.group(0)
-            if re.search(r"group_(portal|public)", body) and re.search(r"\[\s*\(\s*1\s*,\s*'='\s*,\s*1\s*\)\s*\]", body):
-                if m.group(1) not in EXC:
+        for m in RECORD_RE.finditer(text):
+            attrs = _attrs(m.group(1))
+            if attrs.get("model") != "ir.rule":
+                continue
+            rid = attrs.get("id", "?")
+            body = m.group(2)
+            if re.search(r"group_(portal|public)", body) and _open_domain(body):
+                if rid not in EXC:
                     first = text.count("\n", 0, m.start()) + 1
                     last = text.count("\n", 0, m.end()) + 1
-                    report(rel(p), first, last, f"правило {m.group(1)} відкриває всі записи portal/public")
+                    report(rel(p), first, last, f"правило {rid} відкриває всі записи portal/public")
 
 
-def route_auth(fn):
+def module_consts(tree):
+    """{ім'я: рядок} для простих присвоєнь рівня модуля (AUTH = 'public')."""
+    consts = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+            for t in node.targets:
+                if isinstance(t, ast.Name):
+                    consts[t.id] = node.value.value
+    return consts
+
+
+def route_auth(fn, consts):
+    """auth маршруту: літерал або константа модуля; будь-що інше — 'dynamic' (вважаємо ризиковим)."""
     for d in fn.decorator_list:
         if isinstance(d, ast.Call) and getattr(d.func, "attr", getattr(d.func, "id", "")) == "route":
             for kw in d.keywords:
-                if kw.arg == "auth" and isinstance(kw.value, ast.Constant):
-                    return kw.value.value
+                if kw.arg is None:
+                    return "dynamic"  # **kwargs — auth може прийти звідти
+                if kw.arg == "auth":
+                    if isinstance(kw.value, ast.Constant) and isinstance(kw.value.value, str):
+                        return kw.value.value
+                    if isinstance(kw.value, ast.Name) and kw.value.id in consts:
+                        return consts[kw.value.id]
+                    return "dynamic"
             return "user"
     return None
 
@@ -186,11 +233,12 @@ def check_sudo_and_nosemgrep():
         except SyntaxError as e:
             report(rel(p), e.lineno or 1, e.lineno or 1, f"не парситься ({e.msg})")
             continue
+        consts = module_consts(tree)
         for fn in ast.walk(tree):
             if not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
-            auth = route_auth(fn)
-            if auth not in ("public", "none"):
+            auth = route_auth(fn, consts)
+            if auth not in ("public", "none", "dynamic"):
                 continue
             # Зміна декоратора (напр. auth='user' -> 'public') теж робить старий sudo() новим ризиком.
             deco_first = min(d.lineno for d in fn.decorator_list)
