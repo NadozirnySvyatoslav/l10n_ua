@@ -222,7 +222,11 @@ class AdvanceReport(models.Model):
                 'credit': 0.0,
             }))
         settlement = self._get_settlement_account()
-        employee_partner = self.employee_id.work_contact_id
+        # #722: read the contact via the public profile. Reading it on
+        # hr.employee prefetches private fields (l10n_ua_hr_base) and raises
+        # AccessError for an accountant without HR rights.
+        employee_partner = self.env['hr.employee.public'].browse(
+            self.employee_id.id).work_contact_id
         move_lines.append((0, 0, {
             'name': _('Advance report %s', self.name),
             'account_id': settlement.id,
