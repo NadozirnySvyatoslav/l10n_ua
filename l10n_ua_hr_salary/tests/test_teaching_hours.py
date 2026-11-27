@@ -175,11 +175,38 @@ class TestTeachingHours1078(SalaryTestCase):
         entry.write({'hours': 6})
         self.assertEqual(entry.amount, 900.0)
 
-    def test_r1_not_in_vacation_average(self):
-        # Ставки включають оплату за дні відпустки (примітка 4) → не в середню;
-        # податки і база лікарняних — як для зарплати.
+    def test_r1_k12_vacation_included_flag(self):
+        # Ставки включають оплату за дні відпустки (примітка 4) → не в середню
+        # для відпусток, але is_basic_salary лишається: у середньомісячний за
+        # 2 місяці (вихідна допомога) входить. Податки — як для зарплати.
         acc = self.env.ref('l10n_ua_hr_salary.accrual_type_teaching_hourly')
-        self.assertFalse(acc.is_basic_salary)
+        self.assertTrue(acc.is_basic_salary)
+        self.assertTrue(acc.l10n_ua_vacation_included)
         self.assertTrue(acc.is_taxable_pdfo)
         self.assertTrue(acc.is_military_tax)
         self.assertTrue(acc.is_esv_base)
+        others = self.env['hr.accrual.type'].with_context(active_test=False).search([
+            ('id', '!=', acc.id), ('l10n_ua_vacation_included', '=', True)])
+        self.assertFalse(others, 'Ознака лише в TEACH_HOURLY')
+        self.assertFalse(self.env['hr.accrual.type'].new({'name': 'X'}).l10n_ua_vacation_included)
+
+    def test_k13_severance_average_counts_hourly_pay(self):
+        # Грудень 2026 і січень 2027: оклад 15 020 + TEACH_HOURLY 1 000,
+        # 22 + 20 днів за графіком і відпрацьовано. Звільнення в лютому 2027:
+        # (32 040 / 42) × 21 = 16 020, а не 15 020 (п. 3 Порядку № 100).
+        salary = self.env['hr.accrual.type'].search([('code', '=', 'SALARY')], limit=1)
+        teach = self.env.ref('l10n_ua_hr_salary.accrual_type_teaching_hourly')
+        for date_from, date_to, days in ((date(2026, 12, 1), date(2026, 12, 31), 22),
+                                         (date(2027, 1, 1), date(2027, 1, 31), 20)):
+            slip = self.env['hr.payslip'].create({
+                'employee_id': self.employee.id, 'version_id': self.version.id,
+                'date_from': date_from, 'date_to': date_to,
+            })
+            for kind, amount in ((salary, 15020), (teach, 1000)):
+                self.env['hr.payslip.accrual'].create({
+                    'payslip_id': slip.id, 'accrual_type_id': kind.id,
+                    'quantity': 1, 'rate': amount, 'amount': amount,
+                })
+            slip.write({'scheduled_days': days, 'worked_days': days, 'state': 'done'})
+        feb = self._slip(date(2027, 2, 1), date(2027, 2, 28))
+        self.assertAlmostEqual(feb._average_monthly_earnings(date(2027, 2, 20)), 16020.0)

@@ -58,6 +58,16 @@ class TestAveragePeriodAmounts(TransactionCase):
         return self.env['hr.leave']._l10n_ua_vacation_earnings(
             self.employee, payslips, *PERIOD)[0]
 
+    # Hourly pay with vacation days in the rate (#417, Р1)
+
+    def test_k14_hourly_pay_not_in_vacation_average(self):
+        # ПКМУ № 1078, примітка 4: ставка вже включає оплату за дні відпустки.
+        if not self.env['hr.accrual.type'].search([('code', '=', 'TEACH_HOURLY')], limit=1):
+            self.skipTest('TEACH_HOURLY is not shipped')
+        self._payslip(date(2026, 2, 1), [('SALARY', 15020), ('TEACH_HOURLY', 8258)],
+                      worked_days=20)
+        self.assertAlmostEqual(self._earnings(), 15020, places=2)
+
     # Bonuses
 
     def test_types_shipped(self):

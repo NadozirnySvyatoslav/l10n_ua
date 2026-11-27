@@ -43,6 +43,18 @@ class HrAccrualType(models.Model):
              'flag: it takes the pay in the contribution base (ESV Base), '
              'per Порядок № 1266.'
     )
+    # #417: hourly rates of ПКМУ № 1078 already include the vacation days
+    # (примітка 4), so they stay out of the vacation average only; the
+    # two-month average (severance etc., п. 2 абз. 4) still counts them.
+    l10n_ua_vacation_included = fields.Boolean(
+        string='Rate Includes Vacation Pay',
+        default=False,
+        help='The rate already includes the pay for the vacation days (e.g. '
+             'hourly pay of teachers, ПКМУ № 1078, примітка 4). Not included '
+             'in the average salary for vacations and their compensation; '
+             'still included in the two-month average (severance pay and '
+             'other cases of Порядок № 100, п. 2, абз. 4).'
+    )
     l10n_ua_bonus_months = fields.Selection(
         [('1', 'Month'), ('3', 'Quarter'), ('6', 'Half-Year'), ('12', 'Year')],
         string='Bonus Period', default='1', required=True,

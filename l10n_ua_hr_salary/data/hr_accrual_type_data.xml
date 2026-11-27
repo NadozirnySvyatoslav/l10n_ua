@@ -298,15 +298,17 @@
         <!-- Погодинна оплата за проведення навчальних занять (#417): ставки
              ПКМУ № 1078 включають оплату за дні відпустки (примітка 4), тож у
              середню для відпусток не входить, інакше відпускні з цих годин
-             заплатили б двічі (рішення Р1). ПДФО, ВЗ, ЄСВ і база лікарняних
-             (is_esv_base) — як для зарплати. Для наявних баз — міграція
-             19.0.1.8.0 (запис noupdate). -->
+             заплатили б двічі (рішення Р1). Це заробітна плата за п. 3
+             Порядку № 100: у середньомісячний за 2 місяці (вихідна допомога
+             тощо) входить. ПДФО, ВЗ, ЄСВ і база лікарняних — як для зарплати.
+             Для наявних баз — міграція 19.0.1.8.0 (запис noupdate). -->
         <record id="accrual_type_teaching_hourly" model="hr.accrual.type">
             <field name="name">Погодинна оплата за навчальні заняття</field>
             <field name="code">TEACH_HOURLY</field>
             <field name="category">wage</field>
             <field name="calculation_method">fixed</field>
-            <field name="is_basic_salary">False</field>
+            <field name="is_basic_salary">True</field>
+            <field name="l10n_ua_vacation_included">True</field>
             <field name="is_taxable_pdfo">True</field>
             <field name="is_military_tax">True</field>
             <field name="is_esv_base">True</field>

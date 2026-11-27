@@ -24,6 +24,7 @@
                         </group>
                         <group>
                             <field name="is_basic_salary"/>
+                            <field name="l10n_ua_vacation_included" invisible="not is_basic_salary"/>
                             <field name="is_taxable_pdfo"/>
                             <field name="is_military_tax"/>
                             <field name="is_esv_base"/>
