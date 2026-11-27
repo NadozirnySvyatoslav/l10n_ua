@@ -7,6 +7,7 @@ from datetime import datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.addons.l10n_ua_bank_sync.tools import spreadsheet
 
 _logger = logging.getLogger(__name__)
 # Тестам: підмінити, щоб не чекати інтервалу між запитами.
@@ -453,7 +454,7 @@ class L10nUaBankSyncConfig(models.Model):
                     return self._privat_parse_xlsx(content)
             raise UserError(_(
                 'ZIP-файл не схожий ні на MultiCash (umsatz.txt), ні на XLSX.'))
-        if content[:4] == b'\xd0\xcf\x11\xe0':
+        if spreadsheet.is_xls(content):
             return self._privat_parse_xls(content)
         if content[:1] in (b'\x03', b'\x30', b'\x83', b'\x8b', b'\xf5', b'\xfb'):
             raise UserError(_(
@@ -463,24 +464,12 @@ class L10nUaBankSyncConfig(models.Model):
         return self._privat_parse_csv(content.decode('cp1251', 'replace'))
 
     def _privat_parse_xls(self, content):
-        """XLS (BIFF8) через xlrd — табличний експорт Приват24 Бізнес."""
-        import xlrd
-        book = xlrd.open_workbook(file_contents=content)
-        sheet = book.sheet_by_index(0)
-        rows = [[sheet.cell_value(r, c) for c in range(sheet.ncols)]
-                for r in range(sheet.nrows)]
-        return self._privat_parse_table_rows(rows)
+        """XLS (BIFF8) — табличний експорт Приват24 Бізнес."""
+        return self._privat_parse_table_rows(spreadsheet.read_xls_rows(content))
 
     def _privat_parse_xlsx(self, content):
-        """XLSX через openpyxl — та сама розкладка колонок, що й XLS."""
-        import io
-        import openpyxl
-        wb = openpyxl.load_workbook(
-            io.BytesIO(content), read_only=True, data_only=True)
-        ws = wb.active
-        rows = [[('' if v is None else v) for v in row]
-                for row in ws.iter_rows(values_only=True)]
-        return self._privat_parse_table_rows(rows)
+        """XLSX — та сама розкладка колонок, що й XLS."""
+        return self._privat_parse_table_rows(spreadsheet.read_xlsx_rows(content))
 
     def _privat_parse_table_rows(self, rows):
         """Спільний розбір табличного експорту (XLS/XLSX).
