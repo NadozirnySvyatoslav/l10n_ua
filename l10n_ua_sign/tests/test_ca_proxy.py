@@ -11,7 +11,11 @@ from urllib.parse import urlencode
 
 from odoo.tests import HttpCase, tagged
 
-from odoo.addons.l10n_ua_sign.controllers.ca_proxy import _split_address
+import os
+import tempfile
+
+from odoo.addons.l10n_ua_sign.controllers.ca_proxy import (
+    ROOT_CA_HOSTS, _hosts_from_certificates, _split_address)
 
 MODULE = 'odoo.addons.l10n_ua_sign.controllers.ca_proxy'
 PROXY = '/l10n_ua_sign/ca_proxy'
@@ -84,3 +88,37 @@ class TestKepCaProxy(HttpCase):
         self.assertEqual(_split_address('ftp://ca.tax.gov.ua/x'), ('', ''))
         self.assertEqual(_split_address('ca.tax.gov.ua:notaport/x'), ('', ''))
         self.assertEqual(_split_address(''), ('', ''))
+
+
+@tagged('post_install', '-at_install')
+class TestKepCaProxyHosts(HttpCase):
+    """Кореневі органи й адреси з сертифікатів ЦСК (#346)."""
+
+    def test_hosts_from_certificates(self):
+        der = (b'\x30\x82\x01\x00\x86\x24http://zc.bank.gov.ua/services/ocsp/'
+               b'\x30\x1a\x86\x18http://ca.monobank.ua/crl'
+               b'\x86\x10http://bad_host\x00\x86\x14http://ca.test.ua0\x82')
+        with tempfile.NamedTemporaryFile(suffix='.p7b', delete=False) as f:
+            f.write(der)
+        self.addCleanup(os.unlink, f.name)
+        hosts = _hosts_from_certificates(f.name, os.path.getmtime(f.name))
+        self.assertIn('zc.bank.gov.ua', hosts)
+        self.assertIn('ca.monobank.ua', hosts)
+        self.assertNotIn('bad_host', hosts)
+        self.assertNotIn('ca.test.ua0', hosts)
+
+    def test_root_ca_reachable_through_proxy(self):
+        """Підпис ключем банківського КНЕДП перевіряє статус його сертифіката в ЗЦ НБУ."""
+        self.assertTrue({'czo.gov.ua', 'zc.bank.gov.ua'} <= ROOT_CA_HOSTS)
+        self.authenticate('admin', 'admin')
+        response = MagicMock(status_code=200)
+        response.raw.read.return_value = b'OCSPRESP'
+        with patch(MODULE + '._cached_hosts', return_value=frozenset()), \
+                patch(MODULE + '.requests.request', return_value=response) as upstream:
+            query = urlencode({'address': 'http://zc.bank.gov.ua/services/ocsp/',
+                               'contentType': 'application/ocsp-request'})
+            res = self.url_open(f'{PROXY}?{query}', data=base64.b64encode(b'REQ'),
+                                headers={'Content-Type': 'X-user/base64-data'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(base64.b64decode(res.content), b'OCSPRESP')
+        self.assertEqual(upstream.call_args[0][1], 'http://zc.bank.gov.ua/services/ocsp/')
