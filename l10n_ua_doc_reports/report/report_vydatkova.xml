@@ -10,7 +10,7 @@
         <field name="print_report_name">'Видаткова_накладна_%s' % (object.name)</field>
         <field name="binding_model_id" ref="account.model_account_move"/>
         <field name="binding_type">report</field>
-        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
+        <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_form"/>
     </record>
 
     <template id="report_vydatkova_document">
@@ -30,7 +30,7 @@
                         <div class="ua-report-title" style="margin: 10px 0;">
                             Видаткова накладна № <span t-field="o.name"/><br/>
                             <span style="font-size: 11pt;">
-                                від <span t-out="o._get_ua_date_formatted()"/> року
+                                від <span t-out="o._get_ua_date_formatted()"/>
                             </span>
                         </div>
 
@@ -61,7 +61,7 @@
                                         ЄДРПОУ: <span t-field="comp_partner.edrpou"/>
                                     </t>
                                     <t t-if="comp_partner.ipn">
-                                        , ІПН: <span t-field="comp_partner.ipn"/>
+                                        <t t-if="comp_partner.edrpou">, </t>ІПН: <span t-field="comp_partner.ipn"/>
                                     </t>
                                     <t t-if="comp_partner.is_vat_payer">
                                         , платник ПДВ
@@ -83,6 +83,9 @@
                                     <t t-if="partner.l10n_ua_legal_address">
                                         Адреса: <span t-field="partner.l10n_ua_legal_address"/><br/>
                                     </t>
+                                    <t t-elif="partner.contact_address">
+                                        Адреса: <span t-out="partner.contact_address"/><br/>
+                                    </t>
                                     <t t-if="partner.phone">
                                         тел. <span t-out="partner.phone"/><br/>
                                     </t>
@@ -90,7 +93,7 @@
                                         ЄДРПОУ: <span t-field="partner.edrpou"/>
                                     </t>
                                     <t t-if="partner.ipn">
-                                        , ІПН: <span t-field="partner.ipn"/>
+                                        <t t-if="partner.edrpou">, </t>ІПН: <span t-field="partner.ipn"/>
                                     </t>
                                 </td>
                             </tr>
