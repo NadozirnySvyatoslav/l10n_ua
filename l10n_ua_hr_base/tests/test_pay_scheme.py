@@ -179,3 +179,129 @@ class TestPayScheme(TransactionCase):
         with self.assertRaises(Exception), self.cr.savepoint():
             self._staffing(date(2026, 9, 1), pay_scheme_line_id=self.teacher_top.id,
                            pay_scheme_reduction=100.0)
+
+    # --- Вид похідної посади (#417, К2–К5) ---
+
+    def _derived(self, kind, reduction, scheme_line=None, **vals):
+        return self._staffing(
+            date(2026, 9, 1), state='draft', pay_scheme_derived=kind,
+            pay_scheme_line_id=(scheme_line or self.teacher_top).id,
+            pay_scheme_reduction=reduction, **vals)
+
+    def test_derived_post_range_is_enforced(self):
+        """К3: відсоток поза діапазоном виду посади відхиляється з назвою
+        діапазону і норми (пп. 2 п. 2 / примітка 4 № 1078)."""
+        refused = [('deputy_ped', 12.0, '5–10', 'subp. 2 p. 2'),
+                   ('deputy_ped', 4.0, '5–10', 'subp. 2 p. 2'),
+                   ('deputy_other', 31.0, '20–30', 'subp. 2 p. 2'),
+                   ('assistant_head', 29.0, '30–40', 'subp. 2 p. 2'),
+                   ('assistant_educator', 9.0, '10', 'note 4')]
+        for kind, reduction, span, basis in refused:
+            with self.subTest(kind=kind, reduction=reduction), \
+                    self.assertRaises(ValidationError) as caught, \
+                    self.cr.savepoint():
+                self._derived(kind, reduction)
+            self.assertIn(span, str(caught.exception))
+            self.assertIn(basis, str(caught.exception))
+        for kind, reduction in [('deputy_ped', 5.0), ('deputy_ped', 10.0),
+                                ('deputy_other', 25.0), ('assistant_head', 30.0),
+                                ('assistant_head', 40.0)]:
+            with self.subTest(kind=kind, reduction=reduction):
+                self.assertEqual(self._derived(kind, reduction).pay_scheme_reduction,
+                                 reduction)
+
+    def test_derived_post_error_is_translated(self):
+        """К3/К1: користувач з uk_UA бачить помилку українською (у .po
+        записи коду мають позначку `#. odoo-python`)."""
+        self.env['res.lang']._activate_lang('uk_UA')
+        uk = self.env(context=dict(self.env.context, lang='uk_UA'))
+        cases = [('assistant_educator', 9.0, 'примітка 4'),
+                 ('deputy_ped', 12.0, 'пп. 2 п. 2')]
+        for kind, reduction, basis in cases:
+            with self.subTest(kind=kind), self.assertRaises(ValidationError) as caught, \
+                    self.cr.savepoint():
+                self.env['hr.staffing.table'].with_env(uk).create({
+                    'company_id': self.company.id, 'department_id': self.department.id,
+                    'job_id': self.job.id, 'date_from': date(2026, 9, 1), 'state': 'draft',
+                    'pay_scheme_derived': kind,
+                    'pay_scheme_line_id': self.teacher_top.id,
+                    'pay_scheme_reduction': reduction})
+            self.assertIn(basis, str(caught.exception))
+            self.assertIn('нижче окладу посади', str(caught.exception))
+
+    def test_derived_post_checked_on_write(self):
+        line = self._derived('deputy_other', 25.0)
+        with self.assertRaises(ValidationError), self.cr.savepoint():
+            line.pay_scheme_reduction = 15.0
+        line.pay_scheme_derived = False
+        line.pay_scheme_reduction = 15.0  # без виду — як до змін (К11)
+        self.assertEqual(line.pay_scheme_reduction, 15.0)
+        with self.assertRaises(ValidationError), self.cr.savepoint():
+            line.pay_scheme_derived = 'deputy_ped'
+
+    def test_assistant_educator_fills_position_and_percent(self):
+        """К4: вид «помічник вихователя» підставляє «спеціаліст (без
+        категорії)» і 10 %; оклад 12 479, а не 12 478."""
+        line = self._staffing(date(2026, 9, 1), state='draft',
+                              pay_scheme_derived='assistant_educator')
+        self.assertEqual(line.pay_scheme_line_id, self.teacher_none)
+        self.assertEqual(line.pay_scheme_reduction, 10.0)
+        self.assertEqual(line.salary, 12479.0)
+        other = self._staffing(date(2026, 9, 1), state='draft',
+                               pay_scheme_line_id=self.teacher_top.id)
+        other.pay_scheme_derived = 'assistant_educator'
+        self.assertEqual(other.pay_scheme_line_id, self.teacher_none)
+        self.assertEqual(other.salary, 12479.0)
+
+    def test_assistant_educator_form(self):
+        with Form(self.env['hr.staffing.table']) as form:
+            form.company_id = self.company
+            form.department_id = self.department
+            form.job_id = self.job
+            form.date_from = date(2026, 9, 1)
+            form.pay_scheme_derived = 'assistant_educator'
+            self.assertEqual(form.pay_scheme_line_id, self.teacher_none)
+            self.assertEqual(form.pay_scheme_reduction, 10.0)
+            self.assertEqual(form.salary, 12479.0)
+
+    def test_deputy_of_school_head_salaries(self):
+        """К5: заступник директора школи від окладу керівника 0,63 (18 198)."""
+        head = self.env.ref('l10n_ua_hr_base.pay_scheme_1078_ped_01')
+        cases = [('deputy_ped', 5.0, 17288.0), ('deputy_ped', 10.0, 16378.0),
+                 ('deputy_other', 20.0, 14558.0), ('deputy_other', 30.0, 12739.0),
+                 ('assistant_head', 40.0, 10919.0)]
+        for kind, reduction, salary in cases:
+            with self.subTest(reduction=reduction):
+                line = self._derived(kind, reduction, scheme_line=head)
+                self.assertEqual(line.salary, salary)
+        big = self.env.ref('l10n_ua_hr_base.pay_scheme_1078_ped_03')
+        self.assertEqual(big.coefficient, 0.69)
+        self.assertEqual(self._derived('deputy_ped', 10.0, scheme_line=big).salary,
+                         17938.0)
+
+    def test_version_derived_post(self):
+        employee = self.env['hr.employee'].create({
+            'name': 'Ткаченко Олена', 'company_id': self.company.id})
+        employee.version_id.write({'date_version': date(2026, 1, 1),
+                                   'contract_date_start': date(2026, 1, 1)})
+        new = employee.create_version({
+            'date_version': date(2026, 9, 1),
+            'pay_scheme_derived': 'assistant_educator',
+        })
+        self.assertEqual(new.pay_scheme_line_id, self.teacher_none)
+        self.assertEqual(new.wage, 12479.0)
+        with self.assertRaises(ValidationError), self.cr.savepoint():
+            new.write({'pay_scheme_derived': 'deputy_ped',
+                       'pay_scheme_reduction': 12.0})
+        new.write({'pay_scheme_derived': 'deputy_ped',
+                   'pay_scheme_line_id': self.teacher_top.id,
+                   'pay_scheme_reduction': 7.0})
+        self.assertEqual(new.wage, 13969.0)
+
+    def test_help_names_the_three_groups(self):
+        """К1: help перелічує групи пп. 2 п. 2 і примітку 4."""
+        for model in ('hr.staffing.table', 'hr.version'):
+            text = self.env[model]._fields['pay_scheme_reduction'].help
+            for part in ('5–10 %', '20–30 %', '30–40 %', 'chief accountants',
+                         'assistants to the heads', 'Note 4', 'no category'):
+                self.assertIn(part, text, model)

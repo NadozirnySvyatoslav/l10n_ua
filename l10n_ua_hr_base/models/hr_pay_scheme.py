@@ -16,6 +16,76 @@ from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.tools import float_round
 
+# Види похідних посад (#417): оклад нижче окладу посади за схемою.
+# пп. 2 п. 2 ПКМУ № 1078 дає діапазон, у межах якого відсоток обирає
+# роботодавець (п. 7); примітка 4 до схеми — рівно 10 %.
+DERIVED_POSTS = [
+    ('deputy_ped', 'Deputy head, pedagogical post (5–10 %)'),
+    ('deputy_other', 'Deputy head, non-pedagogical post; chief accountant; '
+                     'head of a planning and finance department (20–30 %)'),
+    ('assistant_head', 'Assistant to the head of the institution (30–40 %)'),
+    ('assistant_educator', 'Assistant educator (10 %)'),
+]
+DERIVED_RANGES = {
+    'deputy_ped': (5.0, 10.0),
+    'deputy_other': (20.0, 30.0),
+    'assistant_head': (30.0, 40.0),
+    'assistant_educator': (10.0, 10.0),
+}
+ASSISTANT_EDUCATOR_POSITION = 'l10n_ua_hr_base.pay_scheme_1078_ped_36'
+
+REDUCTION_HELP = (
+    'For a salary set below the salary of the chosen position (CMU Resolution '
+    'No 1078, subp. 2 p. 2): 5–10 % below the head — deputy heads of '
+    'institutions of education and of their units whose posts are '
+    'pedagogical (academic); 20–30 % — such deputies whose posts are not '
+    'pedagogical, heads of planning and finance departments, chief '
+    'accountants; 30–40 % — assistants to the heads of institutions. The '
+    'employer picks the figure within the range (p. 7). Note 4: an assistant '
+    'educator is paid 10 % below an educator-specialist (no category). The '
+    'reduction is taken from the rounded salary of the position and rounded '
+    'again to a whole hryvnia.')
+DERIVED_HELP = (
+    'The kind of a derived post limits the reduction to the range of CMU '
+    'Resolution No 1078 (subp. 2 p. 2, note 4). Empty: any reduction from 0 to '
+    '100 %. An assistant educator takes the position "specialist (no '
+    'category)" and 10 %.')
+
+
+def _check_derived_reduction(records):
+    """Refuse a reduction outside the range of the kind of a derived post."""
+    for record in records:
+        kind = record.pay_scheme_derived
+        if not kind:
+            continue
+        low, high = DERIVED_RANGES[kind]
+        if low <= record.pay_scheme_reduction <= high:
+            continue
+        env = record.env
+        label = dict(record._fields['pay_scheme_derived']
+                     ._description_selection(env))[kind]
+        if low == high:
+            raise ValidationError(env._(
+                '%(kind)s: the salary is exactly %(low)s %% below the salary of '
+                'the position (CMU Resolution No 1078, note 4); %(value)s %% is '
+                'given.', kind=label, low=f'{low:g}',
+                value=f'{record.pay_scheme_reduction:g}'))
+        raise ValidationError(env._(
+            '%(kind)s: the salary is %(low)s–%(high)s %% below the salary of '
+            'the position (CMU Resolution No 1078, subp. 2 p. 2); %(value)s %% '
+            'is given.', kind=label, low=f'{low:g}',
+            high=f'{high:g}', value=f'{record.pay_scheme_reduction:g}'))
+
+
+def _derived_defaults(env, vals):
+    """An assistant educator: 10 % below "specialist (no category)"."""
+    if vals.get('pay_scheme_derived') == 'assistant_educator':
+        vals.setdefault('pay_scheme_reduction', 10.0)
+        position = env.ref(ASSISTANT_EDUCATOR_POSITION, raise_if_not_found=False)
+        if position and not vals.get('pay_scheme_line_id'):
+            vals['pay_scheme_line_id'] = position.id
+    return vals
+
 
 class HrPayBaseValue(models.Model):
     """Базова величина для визначення посадових окладів, на період."""
@@ -140,9 +210,14 @@ class HrPaySchemeLine(models.Model):
         rounded up to one hryvnia — half up, not the banker's rounding.
 
         `reduction` (per cent) gives a salary set below the salary of this
-        position: a deputy 5–10 / 20–30 / 30–40 % below the head (пп. 2 п. 2
-        of No 1078), an assistant educator 10 % below an educator-specialist
-        (note 4). It is taken from the rounded salary of the position and
+        position, пп. 2 п. 2 of No 1078:
+        - 5–10 % — deputy heads of institutions of education and of their
+          units whose posts are pedagogical (academic);
+        - 20–30 % — such deputies whose posts are not pedagogical, heads of
+          planning and finance departments, chief accountants;
+        - 30–40 % — assistants to the heads of institutions;
+        and note 4: an assistant educator 10 % below an educator-specialist
+        (no category). It is taken from the rounded salary of the position and
         rounded again — a coefficient would be off by a hryvnia.
         """
         self.ensure_one()
@@ -193,11 +268,9 @@ class HrStaffingTable(models.Model):
              'before the scheme applies keeps the tariff-grid salary.')
     pay_scheme_reduction = fields.Float(
         string='Below Scheme Position, %', digits=(5, 2), tracking=True,
-        help='For a salary set below the salary of the chosen position: a '
-             'deputy head 5–10 / 20–30 / 30–40 % below the head (the employer '
-             'picks the figure within the range), an assistant educator 10 % '
-             'below an educator-specialist. The reduced salary is rounded to a '
-             'whole hryvnia.')
+        help=REDUCTION_HELP)
+    pay_scheme_derived = fields.Selection(
+        DERIVED_POSTS, string='Derived Post', tracking=True, help=DERIVED_HELP)
     pay_scheme_salary = fields.Monetary(
         string='Scheme Salary', currency_field='currency_id',
         compute='_compute_pay_scheme_salary',
@@ -224,6 +297,18 @@ class HrStaffingTable(models.Model):
         if self.pay_scheme_line_id and self.pay_scheme_salary:
             self.salary = self.pay_scheme_salary
 
+    @api.onchange('pay_scheme_derived')
+    def _onchange_pay_scheme_derived(self):
+        if self.pay_scheme_derived == 'assistant_educator':
+            vals = _derived_defaults(self.env, {
+                'pay_scheme_derived': self.pay_scheme_derived})
+            self.pay_scheme_line_id = vals.get('pay_scheme_line_id')
+            self.pay_scheme_reduction = vals['pay_scheme_reduction']
+
+    @api.constrains('pay_scheme_derived', 'pay_scheme_reduction')
+    def _check_pay_scheme_derived(self):
+        _check_derived_reduction(self)
+
     @api.model
     def _fill_scheme_salary(self, vals, scheme_line, date_from, reduction=0.0):
         if scheme_line and 'salary' not in vals:
@@ -233,6 +318,7 @@ class HrStaffingTable(models.Model):
     def create(self, vals_list):
         SchemeLine = self.env['hr.pay.scheme.line']
         for vals in vals_list:
+            _derived_defaults(self.env, vals)
             if vals.get('pay_scheme_line_id'):
                 self._fill_scheme_salary(
                     vals, SchemeLine.browse(vals['pay_scheme_line_id']),
@@ -242,6 +328,7 @@ class HrStaffingTable(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
+        vals = _derived_defaults(self.env, dict(vals))
         refill = vals.get('pay_scheme_line_id') or 'pay_scheme_reduction' in vals
         if refill and 'salary' not in vals:
             SchemeLine = self.env['hr.pay.scheme.line']
@@ -278,12 +365,10 @@ class HrVersion(models.Model):
              'wage.')
     pay_scheme_reduction = fields.Float(
         string='Below Scheme Position, %', digits=(5, 2), tracking=True,
-        groups='hr.group_hr_manager',
-        help='For a salary set below the salary of the chosen position: a '
-             'deputy head 5–10 / 20–30 / 30–40 % below the head (the employer '
-             'picks the figure within the range), an assistant educator 10 % '
-             'below an educator-specialist. The reduced salary is rounded to a '
-             'whole hryvnia.')
+        groups='hr.group_hr_manager', help=REDUCTION_HELP)
+    pay_scheme_derived = fields.Selection(
+        DERIVED_POSTS, string='Derived Post', tracking=True,
+        groups='hr.group_hr_manager', help=DERIVED_HELP)
     pay_scheme_salary = fields.Monetary(
         string='Scheme Salary', currency_field='currency_id',
         compute='_compute_pay_scheme_salary', groups='hr.group_hr_manager',
@@ -310,10 +395,23 @@ class HrVersion(models.Model):
         if self.pay_scheme_line_id and self.pay_scheme_salary:
             self.wage = self.pay_scheme_salary
 
+    @api.onchange('pay_scheme_derived')
+    def _onchange_pay_scheme_derived(self):
+        if self.pay_scheme_derived == 'assistant_educator':
+            vals = _derived_defaults(self.env, {
+                'pay_scheme_derived': self.pay_scheme_derived})
+            self.pay_scheme_line_id = vals.get('pay_scheme_line_id')
+            self.pay_scheme_reduction = vals['pay_scheme_reduction']
+
+    @api.constrains('pay_scheme_derived', 'pay_scheme_reduction')
+    def _check_pay_scheme_derived(self):
+        _check_derived_reduction(self)
+
     @api.model_create_multi
     def create(self, vals_list):
         SchemeLine = self.env['hr.pay.scheme.line']
         for vals in vals_list:
+            _derived_defaults(self.env, vals)
             if vals.get('pay_scheme_line_id') and 'wage' not in vals:
                 vals['wage'] = SchemeLine.browse(
                     vals['pay_scheme_line_id'])._amount_on(
@@ -323,6 +421,7 @@ class HrVersion(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
+        vals = _derived_defaults(self.env, dict(vals))
         refill = vals.get('pay_scheme_line_id') or 'pay_scheme_reduction' in vals
         if refill and 'wage' not in vals:
             SchemeLine = self.env['hr.pay.scheme.line']
@@ -358,6 +457,9 @@ class HrEmployee(models.Model):
     pay_scheme_reduction = fields.Float(
         related='version_id.pay_scheme_reduction', inherited=True,
         readonly=False, groups='hr.group_hr_manager')
+    pay_scheme_derived = fields.Selection(
+        related='version_id.pay_scheme_derived', inherited=True,
+        readonly=False, groups='hr.group_hr_manager')
     pay_scheme_salary = fields.Monetary(
         related='version_id.pay_scheme_salary', inherited=True,
         groups='hr.group_hr_manager')
@@ -366,3 +468,11 @@ class HrEmployee(models.Model):
     def _onchange_pay_scheme_line_id(self):
         if self.pay_scheme_line_id and self.pay_scheme_salary:
             self.wage = self.pay_scheme_salary
+
+    @api.onchange('pay_scheme_derived')
+    def _onchange_pay_scheme_derived(self):
+        if self.pay_scheme_derived == 'assistant_educator':
+            vals = _derived_defaults(self.env, {
+                'pay_scheme_derived': self.pay_scheme_derived})
+            self.pay_scheme_line_id = vals.get('pay_scheme_line_id')
+            self.pay_scheme_reduction = vals['pay_scheme_reduction']
