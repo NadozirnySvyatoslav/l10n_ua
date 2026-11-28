@@ -8,7 +8,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">l10n_ua_accounting.report_advance_report_document</field>
         <field name="report_file">l10n_ua_accounting.report_advance_report_document</field>
-        <field name="print_report_name">'АЗ_%s_%s' % (object.name, object.employee_id.name)</field>
+        <field name="print_report_name">'АЗ_%s_%s' % (object.name, object.env['hr.employee.public'].browse(object.employee_id.id).name)</field>
         <field name="binding_model_id" ref="model_l10n_ua_advance_report"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="l10n_ua_doc_reports.paperformat_ua_report"/>
@@ -18,6 +18,9 @@
     <template id="report_advance_report_document">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="report">
+                <!-- #727: the employee is read via the public profile, so an
+                     accountant without HR rights can print (no sudo). -->
+                <t t-set="employee" t-value="report.env['hr.employee.public'].browse(report.employee_id.id)"/>
                 <t t-call="web.external_layout">
                     <t t-call="l10n_ua_doc_reports.report_ua_styles"/>
                     <div class="page ua-report">
@@ -54,15 +57,15 @@
                             <table class="table-borderless" style="width: 100%;">
                                 <tr>
                                     <td style="width: 200px;">Підзвітна особа:</td>
-                                    <td class="border-bottom"><span t-field="report.employee_id.name"/></td>
+                                    <td class="border-bottom"><span t-field="employee.name"/></td>
                                 </tr>
                                 <tr>
                                     <td>Посада:</td>
-                                    <td class="border-bottom" t-esc="report.employee_id.job_id.name if report.employee_id.job_id else '-'"/>
+                                    <td class="border-bottom" t-esc="employee.job_id.name if employee.job_id else '-'"/>
                                 </tr>
                                 <tr>
                                     <td>Підрозділ:</td>
-                                    <td class="border-bottom" t-esc="report.employee_id.department_id.name if report.employee_id.department_id else '-'"/>
+                                    <td class="border-bottom" t-esc="employee.department_id.name if employee.department_id else '-'"/>
                                 </tr>
                                 <tr>
                                     <td>Призначення авансу:</td>
@@ -191,7 +194,7 @@
                                 <div class="signature-row">
                                     <span class="signature-line"></span>
                                 </div>
-                                <div class="small text-center" t-field="report.employee_id.name"/>
+                                <div class="small text-center" t-field="employee.name"/>
                             </div>
                         </div>
                     </div>
