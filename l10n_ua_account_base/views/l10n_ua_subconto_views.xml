@@ -21,8 +21,7 @@
                             <field name="active"/>
                         </group>
                         <group>
-                            <field name="model_id" options="{'no_create': True}"/>
-                            <field name="model_name" invisible="1"/>
+                            <field name="model_name"/>
                             <field name="field_name"/>
                         </group>
                     </group>
@@ -42,7 +41,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="code"/>
                 <field name="name"/>
-                <field name="model_id"/>
+                <field name="model_name"/>
                 <field name="field_name"/>
                 <field name="active" optional="hide"/>
             </list>
@@ -56,12 +55,12 @@
             <search string="Subconto Types">
                 <field name="name"/>
                 <field name="code"/>
-                <field name="model_id"/>
+                <field name="model_name"/>
                 <filter string="Active" name="filter_active" domain="[('active', '=', True)]"/>
                 <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
                 <separator/>
                 <group>
-                    <filter string="Model" name="groupby_model" domain="[]" context="{'group_by': 'model_id'}"/>
+                    <filter string="Model" name="groupby_model" domain="[]" context="{'group_by': 'model_name'}"/>
                 </group>
             </search>
         </field>
