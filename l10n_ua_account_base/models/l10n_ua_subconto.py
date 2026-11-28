@@ -14,6 +14,15 @@ Examples:
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
+# Also used by the #701 pre-migration to check existing subconto types
+BASE_SUBCONTO_MODELS = (
+    'res.partner',
+    'res.partner.bank',
+    'account.account',
+    'account.journal',
+    'product.product',
+)
+
 
 class L10nUaSubcontoType(models.Model):
     """
@@ -38,18 +47,14 @@ class L10nUaSubcontoType(models.Model):
     sequence = fields.Integer(default=10)
     active = fields.Boolean(default=True)
 
-    # Reference to Odoo model
-    model_id = fields.Many2one(
-        'ir.model',
+    # Reference to Odoo model (#701, ADR 0005): a closed list instead of a
+    # Many2one to ir.model, so accountants need no access to ir.model and a
+    # subconto cannot expose display_name of an arbitrary model.
+    model_name = fields.Selection(
+        selection='_selection_subconto_models',
         string='Reference Model',
         required=True,
-        ondelete='cascade',
-        domain=[('transient', '=', False)],
         help='Odoo model that provides values for this subconto type',
-    )
-    model_name = fields.Char(
-        related='model_id.model',
-        store=True,
     )
 
     # Display settings
@@ -65,6 +70,33 @@ class L10nUaSubcontoType(models.Model):
         'UNIQUE(code)',
         'Subconto type code must be unique!',
     )
+
+    @api.model
+    def _selection_subconto_models(self):
+        """Models allowed as a subconto dimension, as (model, label) pairs.
+
+        A module bridging another domain (hr, stock, …) extends this list
+        the same way it extends account.move.line._subconto_quick_fields_map.
+        See l10n_ua_account_subconto_hr for an example.
+        """
+        # _description needs no ACL, unlike reading ir.model
+        return [(name, self.env[name]._description)
+                for name in BASE_SUBCONTO_MODELS if name in self.env]
+
+    @api.constrains('model_name')
+    def _check_model_name(self):
+        # The ORM validates only static selections: for a method-based one
+        # (fields_selection.py, convert_to_cache: _selection is None) any
+        # value is accepted, so the closed list is enforced here, on write of
+        # model_name only. A legacy value outside the list stays readable and
+        # usable in postings (see test_legacy_type_outside_list_still_posts).
+        allowed = dict(self._selection_subconto_models())
+        for rec in self:
+            if rec.model_name not in allowed:
+                raise ValidationError(_(
+                    'Model %(model)s is not allowed as a subconto type.',
+                    model=rec.model_name,
+                ))
 
 
 class L10nUaAccountSubconto(models.Model):
@@ -151,7 +183,7 @@ class L10nUaMoveLineSubconto(models.Model):
     )
 
     # Generic reference to any model
-    res_model = fields.Char(
+    res_model = fields.Selection(
         string='Model',
         related='subconto_type_id.model_name',
         store=True,
