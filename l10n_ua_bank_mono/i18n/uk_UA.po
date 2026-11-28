@@ -251,6 +251,18 @@ msgstr "Підключено до корпоративного API monobank, а�
 #. module: l10n_ua_bank_mono
 #. odoo-python
 #: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "Connected to monobank, but account %(iban)s is in %(account_currency)s and the journal in %(journal_currency)s: the statement will not be imported."
+msgstr "Підключено до monobank, але рахунок %(iban)s у валюті %(account_currency)s, а журнал — у %(journal_currency)s: виписку не буде імпортовано."
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
+msgid "monobank has no account with ID %(account)s for this token, so its currency cannot be checked. Clear the account ID to find the account by the journal IBAN. Available: %(ibans)s"
+msgstr "У monobank немає рахунку з ID %(account)s для цього токена, тому його валюту не перевірити. Очистіть ID рахунку, щоб знайти рахунок за IBAN журналу. Доступні: %(ibans)s"
+
+#. module: l10n_ua_bank_mono
+#. odoo-python
+#: code:addons/l10n_ua_bank_mono/models/l10n_ua_bank_mono_config.py:0
 msgid "monobank account %(account)s is in %(account_currency)s, while journal %(journal)s is in %(journal_currency)s. Select a journal in the account currency."
 msgstr "Рахунок monobank %(account)s у валюті %(account_currency)s, а журнал %(journal)s — у %(journal_currency)s. Оберіть журнал у валюті рахунку."
 

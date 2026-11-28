@@ -207,11 +207,28 @@ class L10nUaBankSyncConfig(models.Model):
         client_name = data.get('name', 'Unknown')
         accounts = self._mono_personal_accounts(data)
         iban = self._mono_journal_iban()
-        if iban and iban not in [_clean_iban(acc.get('iban')) for acc in accounts]:
+        if self.mono_account_id:
+            own = next((acc for acc in accounts
+                        if acc.get('id') == self.mono_account_id), None)
+            label = self.mono_account_id
+        else:
+            own = next((acc for acc in accounts
+                        if _clean_iban(acc.get('iban')) == iban), None)
+            label = iban
+        mismatch = own and self._mono_currency_mismatch(own.get('currencyCode'))
+        if label and not own:
             message = _(
                 "Connected to monobank, but account %(iban)s is not among the "
                 "%(count)d accounts of %(client)s.",
-                iban=iban, count=len(accounts), client=client_name)
+                iban=label, count=len(accounts), client=client_name)
+            kind = 'warning'
+        elif mismatch:
+            message = _(
+                "Connected to monobank, but account %(iban)s is in "
+                "%(account_currency)s and the journal in "
+                "%(journal_currency)s: the statement will not be imported.",
+                iban=own.get('iban') or label, account_currency=mismatch[0],
+                journal_currency=mismatch[1])
             kind = 'warning'
         else:
             message = _('Connected to monobank. Client: %s, Accounts: %d') % (
@@ -310,22 +327,39 @@ class L10nUaBankSyncConfig(models.Model):
     def _mono_personal_account(self, budget):
         """The account to read: set explicitly, or the one whose IBAN is the
         journal's. Picking "the first UAH account" would import another
-        account's operations into this journal without a word."""
+        account's operations into this journal without a word.
+
+        client-info is read on every sync, also for an explicit (or
+        remembered) ID: only it tells the account currency, and the statement
+        items carry the currency of each operation, not of the account. Its
+        60-second limit is its own, apart from the statement's (#719)."""
         self.ensure_one()
-        if self.mono_account_id:
-            return self.mono_account_id
         iban = self._mono_journal_iban()
-        if not iban:
+        if not self.mono_account_id and not iban:
             raise UserError(_(
                 "Set a bank account (IBAN) on the journal, or the monobank "
                 "account ID, to read the statement."))
         data = self._mono_personal_request('/personal/client-info', budget)
+        if not isinstance(data, dict):
+            raise UserError(_("monobank API error: %s") % data)
         accounts = self._mono_personal_accounts(data)
+        if self.mono_account_id:
+            for acc in accounts:
+                if acc.get('id') == self.mono_account_id:
+                    self._mono_check_currency(
+                        acc.get('iban') or self.mono_account_id,
+                        acc.get('currencyCode'))
+                    return self.mono_account_id
+            raise UserError(_(
+                "monobank has no account with ID %(account)s for this token, "
+                "so its currency cannot be checked. Clear the account ID to "
+                "find the account by the journal IBAN. Available: %(ibans)s",
+                account=self.mono_account_id,
+                ibans=', '.join(filter(None, (acc.get('iban') for acc in accounts)))
+                or _('none')))
         for acc in accounts:
             if _clean_iban(acc.get('iban')) == iban and acc.get('id'):
                 self._mono_check_currency(iban, acc.get('currencyCode'))
-                # Remembered, so later syncs skip client-info and its own
-                # 60-second limit.
                 self.sudo().mono_account_id = acc['id']
                 return acc['id']
         raise UserError(_(
