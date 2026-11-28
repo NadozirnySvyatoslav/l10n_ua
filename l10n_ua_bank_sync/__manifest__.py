@@ -1,6 +1,6 @@
 {
     'name': 'Ukraine - Bank Sync Base',
-    'version': '19.0.1.2.2',
+    'version': '19.0.1.2.3',
     'category': 'Accounting/Localization',
     'summary': 'Ukrainian bank synchronization base module',
     'description': """
