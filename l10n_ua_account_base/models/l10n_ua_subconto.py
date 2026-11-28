@@ -85,7 +85,11 @@ class L10nUaSubcontoType(models.Model):
 
     @api.constrains('model_name')
     def _check_model_name(self):
-        # The ORM does not validate stored selection values on write
+        # The ORM validates only static selections: for a method-based one
+        # (fields_selection.py, convert_to_cache: _selection is None) any
+        # value is accepted, so the closed list is enforced here, on write of
+        # model_name only. A legacy value outside the list stays readable and
+        # usable in postings (see test_legacy_type_outside_list_still_posts).
         allowed = dict(self._selection_subconto_models())
         for rec in self:
             if rec.model_name not in allowed:
