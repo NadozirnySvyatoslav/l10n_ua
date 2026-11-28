@@ -121,6 +121,36 @@ class L10nUaBankSyncConfig(models.Model):
         self.ensure_one()
         return _clean_iban(self.bank_account_id.acc_number)
 
+    def _mono_currency_mismatch(self, code):
+        """(account currency, journal currency) names when the monobank
+        account is in another currency than the journal, else None.
+
+        The bank gives amounts in the account currency; the statement books
+        them at face value in the journal currency, so a USD account read
+        into a UAH journal would turn 100 dollars into 100 hryvnias."""
+        self.ensure_one()
+        try:
+            code = int(code or 0)
+        except (TypeError, ValueError):
+            code = 0
+        journal_currency = (self.journal_id.currency_id
+                            or self.company_id.currency_id
+                            or self.env.company.currency_id)
+        if not code or code == journal_currency.iso_numeric:
+            return None
+        return (self._mono_corp_currency_name(code), journal_currency.name)
+
+    def _mono_check_currency(self, account, code):
+        mismatch = self._mono_currency_mismatch(code)
+        if mismatch:
+            raise UserError(_(
+                "monobank account %(account)s is in %(account_currency)s, while "
+                "journal %(journal)s is in %(journal_currency)s. Select a journal "
+                "in the account currency.",
+                account=account, account_currency=mismatch[0],
+                journal=self.journal_id.display_name,
+                journal_currency=mismatch[1]))
+
     def _fetch_from_bank(self, date_from, date_to):
         """Fetch statements from monobank API."""
         self.ensure_one()
@@ -177,11 +207,28 @@ class L10nUaBankSyncConfig(models.Model):
         client_name = data.get('name', 'Unknown')
         accounts = self._mono_personal_accounts(data)
         iban = self._mono_journal_iban()
-        if iban and iban not in [_clean_iban(acc.get('iban')) for acc in accounts]:
+        if self.mono_account_id:
+            own = next((acc for acc in accounts
+                        if acc.get('id') == self.mono_account_id), None)
+            label = self.mono_account_id
+        else:
+            own = next((acc for acc in accounts
+                        if _clean_iban(acc.get('iban')) == iban), None)
+            label = iban
+        mismatch = own and self._mono_currency_mismatch(own.get('currencyCode'))
+        if label and not own:
             message = _(
                 "Connected to monobank, but account %(iban)s is not among the "
                 "%(count)d accounts of %(client)s.",
-                iban=iban, count=len(accounts), client=client_name)
+                iban=label, count=len(accounts), client=client_name)
+            kind = 'warning'
+        elif mismatch:
+            message = _(
+                "Connected to monobank, but account %(iban)s is in "
+                "%(account_currency)s and the journal in "
+                "%(journal_currency)s: the statement will not be imported.",
+                iban=own.get('iban') or label, account_currency=mismatch[0],
+                journal_currency=mismatch[1])
             kind = 'warning'
         else:
             message = _('Connected to monobank. Client: %s, Accounts: %d') % (
@@ -280,21 +327,39 @@ class L10nUaBankSyncConfig(models.Model):
     def _mono_personal_account(self, budget):
         """The account to read: set explicitly, or the one whose IBAN is the
         journal's. Picking "the first UAH account" would import another
-        account's operations into this journal without a word."""
+        account's operations into this journal without a word.
+
+        client-info is read on every sync, also for an explicit (or
+        remembered) ID: only it tells the account currency, and the statement
+        items carry the currency of each operation, not of the account. Its
+        60-second limit is its own, apart from the statement's (#719)."""
         self.ensure_one()
-        if self.mono_account_id:
-            return self.mono_account_id
         iban = self._mono_journal_iban()
-        if not iban:
+        if not self.mono_account_id and not iban:
             raise UserError(_(
                 "Set a bank account (IBAN) on the journal, or the monobank "
                 "account ID, to read the statement."))
         data = self._mono_personal_request('/personal/client-info', budget)
+        if not isinstance(data, dict):
+            raise UserError(_("monobank API error: %s") % data)
         accounts = self._mono_personal_accounts(data)
+        if self.mono_account_id:
+            for acc in accounts:
+                if acc.get('id') == self.mono_account_id:
+                    self._mono_check_currency(
+                        acc.get('iban') or self.mono_account_id,
+                        acc.get('currencyCode'))
+                    return self.mono_account_id
+            raise UserError(_(
+                "monobank has no account with ID %(account)s for this token, "
+                "so its currency cannot be checked. Clear the account ID to "
+                "find the account by the journal IBAN. Available: %(ibans)s",
+                account=self.mono_account_id,
+                ibans=', '.join(filter(None, (acc.get('iban') for acc in accounts)))
+                or _('none')))
         for acc in accounts:
             if _clean_iban(acc.get('iban')) == iban and acc.get('id'):
-                # Remembered, so later syncs skip client-info and its own
-                # 60-second limit.
+                self._mono_check_currency(iban, acc.get('currencyCode'))
                 self.sudo().mono_account_id = acc['id']
                 return acc['id']
         raise UserError(_(
@@ -524,6 +589,7 @@ class L10nUaBankSyncConfig(models.Model):
         The bank's day is the Kyiv one, whatever the server's timezone is.
         """
         iban = self._mono_corp_iban()
+        self._mono_corp_check_account_currency(iban)
         from_ts, to_ts = _kyiv_bounds(date_from, date_to)
         query_from = _kyiv_bounds(
             date_from - timedelta(days=MONO_CORP_LOOKBACK_DAYS), date_to)[0]
@@ -547,6 +613,15 @@ class L10nUaBankSyncConfig(models.Model):
             'response': items,
             'balances': self._mono_corp_fetch_balances(iban, date_from, date_to),
         }
+
+    def _mono_corp_check_account_currency(self, iban):
+        """Refuse to read an account in another currency than the journal,
+        before any statement request. An account the bank does not list is
+        left to the statement request, which reports it."""
+        for acc in self._mono_corp_accounts():
+            if _clean_iban(acc.get('iban')) == iban:
+                self._mono_check_currency(iban, acc.get('currency'))
+                return
 
     def _mono_corp_fetch_balances(self, iban, date_from, date_to):
         """End-of-day balances from the day before the period to its end.
@@ -687,13 +762,23 @@ class L10nUaBankSyncConfig(models.Model):
 
     def _mono_corp_test_connection(self):
         accounts = self._mono_corp_accounts()
-        ibans = [_clean_iban(acc.get('iban')) for acc in accounts]
+        by_iban = {_clean_iban(acc.get('iban')): acc for acc in accounts}
         own = self._mono_corp_iban()
-        if own and own not in ibans:
+        mismatch = own in by_iban and self._mono_currency_mismatch(
+            by_iban[own].get('currency'))
+        if own and own not in by_iban:
             message = _(
                 "Connected to monobank corporate API, but account %(iban)s is "
                 "not among the company's %(count)d accounts.",
                 iban=own, count=len(accounts))
+            kind = 'warning'
+        elif mismatch:
+            message = _(
+                "Connected to monobank corporate API, but account %(iban)s is "
+                "in %(account_currency)s and the journal in "
+                "%(journal_currency)s: the statement will not be imported.",
+                iban=own, account_currency=mismatch[0],
+                journal_currency=mismatch[1])
             kind = 'warning'
         else:
             message = _(

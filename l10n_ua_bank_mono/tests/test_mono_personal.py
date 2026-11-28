@@ -51,6 +51,16 @@ def _client_info(*accounts, managed=()):
     }
 
 
+def _own_info(currency=980):
+    """client-info listing the configured account (acc-own)."""
+    return _response(json_data=_client_info(('acc-own', OWN_IBAN, currency)))
+
+
+def _with_info(*responses):
+    """client-info first (read on every sync, #719), then `responses`."""
+    return [_own_info(), *responses]
+
+
 def _item(n, ts, amount=-95000, balance=10050000, **extra):
     """A statement item, shaped like the documented sample."""
     vals = {
@@ -90,7 +100,7 @@ class TestMonoPersonal(TransactionCase):
 
     def test_period_bounds_are_kyiv_days(self):
         with patch(f'{MODULE}.requests.get',
-                   return_value=_response(json_data=[])) as get:
+                   side_effect=_with_info(_response(json_data=[]))) as get:
             raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         low = int(_kyiv(2026, 9, 1).timestamp())
         high = int(_kyiv(2026, 9, 7, 23, 59, 59).timestamp())
@@ -113,7 +123,8 @@ class TestMonoPersonal(TransactionCase):
     def test_full_month_fits_the_documented_span(self):
         """31 days + 1 hour is the documented maximum: a calendar month of
         31 days goes, 32 days do not (they used to be sent and refused)."""
-        with patch(f'{MODULE}.requests.get', return_value=_response(json_data=[])):
+        with patch(f'{MODULE}.requests.get',
+                   side_effect=_with_info(_response(json_data=[]))):
             self.config._fetch_from_bank(date(2026, 8, 1), date(2026, 8, 31))
         with patch(f'{MODULE}.requests.get') as get:
             with self.assertRaisesRegex(UserError, '31 days'):
@@ -131,13 +142,13 @@ class TestMonoPersonal(TransactionCase):
         second = [_item(499, end - 499)] + [
             _item(n, end - n) for n in range(500, 530)]
         with patch(f'{MODULE}.sleep') as sleep, \
-                patch(f'{MODULE}.requests.get', side_effect=[
+                patch(f'{MODULE}.requests.get', side_effect=_with_info(
                     _response(json_data=first),
-                    _response(json_data=second)]) as get:
+                    _response(json_data=second))) as get:
             raw = self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
-        self.assertEqual(get.call_count, 2)
+        self.assertEqual(get.call_count, 3)
         # The next request ends at the oldest operation received ...
-        self.assertTrue(get.call_args_list[1].args[0].endswith(f'/{end - 499}'))
+        self.assertTrue(get.call_args_list[2].args[0].endswith(f'/{end - 499}'))
         # ... after the documented one-request-per-60-seconds pause.
         sleep.assert_called_once_with(60)
         self.assertEqual(len(raw['response']), 530)
@@ -149,7 +160,7 @@ class TestMonoPersonal(TransactionCase):
                  for p in range(2)]
         with patch(f'{MODULE}.sleep'), patch(
                 f'{MODULE}.requests.get',
-                side_effect=[_response(json_data=p) for p in pages]):
+                side_effect=_with_info(*[_response(json_data=p) for p in pages])):
             with self.assertRaisesRegex(UserError, 'shorten'):
                 self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
 
@@ -184,16 +195,68 @@ class TestMonoPersonal(TransactionCase):
                 self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         self.assertEqual(get.call_count, 1)
 
+    def test_account_in_another_currency_is_refused(self):
+        """The FOP's USD account under the journal IBAN of a UAH journal:
+        refused, and not remembered for the next sync (#719)."""
+        self.config.mono_account_id = False
+        info = _client_info(('acc-usd', OWN_IBAN, 840))
+        with patch(f'{MODULE}.requests.get',
+                   return_value=_response(json_data=info)) as get:
+            with self.assertRaisesRegex(UserError, 'USD'):
+                self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertEqual(get.call_count, 1)
+        self.assertFalse(self.config.mono_account_id)
+
+    def test_explicit_account_in_another_currency_is_refused(self):
+        """An account ID set by hand, or remembered before #719, used to
+        skip client-info: a USD account went into the UAH journal at face
+        value. Its currency is checked on every sync now."""
+        with patch(f'{MODULE}.requests.get',
+                   side_effect=[_own_info(840)]) as get:
+            with self.assertRaisesRegex(UserError, 'USD'):
+                self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertEqual(get.call_count, 1)
+        self.assertIn('/personal/client-info', get.call_args.args[0])
+
+    def test_explicit_account_in_the_journal_currency_is_read(self):
+        with patch(f'{MODULE}.requests.get', side_effect=_with_info(
+                _response(json_data=[]))) as get:
+            self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertIn('/personal/statement/acc-own/', get.call_args.args[0])
+
+    def test_explicit_account_not_listed_is_an_error(self):
+        """Its currency cannot be checked, so the statement is not read."""
+        info = _client_info(('acc-card', OTHER_IBAN, 980))
+        with patch(f'{MODULE}.requests.get',
+                   return_value=_response(json_data=info)) as get:
+            with self.assertRaisesRegex(UserError, 'acc-own'):
+                self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
+        self.assertEqual(get.call_count, 1)
+
+    def test_connection_warns_on_another_currency(self):
+        with patch(f'{MODULE}.requests.get', return_value=_own_info(840)):
+            action = self.config.action_test_connection()
+        self.assertEqual(action['params']['type'], 'warning')
+        self.assertIn('USD', action['params']['message'])
+        with patch(f'{MODULE}.requests.get', return_value=_own_info()):
+            action = self.config.action_test_connection()
+        self.assertEqual(action['params']['type'], 'success')
+        self.config.mono_account_id = False
+        with patch(f'{MODULE}.requests.get', return_value=_own_info(840)):
+            action = self.config.action_test_connection()
+        self.assertEqual(action['params']['type'], 'warning')
+        self.assertIn('USD', action['params']['message'])
+
     # --- rate limit -----------------------------------------------------------
 
     def test_rate_limit_is_waited_out_once(self):
         with patch(f'{MODULE}.sleep') as sleep, \
-                patch(f'{MODULE}.requests.get', side_effect=[
+                patch(f'{MODULE}.requests.get', side_effect=_with_info(
                     _response(429, {'errorDescription': 'Too many requests'}),
-                    _response(json_data=[])]) as get:
+                    _response(json_data=[]))) as get:
             self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         sleep.assert_called_once_with(60)
-        self.assertEqual(get.call_count, 2)
+        self.assertEqual(get.call_count, 3)
 
     def test_repeated_rate_limit_names_the_wait(self):
         with patch(f'{MODULE}.sleep') as sleep, \
@@ -249,14 +312,14 @@ class TestMonoPersonal(TransactionCase):
             config.read(['mono_api_token'])
         self.assertTrue(config.mono_has_token)
         with patch(f'{MODULE}.requests.get',
-                   return_value=_response(json_data=[])) as get:
+                   side_effect=_with_info(_response(json_data=[]))) as get:
             config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         self.assertEqual(get.call_args.kwargs['headers'], {'X-Token': 'fop-token'})
 
     def test_token_is_not_logged(self):
         with self.assertLogs(MODULE, level='DEBUG') as logs, \
                 patch(f'{MODULE}.requests.get',
-                      return_value=_response(json_data=[])):
+                      side_effect=_with_info(_response(json_data=[]))):
             self.config._fetch_from_bank(date(2026, 9, 1), date(2026, 9, 7))
         self.assertNotIn('fop-token', '\n'.join(logs.output))
 
